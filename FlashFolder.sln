@@ -1,0 +1,65 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FFService", "FFService\FlashFolder.vcproj", "{2881FFBC-05A4-4513-A17D-290A22ACE6EA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3057F62D-451E-4507-A8B2-A7E625070EAC} = {3057F62D-451E-4507-A8B2-A7E625070EAC}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TC_FlashFolder", "TC_FlashFolder\TC_FlashFolder.vcproj", "{2C1357C2-7005-48C2-ACDC-0972D1ADE505}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FFLib", "fflib\fflib.vcproj", "{3057F62D-451E-4507-A8B2-A7E625070EAC}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Installer", "Installer\Installer.vcproj", "{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C} = {C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}
+		{3057F62D-451E-4507-A8B2-A7E625070EAC} = {3057F62D-451E-4507-A8B2-A7E625070EAC}
+		{2881FFBC-05A4-4513-A17D-290A22ACE6EA} = {2881FFBC-05A4-4513-A17D-290A22ACE6EA}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FFConfig", "FFConfig\FFConfig.vcproj", "{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestGui", "TestGui\TestGui.vcproj", "{E514AF89-F51D-4931-9771-DEEC73419ADE}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Unicode Debug = Unicode Debug
+		Unicode Release = Unicode Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
+		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Debug.Build.0 = Unicode Debug|Win32
+		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Release.ActiveCfg = Unicode Release|Win32
+		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Release.Build.0 = Unicode Release|Win32
+		{2C1357C2-7005-48C2-ACDC-0972D1ADE505}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
+		{2C1357C2-7005-48C2-ACDC-0972D1ADE505}.Unicode Debug.Build.0 = Unicode Debug|Win32
+		{2C1357C2-7005-48C2-ACDC-0972D1ADE505}.Unicode Release.ActiveCfg = Unicode Release|Win32
+		{2C1357C2-7005-48C2-ACDC-0972D1ADE505}.Unicode Release.Build.0 = Unicode Release|Win32
+		{3057F62D-451E-4507-A8B2-A7E625070EAC}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
+		{3057F62D-451E-4507-A8B2-A7E625070EAC}.Unicode Debug.Build.0 = Unicode Debug|Win32
+		{3057F62D-451E-4507-A8B2-A7E625070EAC}.Unicode Release.ActiveCfg = Unicode Release|Win32
+		{3057F62D-451E-4507-A8B2-A7E625070EAC}.Unicode Release.Build.0 = Unicode Release|Win32
+		{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
+		{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}.Unicode Debug.Build.0 = Unicode Debug|Win32
+		{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}.Unicode Release.ActiveCfg = Unicode Release|Win32
+		{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}.Unicode Release.Build.0 = Unicode Release|Win32
+		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
+		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}.Unicode Debug.Build.0 = Unicode Debug|Win32
+		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}.Unicode Release.ActiveCfg = Unicode Release|Win32
+		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}.Unicode Release.Build.0 = Unicode Release|Win32
+		{E514AF89-F51D-4931-9771-DEEC73419ADE}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
+		{E514AF89-F51D-4931-9771-DEEC73419ADE}.Unicode Debug.Build.0 = Unicode Debug|Win32
+		{E514AF89-F51D-4931-9771-DEEC73419ADE}.Unicode Release.ActiveCfg = Unicode Release|Win32
+		{E514AF89-F51D-4931-9771-DEEC73419ADE}.Unicode Release.Build.0 = Unicode Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

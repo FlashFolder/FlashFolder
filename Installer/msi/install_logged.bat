@@ -1,0 +1,1 @@
+start msiexec.exe /i FlashFolder_setup.msi /L*v FlashFolder_setup.log

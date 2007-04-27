@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2003/01/wi">
+
+	<!--  
+		This file is part of FlashFolder. 
+		Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+	  
+		This program is free software; you can redistribute it and/or modify
+		it under the terms of the GNU General Public License as published by
+		the Free Software Foundation; either version 2 of the License, or
+		(at your option) any later version.
+	  
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+	  
+		You should have received a copy of the GNU General Public License
+		along with this program; if not, write to the Free Software
+		Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	-->    
+  
+	<?include _version.wxi?>
+	    
+	<!-- Let WiX randomize Product-ID so a full upgrade is always done.
+	     The product will be identified by the Upgrade-ID. -->
+  
+	<Product Id="????????-????-????-????-????????????"
+		UpgradeCode="5F7D22D7-9FCF-46F2-B899-D118AB900C28"
+		Name="$(loc.CptUI_ProductName)" Language="$(loc.CptUI_LANG)" Version="$(var.Version)" 
+		Manufacturer="$(loc.CptUI_ProductManufacturer)">
+
+		<!-- Let WiX randomize Packacke-ID since this ID should change on every compilation -->
+		<Package 
+			Id="????????-????-????-????-????????????"
+			Description="$(loc.CptUI_PackageDescription)" Comments="$(loc.CptUI_PackageComments)"
+			InstallerVersion="200" Compressed="yes" />
+
+		<Upgrade Id="5F7D22D7-9FCF-46F2-B899-D118AB900C28">
+			<!-- detect whether the same or a newer version is already installed -->
+			<UpgradeVersion
+				Minimum="$(var.Version)" IncludeMinimum="no"
+				OnlyDetect="yes"
+				Property="CPTUI_ALREADYUPDATED" />
+			<!-- invoke an upgrade otherwise -->
+			<UpgradeVersion
+				Minimum="0.0.0.0" IncludeMinimum="yes"
+				Maximum="$(var.Version)" IncludeMaximum="yes"
+				Property="CPTUI_IS_UPGRADING" />				
+		</Upgrade>
+
+		<Media Id="1" Cabinet="Product.cab" EmbedCab="yes" CompressionLevel="high" />
+		
+		<!-- Name of root regkey under HKLM\Software -->
+		<Property Id="CptUI_RootReg">$(loc.CptUI_ProductManufacturer)</Property>
+		<!-- Name of sub regkey under CptUI_RootReg -->
+		<Property Id="CptUI_ProductReg">FlashFolder</Property>
+		
+		<!-- always install program for all users -->
+		<Property Id="ALLUSERS">1</Property>		
+			
+		<!-- Launch condition (system requirements) -->
+		<Condition Message="$(loc.CptUI_Win2k_and_above)"><![CDATA[VersionNT >= 500]]></Condition>		
+			
+    
+		<!-- product components ................................................................. -->
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLDIR" Name="ffdir" LongName="$(loc.CptUI_ProductName)" >
+				
+					<Component Id="MainComponent" Guid="0CD48D8D-E72F-49A7-9738-B8775A9C36FD">
+												
+						<!-- Install program files -->
+						<File DiskId="1" Id="ffexe" Name="ffexe" LongName="FlashFolder.exe" Vital="yes" KeyPath="yes"
+							src="..\exe\FlashFolder.exe" />
+						<File DiskId="1" Id="ffdll" Name="fflib" LongName="fflib6439.dll" Vital="yes" 
+							src="..\exe\fflib6439.dll" />
+						<File DiskId="1" Id="ffcfgexe" Name="ffcfgexe" LongName="FFConfig.exe" Vital="yes" 
+							src="..\exe\FFConfig.exe" />
+							
+						<!-- Install program as an interactive, autorun service -->
+						<ServiceInstall Id="ffservice_inst" 
+							Name="[CptUI_ProductReg]" 
+							DisplayName="$(loc.CptUI_ProductName)"
+							Description="$(loc.CptUI_PackageDescription)"
+							ErrorControl="normal"
+							Interactive="yes"
+							Start="auto"
+							Type="ownProcess"
+							Vital="yes" />		
+						<ServiceControl Id="ffservice_ctrl"
+							Name="[CptUI_ProductReg]"
+							Start="install"
+							Remove="uninstall" 
+							Wait="yes" />								
+							
+					</Component>	
+									
+				</Directory>
+			</Directory>
+		</Directory>
+
+		<Feature Id="MainFeature" 
+			Title="$(loc.FF_MainFeature)" Description="$(loc.FF_MainFeatureDescr)" 
+			Level="1" ConfigurableDirectory="INSTALLDIR" Absent="disallow" AllowAdvertise="no">
+			
+			<!-- Include creation of standard regkeys under HKLM\Software -->
+			<ComponentRef Id="CptUI_StandardReg" />
+			<ComponentRef Id="MainComponent" />
+		</Feature>
+		
+
+		<!-- install sequence + custom actions ........................................... -->
+
+		<InstallExecuteSequence>
+			<!-- must uninstall running FlashFolder service before install; else it could not be upgraded -->
+			<RemoveExistingProducts Before="InstallInitialize" />
+		</InstallExecuteSequence>
+
+		<AdminExecuteSequence />
+		
+
+		<!-- Interface to CptUI .......................................................... -->
+
+		<FragmentRef Id="CptUI"/>
+
+		<Property Id="CptUI_Version">$(var.Version)</Property>
+		<Property Id="CptUI_VersionDisplay">$(var.VersionDisplay)</Property>
+		
+		<Binary Id="CptUI_BmpBanner" SourceFile="Bitmaps\banner.bmp" />
+		<Binary Id="CptUI_BmpDialog" SourceFile="Bitmaps\dialog.bmp" />		
+		<Icon Id="CptUI_ProductIcon" SourceFile="..\FFService\res\FlashFolder.ico" />
+
+	</Product>
+</Wix>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?> 
+<WixLocalization xmlns="http://schemas.microsoft.com/wix/2003/01/localization" Codepage="1252">   
+<!-- This file contains product-specific localizations ......................................-->
+
+	<!-- Strings that are needed by the CptUI library -->
+
+	<String Id="CptUI_LANG">1031</String>
+
+	<String Id="CptUI_ProductName">FlashFolder</String>
+	<String Id="CptUI_ProductWizard">FlashFolder Setup Wizard</String>
+	<String Id="CptUI_ProductManufacturer">zett42</String>
+	<String Id="CptUI_PackageDescription">FlashFolder is an extension for file-related common dialogs (e.g. open/save dialog) that enables quick access to recently used folders and more.</String>
+	<String Id="CptUI_PackageDescriptionShort">An extension for file-related common dialogs</String>
+	<String Id="CptUI_PackageComments">This is the installer for FlashFolder.</String>
+
+	<String Id="CptUI_Wizard">Setup Wizard</String>
+	<String Id="CptUI_Setup">Setup</String>
+
+	<!-- custom texts -->
+
+	<String Id="FF_MainFeature">Program executables</String>
+	<String Id="FF_MainFeatureDescr">The FlashFolder program executables (required)</String>
+	
+</WixLocalization>

@@ -1,0 +1,396 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\FFConfig.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\FFConfig.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUT DIALOGEX 0, 0, 212, 100
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "About FlashFolder"
+CLASS "FFAbout.xmgn4ngertu4mnsf"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,80,79,50,14
+    CTEXT           "FlashFolder Service Version",IDC_ST_FFSERVICE,7,7,198,8
+    LTEXT           "Copyright © 2007 zett42",IDC_STATIC,63,57,85,8
+    CTEXT           "FlashFolder Hook Library Version",IDC_ST_FFLIB,7,20,198,
+                    8
+    CTEXT           "FlashFolder Config Version",IDC_ST_FFCONFIG,7,35,198,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 205
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 93
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+1                       RT_MANIFEST             "res\\manifest.xml"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_RESIZE_NONRESIZABLE_EXCL 
+                            "Enter filenames of programs which are not compatible with the ""Resize non-resizable dialogs"" feature (e.g. myprogram.exe).\nPut each filename on a separate line:"
+    IDS_EDIT_EXCLUDES       "Edit exclusions"
+END
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Englisch (USA) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_STRINGLIST DIALOGEX 0, 0, 285, 188
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,89,167,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,146,167,50,14
+    EDITTEXT        IDC_ED_EXCLUDES,7,37,271,123,ES_MULTILINE | 
+                    ES_WANTRETURN | WS_VSCROLL
+    LTEXT           "",IDC_ST_DESCR,7,7,271,25
+END
+
+IDD_FFCONFIG DIALOGEX 0, 0, 369, 295
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "FlashFolder Configuration"
+CLASS "FFConfig.xmgn4ngertu4mnsf"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Multi-User",IDC_STATIC,7,8,164,43
+    CONTROL         "&Use individual profiles for each user",
+                    IDC_RD_INDIVIDUAL_PROFILES,"Button",BS_AUTORADIOBUTTON | 
+                    WS_DISABLED | WS_GROUP,16,20,129,10
+    CONTROL         "Use &one shared profile for all users",
+                    IDC_RD_SHARED_PROFILE,"Button",BS_AUTORADIOBUTTON | 
+                    WS_DISABLED,16,34,127,10
+    GROUPBOX        "Generic",IDC_STATIC,179,8,183,43
+    LTEXT           "&Max. number of directory history entries:",IDC_STATIC,
+                    189,19,141,11
+    EDITTEXT        IDC_ED_MAX_DIRHISTORY,188,31,34,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_MAX_DIRHISTORY,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS,222,31,11,14
+    GROUPBOX        "",IDC_GP_CFO,7,57,355,65
+    CONTROL         "Common Open / Save Dialog Hook",IDC_CHK_CFO_ENABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,57,125,10
+    LTEXT           "Min. width:",IDC_STATIC,16,74,36,8
+    EDITTEXT        IDC_ED_CFO_MINWIDTH,68,71,44,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_CFO_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | 
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,112,71,11,
+                    14
+    LTEXT           "Min. height:",IDC_STATIC,16,90,39,8
+    EDITTEXT        IDC_ED_CFO_MINHEIGHT,68,87,44,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_CFO_MINHEIGHT,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS,112,87,11,14
+    COMBOBOX        IDC_CB_CFO_POSITION,15,104,108,101,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Max. height of &folder combobox:",IDC_STATIC,144,73,106,
+                    8
+    EDITTEXT        IDC_ED_FOLDERCOMBO_MAXHEIGHT,263,70,45,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_FOLDERCOMBO_MAXHEIGHT,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS,308,70,11,14
+    LTEXT           "Max. height of file&types combobox:",IDC_STATIC,144,89,
+                    114,8
+    EDITTEXT        IDC_ED_FILETYPECOMBO_MAXHEIGHT,263,86,45,14,
+                    ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_FILETYPECOMBO_MAXHEIGHT,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS,308,86,11,14
+    CONTROL         "&Resize non-resizable dialogs",
+                    IDC_CHK_CFO_RESIZENONRESIZABLE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,143,106,105,10
+    PUSHBUTTON      "E&xcludes...",IDC_BTN_NONRESIZABLE_EXCLUDES,249,105,47,
+                    12
+    GROUPBOX        "",IDC_GP_CFD,7,129,355,51
+    CONTROL         "Common Folder Dialog",IDC_CHK_CFD_ENABLE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,14,129,101,10
+    LTEXT           "Min. width:",IDC_STATIC,14,147,36,8
+    EDITTEXT        IDC_ED_CFD_MINWIDTH,66,144,44,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_CFD_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | 
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,110,144,
+                    11,14
+    LTEXT           "Min. height:",IDC_STATIC,14,162,39,8
+    EDITTEXT        IDC_ED_CFD_MINHEIGHT,66,160,44,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_CFD_MINHEIGHT,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS,110,160,11,14
+    COMBOBOX        IDC_CB_CFD_POSITION,134,145,107,104,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "",IDC_GP_MSO,7,186,164,80
+    CONTROL         "MS Office Open / Save Dialog Hook",IDC_CHK_MSO_ENABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,187,128,10
+    LTEXT           "WARNING: EXPERIMENTAL FEATURE!",IDC_STATIC,15,199,122,8
+    LTEXT           "Min. width:",IDC_STATIC,16,215,36,8
+    EDITTEXT        IDC_ED_MSO_MINWIDTH,68,212,44,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_MSO_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | 
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,112,212,
+                    11,14
+    LTEXT           "Min. height:",IDC_STATIC,16,230,39,8
+    EDITTEXT        IDC_ED_MSO_MINHEIGHT,68,228,44,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_MSO_MINHEIGHT,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS,112,228,11,14
+    COMBOBOX        IDC_CB_MSO_POSITION,15,246,108,111,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "",IDC_GP_COW,179,186,183,80
+    CONTROL         "Common Open With Dialog Hook (Windows 2000)",
+                    IDC_CHK_COW_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    186,186,174,10
+    LTEXT           "WARNING: EXPERIMENTAL FEATURE!",IDC_STATIC,186,199,122,
+                    8
+    LTEXT           "Min. width:",IDC_STATIC,186,215,36,8
+    EDITTEXT        IDC_ED_COW_MINWIDTH,238,212,44,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_COW_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | 
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,282,212,
+                    11,14
+    LTEXT           "Min. height:",IDC_STATIC,186,230,39,8
+    EDITTEXT        IDC_ED_COW_MINHEIGHT,238,228,44,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_COW_MINHEIGHT,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS,282,228,11,14
+    COMBOBOX        IDC_CB_COW_POSITION,185,246,108,101,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,121,274,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,180,274,50,14
+END
+
+IDD_FAVORITES DIALOGEX 0, 0, 360, 271
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | 
+    WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "FlashFolder Favorites"
+CLASS "FFFavorites.xmgn4ngertu4mnsf"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Insert",IDC_BTN_ADD,7,7,40,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,49,7,40,14
+    LTEXT           "Drag an item by mouse to change its position.",
+                    IDC_STATIC,100,10,147,8
+    CONTROL         "",IDC_LST_FAVS,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,23,346,159
+    LTEXT           "&Path:",IDC_ST_PATH,7,187,18,8
+    EDITTEXT        IDC_ED_PATH,59,184,263,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "...",IDC_BTN_BROWSE,324,184,29,14,WS_DISABLED
+    LTEXT           "Title (optional):",IDC_ST_TITLE,7,203,50,8
+    EDITTEXT        IDC_ED_TITLE,59,200,294,14,ES_AUTOHSCROLL | WS_DISABLED
+    CONTROL         "&Use FlashFolder favorites",IDC_RD_OWN_FAVORITES,"Button",
+                    BS_AUTORADIOBUTTON,7,221,97,10
+    CONTROL         "Use directory menu from Total Commander®",
+                    IDC_RD_TC_FAVORITES,"Button",BS_AUTORADIOBUTTON,7,233,
+                    159,10
+    DEFPUSHBUTTON   "OK",IDOK,97,250,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,154,250,50,14
+    PUSHBUTTON      "Re&vert",IDC_BTN_REVERT,211,250,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_STRINGLIST, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 278
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 181
+    END
+
+    IDD_FFCONFIG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 362
+        VERTGUIDE, 171
+        VERTGUIDE, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 288
+        HORZGUIDE, 181
+    END
+
+    IDD_FAVORITES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 353
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 264
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_FFCONFIG DLGINIT
+BEGIN
+    IDC_CB_CFO_POSITION, 0x403, 17, 0
+0x6544, 0x6166, 0x6c75, 0x2074, 0x6f70, 0x6973, 0x6974, 0x6e6f, "\000" 
+    IDC_CB_CFO_POSITION, 0x403, 25, 0
+0x6543, 0x746e, 0x7265, 0x6f20, 0x206e, 0x7270, 0x676f, 0x6172, 0x206d, 
+0x6977, 0x646e, 0x776f, "\000" 
+    IDC_CB_CFO_POSITION, 0x403, 17, 0
+0x6543, 0x746e, 0x7265, 0x6f20, 0x206e, 0x6373, 0x6572, 0x6e65, "\000" 
+    IDC_CB_CFD_POSITION, 0x403, 17, 0
+0x6544, 0x6166, 0x6c75, 0x2074, 0x6f70, 0x6973, 0x6974, 0x6e6f, "\000" 
+    IDC_CB_CFD_POSITION, 0x403, 25, 0
+0x6543, 0x746e, 0x7265, 0x6f20, 0x206e, 0x7270, 0x676f, 0x6172, 0x206d, 
+0x6977, 0x646e, 0x776f, "\000" 
+    IDC_CB_CFD_POSITION, 0x403, 17, 0
+0x6543, 0x746e, 0x7265, 0x6f20, 0x206e, 0x6373, 0x6572, 0x6e65, "\000" 
+    IDC_CB_MSO_POSITION, 0x403, 17, 0
+0x6544, 0x6166, 0x6c75, 0x2074, 0x6f70, 0x6973, 0x6974, 0x6e6f, "\000" 
+    IDC_CB_MSO_POSITION, 0x403, 25, 0
+0x6543, 0x746e, 0x7265, 0x6f20, 0x206e, 0x7270, 0x676f, 0x6172, 0x206d, 
+0x6977, 0x646e, 0x776f, "\000" 
+    IDC_CB_MSO_POSITION, 0x403, 17, 0
+0x6543, 0x746e, 0x7265, 0x6f20, 0x206e, 0x6373, 0x6572, 0x6e65, "\000" 
+    IDC_CB_COW_POSITION, 0x403, 17, 0
+0x6544, 0x6166, 0x6c75, 0x2074, 0x6f70, 0x6973, 0x6974, 0x6e6f, "\000" 
+    IDC_CB_COW_POSITION, 0x403, 25, 0
+0x6543, 0x746e, 0x7265, 0x6f20, 0x206e, 0x7270, 0x676f, 0x6172, 0x206d, 
+0x6977, 0x646e, 0x776f, "\000" 
+    IDC_CB_COW_POSITION, 0x403, 17, 0
+0x6543, 0x746e, 0x7265, 0x6f20, 0x206e, 0x6373, 0x6572, 0x6e65, "\000" 
+    0
+END
+
+#endif    // Englisch (USA) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\FFConfig.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

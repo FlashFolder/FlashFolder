@@ -1,0 +1,1 @@
+msiexec /i FlashFolder_setup.msi REINSTALL=ALL REINSTALLMODE=vomus
