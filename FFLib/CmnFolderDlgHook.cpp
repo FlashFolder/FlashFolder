@@ -58,7 +58,6 @@ bool CmnFolderDlgHook::Init( HWND hwndFileDlg, FileDlgHookCallback_base* pCallba
 	m_minFileDialogHeight = g_profile.GetInt( _T("CommonFolderDlg"), _T("MinHeight"), 500 );
 	m_centerFileDialog = g_profile.GetInt( _T("CommonFolderDlg"), _T("Center"), 1 ) != 0;
 
-	::OutputDebugString( _T("[fflib] CmnFolderDlgHook::Init() return\n") );
 	return true;
 }
 

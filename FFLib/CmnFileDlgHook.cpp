@@ -82,8 +82,6 @@ bool CmnFileDlgHook::Init( HWND hwndFileDlg, FileDlgHookCallback_base* pCallback
         }
     }
 
-	::OutputDebugString( _T("[fflib] CmnFileDlgHook::Init() return\n") );
-
 	return true;
 }
 

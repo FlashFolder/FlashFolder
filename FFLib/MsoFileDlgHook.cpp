@@ -37,6 +37,8 @@ bool MsoFileDlgHook::Init( HWND hwndFileDlg, FileDlgHookCallback_base* pCallback
 {
 	if( m_hwndFileDlg ) return false;  // only init once!
 
+	::OutputDebugString( _T("[fflib] MsoFileDlgHook::Init()\n") );
+
 	g_pHook = this;
 
 	m_hwndFileDlg = hwndFileDlg;

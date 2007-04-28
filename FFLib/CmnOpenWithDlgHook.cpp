@@ -36,6 +36,8 @@ bool CmnOpenWithDlgHook::Init( HWND hwndFileDlg, FileDlgHookCallback_base* pCall
 {
 	if( m_hwndDlg ) return false;  // only init once!
 
+	::OutputDebugString( _T("[fflib] CmnOpenWithDlgHook::Init()\n") );
+
 	g_pHook = this;
 
 	m_hwndDlg = hwndFileDlg;
