@@ -35,6 +35,30 @@
 				CleanCommandLine="_cleanup.bat"
 				Output="Creating installer..."/>
 		</Configuration>
+		<Configuration
+			Name="ANSI Release|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="build.bat"
+				ReBuildCommandLine="build.bat"
+				CleanCommandLine="_cleanup.bat"
+				Output="Creating installer..."/>
+		</Configuration>
+		<Configuration
+			Name="ANSI Debug|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="build.bat"
+				ReBuildCommandLine="build.bat"
+				CleanCommandLine="_cleanup.bat"
+				Output="Creating installer..."/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
