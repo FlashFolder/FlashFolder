@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "FFConfig.h"
 #include "AboutDlg.h"
+#include ".\aboutdlg.h"
 
 //-----------------------------------------------------------------------------------------
 
@@ -64,6 +65,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 //-----------------------------------------------------------------------------------------------
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
+	ON_BN_CLICKED(IDC_BTN_HOMEPAGE, OnBnClickedBtnHomepage)
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
@@ -106,4 +108,12 @@ BOOL CAboutDlg::OnInitDialog()
 	}
 
 	return TRUE;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CAboutDlg::OnBnClickedBtnHomepage()
+{
+	::ShellExecute( GetSafeHwnd(), _T("open"), _T("http://sourceforge.net/projects/flashfolder/"),
+		NULL, NULL, SW_SHOW );
 }

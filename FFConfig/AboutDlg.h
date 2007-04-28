@@ -31,4 +31,6 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV-Unterstützung
 	virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedBtnHomepage();
 };
