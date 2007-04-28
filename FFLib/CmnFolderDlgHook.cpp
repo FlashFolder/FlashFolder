@@ -42,6 +42,8 @@ bool CmnFolderDlgHook::Init( HWND hwndFileDlg, FileDlgHookCallback_base* pCallba
 	m_hwndFileDlg = hwndFileDlg;
 	m_pCallbacks = pCallbacks;
 
+	m_currentPath[ 0 ] = 0;
+
 	// Subclass the window proc of the file dialog.
 	m_oldWndProc = reinterpret_cast<WNDPROC>( 
 		::SetWindowLongPtr( hwndFileDlg, GWL_WNDPROC, 
@@ -57,7 +59,6 @@ bool CmnFolderDlgHook::Init( HWND hwndFileDlg, FileDlgHookCallback_base* pCallba
 	m_centerFileDialog = g_profile.GetInt( _T("CommonFolderDlg"), _T("Center"), 1 ) != 0;
 
 	::OutputDebugString( _T("[fflib] CmnFolderDlgHook::Init() return\n") );
-
 	return true;
 }
 
@@ -73,16 +74,23 @@ bool CmnFolderDlgHook::SetFolder( LPCTSTR path )
 
 bool CmnFolderDlgHook::GetFolder( LPTSTR folderPath )
 {
-	HWND hwndTreeParent = ::GetDlgItem( g_pHook->m_hwndFileDlg, 0 );
-	if( ! hwndTreeParent )
-		return false;
-    HWND hwndTree = ::GetDlgItem( hwndTreeParent, 0x0064 );
-	if( ! hwndTree )
-		return false;
+	StringCchCopy( folderPath, MAX_PATH, m_currentPath );
+	return true;
+}
 
-	HTREEITEM hItem = TreeView_GetSelection( hwndTree );
-	if( ! hItem )
-		return false;
+//-----------------------------------------------------------------------------------------
+
+bool CmnFolderDlgHook::SetFilter( LPCTSTR filter )
+{
+	return true;
+}
+
+//-----------------------------------------------------------------------------------------------
+/// Get the currently selected path from the tree control and store it in m_currentPath
+
+bool CmnFolderDlgHook::UpdateCurrentPath( HWND hwndTree, HTREEITEM hItem )
+{
+	m_currentPath[ 0 ] = 0;
 
 	// Get absolute directory path by traversing the tree down 
 	// until a root directory (drive path) is found.
@@ -100,7 +108,7 @@ bool CmnFolderDlgHook::GetFolder( LPTSTR folderPath )
 
 		TreeView_GetItem( hwndTree, &item );
 
-		// check if this is the root folderPath
+		// check if this is the root m_currentPath
 		TCHAR* pPathPart = item.pszText;
 		TCHAR rootBuf[ 3 ] = _T("");					
 		if( TCHAR* p = _tcschr( item.pszText, ':' ) )
@@ -112,23 +120,20 @@ bool CmnFolderDlgHook::GetFolder( LPTSTR folderPath )
 				pPathPart = rootBuf;
 			}
 		}
-		StringCbCopy( tmp, sizeof(tmp), folderPath );
-		StringCbCopy( folderPath, MAX_PATH, pPathPart );
-		StringCbCat( folderPath, MAX_PATH, _T("\\") );
-		StringCbCat( folderPath, MAX_PATH, tmp );
-		
+
+		StringCbCopy( tmp, sizeof(tmp), m_currentPath );
+		StringCchCopy( m_currentPath, MAX_PATH, pPathPart );
+		StringCchCat( m_currentPath, MAX_PATH, _T("\\") );
+		StringCchCat( m_currentPath, MAX_PATH, tmp );
+
 		if( pPathPart == rootBuf )
 			break;
 
 		hItem = TreeView_GetParent( hwndTree, hItem );
 	}
-	return true;
-}
 
-//-----------------------------------------------------------------------------------------
+	::OutputDebugString( m_currentPath );
 
-bool CmnFolderDlgHook::SetFilter( LPCTSTR filter )
-{
 	return true;
 }
 
@@ -143,7 +148,16 @@ LRESULT CALLBACK CmnFolderDlgHook::TreeParentWindowProc(
 		{
 			NMTREEVIEW* pnm = reinterpret_cast<NMTREEVIEW*>( lParam );
 			if( pnm->hdr.code == TVN_SELCHANGED )
-				g_pHook->m_pCallbacks->OnFolderChange();
+			{
+				if( pnm->itemNew.hItem )
+				{
+					if( HWND hwndTree = ::GetDlgItem( hwnd, 0x0064 ) )
+					{
+						g_pHook->UpdateCurrentPath( hwndTree, pnm->itemNew.hItem );
+						g_pHook->m_pCallbacks->OnFolderChange();
+					}
+				}
+			}
 		}
 		break;
 	}
@@ -180,6 +194,13 @@ LRESULT CALLBACK CmnFolderDlgHook::HookWindowProc(
 						::GetWindowLongPtr( hwndTreeParent, GWLP_WNDPROC ) );
 					::SetWindowLongPtrA( hwndTreeParent, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(
 						TreeParentWindowProc ) );
+
+					// get initially selected directory
+					if( HWND hwndTree = ::GetDlgItem( hwndTreeParent, 0x0064 ) )
+					{
+						if( HTREEITEM hItem = TreeView_GetSelection( hwndTree ) )
+							g_pHook->UpdateCurrentPath( hwndTree, hItem );
+					}
 				}
 
 				// notify the tool window

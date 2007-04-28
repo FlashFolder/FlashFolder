@@ -49,6 +49,7 @@ private:
 	static LRESULT CALLBACK HookWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK TreeParentWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	void ResizeFileDialog();
+	bool UpdateCurrentPath( HWND hwndTree, HTREEITEM hItem );
 
 	HWND m_hwndFileDlg;
 	WNDPROC m_oldWndProc, m_oldParentWndProc;
@@ -56,6 +57,7 @@ private:
 	bool m_isWindowActive;
 	bool m_fileDialogCanceled;
 	bool m_initDone;
+	TCHAR m_currentPath[ MAX_PATH + 1 ];
 
 	// options read from INI file specified in Init()
 
