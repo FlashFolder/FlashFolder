@@ -57,3 +57,4 @@
 #include "../common/FolderDlg.h"
 #include "../common/DragListCtrl.h"
 #include "../common/EditEx.h"
+#include "../common/HyperLink.h"

@@ -376,6 +376,9 @@
 				RelativePath="..\common\HistoryLst.h">
 			</File>
 			<File
+				RelativePath="..\common\HyperLink.h">
+			</File>
+			<File
 				RelativePath="..\common\Profile.h">
 			</File>
 			<File
@@ -420,6 +423,9 @@
 			</File>
 			<File
 				RelativePath="..\common\HistoryLst.cpp">
+			</File>
+			<File
+				RelativePath="..\common\HyperLink.cpp">
 			</File>
 			<File
 				RelativePath="..\common\Profile.cpp">

@@ -19,7 +19,6 @@
 #include "stdafx.h"
 #include "FFConfig.h"
 #include "AboutDlg.h"
-#include ".\aboutdlg.h"
 
 //-----------------------------------------------------------------------------------------
 
@@ -60,12 +59,14 @@ CAboutDlg::CAboutDlg( CWnd* pParent ) :
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_ST_HOMEPAGE, m_linkHomepage);
+	DDX_Control(pDX, IDC_ST_BUGREPORT, m_linkBugReport);
+	DDX_Control(pDX, IDC_ST_FEATUREREQ, m_linkFeatureReq);
 }
 
 //-----------------------------------------------------------------------------------------------
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-	ON_BN_CLICKED(IDC_BTN_HOMEPAGE, OnBnClickedBtnHomepage)
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
@@ -107,13 +108,9 @@ BOOL CAboutDlg::OnInitDialog()
 		SetDlgItemText( IDC_ST_FFLIB, s1 + s );
 	}
 
+	m_linkHomepage.SetURL( _T("http://sourceforge.net/projects/flashfolder/") );
+	m_linkBugReport.SetURL( _T("http://sourceforge.net/tracker/?group_id=195039&atid=951838") );
+	m_linkFeatureReq.SetURL( _T("http://sourceforge.net/tracker/?group_id=195039&atid=951841") );
+
 	return TRUE;
-}
-
-//-----------------------------------------------------------------------------------------------
-
-void CAboutDlg::OnBnClickedBtnHomepage()
-{
-	::ShellExecute( GetSafeHwnd(), _T("open"), _T("http://sourceforge.net/projects/flashfolder/"),
-		NULL, NULL, SW_SHOW );
 }

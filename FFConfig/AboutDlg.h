@@ -27,10 +27,13 @@ public:
 
 	enum { IDD = IDD_ABOUT };
 
-protected:
+private:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV-Unterstützung
 	virtual BOOL OnInitDialog();
-	DECLARE_MESSAGE_MAP()
-public:
 	afx_msg void OnBnClickedBtnHomepage();
+	DECLARE_MESSAGE_MAP()
+
+	CHyperLink m_linkHomepage;
+	CHyperLink m_linkBugReport;
+	CHyperLink m_linkFeatureReq;
 };
