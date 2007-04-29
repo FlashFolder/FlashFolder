@@ -640,6 +640,10 @@ LRESULT CALLBACK ToolWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			return (LPARAM) hWindowBrush;
 		}
 		break;
+
+		case WM_CLOSE:
+			::PostMessage( g_hFileDialog, WM_CLOSE, 0, 0 );
+		break;
 	}
 
 	return DefWindowProc(hwnd, uMsg, wParam, lParam); 
