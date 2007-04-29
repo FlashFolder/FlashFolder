@@ -17,6 +17,7 @@
  *
  */
 #pragma once
+#include "afxwin.h"
 
 class CTestGuiDlg : public CDialog
 {
@@ -34,4 +35,6 @@ protected:
 
 private:
 	HICON m_hIcon;
+public:
+	afx_msg void OnBnClickedChkFoSizing();
 };

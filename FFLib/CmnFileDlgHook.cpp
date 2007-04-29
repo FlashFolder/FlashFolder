@@ -31,9 +31,10 @@ CmnFileDlgHook* g_pHook = NULL;
 
 //-----------------------------------------------------------------------------------------
 
-bool CmnFileDlgHook::Init( HWND hwndFileDlg, FileDlgHookCallback_base* pCallbacks )
+bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool, FileDlgHookCallback_base* pCallbacks )
 {
 	if( m_hwndFileDlg ) return false;  // only init once!
+	m_hwndTool = hwndTool; 
 
 	::OutputDebugString( _T("[fflib] CmnFileDlgHook::Init()\n") );
 
@@ -231,12 +232,9 @@ namespace {
 
 //-----------------------------------------------------------------------------------------
 
-void CmnFileDlgHook::ResizeNonResizableFileDialog(
-	int x, int y, int newWidth, int newHeight, bool bCenter)
+void CmnFileDlgHook::ResizeNonResizableFileDialog( int x, int y, int newWidth, int newHeight )
 {
 	//--- EXPERIMENTAL ! ---
-	//    set ResizeNonResizableDialogs=0 in "FlashFolderGlobal.ini" if this
-	//    feature makes problems
 
 	FDMC_STRUCT fdm;
 	fdm.hwndFileDlg = m_hwndFileDlg;
@@ -278,8 +276,7 @@ void CmnFileDlgHook::ResizeNonResizableFileDialog(
 
 	// resize the file dialog (must be done after the sub-dialog is resized,
 	//   else the file dialogs size will sometimes flip back to its original size)
-	SetWindowPos(m_hwndFileDlg, NULL, x, y, newWidth, newHeight,
-                 (bCenter ? 0 : SWP_NOMOVE) | SWP_NOZORDER | SWP_NOACTIVATE);
+	SetWindowPos( m_hwndFileDlg, NULL, x, y, newWidth, newHeight, SWP_NOZORDER | SWP_NOACTIVATE );
 
 	//resize the list view container
 	SetWindowPos(wndList, NULL, 0, 0, 
@@ -307,64 +304,73 @@ void CmnFileDlgHook::ResizeFileDialog()
 	//---- customize file dialog size + position -----
 	//when centering the file dialog, take care that it is centered on the correct monitor
 
-	RECT rcCenter = { 0 };
 	HWND hwndParent = ::GetParent( m_hwndFileDlg );
+
+	MONITORINFO monitorInfo = { sizeof(MONITORINFO) };
+	HMONITOR hMon = ::MonitorFromWindow( hwndParent ? hwndParent : m_hwndFileDlg, MONITOR_DEFAULTTONEAREST );
+	::GetMonitorInfo( hMon, &monitorInfo );
+
+	RECT rcCenter = { 0 };
 	if( m_centerFileDialog == 1 )
 	{
+		// center relative to parent window
 		if( hwndParent )
 			::GetWindowRect( hwndParent, &rcCenter );
 		else
-			m_centerFileDialog = 2;
+			rcCenter = monitorInfo.rcWork;
 	}
-	if( m_centerFileDialog == 2 )
+	else if( m_centerFileDialog == 2 )
 	{
-		if( ! hwndParent ) 
-			hwndParent = m_hwndFileDlg;
-		GetMaximizedRect( hwndParent, rcCenter );
+		// center relative to monitor work area
+		rcCenter = monitorInfo.rcWork;
 	}
+
+	RECT rcTool = { 0 };
+	::GetWindowRect( m_hwndTool, &rcTool );
+	int toolHeight = rcTool.bottom - rcTool.top;
 
 	//get original file dialog size
-	RECT rc;
-	GetClientRect(m_hwndFileDlg, &rc);
+	RECT rcOld; ::GetWindowRect( m_hwndFileDlg, &rcOld );
+	int oldWidth = rcOld.right - rcOld.left;
+	int oldHeight = rcOld.bottom - rcOld.top;
+	int newX = rcOld.left;
+	int newY = rcOld.top;
+	int newWidth = oldWidth;
+	int newHeight = oldHeight;
 
-	//get new dimensions only if bigger than original size
-	int newWidth = rc.right < m_minFileDialogWidth ? m_minFileDialogWidth : rc.right;
-	int newHeight = rc.bottom < m_minFileDialogHeight ? m_minFileDialogHeight : rc.bottom;
-
-	//check whether the file dialog is resizable
-	LONG style = GetWindowLong(m_hwndFileDlg, GWL_STYLE);
-	if (style & WS_SIZEBOX) 
+	// check whether the file dialog is resizable
+	LONG style = GetWindowLong( m_hwndFileDlg, GWL_STYLE );
+	if( ( style & WS_SIZEBOX ) || m_bResizeNonResizableDlgs ) 
 	{
-		//--- make the dialog bigger + center it ---
-		if( m_centerFileDialog != 0 )
-			SetWindowPos(m_hwndFileDlg, NULL, 
-				rcCenter.left + (rcCenter.right - rcCenter.left - newWidth) / 2, 
-				rcCenter.top  + (rcCenter.bottom - rcCenter.top - newHeight) / 2, 
-				newWidth, newHeight, 
-				SWP_NOZORDER | SWP_NOACTIVATE);
-		else
-			SetWindowPos(m_hwndFileDlg, NULL, 
-				0, 0, newWidth, newHeight, 
-				SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+		// use new size only if bigger than original size
+		newWidth  = max( oldWidth,  m_minFileDialogWidth );
+		newHeight = max( oldHeight, m_minFileDialogHeight );
 	}
+	if( m_centerFileDialog != 0 )
+	{
+		// center the dialog		
+		newX = rcCenter.left + ( rcCenter.right - rcCenter.left - newWidth ) / 2;
+		newY = rcCenter.top + ( rcCenter.bottom - rcCenter.top - newHeight + toolHeight ) / 2;
+	}
+
+	// clip new position against screen borders
+	if( newX < monitorInfo.rcWork.left )
+		newX = monitorInfo.rcWork.left;
+	else if( newX + newWidth > monitorInfo.rcWork.right )
+		newX = monitorInfo.rcWork.right - newWidth;
+	if( newY < monitorInfo.rcWork.top + toolHeight )
+		newY = monitorInfo.rcWork.top + toolHeight;
+	else if( newY + newHeight > monitorInfo.rcWork.bottom )
+		newY = monitorInfo.rcWork.bottom - newHeight;
+
+	// set the new position / size
+	if( ! ( style & WS_SIZEBOX ) && m_bResizeNonResizableDlgs )
+		ResizeNonResizableFileDialog( 
+			newX, newY, newWidth, newHeight );
 	else
-	{
-		if (m_bResizeNonResizableDlgs)
-			//if dialog isn't resizable, we must manually resize it
-			ResizeNonResizableFileDialog(
-				rcCenter.left + (rcCenter.right - rcCenter.left - newWidth) / 2, 
-				rcCenter.top  + (rcCenter.bottom - rcCenter.top - newHeight) / 2, 
-				newWidth, newHeight, m_centerFileDialog != 0 );
-		else
-			if (m_centerFileDialog != 0 )
-			{
-				//--- just center the dialog on the screen
-				SetWindowPos(m_hwndFileDlg, NULL, 
-					rcCenter.left + (rcCenter.right - rcCenter.left - rc.right) / 2, 
-					rcCenter.top  + (rcCenter.bottom - rcCenter.top - rc.bottom) / 2, 
-					0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
-			}
-	}
+		SetWindowPos( m_hwndFileDlg, NULL, 
+			newX, newY, newWidth, newHeight, SWP_NOZORDER | SWP_NOACTIVATE );
+
 
 	//--- enlarge the combo boxes ---
 	HWND hFolderCombo = GetDlgItem(m_hwndFileDlg, FILEDLG_CB_FOLDER);

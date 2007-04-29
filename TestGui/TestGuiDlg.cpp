@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TestGui.h"
 #include "TestGuiDlg.h"
+#include ".\testguidlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -55,16 +56,47 @@ BOOL CTestGuiDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Groﬂes Symbol verwenden
 	SetIcon(m_hIcon, FALSE);		// Kleines Symbol verwenden
 
-	
+	CheckDlgButton( IDC_CHK_FO_EXPLORER, 1 );
+	CheckDlgButton( IDC_CHK_FO_SIZING, 1 );
+	CheckDlgButton( IDC_CHK_FO_MFC, 1 );
+	CheckDlgButton( IDC_CHK_FO_CUST, 0 );
+
 	return TRUE; 
 }
+
 //-----------------------------------------------------------------------------------------------
 
 void CTestGuiDlg::OnBnClickedBtnFileopen()
 {
-	CFileDialog dlg( TRUE, _T("txt"), NULL, OFN_HIDEREADONLY | OFN_ENABLESIZING, 
-		_T("Text files (*.txt)|*.txt|All files (*.*)|*.*||"), this );
-	dlg.DoModal();
+	DWORD flags = 0;
+	if( IsDlgButtonChecked( IDC_CHK_FO_EXPLORER ) )
+		flags |= OFN_EXPLORER;
+	if( IsDlgButtonChecked( IDC_CHK_FO_SIZING ) )
+		flags |= OFN_ENABLESIZING;
+
+	CString filter = _T("Text files (*.txt)|*.txt|All files (*.*)|*.*||");
+
+	if( IsDlgButtonChecked( IDC_CHK_FO_CUST ) )
+	{
+	}
+	if( IsDlgButtonChecked( IDC_CHK_FO_MFC ) )
+	{
+		CFileDialog dlg( TRUE, _T("txt"), NULL, flags | OFN_HIDEREADONLY, filter, this );
+		dlg.DoModal();
+	}
+	else
+	{
+		OPENFILENAME ofn = { sizeof(ofn) };
+		ofn.hwndOwner = GetSafeHwnd();
+		ofn.hInstance = AfxGetInstanceHandle();
+		filter.Replace( '|', '\0' );
+		ofn.lpstrFilter = filter;
+		TCHAR fileName[ MAX_PATH + 1 ] = _T("");
+		ofn.lpstrFile = fileName;
+		ofn.nMaxFile = MAX_PATH;
+		ofn.Flags = flags;
+		::GetOpenFileName( &ofn );
+	}
 }
 
 //-----------------------------------------------------------------------------------------------

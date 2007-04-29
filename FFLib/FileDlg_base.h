@@ -50,7 +50,7 @@ public:
 	FileDlgHook_base() {}
 	virtual ~FileDlgHook_base() {}
 
-	virtual bool Init( HWND hWndFileDlg, FileDlgHookCallback_base* pHandlers ) = 0;
+	virtual bool Init( HWND hWndFileDlg, HWND hWndTool, FileDlgHookCallback_base* pHandlers ) = 0;
 
 	virtual bool SetFolder( LPCTSTR path ) = 0;
 	virtual bool GetFolder( LPTSTR folderPath ) = 0;

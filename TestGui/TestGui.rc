@@ -71,15 +71,26 @@ IDR_MAINFRAME           ICON                    "res\\TestGui.ico"
 // Dialog
 //
 
-IDD_TESTGUI_DIALOG DIALOGEX 0, 0, 214, 106
+IDD_TESTGUI_DIALOG DIALOGEX 0, 0, 313, 214
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | 
     WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "TestGui"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    PUSHBUTTON      "File open...",IDC_BTN_FILEOPEN,77,27,60,14
-    PUSHBUTTON      "&Browse dir...",IDC_BTN_BROWSEDIR,77,57,60,14
+    PUSHBUTTON      "Open...",IDC_BTN_BROWSEDIR,244,185,55,14
+    GROUPBOX        "Common File Dialog",IDC_STATIC,7,7,299,111
+    GROUPBOX        "Common Folder Dialog",IDC_STATIC,7,127,299,79
+    PUSHBUTTON      "Open...",IDC_BTN_FILEOPEN,243,95,55,14
+    CONTROL         "Explorer style for customized dialog",
+                    IDC_CHK_FO_EXPLORER,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,15,52,129,10
+    CONTROL         "Enable sizing",IDC_CHK_FO_SIZING,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,15,20,57,10
+    CONTROL         "use MFC",IDC_CHK_FO_MFC,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,15,31,43,10
+    CONTROL         "use MFC + customized dialog",IDC_CHK_FO_CUST,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,15,42,109,10
 END
 
 
@@ -133,9 +144,9 @@ BEGIN
     IDD_TESTGUI_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 207
+        RIGHTMARGIN, 306
         TOPMARGIN, 7
-        BOTTOMMARGIN, 99
+        BOTTOMMARGIN, 207
     END
 END
 #endif    // APSTUDIO_INVOKED

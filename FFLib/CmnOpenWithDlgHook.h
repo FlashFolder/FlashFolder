@@ -34,11 +34,11 @@ class CmnOpenWithDlgHook : public FileDlgHook_base
 {
 public:
 	CmnOpenWithDlgHook() : 
-		m_hwndDlg( 0 ),  
+		m_hwndFileDlg( 0 ),  
         m_initDone( false ), m_isWindowActive( false ), m_hwndSizeGrip( NULL ) {}
 
 	// overridings of FileDlgHook_base
-	virtual bool Init( HWND hwndFileDlg, FileDlgHookCallback_base* pCallbacks );
+	virtual bool Init( HWND hwndFileDlg, HWND hWndTool, FileDlgHookCallback_base* pCallbacks );
 	virtual bool SetFolder( LPCTSTR path );
 	virtual bool GetFolder( LPTSTR folderPath );
 	virtual bool SetFilter( LPCTSTR filter );
@@ -47,7 +47,7 @@ private:
 	static LRESULT CALLBACK HookWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void ResizeDialog();
 
-	HWND m_hwndDlg;
+	HWND m_hwndFileDlg;
 	WNDPROC m_oldWndProc;
 	bool m_isWindowActive;
 	bool m_initDone;
@@ -59,7 +59,7 @@ private:
 
 	int m_minFileDialogWidth;			    // prefered minimum size of file dialog
 	int m_minFileDialogHeight;
-	bool m_centerFileDialog;				// true if file dialog should be centered
+	int m_centerFileDialog;				// true if file dialog should be centered
 	bool m_bResizeNonResizableDlgs;			// true if those non-resizable dialogs should
 };
 

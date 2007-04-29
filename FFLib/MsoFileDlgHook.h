@@ -39,7 +39,7 @@ public:
 
 
 	// overridings of FileDlgHook_base
-	virtual bool Init( HWND hwndFileDlg, FileDlgHookCallback_base* pCallbacks );
+	virtual bool Init( HWND hwndFileDlg, HWND hWndTool, FileDlgHookCallback_base* pCallbacks );
 	virtual bool SetFolder( LPCTSTR path );
 	virtual bool GetFolder( LPTSTR folderPath );
 	virtual bool SetFilter( LPCTSTR filter );
@@ -48,13 +48,14 @@ private:
 	static LRESULT CALLBACK HookWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void ResizeFileDialog();
 
-	HWND m_hwndFileDlg;
+	HWND m_hwndFileDlg, m_hwndTool;
 	WNDPROC m_oldWndProc;
 	FileDlgHookCallback_base* m_pCallbacks;
 	bool m_isWindowActive;
 	bool m_fileDialogCanceled;
 	bool m_initDone;
-
+	
+	int m_centerFileDialog;
 	int m_minFileDialogWidth;			    // prefered minimum size of file dialog
 	int m_minFileDialogHeight;
 };

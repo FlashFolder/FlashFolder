@@ -38,8 +38,6 @@ bool IsRelativePath( LPCTSTR path );
 
 bool IsIniSectionNotEmpty( LPCTSTR filename, LPCTSTR sectionName );
 
-void GetMaximizedRect( HWND hwnd, RECT &rc );
-
 void AddTextInput( std::vector<INPUT>* pInput, LPCTSTR pText );
 
 enum FileDlgType { FDT_NONE, FDT_COMMON, FDT_MSOFFICE, FDT_COMMON_OPENWITH, FDT_COMMON_FOLDER };

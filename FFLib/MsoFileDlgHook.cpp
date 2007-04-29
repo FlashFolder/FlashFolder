@@ -33,9 +33,10 @@ MsoFileDlgHook* g_pHook = NULL;
 
 //-----------------------------------------------------------------------------------------
 
-bool MsoFileDlgHook::Init( HWND hwndFileDlg, FileDlgHookCallback_base* pCallbacks )
+bool MsoFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool, FileDlgHookCallback_base* pCallbacks )
 {
 	if( m_hwndFileDlg ) return false;  // only init once!
+	m_hwndTool = hwndTool; 
 
 	::OutputDebugString( _T("[fflib] MsoFileDlgHook::Init()\n") );
 
@@ -58,6 +59,7 @@ bool MsoFileDlgHook::Init( HWND hwndFileDlg, FileDlgHookCallback_base* pCallback
 	//--- read settings from INI file ---
 	m_minFileDialogWidth = g_profile.GetInt( _T("MSOfficeFileDlg"), _T("MinWidth"), 650 );
 	m_minFileDialogHeight = g_profile.GetInt( _T("MSOfficeFileDlg"), _T("MinHeight"), 500 );
+	m_centerFileDialog = g_profile.GetInt( _T("MSOfficeFileDlg"), _T("Center"), 1 );
 
 	return true;
 }
@@ -287,30 +289,68 @@ void MsoFileDlgHook::ResizeFileDialog()
 	//---- customize file dialog size + position -----
 	//when centering the file dialog, take care that it is centered on the correct monitor
 
-	RECT rcMonitor = { 0 };
-	HWND wnd = GetParent(m_hwndFileDlg);
-	if (wnd == NULL) wnd = m_hwndFileDlg;
-	GetMaximizedRect( wnd, rcMonitor );
+	HWND hwndParent = ::GetParent( m_hwndFileDlg );
+
+	MONITORINFO monitorInfo = { sizeof(MONITORINFO) };
+	HMONITOR hMon = ::MonitorFromWindow( hwndParent ? hwndParent : m_hwndFileDlg, MONITOR_DEFAULTTONEAREST );
+	::GetMonitorInfo( hMon, &monitorInfo );
+
+	RECT rcCenter = { 0 };
+	if( m_centerFileDialog == 1 )
+	{
+		// center relative to parent window
+		if( hwndParent )
+			::GetWindowRect( hwndParent, &rcCenter );
+		else
+			rcCenter = monitorInfo.rcWork;
+	}
+	else if( m_centerFileDialog == 2 )
+	{
+		// center relative to monitor work area
+		rcCenter = monitorInfo.rcWork;
+	}
+
+	RECT rcTool = { 0 };
+	::GetWindowRect( m_hwndTool, &rcTool );
+	int toolHeight = rcTool.bottom - rcTool.top;
 
 	//get original file dialog size
-	RECT rc;
-	GetClientRect(m_hwndFileDlg, &rc);
+	RECT rcOld; ::GetWindowRect( m_hwndFileDlg, &rcOld );
+	int oldWidth = rcOld.right - rcOld.left;
+	int oldHeight = rcOld.bottom - rcOld.top;
+	int newX = rcOld.left;
+	int newY = rcOld.top;
+	int newWidth = oldWidth;
+	int newHeight = oldHeight;
 
-	//get new dimensions only if bigger than original size
-	int newWidth = rc.right < m_minFileDialogWidth ? m_minFileDialogWidth : rc.right;
-	int newHeight = rc.bottom < m_minFileDialogHeight ? m_minFileDialogHeight : rc.bottom;
-
-	//check whether the file dialog is resizable
-	LONG style = GetWindowLong(m_hwndFileDlg, GWL_STYLE);
-	if (style & WS_SIZEBOX) 
+	// check whether the file dialog is resizable
+	LONG style = GetWindowLong( m_hwndFileDlg, GWL_STYLE );
+	if( style & WS_SIZEBOX ) 
 	{
-		//--- make the dialog bigger + center it ---
-		SetWindowPos(m_hwndFileDlg, NULL, 
-			rcMonitor.left + (rcMonitor.right - rcMonitor.left - newWidth) / 2, 
-			rcMonitor.top  + (rcMonitor.bottom - rcMonitor.top - newHeight) / 2, 
-			newWidth, newHeight, 
-			SWP_NOZORDER | SWP_NOACTIVATE);
+		// use new size only if bigger than original size
+		newWidth  = max( oldWidth,  m_minFileDialogWidth );
+		newHeight = max( oldHeight, m_minFileDialogHeight );
 	}
+	if( m_centerFileDialog != 0 )
+	{
+		// center the dialog		
+		newX = rcCenter.left + ( rcCenter.right - rcCenter.left - newWidth ) / 2;
+		newY = rcCenter.top + ( rcCenter.bottom - rcCenter.top - newHeight + toolHeight ) / 2;
+	}
+
+	// clip new position against screen borders
+	if( newX < monitorInfo.rcWork.left )
+		newX = monitorInfo.rcWork.left;
+	else if( newX + newWidth > monitorInfo.rcWork.right )
+		newX = monitorInfo.rcWork.right - newWidth;
+	if( newY < monitorInfo.rcWork.top + toolHeight )
+		newY = monitorInfo.rcWork.top + toolHeight;
+	else if( newY + newHeight > monitorInfo.rcWork.bottom )
+		newY = monitorInfo.rcWork.bottom - newHeight;
+
+	// set the new position / size
+	SetWindowPos( m_hwndFileDlg, NULL, 
+		newX, newY, newWidth, newHeight, SWP_NOZORDER | SWP_NOACTIVATE );
 }
 
 

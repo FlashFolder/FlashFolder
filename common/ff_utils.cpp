@@ -93,23 +93,6 @@ bool IsIniSectionNotEmpty( LPCTSTR filename, LPCTSTR sectionName )
 }
 
 //-----------------------------------------------------------------------------------------
-// GetMaximizedRect()
-//
-//   gets the maximized window rectangle for the monitor on which window hwnd is located
-//-----------------------------------------------------------------------------------------
-void GetMaximizedRect( HWND hwnd, RECT &rc )
-{
-	RECT rcWnd;
-	GetWindowRect(hwnd, &rcWnd);
-	//create temporary (invisible) window
-    HWND wnd = ::CreateWindow( _T("Static"), NULL, WS_POPUP | WS_MAXIMIZE, 
-		rcWnd.left, rcWnd.top, rcWnd.right - rcWnd.left, rcWnd.bottom - rcWnd.top, 
-		NULL, NULL, ::GetModuleHandle( 0 ), 0);
-	GetWindowRect(wnd, &rc);
-	DestroyWindow(wnd);
-}
-
-//-----------------------------------------------------------------------------------------
 // AddTextInput()
 //
 //   adds keyboard input events (key down, key up) for a given string to a 

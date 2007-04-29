@@ -40,7 +40,7 @@ public:
 	{}
 
 	// overridings of FileDlgHook_base
-	virtual bool Init( HWND hwndFileDlg, FileDlgHookCallback_base* pCallbacks );
+	virtual bool Init( HWND hwndFileDlg, HWND hWndTool, FileDlgHookCallback_base* pCallbacks );
 	virtual bool SetFolder( LPCTSTR path );
 	virtual bool GetFolder( LPTSTR folderPath );
 	virtual bool SetFilter( LPCTSTR filter );
@@ -51,7 +51,7 @@ private:
 	void ResizeFileDialog();
 	bool UpdateCurrentPath( HWND hwndTree, HTREEITEM hItem );
 
-	HWND m_hwndFileDlg;
+	HWND m_hwndFileDlg, m_hwndTool;
 	WNDPROC m_oldWndProc, m_oldParentWndProc;
 	FileDlgHookCallback_base* m_pCallbacks;
 	bool m_isWindowActive;

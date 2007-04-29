@@ -892,24 +892,24 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 			if( fileDlgType == FDT_COMMON )
 			{
 				g_spFileDlgHook.reset( new CmnFileDlgHook );
-				g_spFileDlgHook->Init( hwnd, &g_fileDlgHookCallback );
+				g_spFileDlgHook->Init( hwnd, g_hToolWnd, &g_fileDlgHookCallback );
 			}
 			else if( fileDlgType == FDT_MSOFFICE )
 			{
 				g_spFileDlgHook.reset( new MsoFileDlgHook );
-				g_spFileDlgHook->Init( hwnd, &g_fileDlgHookCallback );
+				g_spFileDlgHook->Init( hwnd, g_hToolWnd, &g_fileDlgHookCallback );
 			}
 			else if( fileDlgType == FDT_COMMON_OPENWITH )
 			{
 				// init the "Open With" dialog hook
 				g_spOpenWithDlgHook.reset( new CmnOpenWithDlgHook );
-				g_spOpenWithDlgHook->Init( hwnd, NULL );
+				g_spOpenWithDlgHook->Init( hwnd, g_hToolWnd, NULL );
 			}
 			else if( fileDlgType == FDT_COMMON_FOLDER )
 			{
 				// init the "Open With" dialog hook
 				g_spFileDlgHook.reset( new CmnFolderDlgHook );
-				g_spFileDlgHook->Init( hwnd, &g_fileDlgHookCallback );
+				g_spFileDlgHook->Init( hwnd, g_hToolWnd, &g_fileDlgHookCallback );
 			}
 
 			// Make sure the DLL gets not unloaded as long as the window is subclassed.
