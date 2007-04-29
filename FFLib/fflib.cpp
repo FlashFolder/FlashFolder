@@ -487,7 +487,7 @@ LRESULT CALLBACK ToolWindowEditPathProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			if (wParam == VK_RETURN)
 			{
 				TCHAR path[MAX_PATH + 1] = _T("");
-				GetWindowText(hwnd, path, sizeof(path)-1);
+				GetWindowText(hwnd, path, MAX_PATH );
 
 				SetForegroundWindow(g_hFileDialog);
 				g_spFileDlgHook->SetFolder( path );
@@ -733,7 +733,7 @@ void CreateToolWindow( bool isFileDialog )
 	RECT rcDiv = { 0, 0, 3, 1 };  ::MapDialogRect( g_hFileDialog, &rcDiv ); 
 	RECT rcDivR = { 0, 0, 2, 1 }; ::MapDialogRect( g_hFileDialog, &rcDivR ); 
 	int xEdit = tbSize.cx + rcDiv.right;
-	HWND hEdit = ::CreateWindowEx( WS_EX_STATICEDGE, _T("Edit"), NULL, WS_VISIBLE | WS_CHILD, 
+	HWND hEdit = ::CreateWindowEx( WS_EX_STATICEDGE, _T("Edit"), NULL, WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL, 
 		xEdit, rcDiv.bottom, 
 		rcClient.right - rcClient.left - xEdit - rcDivR.right, 
 		rcClient.bottom - rcClient.top - rcDiv.bottom * 2, 
