@@ -110,19 +110,23 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 
 //-----------------------------------------------------------------------------------------
 
-void AdjustToolWndRect( RECT &rc )
+void AdjustToolWindowPos()
 {
 	//calculates the position + size of the tool window accordingly to the size
 	// of the file dialog
 
-	GetWindowRect( g_hFileDialog, &rc );
-	rc.bottom = rc.top; 
-	
-	RECT rcSize = { 0, 0, 1, 13 };  ::MapDialogRect( g_hFileDialog, &rcSize );
-	// rcSize is the client size --> add the Window border size
-	rcSize.bottom += ::GetSystemMetrics( SM_CYFIXEDFRAME ) * 2;
+	RECT rc;
+	::GetWindowRect( g_hFileDialog, &rc );
 
-	rc.top -= rcSize.bottom; 
+	RECT rcTool; 
+	::GetWindowRect( g_hToolWnd, &rcTool );
+	rcTool.left = rc.left;
+	rcTool.top = rc.top - rcTool.bottom + rcTool.top;
+	rcTool.right = rc.right;
+	rcTool.bottom = rc.top;
+
+	::SetWindowPos( g_hToolWnd, NULL, rcTool.left, rcTool.top, rcTool.right - rcTool.left, rcTool.bottom - rcTool.top, 
+		            SWP_NOZORDER | SWP_NOACTIVATE );
 }
 
 //-----------------------------------------------------------------------------------------
@@ -518,9 +522,9 @@ LRESULT CALLBACK ToolWindowEditPathProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
 //-----------------------------------------------------------------------------------------
 
-LRESULT CALLBACK ToolWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    switch (uMsg)
+    switch( uMsg )
     {
 		case WM_COMMAND:
 		{
@@ -565,7 +569,8 @@ LRESULT CALLBACK ToolWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 						DisplayMenu_Config();
 						break;
 				}
-				return TBDDRET_DEFAULT;
+				::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, TBDDRET_DEFAULT );
+				return TRUE;
 			}
 			else if( pnm->code == TTN_NEEDTEXT )
 			{
@@ -604,7 +609,7 @@ LRESULT CALLBACK ToolWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			RECT rcPath; ::GetWindowRect( hPath, &rcPath ); ScreenToClientRect( hwnd, &rcPath );
 
 			RECT rcDivR = { 0, 0, 1, 1 };
-			::MapDialogRect( g_hFileDialog, &rcDivR ); 
+			::MapDialogRect( g_hToolWnd, &rcDivR ); 
 
 			::SetWindowPos( hPath, NULL, 0, 0, rcClient.right - rcPath.left - rcDivR.right, rcPath.bottom - rcPath.top, 
 				SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE );
@@ -637,7 +642,11 @@ LRESULT CALLBACK ToolWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			}
 
 			SetBkColor(hdcEdit, GetSysColor(COLOR_WINDOW));
-			return (LPARAM) hWindowBrush;
+
+			::SetWindowLongPtr( hwnd, DWL_MSGRESULT, TBDDRET_DEFAULT );
+
+			::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, reinterpret_cast<LONG_PTR>( hWindowBrush ) );
+			return TRUE;
 		}
 		break;
 
@@ -646,7 +655,7 @@ LRESULT CALLBACK ToolWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		break;
 	}
 
-	return DefWindowProc(hwnd, uMsg, wParam, lParam); 
+	return FALSE; 
 }
 
 //-----------------------------------------------------------------------------------------
@@ -663,29 +672,14 @@ void CreateToolWindow( bool isFileDialog )
 {
 	//--- create the external tool window ---
 
-	WNDCLASSEX wc = { 0 };
-	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.lpfnWndProc = &ToolWindowProc;
-	wc.hInstance = (HINSTANCE) g_hInstDll;
-	wc.hbrBackground = (HBRUSH) (COLOR_BTNFACE + 1); 
-	wc.lpszClassName = _T("FlashFolderToolWnd_73614384");
-	RegisterClassEx( &wc );
-
-	g_hToolWnd = ::CreateWindow( wc.lpszClassName, NULL, WS_POPUP | WS_CLIPCHILDREN | WS_DLGFRAME, 
-		0, 0, 0, 0,	g_hFileDialog, (HMENU) 0, (HINSTANCE) g_hInstDll, NULL); 
+	g_hToolWnd = ::CreateDialog( g_hInstDll, MAKEINTRESOURCE( IDD_TOOLWND ), g_hFileDialog, ToolDlgProc );
 	if( g_hToolWnd == NULL )
 		return;
 
-	HFONT hFont = reinterpret_cast<HFONT>( ::SendMessage( g_hFileDialog, WM_GETFONT, 0, 0 ) );
-	if( ! hFont )
-		hFont = reinterpret_cast<HFONT>( ::GetStockObject( DEFAULT_GUI_FONT ) );
-	::SendMessage( g_hToolWnd, WM_SETFONT, reinterpret_cast<WPARAM>( hFont ), 0 );
+	AdjustToolWindowPos();
 
-	//--- set final tool window position and size
-	RECT rcTool;  
-	AdjustToolWndRect( rcTool );
-	SetWindowPos( g_hToolWnd, NULL, rcTool.left, rcTool.top, rcTool.right - rcTool.left, rcTool.bottom - rcTool.top, 
-		          SWP_NOZORDER | SWP_NOACTIVATE );
+	HFONT hFont = reinterpret_cast<HFONT>( ::SendMessage( g_hToolWnd, WM_GETFONT, 0, 0 ) );
+
 	RECT rcClient;
 	GetClientRect( g_hToolWnd, &rcClient );
 
@@ -734,8 +728,8 @@ void CreateToolWindow( bool isFileDialog )
 
 	//--- create + sub-class the edit control 
 
-	RECT rcDiv = { 0, 0, 3, 1 };  ::MapDialogRect( g_hFileDialog, &rcDiv ); 
-	RECT rcDivR = { 0, 0, 2, 1 }; ::MapDialogRect( g_hFileDialog, &rcDivR ); 
+	RECT rcDiv = { 0, 0, 3, 1 };  ::MapDialogRect( g_hToolWnd, &rcDiv ); 
+	RECT rcDivR = { 0, 0, 2, 1 }; ::MapDialogRect( g_hToolWnd, &rcDivR ); 
 	int xEdit = tbSize.cx + rcDiv.right;
 	HWND hEdit = ::CreateWindowEx( WS_EX_STATICEDGE, _T("Edit"), NULL, WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL, 
 		xEdit, rcDiv.bottom, 
@@ -783,9 +777,7 @@ public:
     virtual void OnResize()
 	{
 		//reposition the tool window to "dock" it onto the file dialog
-		RECT rc;
-		AdjustToolWndRect( rc );
-		::MoveWindow( g_hToolWnd, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE );
+		AdjustToolWindowPos();
 	}
 
 	virtual void OnEnable( bool bEnable )

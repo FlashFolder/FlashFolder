@@ -53,6 +53,38 @@ END
 //
 
 1                       RT_MANIFEST             "res\\xp_manifest.xml"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TOOLWND DIALOGEX 0, 0, 186, 13
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | 
+    WS_CLIPCHILDREN
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_TOOLWND, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 7
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
 #endif    // Deutsch (Deutschland) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -65,7 +97,6 @@ END
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -94,6 +125,10 @@ BEGIN
     ID_FF_FAVORITES         "Favorite folders (shared with Total Commander)"
     ID_FF_SHOWALL           "View all files (*.*)"
     ID_FF_OPENDIRS          "Folders of currently open files"
+END
+
+STRINGTABLE 
+BEGIN
     ID_FF_CONFIG            "Edit FlashFolder configuration"
 END
 
