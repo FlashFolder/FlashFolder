@@ -110,14 +110,19 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 
 //-----------------------------------------------------------------------------------------
 
-void AdjustToolWndRect(RECT &rc)
+void AdjustToolWndRect( RECT &rc )
 {
 	//calculates the position + size of the tool window accordingly to the size
 	// of the file dialog
 
-	GetWindowRect(g_hFileDialog, &rc);
+	GetWindowRect( g_hFileDialog, &rc );
 	rc.bottom = rc.top; 
-	rc.top -= 27; 
+	
+	RECT rcSize = { 0, 0, 1, 13 };  ::MapDialogRect( g_hFileDialog, &rcSize );
+	// rcSize is the client size --> add the Window border size
+	rcSize.bottom += ::GetSystemMetrics( SM_CYFIXEDFRAME ) * 2;
+
+	rc.top -= rcSize.bottom; 
 }
 
 //-----------------------------------------------------------------------------------------
@@ -589,13 +594,20 @@ LRESULT CALLBACK ToolWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 		case WM_WINDOWPOSCHANGED:
 		{
-			//resize path control
-			WINDOWPOS *wp = (WINDOWPOS *) lParam;
-			RECT rc;
-			GetClientRect(GetDlgItem(hwnd, ID_FF_TOOLBAR), &rc);
-			rc.right += 7;
-			HWND hPath = GetDlgItem(hwnd, ID_FF_PATH);
-			MoveWindow(hPath, rc.right, 2, wp->cx - rc.right - 8, 17, TRUE);
+			//resize path edit control
+			
+			WINDOWPOS *wp = reinterpret_cast<WINDOWPOS*>( lParam );
+			
+			RECT rcClient; ::GetClientRect( hwnd, &rcClient );
+
+			HWND hPath = GetDlgItem( hwnd, ID_FF_PATH );
+			RECT rcPath; ::GetWindowRect( hPath, &rcPath ); ScreenToClientRect( hwnd, &rcPath );
+
+			RECT rcDivR = { 0, 0, 1, 1 };
+			::MapDialogRect( g_hFileDialog, &rcDivR ); 
+
+			::SetWindowPos( hPath, NULL, 0, 0, rcClient.right - rcPath.left - rcDivR.right, rcPath.bottom - rcPath.top, 
+				SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE );
 		}
 		break;
 
@@ -655,13 +667,23 @@ void CreateToolWindow( bool isFileDialog )
 	wc.lpszClassName = _T("FlashFolderToolWnd_73614384");
 	RegisterClassEx( &wc );
 
-	RECT rc;
-	AdjustToolWndRect(rc);
 	g_hToolWnd = ::CreateWindow( wc.lpszClassName, NULL, WS_POPUP | WS_CLIPCHILDREN | WS_DLGFRAME, 
-		rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 
-		g_hFileDialog, (HMENU) 0, (HINSTANCE) g_hInstDll, NULL); 
+		0, 0, 0, 0,	g_hFileDialog, (HMENU) 0, (HINSTANCE) g_hInstDll, NULL); 
 	if( g_hToolWnd == NULL )
 		return;
+
+	HFONT hFont = reinterpret_cast<HFONT>( ::SendMessage( g_hFileDialog, WM_GETFONT, 0, 0 ) );
+	if( ! hFont )
+		hFont = reinterpret_cast<HFONT>( ::GetStockObject( DEFAULT_GUI_FONT ) );
+	::SendMessage( g_hToolWnd, WM_SETFONT, reinterpret_cast<WPARAM>( hFont ), 0 );
+
+	//--- set final tool window position and size
+	RECT rcTool;  
+	AdjustToolWndRect( rcTool );
+	SetWindowPos( g_hToolWnd, NULL, rcTool.left, rcTool.top, rcTool.right - rcTool.left, rcTool.bottom - rcTool.top, 
+		          SWP_NOZORDER | SWP_NOACTIVATE );
+	RECT rcClient;
+	GetClientRect( g_hToolWnd, &rcClient );
 
 	//--- create the toolbar ---
 
@@ -704,19 +726,23 @@ void CreateToolWindow( bool isFileDialog )
 	::SendMessage( hTb, TB_GETRECT, tbButtons.back().idCommand, reinterpret_cast<LPARAM>( &tbRC ) );
 	SIZE tbSize = { tbRC.right, tbRC.bottom };
 
-	SetWindowPos( hTb, NULL, 2, 0, tbSize.cx, tbSize.cy, SWP_NOZORDER | SWP_NOACTIVATE );
+	SetWindowPos( hTb, NULL, 0, ( rcClient.bottom - tbSize.cy ) / 2, tbSize.cx, tbSize.cy, SWP_NOZORDER | SWP_NOACTIVATE );
 
 	//--- create + sub-class the edit control 
-	tbSize.cx += 7;
-	HWND hEdit = CreateWindowEx(WS_EX_STATICEDGE, _T("Edit"), NULL, WS_VISIBLE | WS_CHILD, 
-		tbSize.cx, 2, rc.right - rc.left - tbSize.cx - 6, 17, 
+
+	RECT rcDiv = { 0, 0, 3, 1 };  ::MapDialogRect( g_hFileDialog, &rcDiv ); 
+	RECT rcDivR = { 0, 0, 2, 1 }; ::MapDialogRect( g_hFileDialog, &rcDivR ); 
+	int xEdit = tbSize.cx + rcDiv.right;
+	HWND hEdit = ::CreateWindowEx( WS_EX_STATICEDGE, _T("Edit"), NULL, WS_VISIBLE | WS_CHILD, 
+		xEdit, rcDiv.bottom, 
+		rcClient.right - rcClient.left - xEdit - rcDivR.right, 
+		rcClient.bottom - rcClient.top - rcDiv.bottom * 2, 
 		g_hToolWnd, (HMENU) ID_FF_PATH, (HINSTANCE) g_hInstDll, NULL);
 	//sub-class the edit control to handle key-stroke messages
 	g_wndProcToolWindowEditPath = (WNDPROC)  
 		SetWindowLong(hEdit, GWL_WNDPROC, (LONG) &ToolWindowEditPathProc);
 
-    //--- set default font for all controls
-	HFONT hFont = (HFONT) GetStockObject(DEFAULT_GUI_FONT);
+    //--- set default font for all child controls
 	EnumChildWindows(g_hToolWnd, ToolWndSetFont, (LPARAM) hFont);
 
 	//--- read options from global configuration
