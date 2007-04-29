@@ -84,8 +84,8 @@ BEGIN
     CTEXT           "FlashFolder Hook Library Version",IDC_ST_FFLIB,7,20,198,
                     8
     CTEXT           "FlashFolder Config Version",IDC_ST_FFCONFIG,7,35,198,8
-    CTEXT           "Visit FlashFolder project page at SourceForge.net",
-                    IDC_ST_HOMEPAGE,7,72,198,8
+    CTEXT           "Visit project page at SourceForge.net",IDC_ST_HOMEPAGE,
+                    7,72,198,8
     CTEXT           "Submit bug report",IDC_ST_BUGREPORT,7,84,198,8
     CTEXT           "Submit feature request",IDC_ST_FEATUREREQ,6,96,199,8
 END
