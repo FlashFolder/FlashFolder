@@ -37,8 +37,6 @@
 
 using namespace NT;
 using namespace std;
-using namespace boost;
-
 
 //-----------------------------------------------------------------------------------------
 // global variables that are shared by all Instances of the DLL  
@@ -58,8 +56,8 @@ HHOOK g_hHook = NULL;						// handle of the hook
 HMODULE g_hInstDll = NULL;
 HWND g_hFileDialog = NULL;				// handle of file open/save dialog 
 
-scoped_ptr<FileDlgHook_base> g_spFileDlgHook;   // ptr to the hook instance
-scoped_ptr<FileDlgHook_base> g_spOpenWithDlgHook;   // ptr to the hook instance
+auto_ptr<FileDlgHook_base> g_spFileDlgHook;   // ptr to the hook instance
+auto_ptr<FileDlgHook_base> g_spOpenWithDlgHook;   // ptr to the hook instance
 
 HWND g_hToolWnd = NULL;					// handle of cool external tool window
 WNDPROC g_wndProcToolWindowEditPath;
@@ -915,8 +913,7 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 			// Make sure the DLL gets not unloaded as long as the window is subclassed.
 			// This can occur if the FlashFolder service stops while a file dialog is open.
 			// Intentionally there is no balancing FreeLibrary() call since I couldn't find
-			// a good place to call it. No problem since Windows Installer can "magically" 
-			// delete the DLL file during uninstall, even if it is still loaded into some processes.
+			// a good place to call it. 
 			TCHAR dllPath[ MAX_PATH + 1 ];
 			::GetModuleFileName( (HMODULE) g_hInstDll, dllPath, MAX_PATH ); 
 			::LoadLibrary( dllPath );  

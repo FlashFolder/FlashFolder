@@ -24,10 +24,8 @@
 #include <vector>
 #include <string>
 #include <set>
+#include <memory>
 using namespace std;
-
-//--- boost headers
-#include <boost/scoped_ptr.hpp>
 
 //--- own headers
 #include "../common/tstring.h"
