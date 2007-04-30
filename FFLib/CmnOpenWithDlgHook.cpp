@@ -32,7 +32,7 @@ CmnOpenWithDlgHook* g_pHook = NULL;
 
 //-----------------------------------------------------------------------------------------
 
-bool CmnOpenWithDlgHook::Init( HWND hwndFileDlg, HWND hwndTool, FileDlgHookCallback_base* pCallbacks )
+bool CmnOpenWithDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 {
 	if( m_hwndFileDlg ) return false;  // only init once!
 

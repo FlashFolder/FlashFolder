@@ -370,9 +370,6 @@ void DisplayMenu_OpenDirs()
 
 void DisplayMenu_Favorites()
 {
-
-	// *** TODO: horiz dividers + sub menus 
-
     HMENU hMenu = ::CreatePopupMenu();
 
 	FavoritesList dirList;
@@ -489,9 +486,11 @@ LRESULT CALLBACK ToolWindowEditPathProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			{
 				TCHAR path[MAX_PATH + 1] = _T("");
 				GetWindowText(hwnd, path, MAX_PATH );
-
-				SetForegroundWindow(g_hFileDialog);
-				g_spFileDlgHook->SetFolder( path );
+				if( DirectoryExists( path ) )
+				{
+					SetForegroundWindow(g_hFileDialog);
+					g_spFileDlgHook->SetFolder( path );
+				}
 			}
 			else if (wParam == VK_ESCAPE) 
 				PostMessage(g_hFileDialog, WM_CLOSE, 0, 0);
@@ -649,6 +648,10 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_CLOSE:
 			::PostMessage( g_hFileDialog, WM_CLOSE, 0, 0 );
 		break;
+
+		case WM_TIMER:
+			g_spFileDlgHook->OnTimer();
+		break;
 	}
 
 	return FALSE; 
@@ -755,51 +758,55 @@ void CreateToolWindow( bool isFileDialog )
 
 // callbacks that will be called by the file dialog hook
 
-class FileDlgHookCallback : public FileDlgHookCallback_base
+namespace FileDlgHookCallbacks
 {
-public:
-	virtual void OnInitDone()
-	{
-        //--- initial show + update of the tool window ---
-		UpdatePathEdit();
-		::ShowWindow( g_hToolWnd, SW_SHOWNA );
-	}
-	
-	virtual void OnFolderChange()
-	{
-		UpdatePathEdit();
-	}
 
-    virtual void OnResize()
-	{
-		//reposition the tool window to "dock" it onto the file dialog
-		AdjustToolWindowPos();
-	}
-
-	virtual void OnEnable( bool bEnable )
-	{
-		::EnableWindow( g_hToolWnd, bEnable );
-	}
-
-	virtual void OnShow( bool bShow )
-	{
-		::ShowWindow( g_hToolWnd, bShow ? SW_SHOW : SW_HIDE );
-	}
-
-	virtual void OnDestroy( bool isOkBtnPressed )
-	{
-        //--- add folder to history if file dialog was closed with OK
-		if( isOkBtnPressed )
-			AddCurrentFolderToHistory();			
-
-        //--- destroy tool window + class ---
-		::DestroyWindow( g_hToolWnd );
-		::UnregisterClass( _T("FlashFolderToolWnd_73614384"), (HINSTANCE) g_hInstDll );
-		g_hToolWnd = NULL;
-		g_hFileDialog = NULL;
-	}
+void OnInitDone()
+{
+	//--- initial show + update of the tool window ---
+	UpdatePathEdit();
+	::ShowWindow( g_hToolWnd, SW_SHOWNA );
 }
-g_fileDlgHookCallback;
+
+void OnFolderChange()
+{
+	UpdatePathEdit();
+}
+
+void OnResize()
+{
+	//reposition the tool window to "dock" it onto the file dialog
+	AdjustToolWindowPos();
+}
+
+void OnEnable( bool bEnable )
+{
+	::EnableWindow( g_hToolWnd, bEnable );
+}
+
+void OnShow( bool bShow )
+{
+	::ShowWindow( g_hToolWnd, bShow ? SW_SHOW : SW_HIDE );
+}
+
+void OnDestroy( bool isOkBtnPressed )
+{
+	//--- add folder to history if file dialog was closed with OK
+	if( isOkBtnPressed )
+		AddCurrentFolderToHistory();			
+
+	//--- destroy tool window + class ---
+	::DestroyWindow( g_hToolWnd );
+	g_hToolWnd = NULL;
+	g_hFileDialog = NULL;
+}
+
+void SetTimer( DWORD interval )
+{
+	::SetTimer( g_hToolWnd, 1, interval, NULL );
+}
+
+}; //namespace FileDlgHookCallbacks
 
 //-----------------------------------------------------------------------------------------
 /**
@@ -908,24 +915,24 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 			if( fileDlgType == FDT_COMMON )
 			{
 				g_spFileDlgHook.reset( new CmnFileDlgHook );
-				g_spFileDlgHook->Init( hwnd, g_hToolWnd, &g_fileDlgHookCallback );
+				g_spFileDlgHook->Init( hwnd, g_hToolWnd );
 			}
 			else if( fileDlgType == FDT_MSOFFICE )
 			{
 				g_spFileDlgHook.reset( new MsoFileDlgHook );
-				g_spFileDlgHook->Init( hwnd, g_hToolWnd, &g_fileDlgHookCallback );
+				g_spFileDlgHook->Init( hwnd, g_hToolWnd );
 			}
 			else if( fileDlgType == FDT_COMMON_OPENWITH )
 			{
 				// init the "Open With" dialog hook
 				g_spOpenWithDlgHook.reset( new CmnOpenWithDlgHook );
-				g_spOpenWithDlgHook->Init( hwnd, g_hToolWnd, NULL );
+				g_spOpenWithDlgHook->Init( hwnd, g_hToolWnd );
 			}
 			else if( fileDlgType == FDT_COMMON_FOLDER )
 			{
 				// init the "Open With" dialog hook
 				g_spFileDlgHook.reset( new CmnFolderDlgHook );
-				g_spFileDlgHook->Init( hwnd, g_hToolWnd, &g_fileDlgHookCallback );
+				g_spFileDlgHook->Init( hwnd, g_hToolWnd );
 			}
 
 			// Make sure the DLL gets not unloaded as long as the window is subclassed.

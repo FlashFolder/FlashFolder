@@ -31,7 +31,7 @@ CmnFileDlgHook* g_pHook = NULL;
 
 //-----------------------------------------------------------------------------------------
 
-bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool, FileDlgHookCallback_base* pCallbacks )
+bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 {
 	if( m_hwndFileDlg ) return false;  // only init once!
 	m_hwndTool = hwndTool; 
@@ -41,7 +41,6 @@ bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool, FileDlgHookCallback_
 	g_pHook = this;
 
 	m_hwndFileDlg = hwndFileDlg;
-	m_pCallbacks = pCallbacks;
 
 	// Subclass the window proc of the file dialog.
 	m_oldWndProc = reinterpret_cast<WNDPROC>( 
@@ -126,7 +125,7 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc(
 				g_pHook->ResizeFileDialog();
 
 				// notify the tool window
-				g_pHook->m_pCallbacks->OnInitDone();
+				FileDlgHookCallbacks::OnInitDone();
             }
 		}
 		break;
@@ -153,7 +152,7 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc(
 			// I don't really know what this message means, but I need it to check
 			// whether the user has changed the actual folder path.
             if( g_pHook->m_isWindowActive )
-				g_pHook->m_pCallbacks->OnFolderChange();
+				FileDlgHookCallbacks::OnFolderChange();
 			break;
 
 		case WM_ACTIVATE:
@@ -161,19 +160,19 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc(
 			break;
 
         case WM_WINDOWPOSCHANGED:
-			g_pHook->m_pCallbacks->OnResize();
+			FileDlgHookCallbacks::OnResize();
 			break;
 
         case WM_ENABLE:
-			g_pHook->m_pCallbacks->OnEnable( wParam != 0 );
+			FileDlgHookCallbacks::OnEnable( wParam != 0 );
             break;
 
 		case WM_SHOWWINDOW:
-			g_pHook->m_pCallbacks->OnShow( wParam != 0 );
+			FileDlgHookCallbacks::OnShow( wParam != 0 );
 			break;
 
 		case WM_DESTROY:
-			g_pHook->m_pCallbacks->OnDestroy( ! g_pHook->m_fileDialogCanceled );
+			FileDlgHookCallbacks::OnDestroy( ! g_pHook->m_fileDialogCanceled );
 			break;
 
 		case WM_NCDESTROY:

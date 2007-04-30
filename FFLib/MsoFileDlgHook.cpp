@@ -33,17 +33,18 @@ MsoFileDlgHook* g_pHook = NULL;
 
 //-----------------------------------------------------------------------------------------
 
-bool MsoFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool, FileDlgHookCallback_base* pCallbacks )
+bool MsoFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 {
 	if( m_hwndFileDlg ) return false;  // only init once!
 	m_hwndTool = hwndTool; 
 
 	::OutputDebugString( _T("[fflib] MsoFileDlgHook::Init()\n") );
 
+	m_currentDir[ 0 ] = 0;
+
 	g_pHook = this;
 
 	m_hwndFileDlg = hwndFileDlg;
-	m_pCallbacks = pCallbacks;
 
 	// Subclass the window proc of the file dialog.
 	m_oldWndProc = reinterpret_cast<WNDPROC>( 
@@ -66,7 +67,7 @@ bool MsoFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool, FileDlgHookCallback_
 
 //-----------------------------------------------------------------------------------------
 
-bool MsoFileDlgHook::SetFolder( LPCTSTR path )
+bool MsoFileDlgHook::EnterFilenameEditText( LPCTSTR pText )
 {
 	// MSO seems to partly use its own windowless controls. E.g. calling 
 	// SetFocus() seems to put the cursor into the edit control but the internal focus 
@@ -75,17 +76,6 @@ bool MsoFileDlgHook::SetFolder( LPCTSTR path )
 	// keyboard input.
 
 	TCHAR oldEditTxt[1024] = _T(""); 
-	
-	// append backslash to path if necessary
-	TCHAR pathBuf[MAX_PATH + 2 ];
-	_tcsncpy( pathBuf, path, MAX_PATH );
-	pathBuf[MAX_PATH] = 0;
-	size_t len = _tcslen( pathBuf );
-	if( len > 0 )
-	{
-		TCHAR* p = _tcsninc( pathBuf, len - 1 );
-        if( *p != _T('\\') ) _tcscat( pathBuf, _T("\\") );
-	}
 
 	HWND hEditFileName = ::GetDlgItem( m_hwndFileDlg, MSO2002_FILEDLG_ED_FILENAME );
 	if( ! hEditFileName )
@@ -139,9 +129,9 @@ bool MsoFileDlgHook::SetFolder( LPCTSTR path )
 		inp.ki.wVk = VK_CONTROL;
 		vinp.push_back( inp );
 
-		// simulate keystrokes in the filename edit control to put the destination 
-		// path into it
-		AddTextInput( &vinp, pathBuf );
+		// simulate keystrokes in the filename edit control to put the given text
+		// into it
+		AddTextInput( &vinp, pText );
 
 		// simulate return key
 		memset( &inp, 0, sizeof(inp) );
@@ -186,9 +176,27 @@ bool MsoFileDlgHook::SetFolder( LPCTSTR path )
 
 //-----------------------------------------------------------------------------------------
 
+bool MsoFileDlgHook::SetFolder( LPCTSTR path )
+{	
+	// append backslash to path if necessary
+	TCHAR pathBuf[MAX_PATH + 1 ];
+	StringCbCopy( pathBuf, sizeof(pathBuf), path );
+	size_t len = _tcslen( pathBuf );
+	if( len > 0 )
+	{
+		TCHAR* p = _tcsninc( pathBuf, len - 1 );
+        if( *p != _T('\\') ) 
+			StringCbCat( pathBuf, sizeof(pathBuf), _T("\\") );
+	}
+
+	return EnterFilenameEditText( path );
+}
+
+//-----------------------------------------------------------------------------------------
+
 bool MsoFileDlgHook::GetFolder( LPTSTR folderPath )
 {
-	::GetCurrentDirectory( MAX_PATH, folderPath );
+	StringCchCopy( folderPath, MAX_PATH, m_currentDir );
 	return true;
 }
 
@@ -196,7 +204,31 @@ bool MsoFileDlgHook::GetFolder( LPTSTR folderPath )
 
 bool MsoFileDlgHook::SetFilter( LPCTSTR filter )
 {
-	return true;
+	return EnterFilenameEditText( filter );
+}
+
+//-----------------------------------------------------------------------------------------
+
+void MsoFileDlgHook::OnTimer()
+{
+	if( ! g_pHook->m_isWindowActive )
+		return;
+
+	// Check if the current path has changed. If so, notify the tool window.
+	// I do this since I didn't found a message that is send by the file dialog when the path
+	// has changed. And who knows if this message would be the same for all versions of MSO?
+
+	if( HWND hwnd = ::FindWindowEx( g_pHook->m_hwndFileDlg, NULL, _T("Snake List"), NULL ) ) 
+	{
+		TCHAR curDir[ MAX_PATH + 1 ] = _T("");
+		ShellView_GetCurrentDir( hwnd, curDir );
+	
+		if( _tcsicmp( curDir, m_currentDir ) != 0 )
+		{
+			StringCbCopy( m_currentDir, sizeof(m_currentDir), curDir );
+			FileDlgHookCallbacks::OnFolderChange();
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------------------
@@ -217,9 +249,12 @@ LRESULT CALLBACK MsoFileDlgHook::HookWindowProc(
 				//customize file dialog's initial size + position
 				g_pHook->ResizeFileDialog();
 
+				// create timer for polling current directory
+				FileDlgHookCallbacks::SetTimer( 75 );
+
 				// notify the tool window
-				g_pHook->m_pCallbacks->OnInitDone();
-            }
+				FileDlgHookCallbacks::OnInitDone();
+			}
 		}
 		break;
 
@@ -240,32 +275,25 @@ LRESULT CALLBACK MsoFileDlgHook::HookWindowProc(
 			}
 		}
 		break;
-/*
-		case WM_USER + 300:
-			// I don't really know what this message means, but I need it to check
-			// whether the user has changed the actual folder path.
-            if( g_pHook->m_isWindowActive )
-				g_pHook->m_pCallbacks->OnFolderChange();
-			break;
-*/          
+
 		case WM_ACTIVATE:
 			g_pHook->m_isWindowActive = LOWORD(wParam) != 0;
 			break;
 
         case WM_WINDOWPOSCHANGED:
-			g_pHook->m_pCallbacks->OnResize();
+			FileDlgHookCallbacks::OnResize();
 			break;
 
         case WM_ENABLE:
-			g_pHook->m_pCallbacks->OnEnable( wParam != 0 );
+			FileDlgHookCallbacks::OnEnable( wParam != 0 );
             break;
 
 		case WM_SHOWWINDOW:
-			g_pHook->m_pCallbacks->OnShow( wParam != 0 );
+			FileDlgHookCallbacks::OnShow( wParam != 0 );
 			break;
 
 		case WM_DESTROY:
-			g_pHook->m_pCallbacks->OnDestroy( ! g_pHook->m_fileDialogCanceled );
+			FileDlgHookCallbacks::OnDestroy( ! g_pHook->m_fileDialogCanceled );
 			break;
 
 		case WM_NCDESTROY:

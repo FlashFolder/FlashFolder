@@ -346,3 +346,52 @@ bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter )
 	return false;
 }
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \brief Returns path to folder who's content is currently visible in a shell folder view.
+ *
+ * Tested successfully with both common file dialog and MS Office file dialog on WinXP.\n
+ * TODO: Win2k - find a way to work around IFolderView which isn't supported under this OS.
+ * 
+ * \param hwnd Window handle that contains the shell view. This should be the parent window
+ *             of the control which has the "SHELLDLL_DefView" class. 
+ * \param path Receives the path if the folder is from the file system. Otherwise an empty string
+ *             returned. The buffer must be at least MAX_PATH characters in size.
+ * \retval true success
+ * \retval false failure
+ */
+bool ShellView_GetCurrentDir( HWND hwnd, LPTSTR path )
+{
+	path[ 0 ] = 0;
+	bool res = false;
+
+	IShellBrowser *pShBrowser = 
+		reinterpret_cast<IShellBrowser*>( ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 ) );
+	if( pShBrowser )
+	{
+		IShellView* psv;
+		if( SUCCEEDED( pShBrowser->QueryActiveShellView( &psv ) ) )
+		{	
+			IFolderView* pfv;
+			if( SUCCEEDED( psv->QueryInterface( IID_IFolderView, (void**) &pfv ) ) ) 
+			{
+				IPersistFolder2* ppf2;
+				if( SUCCEEDED( pfv->GetFolder( IID_IPersistFolder2, (void**) &ppf2 ) ) )
+				{
+					LPITEMIDLIST pidlFolder;
+					if( SUCCEEDED( ppf2->GetCurFolder( &pidlFolder ) ) ) 
+					{
+						if( ::SHGetPathFromIDList( pidlFolder, path ) )
+							res = true;
+						::CoTaskMemFree( pidlFolder );
+					}
+					ppf2->Release();
+				}
+				pfv->Release();
+			}
+
+			psv->Release();
+		}
+	}
+	return res;
+}

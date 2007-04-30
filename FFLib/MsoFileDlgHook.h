@@ -34,26 +34,28 @@ class MsoFileDlgHook : public FileDlgHook_base
 {
 public:
 	MsoFileDlgHook() :
-		m_hwndFileDlg( 0 ), m_pCallbacks( 0 ), m_fileDialogCanceled( false ),
+		m_hwndFileDlg( 0 ), m_fileDialogCanceled( false ),
         m_initDone( false ), m_isWindowActive( false ) {}
 
 
 	// overridings of FileDlgHook_base
-	virtual bool Init( HWND hwndFileDlg, HWND hWndTool, FileDlgHookCallback_base* pCallbacks );
+	virtual bool Init( HWND hwndFileDlg, HWND hWndTool );
 	virtual bool SetFolder( LPCTSTR path );
 	virtual bool GetFolder( LPTSTR folderPath );
 	virtual bool SetFilter( LPCTSTR filter );
+	virtual void OnTimer();
 
 private:
 	static LRESULT CALLBACK HookWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void ResizeFileDialog();
+	bool EnterFilenameEditText( LPCTSTR text );
 
 	HWND m_hwndFileDlg, m_hwndTool;
 	WNDPROC m_oldWndProc;
-	FileDlgHookCallback_base* m_pCallbacks;
 	bool m_isWindowActive;
 	bool m_fileDialogCanceled;
 	bool m_initDone;
+	TCHAR m_currentDir[ MAX_PATH + 1 ];
 	
 	int m_centerFileDialog;
 	int m_minFileDialogWidth;			    // prefered minimum size of file dialog

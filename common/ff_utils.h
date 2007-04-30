@@ -47,6 +47,8 @@ bool FileDlgBrowseToFolder( HWND hwndFileDlg, LPCTSTR path );
 bool FileDlgGetCurrentFolder( HWND hwndFileDlg, LPTSTR folderPath );
 bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter );
 
+bool ShellView_GetCurrentDir( HWND hwnd, LPTSTR path );
+
 // undocumented message for explorer / common file dialog
 const UINT WM_GETISHELLBROWSER = WM_USER + 7;
 

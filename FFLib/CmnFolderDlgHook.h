@@ -34,13 +34,13 @@ class CmnFolderDlgHook : public FileDlgHook_base
 {
 public:
 	CmnFolderDlgHook() : 
-		m_hwndFileDlg( 0 ), m_pCallbacks( 0 ), m_fileDialogCanceled( false ),
+		m_hwndFileDlg( 0 ), m_fileDialogCanceled( false ),
         m_initDone( false ), m_isWindowActive( false ),
 		m_oldParentWndProc( NULL )
 	{}
 
 	// overridings of FileDlgHook_base
-	virtual bool Init( HWND hwndFileDlg, HWND hWndTool, FileDlgHookCallback_base* pCallbacks );
+	virtual bool Init( HWND hwndFileDlg, HWND hWndTool );
 	virtual bool SetFolder( LPCTSTR path );
 	virtual bool GetFolder( LPTSTR folderPath );
 	virtual bool SetFilter( LPCTSTR filter );
@@ -53,7 +53,6 @@ private:
 
 	HWND m_hwndFileDlg, m_hwndTool;
 	WNDPROC m_oldWndProc, m_oldParentWndProc;
-	FileDlgHookCallback_base* m_pCallbacks;
 	bool m_isWindowActive;
 	bool m_fileDialogCanceled;
 	bool m_initDone;

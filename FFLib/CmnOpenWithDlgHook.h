@@ -38,7 +38,7 @@ public:
         m_initDone( false ), m_isWindowActive( false ), m_hwndSizeGrip( NULL ) {}
 
 	// overridings of FileDlgHook_base
-	virtual bool Init( HWND hwndFileDlg, HWND hWndTool, FileDlgHookCallback_base* pCallbacks );
+	virtual bool Init( HWND hwndFileDlg, HWND hWndTool );
 	virtual bool SetFolder( LPCTSTR path );
 	virtual bool GetFolder( LPTSTR folderPath );
 	virtual bool SetFilter( LPCTSTR filter );

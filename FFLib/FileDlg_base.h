@@ -29,15 +29,15 @@
 // callback interface for FileDlgHook_base derivates to forward messages to 
 // the FlashFolder tool window
 
-class FileDlgHookCallback_base
+namespace FileDlgHookCallbacks
 {
-public:
-	virtual void OnInitDone() = 0;
-	virtual void OnFolderChange() = 0;
-    virtual void OnResize() = 0;
-	virtual void OnEnable( bool bEnable ) = 0;
-	virtual void OnDestroy( bool isOkBtnPressed ) = 0;
-	virtual void OnShow( bool bShow ) = 0;
+	void OnInitDone();
+	void OnFolderChange();
+    void OnResize();
+	void OnEnable( bool bEnable );
+	void OnDestroy( bool isOkBtnPressed );
+	void OnShow( bool bShow );
+	void SetTimer( DWORD interval );
 };
 
 //-----------------------------------------------------------------------------------
@@ -50,11 +50,13 @@ public:
 	FileDlgHook_base() {}
 	virtual ~FileDlgHook_base() {}
 
-	virtual bool Init( HWND hWndFileDlg, HWND hWndTool, FileDlgHookCallback_base* pHandlers ) = 0;
+	virtual bool Init( HWND hWndFileDlg, HWND hWndTool ) = 0;
 
 	virtual bool SetFolder( LPCTSTR path ) = 0;
 	virtual bool GetFolder( LPTSTR folderPath ) = 0;
 	virtual bool SetFilter( LPCTSTR filter ) = 0;
+
+	virtual void OnTimer() {}
 };
 
 //-----------------------------------------------------------------------------------
