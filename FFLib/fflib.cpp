@@ -643,8 +643,6 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			SetBkColor(hdcEdit, GetSysColor(COLOR_WINDOW));
 
-			::SetWindowLongPtr( hwnd, DWL_MSGRESULT, TBDDRET_DEFAULT );
-
 			::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, reinterpret_cast<LONG_PTR>( hWindowBrush ) );
 			return TRUE;
 		}
