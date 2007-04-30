@@ -69,8 +69,8 @@ Profile g_profile( _T("zett42\\FlashFolder") );
 //--- options, read from global INI file ---
 int g_globalHistoryMaxEntries;
 
-//--- constants ---
-const HBRUSH hWindowBrush = GetSysColorBrush(COLOR_WINDOW);
+// sys color window brush
+HBRUSH g_hWindowBrush = NULL; 
 
 
 //-----------------------------------------------------------------------------------------
@@ -616,7 +616,6 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
-
 		case WM_CTLCOLOREDIT:
 		{
 			//called when the path control is redrawn by windows
@@ -642,9 +641,10 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			SetBkColor(hdcEdit, GetSysColor(COLOR_WINDOW));
-
-			::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, reinterpret_cast<LONG_PTR>( hWindowBrush ) );
-			return TRUE;
+			
+			if( ! g_hWindowBrush )
+				g_hWindowBrush = ::GetSysColorBrush( COLOR_WINDOW );
+			return reinterpret_cast<INT_PTR>( g_hWindowBrush );
 		}
 		break;
 
