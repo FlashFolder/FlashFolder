@@ -91,8 +91,8 @@ BOOL CFFConfigDlg::OnInitDialog()
 	//--- get profile data
 
 	CString s;
-	
-	CheckDlgButton( g_profile.IsShared() ? IDC_RD_SHARED_PROFILE : IDC_RD_INDIVIDUAL_PROFILES, 1 );
+	s.LoadString( g_profile.IsShared() ? IDS_MU_SHARED : IDS_MU_INDIVIDUAL );
+	SetDlgItemText( IDC_ST_MULTIUSER, s );
 	
 	s.Format( _T("%d"), g_profile.GetInt( _T("main"), _T("MaxGlobalHistoryEntries") ) );
 	SetDlgItemText( IDC_ED_MAX_DIRHISTORY, s );

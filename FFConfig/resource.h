@@ -10,8 +10,10 @@
 #define IDD_STRINGLIST                  132
 #define IDS_RESIZE_NONRESIZABLE_EXCL    133
 #define IDS_EDIT_EXCLUDES               134
+#define IDS_MU_INDIVIDUAL               135
 #define IDD_DIALOG1                     136
 #define IDD_ABOUT                       136
+#define IDS_MU_SHARED                   136
 #define IDC_RD_INDIVIDUAL_PROFILES      1000
 #define IDC_RD_SHARED_PROFILE           1001
 #define IDC_ED_MAX_DIRHISTORY           1002
@@ -74,8 +76,8 @@
 #define IDC_CB_COW_POSITION             1057
 #define IDC_ST_BUGREPORT                1057
 #define IDC_CB_CFO_POSITION             1058
-#define IDC_ST_HOMEPAGE3                1058
 #define IDC_ST_FEATUREREQ               1058
+#define IDC_ST_MULTIUSER                1059
 
 // Next default values for new objects
 // 
@@ -83,7 +85,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        138
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1057
+#define _APS_NEXT_CONTROL_VALUE         1060
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

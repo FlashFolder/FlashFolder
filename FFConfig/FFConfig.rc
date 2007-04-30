@@ -127,6 +127,8 @@ BEGIN
     IDS_RESIZE_NONRESIZABLE_EXCL 
                             "Enter filenames of programs which are not compatible with the ""Resize non-resizable dialogs"" feature (e.g. myprogram.exe).\nPut each filename on a separate line:"
     IDS_EDIT_EXCLUDES       "Edit exclusions"
+    IDS_MU_INDIVIDUAL       "Use individual user profiles"
+    IDS_MU_SHARED           "Use shared profile for all users"
 END
 
 #endif    // Deutsch (Deutschland) resources
@@ -168,12 +170,6 @@ CLASS "FFConfig.xmgn4ngertu4mnsf"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     GROUPBOX        "Multi-User",IDC_STATIC,7,8,164,43
-    CONTROL         "&Use individual profiles for each user",
-                    IDC_RD_INDIVIDUAL_PROFILES,"Button",BS_AUTORADIOBUTTON | 
-                    WS_DISABLED | WS_GROUP,16,20,129,10
-    CONTROL         "Use &one shared profile for all users",
-                    IDC_RD_SHARED_PROFILE,"Button",BS_AUTORADIOBUTTON | 
-                    WS_DISABLED,16,34,127,10
     GROUPBOX        "Generic",IDC_STATIC,179,8,183,43
     LTEXT           "&Max. number of directory history entries:",IDC_STATIC,
                     189,19,141,11
@@ -263,8 +259,11 @@ BEGIN
                     UDS_ARROWKEYS,282,228,11,14
     COMBOBOX        IDC_CB_COW_POSITION,185,246,108,101,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,121,274,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,180,274,50,14
+    DEFPUSHBUTTON   "OK",IDOK,130,274,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,189,274,50,14
+    LTEXT           "Statisch",IDC_ST_MULTIUSER,14,19,151,8
+    LTEXT           "To change this option, you need to reinstall FlashFolder.",
+                    IDC_STATIC,13,30,149,17,WS_DISABLED
 END
 
 IDD_FAVORITES DIALOGEX 0, 0, 360, 271
