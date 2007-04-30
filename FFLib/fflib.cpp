@@ -69,9 +69,6 @@ Profile g_profile( _T("zett42\\FlashFolder") );
 //--- options, read from global INI file ---
 int g_globalHistoryMaxEntries;
 
-// sys color window brush
-HBRUSH g_hWindowBrush = NULL; 
-
 
 //-----------------------------------------------------------------------------------------
 // DLL entry point
@@ -642,9 +639,10 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			SetBkColor(hdcEdit, GetSysColor(COLOR_WINDOW));
 			
-			if( ! g_hWindowBrush )
-				g_hWindowBrush = ::GetSysColorBrush( COLOR_WINDOW );
-			return reinterpret_cast<INT_PTR>( g_hWindowBrush );
+			static HBRUSH s_hWindowBrush = NULL; 
+			if( ! s_hWindowBrush )
+				s_hWindowBrush = ::GetSysColorBrush( COLOR_WINDOW );
+			return reinterpret_cast<INT_PTR>( s_hWindowBrush );
 		}
 		break;
 
