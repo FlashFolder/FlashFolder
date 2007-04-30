@@ -35,8 +35,9 @@ class MsoFileDlgHook : public FileDlgHook_base
 public:
 	MsoFileDlgHook() :
 		m_hwndFileDlg( 0 ), m_fileDialogCanceled( false ),
-        m_initDone( false ), m_isWindowActive( false ) {}
-
+        m_initDone( false ), m_isWindowActive( false ), 
+		m_hKeyboardHook( NULL ) 
+	{}
 
 	// overridings of FileDlgHook_base
 	virtual bool Init( HWND hwndFileDlg, HWND hWndTool );
@@ -47,6 +48,8 @@ public:
 
 private:
 	static LRESULT CALLBACK HookWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK KeyboardHookProc( int code, WPARAM wParam, LPARAM lParam );
+
 	void ResizeFileDialog();
 	bool EnterFilenameEditText( LPCTSTR text );
 
@@ -56,7 +59,9 @@ private:
 	bool m_fileDialogCanceled;
 	bool m_initDone;
 	TCHAR m_currentDir[ MAX_PATH + 1 ];
-	
+	UINT m_wmObjectSel;
+	HHOOK m_hKeyboardHook;
+
 	int m_centerFileDialog;
 	int m_minFileDialogWidth;			    // prefered minimum size of file dialog
 	int m_minFileDialogHeight;

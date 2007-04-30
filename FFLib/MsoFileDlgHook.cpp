@@ -36,6 +36,7 @@ MsoFileDlgHook* g_pHook = NULL;
 bool MsoFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 {
 	if( m_hwndFileDlg ) return false;  // only init once!
+	m_hwndFileDlg = hwndFileDlg;
 	m_hwndTool = hwndTool; 
 
 	::OutputDebugString( _T("[fflib] MsoFileDlgHook::Init()\n") );
@@ -44,7 +45,13 @@ bool MsoFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 
 	g_pHook = this;
 
-	m_hwndFileDlg = hwndFileDlg;
+	// Create a hook for watching ESC key to determine if file dialog has been canceled.
+	// Just watching for ESC in WM_KEYDOWN of file dialog would not be enough, since ESC in
+	// the file name edit control would not be catched this way.
+	m_hKeyboardHook = ::SetWindowsHookEx( WH_KEYBOARD, KeyboardHookProc, NULL, ::GetCurrentThreadId() ); 
+
+	// Registered message that is send by the MSO file dialog
+	m_wmObjectSel = ::RegisterWindowMessage( _T("WM_OBJECTSEL") );
 
 	// Subclass the window proc of the file dialog.
 	m_oldWndProc = reinterpret_cast<WNDPROC>( 
@@ -63,6 +70,16 @@ bool MsoFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 	m_centerFileDialog = g_profile.GetInt( _T("MSOfficeFileDlg"), _T("Center"), 1 );
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------------------
+
+LRESULT CALLBACK MsoFileDlgHook::KeyboardHookProc( int code, WPARAM wParam, LPARAM lParam )
+{
+	if( code == HC_ACTION && wParam == VK_ESCAPE )
+		g_pHook->m_fileDialogCanceled = true;
+
+	return ::CallNextHookEx( g_pHook->m_hKeyboardHook, code, wParam, lParam );
 }
 
 //-----------------------------------------------------------------------------------------
@@ -270,6 +287,9 @@ LRESULT CALLBACK MsoFileDlgHook::HookWindowProc(
 				//  'cause this way we won't get files opened by double-clicks in
 				//  the listview. Instead, we check if not IDCANCEL was received.
 				//  IDCANCEL will be send for all ways of cancel: button and keyboard.
+				// Note: this doesn't work for office 2000, 2002 but keep it in since it might work for
+				// other versions.
+
 				if( wID == IDCANCEL )	      
 					g_pHook->m_fileDialogCanceled = true;
 			}
@@ -301,10 +321,25 @@ LRESULT CALLBACK MsoFileDlgHook::HookWindowProc(
 			// Remove our window property from the file dialog.
 			// We stored it there in CmnFileDlgHook::Init().
 			::RemoveProp( hwnd, FLASHFOLDER_HOOK_PROPERTY );     
+
+			if( g_pHook->m_hKeyboardHook )
+				::UnhookWindowsHookEx( g_pHook->m_hKeyboardHook );
 		}
 		break;
 
+		case WM_CLOSE:
+			// WM_CLOSE is only received when the dialog is closed via the window close button
+			g_pHook->m_fileDialogCanceled = true;
+		break;
     }
+
+	if( uMsg == g_pHook->m_wmObjectSel )
+	{
+		// The registered window message "WM_OBJECTSEL" is send when the user sets the 
+		// input focus to another control in the file dialog.
+
+		g_pHook->m_fileDialogCanceled = lParam == 2;  // cancel button selected
+	}
 
     //call original message handler
     return CallWindowProc( g_pHook->m_oldWndProc, hwnd, uMsg, wParam, lParam);
@@ -380,5 +415,3 @@ void MsoFileDlgHook::ResizeFileDialog()
 	SetWindowPos( m_hwndFileDlg, NULL, 
 		newX, newY, newWidth, newHeight, SWP_NOZORDER | SWP_NOACTIVATE );
 }
-
-
