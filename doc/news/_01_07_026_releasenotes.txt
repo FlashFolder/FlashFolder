@@ -1,0 +1,4 @@
+Version 1.7.26 (beta) is mainly a bug-fix release. 
+Most importantly FlashFolder now works better with the MS Office file open/save
+dialogs: The current directory is now displayed correctly, the "view all files"
+button works and the directory of the opened file is added to the history menu.

@@ -1,0 +1,5 @@
+1709218 File dialog is moved across screen borders when centered 	  
+1709749 Alt+F4 closes FlashFolder toolbar 	  
+1709739 Path longer than width of edit control cannot be entered 	  
+1709647 Browse For Folder Dialog doesn't use position option 	  
+1709186 Support of Windows high DPI setting

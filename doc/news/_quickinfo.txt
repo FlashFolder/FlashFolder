@@ -1,0 +1,22 @@
+FlashFolder is an extension for file-related common dialogs (e.g. open/save dialog) 
+seen in most Windows programs. A small toolbar docks onto these dialogs that provides
+menus for quick access to recently-used folders, favorite folders and more.
+
+FlashFolder also enhances the file dialogs by other means:
+- enlarges the dialogs to a configurable size (even non-resizable file dialogs 
+  of many programs)
+- can automatically position the dialogs at the center of the main program window 
+  or at the center of the screen
+- enlarges the directory- and file type drop-down fields so less scrolling is needed for them 
+- Total Commander (R) directory menu can be displayed instead of FlashFolders 
+  own favorites
+
+Supported dialogs:
+- common open/save dialog (Win 2000 / XP)
+- MS Office open/save dialog (requires Win XP for full functionality)
+- common browse for folder dialog (Win 2000 / XP)
+- "open with" dialog (Win 2000)
+
+The "open with" dialog is an exception in that it does not host the FlashFolder
+toolbar. FlashFolder only enlarges this dialog (even makes it resizable) and 
+repositions it according to what is set in the options dialog.

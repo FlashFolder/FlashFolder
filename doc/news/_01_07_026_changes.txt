@@ -1,0 +1,11 @@
+FIX: current dir not shown for MSO dialogs (issue 1709666)
+FIX: button "view all files" did not work for MSO dialogs
+FIX: Alt+F4 closed tool window (issue 1709749)
+FIX: path longer than with of edit control could not be entererd 
+     (issue 1709739)
+FIX: text in path edit control was clipped if Windows high dpi 
+     setting was activated (issue 1709186)
+FIX: file dialog was not always positioned according to FlashFolder 
+     options and could be cropped at the screen borders (Issues #1709218, #1709647)
+
+ADD: put hyperlinks into the about box
