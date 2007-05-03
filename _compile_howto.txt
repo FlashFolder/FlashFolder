@@ -7,4 +7,6 @@ Prerequisites:
 - environment variable WIX_2_0_DIR set to the directory path of the WiX 2.0 binaries (without trailing backslash)
 
 Compile:
-Open FlashFolder.sln in Visual Studio, compile the "Installer" sub-project. This should compile all necessary dependencies resulting in the final .msi installer file.
+1. Open FlashFolder.sln in Visual Studio.
+2. Select "Unicode Release" configuration.
+3. Compile the "Installer" sub-project. This should compile all necessary dependencies resulting in the final .msi installer file.
