@@ -4,10 +4,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FFService", "FFService\Flas
 		{3057F62D-451E-4507-A8B2-A7E625070EAC} = {3057F62D-451E-4507-A8B2-A7E625070EAC}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TC_FlashFolder", "TC_FlashFolder\TC_FlashFolder.vcproj", "{2C1357C2-7005-48C2-ACDC-0972D1ADE505}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FFLib", "fflib\fflib.vcproj", "{3057F62D-451E-4507-A8B2-A7E625070EAC}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
@@ -43,14 +39,6 @@ Global
 		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Debug.Build.0 = Unicode Debug|Win32
 		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Release.ActiveCfg = Unicode Release|Win32
 		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Release.Build.0 = Unicode Release|Win32
-		{2C1357C2-7005-48C2-ACDC-0972D1ADE505}.ANSI Debug.ActiveCfg = ANSI Debug|Win32
-		{2C1357C2-7005-48C2-ACDC-0972D1ADE505}.ANSI Debug.Build.0 = ANSI Debug|Win32
-		{2C1357C2-7005-48C2-ACDC-0972D1ADE505}.ANSI Release.ActiveCfg = ANSI Release|Win32
-		{2C1357C2-7005-48C2-ACDC-0972D1ADE505}.ANSI Release.Build.0 = ANSI Release|Win32
-		{2C1357C2-7005-48C2-ACDC-0972D1ADE505}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
-		{2C1357C2-7005-48C2-ACDC-0972D1ADE505}.Unicode Debug.Build.0 = Unicode Debug|Win32
-		{2C1357C2-7005-48C2-ACDC-0972D1ADE505}.Unicode Release.ActiveCfg = Unicode Release|Win32
-		{2C1357C2-7005-48C2-ACDC-0972D1ADE505}.Unicode Release.Build.0 = Unicode Release|Win32
 		{3057F62D-451E-4507-A8B2-A7E625070EAC}.ANSI Debug.ActiveCfg = ANSI Debug|Win32
 		{3057F62D-451E-4507-A8B2-A7E625070EAC}.ANSI Debug.Build.0 = ANSI Debug|Win32
 		{3057F62D-451E-4507-A8B2-A7E625070EAC}.ANSI Release.ActiveCfg = ANSI Release|Win32
