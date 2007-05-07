@@ -1,22 +1,26 @@
+[size=17][b]Introduction[/b][/size]
+
 I'm proud to announce the first public release of [b]FlashFolder[/b] (Version 1.7.26 BETA) to the Total Commander community.
 
-FlashFolder is an open source tool that extends the file-related common dialogs (e.g. open/save dialog) seen in most Windows applications. A small toolbar docks onto these dialogs that provides menus for quick access to recently-used folders, favorite folders and more. 
+FlashFolder is an open source tool that extends the file-related common dialogs (e.g. open/save dialog) seen in most Windows applications. A small toolbar docks onto these dialogs that provides menus for quick access to recently-used folders, favorite folders and more.
 
 There are two features that should make it potentially interesting for Total Commander users:
-[list]- access the TC directory menu from the file dialogs of most programs
-- quickly navigate the file dialog to the left / right current directories of TC [/list]
-Read more about FlashFolder features at the [url=http://www.zett42.de/flashfolder]FlashFolder Homepage...[/url]
-
-[b]Links[/b]
-
-[url=http://www.zett42.de/flashfolder]FlashFolder Homepage[/url]
-[url=http://sourceforge.net/project/screenshots.php?group_id=195039]Screenshots[/url]
-[url=http://sourceforge.net/project/platformdownload.php?group_id=195039]Download[/url]
-
-[url=http://sourceforge.net/tracker/?group_id=195039&atid=951838]Submit a bug report[/url]
-[url=http://sourceforge.net/tracker/?group_id=195039&atid=951841]Submit a feature request[/url]
+[list]
+[*]access the TC directory menu from the file dialogs of most programs
+[*]quickly navigate the file dialog to the left / right current directories of TC [/list]
+Read more about FlashFolder features at the [url=http://zett42.de/flashfolder/?page_id=3]FlashFolder Homepage...[/url]
 
 
-[b]Similar tools[/b]
+[size=17][b]Links[/b][/size]
+
+[list][*][url=http://www.zett42.de/flashfolder]FlashFolder Homepage[/url]
+[*][url=http://sourceforge.net/project/screenshots.php?group_id=195039]Screenshots[/url]
+[*][url=http://sourceforge.net/project/platformdownload.php?group_id=195039]Download[/url]
+
+[*][url=http://sourceforge.net/tracker/?group_id=195039&atid=951838]Submit a bug report[/url]
+[*][url=http://sourceforge.net/tracker/?group_id=195039&atid=951841]Submit a feature request[/url]
+[/list]
+
+[size=17][b]Similar tools[/b][/size]
 
 There is at least one similar freeware tool I know of: [url=http://ghisler.ch/board/viewtopic.php?p=88536#88536]FavMenu 2.0[/url]
