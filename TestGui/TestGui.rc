@@ -91,6 +91,8 @@ BEGIN
                     WS_TABSTOP,15,31,43,10
     CONTROL         "use MFC + customized dialog",IDC_CHK_FO_CUST,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,15,42,109,10
+    CONTROL         "Old style",IDC_CHK_FD_OLDSTYLE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,15,142,44,10
 END
 
 

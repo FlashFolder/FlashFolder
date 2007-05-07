@@ -103,6 +103,10 @@ void CTestGuiDlg::OnBnClickedBtnFileopen()
 
 void CTestGuiDlg::OnBnClickedBtnBrowsedir()
 {
-	CFolderDlg dlg( _T("Select directory"), NULL, this );
+	UINT flags = BIF_RETURNONLYFSDIRS; 
+	if( ! IsDlgButtonChecked( IDC_CHK_FD_OLDSTYLE ) )
+		flags |= BIF_USENEWUI;
+
+	CFolderDlg dlg( _T("Select directory"), NULL, this, flags );
 	dlg.DoModal();
 }

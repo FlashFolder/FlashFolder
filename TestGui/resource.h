@@ -8,6 +8,8 @@
 #define IDC_BTN_FILEOPEN                1000
 #define IDC_BTN_BROWSEDIR               1001
 #define IDC_CHK_FO_EXPLORER             1005
+#define IDC_CHK_FO_EXPLORER2            1006
+#define IDC_CHK_FD_OLDSTYLE             1006
 #define IDC_CHK_FO_SIZING               1008
 #define IDC_CHK_FO_MFC                  1009
 #define IDC_CHK_FO_CUST                 1010
