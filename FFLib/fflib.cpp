@@ -263,17 +263,23 @@ void DisplayMenu_OpenDirs()
 	CTotalCmdUtils tcmdUtils( CTotalCmdUtils::FindTopTCmdWnd() );
     if( tcmdUtils.GetTCmdWnd() )
     {
-        TCHAR leftDir[MAX_PATH+1];
-        TCHAR rightDir[MAX_PATH+1];
+        TCHAR leftDir[MAX_PATH+1] = _T("");
+        TCHAR rightDir[MAX_PATH+1] = _T("");
         if( tcmdUtils.GetDirs( leftDir, MAX_PATH, rightDir, MAX_PATH ) )
         {
-			TCHAR s1[ MAX_PATH + 20 ] = _T("[TC] ");
-			StringCbCat( s1, sizeof(s1), leftDir );
-			TCHAR s2[ MAX_PATH + 20 ] = _T("[TC] ");
-			StringCbCat( s2, sizeof(s2), rightDir );
-            ::AppendMenu( hMenu, MF_STRING, 2000, s1 );
-            ::AppendMenu( hMenu, MF_STRING, 2001, s2 );
-            ::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
+			if( ! leftDir[ 0 ] == 0 )
+			{
+				TCHAR s1[ MAX_PATH + 20 ] = _T("[TC] ");
+				StringCbCat( s1, sizeof(s1), leftDir );
+				::AppendMenu( hMenu, MF_STRING, 2000, s1 );
+			}
+			if( ! rightDir[ 0 ] == 0 )
+			{
+				TCHAR s2[ MAX_PATH + 20 ] = _T("[TC] ");
+				StringCbCat( s2, sizeof(s2), rightDir );
+				::AppendMenu( hMenu, MF_STRING, 2001, s2 );
+			}
+			::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
         }
     }
 

@@ -72,7 +72,7 @@ bool CTotalCmdUtils::GetDirs( LPTSTR pLeftDir, unsigned leftDirLen,
     
     ::EnumChildWindows( m_hwnd, FindSubWindows_Proc, reinterpret_cast<LPARAM>( &data ) );
     
-    return m_hwndLeft && m_hwndRight;
+    return m_hwndLeft || m_hwndRight;
 }
 
 //-------------------------------------------------------------------------------------------------
