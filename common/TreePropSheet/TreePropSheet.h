@@ -123,7 +123,7 @@ public:
 	Otherwise it will fail.
 
 	@param nWidth
-		The width in pixels for the page tree. 
+		The width in dialog units for the page tree. 
 
 	@return
 		TRUE on success, FALSE otherwise (if the window has already been

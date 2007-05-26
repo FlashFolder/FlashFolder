@@ -63,22 +63,6 @@ protected:
 // Implementation helpers
 protected:
 	/**
-	Fills a rectangular area with a gradient color starting at the left
-	side with the color clrLeft and ending at the right sight with the
-	color clrRight.
-
-	@param pDc
-		Device context to draw the rectangle in.
-	@param rect
-		Rectangular area to fill.
-	@param clrLeft
-		Color on the left side.
-	@param clrRight
-		Color on the right side.
-	*/
-	void FillGradientRectH(CDC *pDc, const RECT &rect, COLORREF clrLeft, COLORREF clrRight);
-
-	/**
 	Returns TRUE if Windows XP theme support is available, FALSE 
 	otherwise.
 	*/

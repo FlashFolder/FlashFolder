@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "TreePropSheet.h"
 #include "PropPageFrameDefault.h"
-#include "HighColorTab.hpp"
+#include "..\HighColorTab.hpp"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -394,6 +394,11 @@ HTREEITEM CTreePropSheet::CreatePageTreeItem(LPCTSTR lpszPath, HTREEITEM hParent
 		hChild = m_pwndPageTree->GetNextItem(hChild, TVGN_NEXT);
 	}
 
+	// Get caption for the tree only, if exists.
+	int p = strTopMostItem.ReverseFind( '|' );
+	if( p != -1 )
+		strTopMostItem = strTopMostItem.Left( p );
+
 	// If item with that text does not already exist, create a new one
 	if (!hItem)
 	{
@@ -546,16 +551,38 @@ BOOL CTreePropSheet::SelectCurrentPageTreeItem()
 
 void CTreePropSheet::UpdateCaption()
 {
-	HWND			hPage = PropSheet_GetCurrentPageHwnd(GetSafeHwnd());
-	BOOL			bRealPage = IsWindow(hPage) && ::IsWindowVisible(hPage);
+	HWND hPage = PropSheet_GetCurrentPageHwnd(GetSafeHwnd());
+	CWnd* pPage = NULL;
+	if( IsWindow( hPage ) )
+		pPage = CWnd::FromHandle( hPage );
+	BOOL bRealPage = IsWindow(hPage) && ::IsWindowVisible(hPage);
 	HTREEITEM	hItem = m_pwndPageTree->GetSelectedItem();
 	if (!hItem)
 		return;
-	CString		strCaption = m_pwndPageTree->GetItemText(hItem);
 
-	// if empty page, then update empty page message
-	if (!bRealPage)
+	// Extract the caption from the path. '|' can be used to specify a different caption for the
+	// tree and for the page.
+	CString	strCaption = m_pwndPageTree->GetItemText(hItem);
+	if( bRealPage )
+	{
+		pPage->GetWindowText( strCaption );
+		int p = strCaption.ReverseFind( '|' );
+		if( p != -1 )
+			strCaption = strCaption.Mid( p + 1 );
+		else
+		{
+			for( int i = strCaption.GetLength(); i >= 0; --i )
+				if( strCaption.Mid( i, 2 ) == _T("::") )
+				{
+					strCaption = strCaption.Mid( i + 2 );
+					break;
+				}
+		}
+	}
+	else
+	{
 		m_pFrame->SetMsgText(GenerateEmptyPageMessage(m_strEmptyPageMessage, strCaption));
+	}
 
 	// if no captions are displayed, cancel here
 	if (!m_pFrame->GetShowCaption())
@@ -783,20 +810,22 @@ BOOL CTreePropSheet::OnInitDialog()
 	m_pFrame->ShowCaption(m_bPageCaption);
 
 	// Lets make place for the tree ctrl
-	const int	nTreeWidth = m_nPageTreeWidth;
-	const int	nTreeSpace = 5;
+	CRect rcTreeWidth( 0, 0, m_nPageTreeWidth, 1 );
+	MapDialogRect( rcTreeWidth );
+	CRect rcTreeSpace( 0, 0, 3, 1 );
+	MapDialogRect( rcTreeSpace );
 
 	CRect	rectSheet;
 	GetWindowRect(rectSheet);
-	rectSheet.right+= nTreeWidth;
+	rectSheet.right+= rcTreeWidth.Width();
 	SetWindowPos(NULL, -1, -1, rectSheet.Width(), rectSheet.Height(), SWP_NOZORDER|SWP_NOMOVE);
 	CenterWindow();
 
-	MoveChildWindows(nTreeWidth, 0);
+	MoveChildWindows(rcTreeWidth.Width(), 0);
 
 	// Lets calculate the rectangle for the tree ctrl
 	CRect	rectTree(rectFrame);
-	rectTree.right = rectTree.left + nTreeWidth - nTreeSpace;
+	rectTree.right = rectTree.left + rcTreeWidth.Width() - rcTreeSpace.Width();
 
 	// calculate caption height
 	CTabCtrl	wndTabCtrl;
@@ -834,7 +863,7 @@ BOOL CTreePropSheet::OnInitDialog()
 	}
 
 	// finally create the tree control
-	const DWORD	dwTreeStyle = TVS_SHOWSELALWAYS|TVS_TRACKSELECT|TVS_HASLINES|TVS_LINESATROOT|TVS_HASBUTTONS;
+	const DWORD	dwTreeStyle = TVS_SHOWSELALWAYS|TVS_TRACKSELECT|TVS_HASLINES/*|TVS_LINESATROOT|TVS_HASBUTTONS*/;
 	m_pwndPageTree = CreatePageTreeObject();
 	if (!m_pwndPageTree)
 	{
@@ -849,6 +878,8 @@ BOOL CTreePropSheet::OnInitDialog()
 		_T("SysTreeView32"), _T("PageTree"),
 		WS_TABSTOP|WS_CHILD|WS_VISIBLE|dwTreeStyle,
 		rectTree, this, s_unPageTreeId);
+
+	m_pwndPageTree->SetFont( GetFont() );
 	
 	if (m_bTreeImages)
 	{

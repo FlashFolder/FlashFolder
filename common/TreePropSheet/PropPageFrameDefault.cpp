@@ -294,9 +294,18 @@ CRect CPropPageFrameDefault::CalcCaptionArea()
 
 void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaption, HICON hIcon)
 {
-	COLORREF	clrLeft = GetSysColor(COLOR_INACTIVECAPTION);
-	COLORREF	clrRight = pDc->GetPixel(rect.right-1, rect.top);
-	FillGradientRectH(pDc, rect, clrLeft, clrRight);
+	COLORREF	clrLeft = ::GetSysColor( COLOR_HIGHLIGHT );
+	COLORREF	clrRight = pDc->GetPixel(rect.right-1, rect.top);	
+	TRIVERTEX gVert[ 2 ] = { 
+		rect.left, rect.top,     ( clrLeft & 0xFF ) << 8, clrLeft & 0xFF00, ( clrLeft & 0xFF0000 ) >> 8, 0,
+		rect.right, rect.bottom, ( clrRight & 0xFF ) << 8, clrRight & 0xFF00, ( clrRight & 0xFF0000 ) >> 8, 0
+	};
+	GRADIENT_RECT gRect = { 0, 1 };
+	pDc-> GradientFill( gVert, 2, &gRect, 1, GRADIENT_FILL_RECT_H );
+	
+	CDialog* pParent = (CDialog*) GetParent();
+	CRect rcMargin( 0, 0, 2, 1 );
+	pParent->MapDialogRect( rcMargin );
 
 	// draw icon
 	if (hIcon && m_Images.GetSafeHandle() && m_Images.GetImageCount() == 1)
@@ -309,11 +318,11 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 	}
 
 	// draw text
-	rect.left+= 2;
+	rect.left += rcMargin.Width();
 
-	COLORREF	clrPrev = pDc->SetTextColor(GetSysColor(COLOR_CAPTIONTEXT));
 	int				nBkStyle = pDc->SetBkMode(TRANSPARENT);
 	CFont			*pFont = (CFont*)pDc->SelectStockObject(SYSTEM_FONT);
+	COLORREF clrPrev = pDc->SetTextColor( GetSysColor( COLOR_HIGHLIGHTTEXT ) );
 
 	pDc->DrawText(lpszCaption, rect, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
@@ -321,42 +330,6 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 	pDc->SetBkMode(nBkStyle);
 	pDc->SelectObject(pFont);
 }
-
-
-/////////////////////////////////////////////////////////////////////
-// Implementation helpers
-
-void CPropPageFrameDefault::FillGradientRectH(CDC *pDc, const RECT &rect, COLORREF clrLeft, COLORREF clrRight)
-{
-	// pre calculation
-	int	nSteps = rect.right-rect.left;
-	int	nRRange = GetRValue(clrRight)-GetRValue(clrLeft);
-	int	nGRange = GetGValue(clrRight)-GetGValue(clrLeft);
-	int	nBRange = GetBValue(clrRight)-GetBValue(clrLeft);
-
-	double	dRStep = (double)nRRange/(double)nSteps;
-	double	dGStep = (double)nGRange/(double)nSteps;
-	double	dBStep = (double)nBRange/(double)nSteps;
-
-	double	dR = (double)GetRValue(clrLeft);
-	double	dG = (double)GetGValue(clrLeft);
-	double	dB = (double)GetBValue(clrLeft);
-
-	CPen	*pPrevPen = NULL;
-	for (int x = rect.left; x <= rect.right; ++x)
-	{
-		CPen	Pen(PS_SOLID, 1, RGB((BYTE)dR, (BYTE)dG, (BYTE)dB));
-		pPrevPen = pDc->SelectObject(&Pen);
-		pDc->MoveTo(x, rect.top);
-		pDc->LineTo(x, rect.bottom);
-		pDc->SelectObject(pPrevPen);
-		
-		dR+= dRStep;
-		dG+= dGStep;
-		dB+= dBStep;
-	}
-}
-
 
 /////////////////////////////////////////////////////////////////////
 // message handlers
