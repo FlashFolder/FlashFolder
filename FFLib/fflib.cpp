@@ -848,6 +848,8 @@ void SetProfileDefaults()
 	g_profile.SetInt( _T("CommonFolderDlg"), _T("MinWidth"), 400, Profile::DONT_OVERWRITE );
 	g_profile.SetInt( _T("CommonFolderDlg"), _T("MinHeight"), 500, Profile::DONT_OVERWRITE );
 	g_profile.SetInt( _T("CommonFolderDlg"), _T("Center"), 1, Profile::DONT_OVERWRITE );
+	if( ! g_profile.SectionExists( _T("CommonFolderDlg.Excludes") ) )
+		g_profile.SetString( _T("CommonFolderDlg.Excludes"), _T("0"), _T("iTunes.exe") );
 
 	//--- MSO file dialog
 
