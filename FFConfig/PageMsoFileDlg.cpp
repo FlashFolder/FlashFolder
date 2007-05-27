@@ -95,7 +95,7 @@ BOOL CPageMsoFileDlg::OnApply()
 	g_profile.SetInt( PROFILE_GROUP, _T("MinHeight"), _ttoi( s ) );
 	g_profile.SetInt( PROFILE_GROUP, _T("Center"), m_cbPos.GetCurSel() );
 
-	g_profile.DeleteSection( PROFILE_GROUP + _T(".Excludes") );
+	g_profile.ClearSection( PROFILE_GROUP + _T(".Excludes") );
 	for( int i = 0; i != m_excludes.size(); ++i )
 	{
 		CString key; key.Format( _T("%d"), i );

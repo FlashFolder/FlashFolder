@@ -104,7 +104,7 @@ void CExcludesDlg::OnOK()
 
 void CExcludesDlg::OnBnClickedBtnAdd()
 {
-	CFileDialog dlg( TRUE, _T("exe"), _T(""), OFN_HIDEREADONLY, 
+	CFileDialog dlg( TRUE, _T("exe"), _T(""), OFN_HIDEREADONLY | OFN_ENABLESIZING, 
 		_T("Applications (*.exe)|*.exe|All files (*.*)|*.*||"), this );
 	if( dlg.DoModal() == IDOK )
 	{

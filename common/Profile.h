@@ -51,6 +51,7 @@ public:
 	void SetInt( LPCTSTR pSectionName, LPCTSTR pValueName, int value, DWORD flags = 0 );
 
 	void DeleteSection( LPCTSTR pSectionName );
+	void ClearSection( LPCTSTR pSectionName );
 	void DeleteValue( LPCTSTR pSectionName, LPCTSTR pValueName );
 
 private:

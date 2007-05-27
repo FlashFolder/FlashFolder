@@ -120,14 +120,14 @@ BOOL CPageCommonFileDlg::OnApply()
 	GetDlgItemText( IDC_ED_FOLDERCOMBO_MAXHEIGHT, s );
 	g_profile.SetInt( PROFILE_GROUP, _T("FolderComboHeight"), _ttoi( s ) );
 
-	g_profile.DeleteSection( PROFILE_GROUP + _T(".NonResizableExcludes") );
+	g_profile.ClearSection( PROFILE_GROUP + _T(".NonResizableExcludes") );
 	for( int i = 0; i != m_nonResizableExcludes.size(); ++i )
 	{
 		CString key; key.Format( _T("%d"), i );
 		g_profile.SetString( PROFILE_GROUP + _T(".NonResizableExcludes"), key, 
 			m_nonResizableExcludes[ i ] );
 	}
-	g_profile.DeleteSection( PROFILE_GROUP + _T(".Excludes") );
+	g_profile.ClearSection( PROFILE_GROUP + _T(".Excludes") );
 	for( int i = 0; i != m_excludes.size(); ++i )
 	{
 		CString key; key.Format( _T("%d"), i );

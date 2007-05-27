@@ -217,6 +217,22 @@ void Profile::DeleteSection( LPCTSTR pSectionName )
 
 //-----------------------------------------------------------------------------------
 
+void Profile::ClearSection( LPCTSTR pSectionName )
+{
+	DeleteSection( pSectionName );
+
+	tstring keyPath;
+	HKEY hRoot;
+	GetRootKey( &hRoot, &keyPath, pSectionName );
+	HKEY hKey = NULL;
+	if( ::RegCreateKeyEx( hRoot, keyPath.c_str(), 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL ) == ERROR_SUCCESS )
+	{
+		::RegCloseKey( hKey );
+	}
+}
+
+//-----------------------------------------------------------------------------------
+
 void Profile::DeleteValue( LPCTSTR pSectionName, LPCTSTR pValueName )
 {
 	tstring keyPath;
