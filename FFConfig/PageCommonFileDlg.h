@@ -1,5 +1,5 @@
-/* This file is part of FlashFolder. 
- * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+/* This file is part of FlashFolder.
+ * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net )
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,34 +18,29 @@
  */
 #pragma once
 
-#include "PageGeneric.h"
-#include "PageCommonFileDlg.h"
-#include "PageCommonDirDlg.h"
-#include "PageCommonOpenWithDlg.h"
-#include "PageMsoFileDlg.h"
-
 //-----------------------------------------------------------------------------------------------
 
-class CFFConfigDlg : public TreePropSheet::CTreePropSheet
+class CPageCommonFileDlg : public CAutoPropertyPage
 {
 public:
-	CFFConfigDlg(CWnd* pParent = NULL);	// standard constructor
+	typedef CAutoPropertyPage base;
 
-	enum { IDD = IDD_FFCONFIG_DIALOG };
+	CPageCommonFileDlg();
 
-private:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+	enum { IDD = IDD_PAGE_COMMON_FILEDLG };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    
 	virtual BOOL OnInitDialog();
+	virtual BOOL OnApply();
+
+	afx_msg void OnBnClickedBtnExcludes();
+	afx_msg void OnBnClickedBtnNonresizableExcludes();
+	afx_msg void OnBnClickedChkEnable();
 	DECLARE_MESSAGE_MAP()
 
-	CGroupCheck m_chkCFO, m_chkCFD, m_chkMSO, m_chkCOW;
-	CComboBox m_cbCFO_pos, m_cbCFD_pos, m_cbMSO_pos, m_cbCOW_pos;
-
-	std::vector<CString> m_cfoNonResizableExcludes;
-
-	CPageGeneric m_pageGeneric;
-	CPageCommonFileDlg m_pageCommonFileDlg;
-	CPageCommonDirDlg m_pageCommonDirDlg;
-	CPageCommonOpenWithDlg m_pageCommonOpenWithDlg;
-	CPageMsoFileDlg m_pageMsoFileDlg;
+private:
+	CComboBox m_cbPos;
+	std::vector<CString> m_excludes;
+	std::vector<CString> m_nonResizableExcludes;
 };

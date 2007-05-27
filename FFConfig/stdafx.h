@@ -8,9 +8,9 @@
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 #endif
 
-#define WINVER 0x0500		
-#define _WIN32_WINNT 0x0500	
-#define _WIN32_WINDOWS 0x0500 
+#define WINVER 0x0501		
+#define _WIN32_WINNT 0x0501	
+#define _WIN32_WINDOWS 0x0501 
 
 
 // turns off MFC's hiding of some common and often safely ignored warning messages
@@ -21,6 +21,7 @@
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
 #include <afxcmn.h>			// MFC support for Windows Common Controls
+#include <afxdlgs.h>
 #include <shlwapi.h>
 #include <shellapi.h>
 #include <shobjidl.h>
@@ -58,3 +59,9 @@
 #include "../common/DragListCtrl.h"
 #include "../common/EditEx.h"
 #include "../common/HyperLink.h"
+#include "../common/AutoPropertyPage.h"
+// UI - TreePropSheet headers
+#include "../common/TreePropSheet/TreePropSheet.h"
+#include "../common/TreePropSheet/PropPageFrame.h"
+#include "../common/TreePropSheet/PropPageFrameDefault.h"
+

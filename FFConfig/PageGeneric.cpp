@@ -1,5 +1,5 @@
-/* This file is part of FlashFolder. 
- * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+/* This file is part of FlashFolder.
+ * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net )
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,63 +18,60 @@
  */
 #include "stdafx.h"
 #include "FFConfig.h"
-#include "StringListDlg.h"
+#include "PageGeneric.h"
 
-using namespace std;
+const CString PROFILE_GROUP = _T("Main");
 
 //-----------------------------------------------------------------------------------------------
 
-IMPLEMENT_DYNAMIC(CStringListDlg, CDialog)
-CStringListDlg::CStringListDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CStringListDlg::IDD, pParent)
+CPageGeneric::CPageGeneric()
+	: base(CPageGeneric::IDD)
 {}
 
 //-----------------------------------------------------------------------------------------------
 
-void CStringListDlg::DoDataExchange(CDataExchange* pDX)
+void CPageGeneric::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_ED_EXCLUDES, m_edList);
+	base::DoDataExchange(pDX);
 }
 
 //-----------------------------------------------------------------------------------------------
 
-BEGIN_MESSAGE_MAP(CStringListDlg, CDialog)
+BEGIN_MESSAGE_MAP(CPageGeneric, CPageGeneric::base)
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
 
-BOOL CStringListDlg::OnInitDialog()
+BOOL CPageGeneric::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	base::OnInitDialog();
 
-	SetWindowText( m_title );
-	SetDlgItemText( IDC_ST_DESCR, m_descr );
+	//--- init controls
+
+	GetDlgItem( IDC_SP_MAX_DIRHISTORY )->SendMessage( UDM_SETRANGE, NULL, MAKELONG( 50, 0 ) );
+
+	//--- get profile data
 
 	CString s;
-	for( int i = 0; i != m_list.size(); ++i )
-	{
-		if( ! s.IsEmpty() )
-			s += _T("\r\n");
-		s += m_list[ i ];
-	}
-		
-	m_edList.SetWindowText( s );
+	s.LoadString( g_profile.IsShared() ? IDS_MU_SHARED : IDS_MU_INDIVIDUAL );
+	SetDlgItemText( IDC_ST_MULTIUSER, s );
+	
+	s.Format( _T("%d"), g_profile.GetInt( PROFILE_GROUP, _T("MaxGlobalHistoryEntries") ) );
+	SetDlgItemText( IDC_ED_MAX_DIRHISTORY, s );
 
 	return TRUE;
 }
 
 //-----------------------------------------------------------------------------------------------
 
-void CStringListDlg::OnOK()
+BOOL CPageGeneric::OnApply()
 {
-	CString s; m_edList.GetWindowText( s );
-	s.Replace( _T("\r\n"), _T("\n") );
+	// Multi-User option is currently read-only since it would require more work like
+	// checking for admin rights, elevation on Vista, etc.
 
-	m_list.clear();
-	SplitString( back_inserter( m_list ), s.GetString(), _T('\n') );
-
-	CDialog::OnOK();
+	CString s;
+	GetDlgItemText( IDC_ED_MAX_DIRHISTORY, s );
+	g_profile.SetInt( PROFILE_GROUP, _T("MaxGlobalHistoryEntries"), _ttoi( s ) );
+	
+	return base::OnApply();
 }
-
-//-----------------------------------------------------------------------------------------------

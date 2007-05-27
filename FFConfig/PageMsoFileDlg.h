@@ -1,5 +1,5 @@
-/* This file is part of FlashFolder. 
- * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+/* This file is part of FlashFolder.
+ * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net )
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,34 +18,27 @@
  */
 #pragma once
 
-#include <vector>
-#include "afxwin.h"
-
 //-----------------------------------------------------------------------------------------------
 
-class CStringListDlg : public CDialog
+class CPageMsoFileDlg : public CAutoPropertyPage
 {
-	DECLARE_DYNAMIC(CStringListDlg)
-
 public:
-	CStringListDlg(CWnd* pParent = NULL);   // Standardkonstruktor
+	typedef CAutoPropertyPage base;
 
-	void SetTitle( const CString& s ) { m_title = s; }
-	void SetDescr( const CString& s ) { m_descr = s; }
+	CPageMsoFileDlg();
 
-	void SetStrings( const std::vector<CString>& list )  { m_list = list; }
-	void GetStrings( std::vector<CString>* pList ) const { *pList = m_list; }
+	enum { IDD = IDD_PAGE_MSO_FILEDLG };
 
-	enum { IDD = IDD_STRINGLIST };
-
-private:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV-Unterstützung
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    
 	virtual BOOL OnInitDialog();
-	virtual void OnOK();
+	virtual BOOL OnApply();
+
+	afx_msg void OnBnClickedBtnExcludes();
+	afx_msg void OnBnClickedChkEnable();
 	DECLARE_MESSAGE_MAP()
 
-	std::vector<CString> m_list;
-	CEdit m_edList;
-
-	CString m_title, m_descr;
+private:
+	CComboBox m_cbPos;
+	std::vector<CString> m_excludes;
 };

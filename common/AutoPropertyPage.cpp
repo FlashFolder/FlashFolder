@@ -1,5 +1,5 @@
-/* This file is part of FlashFolder. 
- * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+/* This file is part of FlashFolder.
+ * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net )
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,50 +17,42 @@
  *
  */
 #include "stdafx.h"
-#include "FFConfig.h"
-#include "FFConfigDlg.h"
-#include "ExcludesDlg.h"
-
-using namespace std;
-using namespace TreePropSheet;
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
+#include "AutoPropertyPage.h"
 
 //-----------------------------------------------------------------------------------------------
 
-CFFConfigDlg::CFFConfigDlg(CWnd* pParent /*=NULL*/)
-	: CTreePropSheet( _T("FlashFolder Options"), pParent)
-{
-	SetTreeWidth( 125 );
-	
-	SetTreeViewMode( TRUE, TRUE, FALSE );
-	AddPage( &m_pageGeneric );
-	AddPage( &m_pageCommonFileDlg );
-	AddPage( &m_pageCommonDirDlg );
-	AddPage( &m_pageCommonOpenWithDlg );
-	AddPage( &m_pageMsoFileDlg );
-
-	SetEmptyPageText( _T("Please select a sub-page.") );
-}
+CAutoPropertyPage::CAutoPropertyPage( UINT resId )
+	: CPropertyPage( resId )
+{}
 
 //-----------------------------------------------------------------------------------------------
 
-void CFFConfigDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CTreePropSheet::DoDataExchange(pDX);
-}
-
-//-----------------------------------------------------------------------------------------------
-
-BEGIN_MESSAGE_MAP(CFFConfigDlg, CTreePropSheet)
+BEGIN_MESSAGE_MAP(CAutoPropertyPage, CPropertyPage)
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
 
-BOOL CFFConfigDlg::OnInitDialog()
+BOOL CAutoPropertyPage::OnNotify( WPARAM wp, LPARAM lp, LRESULT* pRes )
 {
-	CTreePropSheet::OnInitDialog();
-	return TRUE;  // return TRUE  unless you set the focus to a control
+	NMHDR* pnm = reinterpret_cast<NMHDR*>( lp );
+	return CPropertyPage::OnNotify( wp, lp, pRes );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+BOOL CAutoPropertyPage::OnCommand( WPARAM wp, LPARAM lp )
+{
+	UINT code = ( wp >> 16 ) & 0xFFFF;
+	CWnd* pWnd = CWnd::FromHandle( (HWND) lp );
+	DWORD style = pWnd->GetStyle();
+
+	if( code == BN_CLICKED )
+	{
+		if( ! ( style & BS_PUSHBUTTON ) )
+			SetModified();
+	}
+	else if( code == CBN_SELCHANGE || code == EN_CHANGE  )
+		SetModified();
+
+	return CPropertyPage::OnCommand( wp, lp );
 }

@@ -117,22 +117,30 @@ BOOL CFFConfigApp::InitInstance()
 	// visual styles.  Otherwise, any window creation will fail.
 	InitCommonControls();
 
-	CDialog* pDlg = NULL;
 	switch( dlgType )
 	{
 		case DLG_CONFIG:
-			pDlg = new CFFConfigDlg( CWnd::FromHandle( hwndParent ) );
+		{
+			CFFConfigDlg dlg( CWnd::FromHandle( hwndParent ) );
+			m_pMainWnd = &dlg;
+			dlg.DoModal();
 			break;
+		}
 		case DLG_FAVS:
-			pDlg = new CFolderFavoritesDlg( CWnd::FromHandle( hwndParent ) );
+		{
+			CFolderFavoritesDlg dlg( CWnd::FromHandle( hwndParent ) );
+			m_pMainWnd = &dlg;
+			dlg.DoModal();
 			break;
+		}
 		case DLG_ABOUT:
-			pDlg = new CAboutDlg( CWnd::FromHandle( hwndParent ) );
+		{
+			CAboutDlg dlg( CWnd::FromHandle( hwndParent ) );
+			m_pMainWnd = &dlg;
+			dlg.DoModal();
 			break;
+		}
 	}
-	m_pMainWnd = pDlg;
-	pDlg->DoModal();
-	delete pDlg;
 
 	return FALSE;
 }

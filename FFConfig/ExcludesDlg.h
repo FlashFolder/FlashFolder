@@ -18,34 +18,31 @@
  */
 #pragma once
 
-#include "PageGeneric.h"
-#include "PageCommonFileDlg.h"
-#include "PageCommonDirDlg.h"
-#include "PageCommonOpenWithDlg.h"
-#include "PageMsoFileDlg.h"
-
 //-----------------------------------------------------------------------------------------------
 
-class CFFConfigDlg : public TreePropSheet::CTreePropSheet
+class CExcludesDlg : public CDialog
 {
 public:
-	CFFConfigDlg(CWnd* pParent = NULL);	// standard constructor
+	enum { IDD = IDD_EXCLUDE };
 
-	enum { IDD = IDD_FFCONFIG_DIALOG };
+	CExcludesDlg(CWnd* pParent = NULL);   // Standardkonstruktor
+
+	void SetTitle( const CString& s ) { m_title = s; }
+	void SetDescr( const CString& s ) { m_descr = s; }
+
+	void SetStrings( const std::vector<CString>& list )  { m_list = list; }
+	void GetStrings( std::vector<CString>* pList ) const { *pList = m_list; }
 
 private:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV-Unterstützung
 	virtual BOOL OnInitDialog();
+	virtual void OnOK();
+	afx_msg void OnBnClickedBtnAdd();
 	DECLARE_MESSAGE_MAP()
 
-	CGroupCheck m_chkCFO, m_chkCFD, m_chkMSO, m_chkCOW;
-	CComboBox m_cbCFO_pos, m_cbCFD_pos, m_cbMSO_pos, m_cbCOW_pos;
+private:
+	std::vector<CString> m_list;
+	CEdit m_edList;
 
-	std::vector<CString> m_cfoNonResizableExcludes;
-
-	CPageGeneric m_pageGeneric;
-	CPageCommonFileDlg m_pageCommonFileDlg;
-	CPageCommonDirDlg m_pageCommonDirDlg;
-	CPageCommonOpenWithDlg m_pageCommonOpenWithDlg;
-	CPageMsoFileDlg m_pageMsoFileDlg;
+	CString m_title, m_descr;
 };

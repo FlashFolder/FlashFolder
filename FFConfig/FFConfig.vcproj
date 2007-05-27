@@ -34,10 +34,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="version.lib"
+				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
+				DelayLoadDLLs="uxtheme.dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				TargetMachine="1"/>
@@ -93,10 +94,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="version.lib"
+				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
+				DelayLoadDLLs="uxtheme.dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -154,10 +156,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="version.lib"
+				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
+				DelayLoadDLLs="uxtheme.dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -217,10 +220,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="version.lib"
+				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
+				DelayLoadDLLs="uxtheme.dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				TargetMachine="1"/>
@@ -266,6 +270,9 @@
 				RelativePath=".\AboutDlg.cpp">
 			</File>
 			<File
+				RelativePath=".\ExcludesDlg.cpp">
+			</File>
+			<File
 				RelativePath=".\FFConfig.cpp">
 			</File>
 			<File
@@ -273,6 +280,21 @@
 			</File>
 			<File
 				RelativePath=".\FolderFavoritesDlg.cpp">
+			</File>
+			<File
+				RelativePath=".\PageCommonDirDlg.cpp">
+			</File>
+			<File
+				RelativePath=".\PageCommonFileDlg.cpp">
+			</File>
+			<File
+				RelativePath=".\PageCommonOpenWithDlg.cpp">
+			</File>
+			<File
+				RelativePath=".\PageGeneric.cpp">
+			</File>
+			<File
+				RelativePath=".\PageMsoFileDlg.cpp">
 			</File>
 			<File
 				RelativePath=".\stdafx.cpp">
@@ -301,9 +323,6 @@
 						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\StringListDlg.cpp">
-			</File>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -311,6 +330,9 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath=".\AboutDlg.h">
+			</File>
+			<File
+				RelativePath=".\ExcludesDlg.h">
 			</File>
 			<File
 				RelativePath=".\FFConfig.h">
@@ -322,13 +344,25 @@
 				RelativePath=".\FolderFavoritesDlg.h">
 			</File>
 			<File
+				RelativePath=".\PageCommonDirDlg.h">
+			</File>
+			<File
+				RelativePath=".\PageCommonFileDlg.h">
+			</File>
+			<File
+				RelativePath=".\PageCommonOpenWithDlg.h">
+			</File>
+			<File
+				RelativePath=".\PageGeneric.h">
+			</File>
+			<File
+				RelativePath=".\PageMsoFileDlg.h">
+			</File>
+			<File
 				RelativePath=".\Resource.h">
 			</File>
 			<File
 				RelativePath=".\stdafx.h">
-			</File>
-			<File
-				RelativePath=".\StringListDlg.h">
 			</File>
 		</Filter>
 		<Filter
@@ -351,6 +385,9 @@
 		<Filter
 			Name="common_h"
 			Filter="*.h">
+			<File
+				RelativePath="..\common\AutoPropertyPage.h">
+			</File>
 			<File
 				RelativePath="..\common\DlgAnchor.h">
 			</File>
@@ -382,6 +419,12 @@
 				RelativePath="..\common\Profile.h">
 			</File>
 			<File
+				RelativePath="..\common\TreePropSheet\PropPageFrame.h">
+			</File>
+			<File
+				RelativePath="..\common\TreePropSheet\PropPageFrameDefault.h">
+			</File>
+			<File
 				RelativePath="..\common\Registry.h">
 			</File>
 			<File
@@ -394,12 +437,18 @@
 				RelativePath="..\common\TotalCmdUtils.h">
 			</File>
 			<File
+				RelativePath="..\common\TreePropSheet\TreePropSheet.h">
+			</File>
+			<File
 				RelativePath="..\common\tstring.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="common_cpp"
 			Filter="*.cpp">
+			<File
+				RelativePath="..\common\AutoPropertyPage.cpp">
+			</File>
 			<File
 				RelativePath="..\common\DlgAnchor.cpp">
 			</File>
@@ -431,10 +480,19 @@
 				RelativePath="..\common\Profile.cpp">
 			</File>
 			<File
+				RelativePath="..\common\TreePropSheet\PropPageFrame.cpp">
+			</File>
+			<File
+				RelativePath="..\common\TreePropSheet\PropPageFrameDefault.cpp">
+			</File>
+			<File
 				RelativePath="..\common\SizeGrip.cpp">
 			</File>
 			<File
 				RelativePath="..\common\TotalCmdUtils.cpp">
+			</File>
+			<File
+				RelativePath="..\common\TreePropSheet\TreePropSheet.cpp">
 			</File>
 		</Filter>
 	</Files>
