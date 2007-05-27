@@ -125,8 +125,8 @@ BEGIN
     LTEXT           "Statisch",IDC_ST_MULTIUSER,14,22,151,8
     LTEXT           "To change this option, you need to reinstall FlashFolder.",
                     IDC_STATIC,13,33,171,17,WS_DISABLED
-    LTEXT           "&Max. number of directory history entries:",IDC_STATIC,
-                    7,69,183,11
+    LTEXT           "&Max. number of folder history entries:",IDC_STATIC,7,
+                    69,183,11
     EDITTEXT        IDC_ED_MAX_DIRHISTORY,7,79,34,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_SP_MAX_DIRHISTORY,"msctls_updown32",
                     UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
@@ -223,6 +223,49 @@ BEGIN
                     WS_TABSTOP,7,139,105,10
     PUSHBUTTON      "E&xcludes...",IDC_BTN_NONRESIZABLE_EXCLUDES,113,138,47,
                     12
+END
+
+IDD_EXCLUDE DIALOGEX 0, 0, 285, 198
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Edit Exclusion List"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "",IDC_ST_DESCR,7,7,271,25
+    EDITTEXT        IDC_ED_EXCLUDES,7,37,271,123,ES_MULTILINE | 
+                    ES_WANTRETURN | WS_VSCROLL
+    PUSHBUTTON      "&Add program...",IDC_BTN_ADD,7,160,66,14
+    DEFPUSHBUTTON   "OK",IDOK,89,177,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,146,177,50,14
+END
+
+IDD_FAVORITES DIALOGEX 0, 0, 360, 271
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | 
+    WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "FlashFolder Favorites"
+CLASS "FFFavorites.xmgn4ngertu4mnsf"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Insert",IDC_BTN_ADD,7,7,40,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,49,7,40,14
+    LTEXT           "Drag an item by mouse to change its position.",
+                    IDC_STATIC,100,10,147,8
+    CONTROL         "",IDC_LST_FAVS,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,23,346,159
+    LTEXT           "&Path:",IDC_ST_PATH,7,187,18,8
+    EDITTEXT        IDC_ED_PATH,59,184,263,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "...",IDC_BTN_BROWSE,324,184,29,14,WS_DISABLED
+    LTEXT           "Title (optional):",IDC_ST_TITLE,7,203,50,8
+    EDITTEXT        IDC_ED_TITLE,59,200,294,14,ES_AUTOHSCROLL | WS_DISABLED
+    CONTROL         "&Use FlashFolder favorites",IDC_RD_OWN_FAVORITES,"Button",
+                    BS_AUTORADIOBUTTON,7,221,97,10
+    CONTROL         "Use directory menu from Total Commander®",
+                    IDC_RD_TC_FAVORITES,"Button",BS_AUTORADIOBUTTON,7,233,
+                    159,10
+    DEFPUSHBUTTON   "OK",IDOK,97,250,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,154,250,50,14
+    PUSHBUTTON      "Re&vert",IDC_BTN_REVERT,211,250,50,14
 END
 
 
@@ -365,81 +408,6 @@ BEGIN
     IDS_EXCLUDES            "Enter filenames of programs which are not compatible with this feature (e.g. myprogram.exe).\n&Put each filename on a separate line:"
 END
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_EXCLUDE DIALOGEX 0, 0, 285, 198
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | 
-    WS_CAPTION | WS_SYSMENU
-CAPTION "Edit Exclusion List"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "",IDC_ST_DESCR,7,7,271,25
-    EDITTEXT        IDC_ED_EXCLUDES,7,37,271,123,ES_MULTILINE | 
-                    ES_WANTRETURN | WS_VSCROLL
-    PUSHBUTTON      "&Add program...",IDC_BTN_ADD,7,160,66,14
-    DEFPUSHBUTTON   "OK",IDOK,89,177,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,146,177,50,14
-END
-
-IDD_FAVORITES DIALOGEX 0, 0, 360, 271
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | 
-    WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "FlashFolder Favorites"
-CLASS "FFFavorites.xmgn4ngertu4mnsf"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    PUSHBUTTON      "&Insert",IDC_BTN_ADD,7,7,40,14
-    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,49,7,40,14
-    LTEXT           "Drag an item by mouse to change its position.",
-                    IDC_STATIC,100,10,147,8
-    CONTROL         "",IDC_LST_FAVS,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
-                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,23,346,159
-    LTEXT           "&Path:",IDC_ST_PATH,7,187,18,8
-    EDITTEXT        IDC_ED_PATH,59,184,263,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "...",IDC_BTN_BROWSE,324,184,29,14,WS_DISABLED
-    LTEXT           "Title (optional):",IDC_ST_TITLE,7,203,50,8
-    EDITTEXT        IDC_ED_TITLE,59,200,294,14,ES_AUTOHSCROLL | WS_DISABLED
-    CONTROL         "&Use FlashFolder favorites",IDC_RD_OWN_FAVORITES,"Button",
-                    BS_AUTORADIOBUTTON,7,221,97,10
-    CONTROL         "Use directory menu from Total Commander®",
-                    IDC_RD_TC_FAVORITES,"Button",BS_AUTORADIOBUTTON,7,233,
-                    159,10
-    DEFPUSHBUTTON   "OK",IDOK,97,250,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,154,250,50,14
-    PUSHBUTTON      "Re&vert",IDC_BTN_REVERT,211,250,50,14
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
-BEGIN
-    IDD_EXCLUDE, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 278
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 191
-    END
-
-    IDD_FAVORITES, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 353
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 264
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
 #endif    // Englisch (USA) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -464,3 +432,4 @@ LANGUAGE 9, 1
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
