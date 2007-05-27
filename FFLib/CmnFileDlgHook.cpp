@@ -62,26 +62,26 @@ bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
     //--- check exclusion list for resizing of non-resizable dialogs
 
     // get application EXE filename
-	TCHAR procPath[MAX_PATH+1];
+	TCHAR procPath[ MAX_PATH + 1 ] = _T("");
 	::GetModuleFileName( NULL, procPath, MAX_PATH );
-    TCHAR* pProcExe = _tcsrchr( procPath, _T('\\') );
-    if( pProcExe ) pProcExe++;
+    if( TCHAR* pProcExe = _tcsrchr( procPath, _T('\\') ) )
+	{
+		++pProcExe;
+		for( int i = 0;; ++i )
+		{
+			TCHAR key[10];
+			_stprintf( key, _T("%d"), i );
+			tstring path = g_profile.GetString( _T("CommonFileDlg.NonResizableExcludes"), key, _T("") );
+			if( path.empty() )
+				break;
 
-	for( int i = 0;; ++i )
-    {
-		TCHAR key[10];
-        _stprintf( key, _T("%d"), ++i );
-		tstring path = g_profile.GetString( _T("CommonFileDlg.NonResizableExcludes"), key, _T("") );
-		if( path.empty() )
-			break;
-
-        if( _tcsicmp( pProcExe, path.c_str() ) == 0 )
-        {
-            m_bResizeNonResizableDlgs = false;
-            break;
-        }
-    }
-
+			if( _tcsicmp( pProcExe, path.c_str() ) == 0 )
+			{
+				m_bResizeNonResizableDlgs = false;
+				break;
+			}
+		}
+	}
 	return true;
 }
 
