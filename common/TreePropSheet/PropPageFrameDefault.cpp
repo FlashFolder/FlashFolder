@@ -7,13 +7,10 @@
 *
 * Redistribution is appreciated.
 *
-* $Workfile:$
-* $Revision:$
-* $Modtime:$
-* $Author:$
-*
-* Revision History:
-*	$History:$
+* Changes by zett42 (zett42 at users.sourceforge.net):
+*    FIX: CTreePropSheet did not use DPI-independent metrics
+*    FIX: Prop-page caption colors did not work with some XP themes
+*    ADD: Allow different captions for tree and prop-page.
 *
 *********************************************************************/
 
