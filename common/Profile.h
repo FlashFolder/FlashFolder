@@ -32,14 +32,12 @@ public:
 		DONT_OVERWRITE = 0x001   ///< if set, don't overwrite existing values
 	};
 
-	Profile( LPCTSTR rootKey )
-		: m_rootKey( rootKey ) {}
+	Profile() : m_isShared( false ) {}
+	Profile( LPCTSTR rootPath ) { SetRoot( rootPath ); }
 
-	void SetRoot( LPCTSTR rootKey ) { m_rootKey = rootKey; }
-	tstring GetRoot() const { return m_rootKey; }
+	void SetRoot( LPCTSTR rootPath );
 
-	bool IsShared() const; 
-	void SetShared( bool isShared );
+	bool IsShared() const {	return m_isShared; } 
 
 	bool ValueExists( LPCTSTR pSectionName, LPCTSTR pValueName ) const;
 	bool SectionExists( LPCTSTR pSectionName ) const;
@@ -54,8 +52,12 @@ public:
 	void ClearSection( LPCTSTR pSectionName );
 	void DeleteValue( LPCTSTR pSectionName, LPCTSTR pValueName );
 
-private:
-	void GetRootKey( HKEY* pKey, tstring* pPath, LPCTSTR pSectionName = NULL ) const;
+	/// Deletes all profile data but keeps the empty main profile regkey (so that regkey privileges 
+	/// set by the installer for "shared profile" are not removed).
+	void Clear();
 
-	tstring m_rootKey; 		
+private:
+	tstring m_regPath;
+	HKEY m_hRootKey;
+	bool m_isShared;
 };

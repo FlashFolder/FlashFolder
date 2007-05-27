@@ -64,7 +64,7 @@ WNDPROC g_wndProcToolWindowEditPath;
 
 TCHAR g_favIniFilePath[MAX_PATH+1];		// Path to INI-File with favorite folders
 
-Profile g_profile( _T("zett42\\FlashFolder") );   
+Profile g_profile;   
 
 //--- options, read from global INI file ---
 int g_globalHistoryMaxEntries;
@@ -818,9 +818,22 @@ void SetTimer( DWORD interval )
 /**
  * Set default program settings when the first file dialog is opened by the current user.
 **/
-void SetProfileDefaults()
+DLLFUNC void SetProfileDefaults( bool bReset )
 {
 	OutputDebugString( _T("[fflib] setting default profile data\n") );
+
+	if( bReset )
+	{
+		g_profile.Clear();
+	}
+	else
+	{
+		// For optimization: only set defaults if this is the first run of a new FlashFolder version.
+		int lastRevision = g_profile.GetInt( _T("main"), _T("LastRunRevision") );
+		if( lastRevision >= APP_VER_BUILD )
+			return;
+		g_profile.SetInt( _T("main"), _T("LastRunRevision"), APP_VER_BUILD );
+	}
 
 	tstring tcIniPath;
 	bool isTcInstalled = GetTotalCmdLocation( NULL, &tcIniPath );
@@ -933,6 +946,7 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 		FileDlgType fileDlgType = GetFileDlgType( hwnd );
 		if( fileDlgType != FDT_NONE )
 		{
+			g_profile.SetRoot( _T("zett42\\FlashFolder") );
 			SetProfileDefaults();
 
 			if( ! IsCurrentProgramEnabledForDialog( fileDlgType ) )

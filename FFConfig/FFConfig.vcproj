@@ -486,6 +486,9 @@
 				RelativePath="..\common\TreePropSheet\PropPageFrameDefault.cpp">
 			</File>
 			<File
+				RelativePath="..\common\Registry.cpp">
+			</File>
+			<File
 				RelativePath="..\common\SizeGrip.cpp">
 			</File>
 			<File

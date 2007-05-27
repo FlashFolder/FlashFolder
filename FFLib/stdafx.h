@@ -28,6 +28,7 @@
 using namespace std;
 
 //--- own headers
+#include "../_version.h"
 #include "../common/tstring.h"
 #include "../common/Profile.h"
 #include "../common/ff_utils.h"

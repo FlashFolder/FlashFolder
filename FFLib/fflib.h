@@ -35,6 +35,8 @@ DLLFUNC bool InstallHook();
 
 DLLFUNC bool UninstallHook();
 
+DLLFUNC void SetProfileDefaults( bool bReset = false );
+
 //-----------------------------------------------------------------------------------------
 
 extern Profile g_profile;

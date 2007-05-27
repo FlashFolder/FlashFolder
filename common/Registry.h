@@ -22,16 +22,30 @@
 
 #pragma once
 
+/**
+ *  \brief Encapsulates a registry key (HKEY) and provides methods to access it.
+**/
 class RegKey
 {
 public:
 	RegKey() : m_hKey( NULL ) {}
 
-	RegKey( HKEY hRoot, LPCTSTR pSubKey, DWORD desiredAccess = KEY_QUERY_VALUE )
-		{ Open( hRoot, pSubKey, desiredAccess ); }
+	/// \brief Constructor attaches this instance to an HKEY handle, taking ownership of it.
+	RegKey( HKEY hKeyAttach ) : m_hKey( hKeyAttach ) {}
 
+	/// \brief Constructor opens an existing regkey or creates a new one.
+	RegKey( HKEY hRoot, LPCTSTR pSubKey, DWORD desiredAccess = KEY_QUERY_VALUE, bool bCreate = false )
+	{ 
+		if( bCreate )
+			Create( hRoot, pSubKey, desiredAccess );
+		else
+			Open( hRoot, pSubKey, desiredAccess ); 
+	}
+
+	/// \brief Destructor automatically closes the regkey if it goes out of scope.
 	~RegKey() { Close(); }
 
+	/// \brief Opens an existing regkey for read access.
 	bool Open( HKEY hRoot, LPCTSTR pSubKey, DWORD desiredAccess = KEY_QUERY_VALUE )
 	{
 		Close();
@@ -41,6 +55,7 @@ public:
 		return false;
 	}
 
+	/// \brief Creates a new regkey or opens it if it already exists. 
 	bool Create( HKEY hRoot, LPCTSTR pSubKey, DWORD desiredAccess = KEY_ALL_ACCESS )
 	{
 		Close();
@@ -50,7 +65,15 @@ public:
 		m_hKey = NULL;
 		return false;
 	}
-	
+
+	/// Attach this instance to an HKEY handle, taking ownership of it.
+	void Attach( HKEY hKey ) { Close(); m_hKey = hKey; }
+
+	/// Detaches this instance from the HKEY handle.
+	HKEY Detach() { HKEY h = m_hKey; m_hKey = NULL; return h; }
+
+
+	/// \brief Closes the currently open regkey instance. 
 	void Close()
 	{
 		if( m_hKey ) 
@@ -58,80 +81,122 @@ public:
 		m_hKey = NULL;
 	}
 
+	/// \brief Converts a RegKey instance to an HKEY so it can be used in place of an HKEY. 
 	operator HKEY() const { return m_hKey; }
 	
+	/// \brief Checks if a sub-key of the currently open regkey exists. 
+	bool KeyExists( LPCTSTR pKeyPath )
+	{
+		if( ! m_hKey )
+			return false;
+		HKEY hKey = NULL;
+		if( ::RegOpenKeyEx( m_hKey, pKeyPath, 0, KEY_QUERY_VALUE, &hKey ) == ERROR_SUCCESS )
+		{
+			::RegCloseKey( hKey );
+			return true;
+		}
+		return false;				
+	}
+	/// \brief Checks if a value of the currently open regkey exists. 
 	bool ValueExists( LPCTSTR pValueName )
 	{
-		return ::RegQueryValueEx( m_hKey, pValueName, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS;
+		tstring s = tstring( L"RegKey::ValueExists " ) + tstring( pValueName );
+		::OutputDebugString( s.c_str() );
+		if( ! m_hKey )
+			return false;
+		bool res = ::RegQueryValueEx( m_hKey, pValueName, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS;
+		if( res )
+			::OutputDebugString( L"  true" );
+		return res;
 	}
 
-	bool GetString( tstring* pValue, LPCTSTR pValueName )
-	{
-		*pValue = _T("");
-		DWORD type = 0;
-		TCHAR buf[ 1024 ] = _T("");
-		DWORD size = sizeof(buf) - sizeof(TCHAR);
-		if( ::RegQueryValueEx( m_hKey, pValueName, NULL, &type, 
-				reinterpret_cast<LPBYTE>( &buf ), &size ) == ERROR_SUCCESS )
-			if( type == REG_SZ )
-			{
-				buf[ size / sizeof(TCHAR) ] = 0;
-				*pValue = buf;				
-				return true;
-			}
-		return false;
-	}
+	/// \brief Retrieves a string value from the currently open regkey.
+	/// \return true if the operation was successful.
+	bool GetString( tstring* pValue, LPCTSTR pValueName );
 
+	/// \brief Retrieves a string value from the currently open regkey. 
+	/// \return The retrieved value or the given default value if the value could not be read.
 	tstring GetString( LPCTSTR pValueName, LPCTSTR pDefaultValue = _T("") )
 	{
+		if( ! m_hKey )
+			return pDefaultValue;
 		tstring res;
 		if( GetString( &res, pValueName ) )
 			return res;
 		return pDefaultValue;
 	}
 
-	void SetString( LPCTSTR pValueName, LPCTSTR pValue )
+	/// \brief Sets a string value of the currently open regkey. 
+	/// \return true if the operation was successful
+	bool SetString( LPCTSTR pValueName, LPCTSTR pValue )
 	{
+		if( ! m_hKey )
+			return false;
 		DWORD size = ( _tcslen( pValue ) + 1 ) * sizeof(TCHAR);
-		::RegSetValueEx( m_hKey, pValueName, 0, REG_SZ, reinterpret_cast<const BYTE*>( pValue ), size ); 
+		return ::RegSetValueEx( m_hKey, pValueName, 0, REG_SZ, reinterpret_cast<const BYTE*>( pValue ), size )
+			== ERROR_SUCCESS; 
 	}
 
-	bool GetInt( int* pValue, LPCTSTR pValueName )
-	{
-		DWORD type = 0;
-		TCHAR buf[ 64 ] = _T("");
-		DWORD size = sizeof(buf) - sizeof(TCHAR);
-		if( ::RegQueryValueEx( m_hKey, pValueName, NULL, &type, 
-				reinterpret_cast<LPBYTE>( &buf ), &size ) == ERROR_SUCCESS )
-			if( type == REG_SZ )
-			{
-				buf[ size / sizeof(TCHAR) ] = 0;
-				*pValue = _ttoi( buf );
-				return true;
-			}
-			else if( type == REG_DWORD )
-			{
-				*pValue = *reinterpret_cast<DWORD*>( buf );
-				return true;
-			}
-		return false;
-	}
+	/// \brief Retrieves an integer value from the currently open regkey.
+	///
+	/// The value can be of type REG_DWORD or REG_SZ. In the latter case the string is interpreted as integer.
+	/// \return true if the operation was successful
+	bool GetInt( int* pValue, LPCTSTR pValueName );
 
-	int GetInt( LPCTSTR pValueName, int pDefaultValue = 0 )
+	/// \brief Retrieves an integer value from the currently open regkey.
+	///
+	/// The value can be of type REG_DWORD or REG_SZ. In the latter case the string is interpreted as integer.
+	/// \return The retrieved value or the given default value if the value could not be read.
+	int GetInt( LPCTSTR pValueName, int defaultValue = 0 )
 	{
+		if( ! m_hKey )
+			return defaultValue;
 		int res;
 		if( GetInt( &res, pValueName ) )
 			return res;
-		return pDefaultValue;
+		return defaultValue;
 	}
 
-	void SetInt( LPCTSTR pValueName, int value )
+	/// \brief Retrieves an integer value from the currently open regkey.
+	/// \return true if the operation was successful
+	bool SetInt( LPCTSTR pValueName, int value )
 	{
+		if( ! m_hKey )
+			return false;
 		DWORD dwValue = static_cast<DWORD>( value );
-		::RegSetValueEx( m_hKey, pValueName, 0, REG_DWORD, reinterpret_cast<const BYTE*>( &dwValue ), 4 ); 
+		return ::RegSetValueEx( m_hKey, pValueName, 0, REG_DWORD, reinterpret_cast<const BYTE*>( &dwValue ), 4 )
+			== ERROR_SUCCESS;
 	}
 
+	/// \brief Deletes a subkey and all its descendants. 
+	/// \return true if the operation was successful
+	bool DeleteKey( LPCTSTR pKeyPath = NULL )
+	{
+		if( ! m_hKey )
+			return false;
+		return ::SHDeleteKey( m_hKey, pKeyPath ) == ERROR_SUCCESS;
+	}
+
+	/// \brief Delete all values and subkeys of the current regkey; 
+	/// \return true if the operation was successful
+	bool Clear()
+	{
+		if( ! m_hKey )
+			return false;
+		return ClearKey( m_hKey );
+	}
+
+	/// \brief Delete a value of the current regkey.
+	/// \retval true if the operation was successful
+	bool DeleteValue( LPCTSTR pValueName )
+	{
+		if( ! m_hKey )
+			return false;
+		return ::RegDeleteValue( m_hKey, pValueName ) == ERROR_SUCCESS;
+	}
 
 private:
+	static bool ClearKey( HKEY hKeyRoot );
+
 	HKEY m_hKey;
 };

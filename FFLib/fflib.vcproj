@@ -405,6 +405,9 @@
 			Name="Header-Dateien"
 			Filter="h;hpp;hxx;hm;inl">
 			<File
+				RelativePath="..\_version.h">
+			</File>
+			<File
 				RelativePath=".\CmnFileDlgHook.h">
 			</File>
 			<File
@@ -490,6 +493,9 @@
 			</File>
 			<File
 				RelativePath="..\common\Profile.cpp">
+			</File>
+			<File
+				RelativePath="..\common\Registry.cpp">
 			</File>
 			<File
 				RelativePath="..\common\TotalCmdUtils.cpp">
