@@ -839,6 +839,8 @@ void SetProfileDefaults()
 	g_profile.SetInt( _T("CommonFileDlg"), _T("ResizeNonResizableDialogs"), 1, Profile::DONT_OVERWRITE );
 	if( ! g_profile.SectionExists( _T("CommonFileDlg.NonResizableExcludes") ) )
 		g_profile.SetString( _T("CommonFileDlg.NonResizableExcludes"), _T("0"), _T("i_view32.exe") );
+	if( ! g_profile.SectionExists( _T("CommonFileDlg.Excludes") ) )
+		g_profile.SetString( _T("CommonFileDlg.Excludes"), _T("0"), _T("iTunes.exe") );
 
 	//--- common folder dialog
 
@@ -862,6 +864,57 @@ void SetProfileDefaults()
 	g_profile.SetInt( _T("CommonOpenWithDlg"), _T("Center"), 1, Profile::DONT_OVERWRITE );
 }
 
+//-----------------------------------------------------------------------------------------------
+// Check if hook for the current program and the given type of dialog is enabled.
+
+bool IsCurrentProgramEnabledForDialog( FileDlgType fileDlgType )
+{
+	::OutputDebugString( _T("IsCurrentProgramEnabled...\n") );
+
+	// Check if FlashFolder is globally disabled for given kind of dialog.
+	TCHAR* pProfileGroup = _T("");
+	switch( fileDlgType )
+	{
+		case FDT_COMMON:
+			pProfileGroup = _T("CommonFileDlg");
+		break;
+		case FDT_MSOFFICE:
+			pProfileGroup = _T("MSOfficeFileDlg");
+		break;
+		case FDT_COMMON_OPENWITH:
+			pProfileGroup = _T("CommonOpenWithDlg");
+		break;
+		case FDT_COMMON_FOLDER:
+			pProfileGroup = _T("CommonFolderDlg");
+		break;	
+	}
+	if( g_profile.GetInt( pProfileGroup, _T("EnableHook") ) == 0 )
+		return false;
+
+    // Get EXE filename of current program.
+	TCHAR procPath[ MAX_PATH + 1 ] = _T("");
+	::GetModuleFileName( NULL, procPath, MAX_PATH );
+    if( TCHAR* pProcExe = _tcsrchr( procPath, _T('\\') ) )
+	{
+		++pProcExe;
+
+		// Check if EXE filename is in the excludes list for given dialog type.
+		tstring excludesGroup = pProfileGroup;
+		excludesGroup += _T(".Excludes");
+		for( int i = 0;; ++i )
+		{
+			TCHAR key[10];
+			_stprintf( key, _T("%d"), i );
+			tstring path = g_profile.GetString( excludesGroup.c_str(), key );
+			if( path.empty() )
+				break;
+			if( _tcsicmp( pProcExe, path.c_str() ) == 0 )
+				return false;
+		}
+	}
+	return true;
+}
+
 //-----------------------------------------------------------------------------------------
 
 LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -880,37 +933,12 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 		{
 			SetProfileDefaults();
 
-			bool isFileDialog = false;
-
-			//--- check if hook for this type of dialog is enabled
-			bool isEnabled = true;
-			if( fileDlgType == FDT_COMMON )
-			{
-				isFileDialog = true;
-				if( g_profile.GetInt( _T("CommonFileDlg"), _T("EnableHook") ) == 0 )
-					isEnabled = false;
-			}
-			else if( fileDlgType == FDT_MSOFFICE ) 
-			{
-				isFileDialog = true;
-				if( g_profile.GetInt( _T("MSOfficeFileDlg"), _T("EnableHook") ) == 0 )
-					isEnabled = false;
-			}
-			else if( fileDlgType == FDT_COMMON_OPENWITH ) 
-			{
-				if( g_profile.GetInt( _T("CommonOpenWithDlg"), _T("EnableHook") ) == 0 )
-					isEnabled = false;
-			}
-			else if( fileDlgType == FDT_COMMON_FOLDER ) 
-			{
-				if( g_profile.GetInt( _T("CommonFolderDlg"), _T("EnableHook") ) == 0 )
-					isEnabled = false;
-			}
-			if( ! isEnabled )
+			if( ! IsCurrentProgramEnabledForDialog( fileDlgType ) )
 				return CallNextHookEx( g_hHook, nCode, wParam, lParam );
 
-
 			//--- initialise hook for this dialog
+
+			bool isFileDialog = ( fileDlgType == FDT_COMMON || fileDlgType == FDT_MSOFFICE );
 
 			g_hFileDialog = hwnd;
 
@@ -918,27 +946,34 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 			// create an instance of a file dialog hook class depending on the
 			// type of file dialog
-			if( fileDlgType == FDT_COMMON )
+			switch( fileDlgType )
 			{
-				g_spFileDlgHook.reset( new CmnFileDlgHook );
-				g_spFileDlgHook->Init( hwnd, g_hToolWnd );
-			}
-			else if( fileDlgType == FDT_MSOFFICE )
-			{
-				g_spFileDlgHook.reset( new MsoFileDlgHook );
-				g_spFileDlgHook->Init( hwnd, g_hToolWnd );
-			}
-			else if( fileDlgType == FDT_COMMON_OPENWITH )
-			{
-				// init the "Open With" dialog hook
-				g_spOpenWithDlgHook.reset( new CmnOpenWithDlgHook );
-				g_spOpenWithDlgHook->Init( hwnd, g_hToolWnd );
-			}
-			else if( fileDlgType == FDT_COMMON_FOLDER )
-			{
-				// init the "Open With" dialog hook
-				g_spFileDlgHook.reset( new CmnFolderDlgHook );
-				g_spFileDlgHook->Init( hwnd, g_hToolWnd );
+				case FDT_COMMON:
+				{
+					g_spFileDlgHook.reset( new CmnFileDlgHook );
+					g_spFileDlgHook->Init( hwnd, g_hToolWnd );
+				}
+				break;
+				case FDT_MSOFFICE:
+				{
+					g_spFileDlgHook.reset( new MsoFileDlgHook );
+					g_spFileDlgHook->Init( hwnd, g_hToolWnd );
+				}
+				break;
+				case FDT_COMMON_OPENWITH:
+				{
+					// init the "Open With" dialog hook
+					g_spOpenWithDlgHook.reset( new CmnOpenWithDlgHook );
+					g_spOpenWithDlgHook->Init( hwnd, g_hToolWnd );
+				}
+				break;
+				case FDT_COMMON_FOLDER:
+				{
+					// init the "Open With" dialog hook
+					g_spFileDlgHook.reset( new CmnFolderDlgHook );
+					g_spFileDlgHook->Init( hwnd, g_hToolWnd );
+				}
+				break;
 			}
 
 			// Make sure the DLL gets not unloaded as long as the window is subclassed.
