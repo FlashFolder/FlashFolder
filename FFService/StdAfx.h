@@ -9,6 +9,3 @@
 // CRT headers
 #include <stdio.h>
 #include <tchar.h>
-
-// own headers
-#include "../common/Profile.h"

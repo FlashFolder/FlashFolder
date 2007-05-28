@@ -23,7 +23,7 @@
 #include "stdafx.h"
 #include "resource.h"
 #include "../_version.h"
-#include "../fflib/fflib.h"
+#include "../fflib/fflib_exports.h"
 
 HINSTANCE g_hInstance = NULL;
 
