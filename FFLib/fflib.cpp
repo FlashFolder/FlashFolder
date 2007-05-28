@@ -744,6 +744,8 @@ void CreateToolWindow( bool isFileDialog )
 		rcClient.right - rcClient.left - xEdit - rcDivR.right, 
 		rcClient.bottom - rcClient.top - rcDiv.bottom * 2, 
 		g_hToolWnd, (HMENU) ID_FF_PATH, (HINSTANCE) g_hInstDll, NULL);
+	// enable auto-complete for the edit control
+	::SHAutoComplete( hEdit, SHACF_FILESYS_DIRS | SHACF_USETAB );
 	//sub-class the edit control to handle key-stroke messages
 	g_wndProcToolWindowEditPath = (WNDPROC)  
 		SetWindowLong(hEdit, GWL_WNDPROC, (LONG) &ToolWindowEditPathProc);
@@ -822,8 +824,6 @@ void SetTimer( DWORD interval )
 
 bool IsCurrentProgramEnabledForDialog( FileDlgType fileDlgType )
 {
-	::OutputDebugString( _T("IsCurrentProgramEnabled...\n") );
-
 	// Check if FlashFolder is globally disabled for given kind of dialog.
 	TCHAR* pProfileGroup = _T("");
 	switch( fileDlgType )
