@@ -84,6 +84,9 @@ protected:
 	is no icon.
 	*/
 	CImageList m_Images;
+
+private:
+	DWORD m_osVer;
 };
 
 
