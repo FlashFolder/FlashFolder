@@ -18,21 +18,30 @@
  */
 #pragma once
 
+#include "AutoPropertyPage.h"
+
 //-----------------------------------------------------------------------------------------------
 
 class CPageGeneric : public CAutoPropertyPage
 {
 public:
 	typedef CAutoPropertyPage base;
-		
-	CPageGeneric();
 
 	enum { IDD = IDD_PAGE_GENERIC };
+
+	CPageGeneric();
+
+	virtual void ReadProfile( const Profile& profile );
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 
+	afx_msg void OnBnClickedBtnReset();
+	afx_msg LRESULT OnPageChanged( WPARAM, LPARAM );
 	DECLARE_MESSAGE_MAP()
+
+private:
+	bool m_bReadDefaults;
 };

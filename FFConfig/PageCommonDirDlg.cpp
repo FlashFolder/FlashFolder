@@ -21,12 +21,17 @@
 #include "PageCommonDirDlg.h"
 #include "ExcludesDlg.h"
 
+using namespace std;
+
+//-----------------------------------------------------------------------------------------------
+
 const CString PROFILE_GROUP = _T("CommonFolderDlg");
 
 //-----------------------------------------------------------------------------------------------
 
 CPageCommonDirDlg::CPageCommonDirDlg()
-	: base(CPageCommonDirDlg::IDD)
+	: base(CPageCommonDirDlg::IDD),
+	m_bReadDefaults( false )
 {}
 
 //-----------------------------------------------------------------------------------------------
@@ -60,27 +65,40 @@ BOOL CPageCommonDirDlg::OnInitDialog()
 
 	//--- get profile data
 
-	CString s;
-	CheckDlgButton( IDC_CHK_ENABLE, g_profile.GetInt( PROFILE_GROUP, _T("EnableHook") ) );
-	s.Format( _T("%d"), g_profile.GetInt( PROFILE_GROUP, _T("MinWidth") ) );
-	SetDlgItemText( IDC_ED_MINWIDTH, s );
-	s.Format( _T("%d"), g_profile.GetInt( PROFILE_GROUP, _T("MinHeight") ) );
-	SetDlgItemText( IDC_ED_MINHEIGHT, s );
-	m_cbPos.SetCurSel( g_profile.GetInt( PROFILE_GROUP, _T("Center") ) );
+	if( m_bReadDefaults )
+		ReadProfile( g_profileDefaults );
+	else
+		ReadProfile( g_profile );
 
-	for( int i = 0;; ++i )
+	return TRUE;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CPageCommonDirDlg::ReadProfile( const Profile& profile )
+{
+	if( ! GetSafeHwnd() )
 	{
-		CString key; key.Format( _T("%d"), i );
-		CString name = g_profile.GetString( PROFILE_GROUP + _T(".Excludes"), key ).c_str();
-		if( name.IsEmpty() )
-			break;
-		m_excludes.push_back( name );
+		m_bReadDefaults = true;
+		return;
 	}
+
+	CString s;
+	CheckDlgButton( IDC_CHK_ENABLE, profile.GetInt( PROFILE_GROUP, _T("EnableHook") ) );
+	s.Format( _T("%d"), profile.GetInt( PROFILE_GROUP, _T("MinWidth") ) );
+	SetDlgItemText( IDC_ED_MINWIDTH, s );
+	s.Format( _T("%d"), profile.GetInt( PROFILE_GROUP, _T("MinHeight") ) );
+	SetDlgItemText( IDC_ED_MINHEIGHT, s );
+	m_cbPos.SetCurSel( profile.GetInt( PROFILE_GROUP, _T("Center") ) );
+
+	vector<tstring> list;
+	m_excludes.clear();
+	profile.GetStringList( &list, PROFILE_GROUP + _T(".Excludes") );
+	for( int i = 0; i < list.size(); ++i )
+		m_excludes.push_back( list[ i ].c_str() );
 
 	// Set initial enabled state for child controls
 	OnBnClickedChkEnable();
-
-	return TRUE;
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -95,13 +113,10 @@ BOOL CPageCommonDirDlg::OnApply()
 	g_profile.SetInt( PROFILE_GROUP, _T("MinHeight"), _ttoi( s ) );
 	g_profile.SetInt( PROFILE_GROUP, _T("Center"), m_cbPos.GetCurSel() );
 
-	g_profile.ClearSection( PROFILE_GROUP + _T(".Excludes") );
+	vector<tstring> list;
 	for( int i = 0; i != m_excludes.size(); ++i )
-	{
-		CString key; key.Format( _T("%d"), i );
-		g_profile.SetString( PROFILE_GROUP + _T(".Excludes"), key, 
-			m_excludes[ i ] );
-	}
+		list.push_back( m_excludes[ i ].GetString() );
+	g_profile.SetStringList( PROFILE_GROUP + _T(".Excludes"), list );
 
 	return base::OnApply();
 }

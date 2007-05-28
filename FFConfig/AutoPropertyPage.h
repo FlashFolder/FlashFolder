@@ -19,8 +19,11 @@
 #pragma once
 
 //-----------------------------------------------------------------------------------------------
-/// \brief Automatically sets modified flag (SetModified()) by handling change-notifications send 
-/// by child controls.\n
+/// \brief Abstract base class for property pages.
+///
+/// - automatically sets modified flag (SetModified()) by handling change-notifications send 
+///   by child controls
+/// - provides virtual method for reading profile data
 ///
 /// Currently implemented handlers for:
 /// Checkbox, Radiobutton, Edit Control,  
@@ -31,8 +34,15 @@ public:
 	CAutoPropertyPage() {}
 	CAutoPropertyPage( UINT resId );
 
+	virtual void ReadProfile( const Profile& profile ) = 0;
+
 protected:
-	virtual BOOL OnNotify( WPARAM wp, LPARAM lp, LRESULT* pRes );
+	virtual BOOL OnInitDialog();
 	virtual BOOL OnCommand( WPARAM wp, LPARAM lp );
+
+	afx_msg LRESULT OnAfterInitDialog( WPARAM, LPARAM );
 	DECLARE_MESSAGE_MAP()
+
+private:
+	bool m_isInitialized;
 };

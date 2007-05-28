@@ -65,9 +65,9 @@ bool MsoFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 	           reinterpret_cast<HANDLE>( this ) );
 
 	//--- read settings from INI file ---
-	m_minFileDialogWidth = g_profile.GetInt( _T("MSOfficeFileDlg"), _T("MinWidth"), 650 );
-	m_minFileDialogHeight = g_profile.GetInt( _T("MSOfficeFileDlg"), _T("MinHeight"), 500 );
-	m_centerFileDialog = g_profile.GetInt( _T("MSOfficeFileDlg"), _T("Center"), 1 );
+	m_minFileDialogWidth = g_profile.GetInt( _T("MSOfficeFileDlg"), _T("MinWidth") );
+	m_minFileDialogHeight = g_profile.GetInt( _T("MSOfficeFileDlg"), _T("MinHeight") );
+	m_centerFileDialog = g_profile.GetInt( _T("MSOfficeFileDlg"), _T("Center") );
 
 	return true;
 }

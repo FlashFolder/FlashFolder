@@ -34,15 +34,18 @@ CFFConfigDlg::CFFConfigDlg(CWnd* pParent /*=NULL*/)
 	: CTreePropSheet( _T("FlashFolder Options"), pParent)
 {
 	SetTreeWidth( 125 );
-	
 	SetTreeViewMode( TRUE, TRUE, FALSE );
+	SetEmptyPageText( _T("Please select a sub-page.") );
+
 	AddPage( &m_pageGeneric );
 	AddPage( &m_pageCommonFileDlg );
 	AddPage( &m_pageCommonDirDlg );
 	AddPage( &m_pageCommonOpenWithDlg );
 	AddPage( &m_pageMsoFileDlg );
 
-	SetEmptyPageText( _T("Please select a sub-page.") );
+	// See http://support.microsoft.com/default.aspx?scid=kb%3Ben-us%3BQ158552 for why 
+	// the first-chance access-violation exception can savely be ignored. 
+	// The Exception occurs in comctl32.dll during property sheet creation.
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -55,6 +58,7 @@ void CFFConfigDlg::DoDataExchange(CDataExchange* pDX)
 //-----------------------------------------------------------------------------------------------
 
 BEGIN_MESSAGE_MAP(CFFConfigDlg, CTreePropSheet)
+	ON_MESSAGE( PSM_CHANGED, OnPageChanged )
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
@@ -63,4 +67,23 @@ BOOL CFFConfigDlg::OnInitDialog()
 {
 	CTreePropSheet::OnInitDialog();
 	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
+//-----------------------------------------------------------------------------------------------
+
+LRESULT CFFConfigDlg::OnPageChanged( WPARAM wp, LPARAM lp )
+{
+	const MSG* pMsg = GetCurrentMessage();
+	LRESULT res = DefWindowProc( pMsg->message, wp, lp );
+
+	HWND hwndChanged = reinterpret_cast<HWND>( wp );
+
+	/// notify all pages about the change
+	for( int i = 0; i < GetPageCount(); ++i )
+	{
+		CPropertyPage* pPage = GetPage( i );
+		if( pPage->GetSafeHwnd() )
+			pPage->SendMessage( WM_APP_PAGE_CHANGED, wp, 0 );
+	}
+	return res;
 }

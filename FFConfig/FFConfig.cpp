@@ -21,6 +21,7 @@
 #include "FFConfigDlg.h"
 #include "FolderFavoritesDlg.h"
 #include "AboutDlg.h"
+#include "../common/ProfileDefaults.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -32,7 +33,8 @@
 CFFConfigApp g_app;
 
 // The one and only Profile object
-Profile g_profile( _T("zett42\\FlashFolder") );
+RegistryProfile g_profile( _T("zett42\\FlashFolder") );
+MemoryProfile g_profileDefaults;
 
 //-----------------------------------------------------------------------------------------------
 
@@ -60,6 +62,11 @@ CFFConfigApp::CFFConfigApp()
 
 BOOL CFFConfigApp::InitInstance()
 {
+	// InitCommonControls() is required on Windows XP if an application
+	// manifest specifies use of ComCtl32.dll version 6 or later to enable
+	// visual styles.  Otherwise, any window creation will fail.
+	InitCommonControls();
+
 	CWinApp::InitInstance();
 
 	HWND hwndParent = NULL;
@@ -102,6 +109,7 @@ BOOL CFFConfigApp::InitInstance()
 		return FALSE;
 	}	    
 
+
 	// Register the dialog class that is specified in the .rc-file
 	WNDCLASS wc = { 0 };
 	wc.hInstance = AfxGetInstanceHandle();
@@ -112,10 +120,9 @@ BOOL CFFConfigApp::InitInstance()
 	wc.hCursor = LoadStandardCursor( IDC_ARROW );
 	::RegisterClass( &wc );
 
-	// InitCommonControls() is required on Windows XP if an application
-	// manifest specifies use of ComCtl32.dll version 6 or later to enable
-	// visual styles.  Otherwise, any window creation will fail.
-	InitCommonControls();
+	// intialize default profile settings
+	GetProfileDefaults( &g_profileDefaults );
+	g_profile.SetDefaults( &g_profileDefaults );
 
 	switch( dlgType )
 	{

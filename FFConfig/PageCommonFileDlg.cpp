@@ -23,12 +23,15 @@
 
 using namespace std;
 
+//-----------------------------------------------------------------------------------------------
+
 const CString PROFILE_GROUP = _T("CommonFileDlg");
 
 //-----------------------------------------------------------------------------------------------
 
 CPageCommonFileDlg::CPageCommonFileDlg()
-	: base(CPageCommonFileDlg::IDD)
+	: base(CPageCommonFileDlg::IDD),
+	m_bReadDefaults( false )
 {}
 
 //-----------------------------------------------------------------------------------------------
@@ -65,41 +68,52 @@ BOOL CPageCommonFileDlg::OnInitDialog()
 
 	//--- get profile data
 
+	if( m_bReadDefaults )
+		ReadProfile( g_profileDefaults );
+	else
+		ReadProfile( g_profile );
+
+	return TRUE;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CPageCommonFileDlg::ReadProfile( const Profile& profile )
+{
+	if( ! GetSafeHwnd() )
+	{
+		// If the dialog was not active before, it has not been initialized yet.
+		m_bReadDefaults = true;
+		return;
+	}
+
 	CString s;
-	CheckDlgButton( IDC_CHK_ENABLE, g_profile.GetInt( PROFILE_GROUP, _T("EnableHook") ) );
-	s.Format( _T("%d"), g_profile.GetInt( PROFILE_GROUP, _T("MinWidth") ) );
+	CheckDlgButton( IDC_CHK_ENABLE, profile.GetInt( PROFILE_GROUP, _T("EnableHook") ) );
+	s.Format( _T("%d"), profile.GetInt( PROFILE_GROUP, _T("MinWidth") ) );
 	SetDlgItemText( IDC_ED_MINWIDTH, s );
-	s.Format( _T("%d"), g_profile.GetInt( PROFILE_GROUP, _T("MinHeight") ) );
+	s.Format( _T("%d"), profile.GetInt( PROFILE_GROUP, _T("MinHeight") ) );
 	SetDlgItemText( IDC_ED_MINHEIGHT, s );
-	m_cbPos.SetCurSel( g_profile.GetInt( PROFILE_GROUP, _T("Center") ) );
-	CheckDlgButton( IDC_CHK_RESIZENONRESIZABLE, g_profile.GetInt( PROFILE_GROUP, 
+	m_cbPos.SetCurSel( profile.GetInt( PROFILE_GROUP, _T("Center") ) );
+	CheckDlgButton( IDC_CHK_RESIZENONRESIZABLE, profile.GetInt( PROFILE_GROUP, 
 		_T("ResizeNonResizableDialogs") ) );
-	s.Format( _T("%d"), g_profile.GetInt( PROFILE_GROUP, _T("FiletypesComboHeight") ) );
+	s.Format( _T("%d"), profile.GetInt( PROFILE_GROUP, _T("FiletypesComboHeight") ) );
 	SetDlgItemText( IDC_ED_FILETYPECOMBO_MAXHEIGHT, s );
-	s.Format( _T("%d"), g_profile.GetInt( PROFILE_GROUP, _T("FolderComboHeight") ) );
+	s.Format( _T("%d"), profile.GetInt( PROFILE_GROUP, _T("FolderComboHeight") ) );
 	SetDlgItemText( IDC_ED_FOLDERCOMBO_MAXHEIGHT, s );
 
-	for( int i = 0;; ++i )
-	{
-		CString key; key.Format( _T("%d"), i );
-		CString name = g_profile.GetString( _T("CommonFileDlg.NonResizableExcludes"), key ).c_str();
-		if( name.IsEmpty() )
-			break;
-		m_nonResizableExcludes.push_back( name );
-	}
-	for( int i = 0;; ++i )
-	{
-		CString key; key.Format( _T("%d"), i );
-		CString name = g_profile.GetString( _T("CommonFileDlg.Excludes"), key ).c_str();
-		if( name.IsEmpty() )
-			break;
-		m_excludes.push_back( name );
-	}
+	vector<tstring> list;
+	m_excludes.clear();
+	profile.GetStringList( &list, PROFILE_GROUP + _T(".Excludes") );
+	for( int i = 0; i < list.size(); ++i )
+		m_excludes.push_back( list[ i ].c_str() );
+
+	m_nonResizableExcludes.clear();
+	profile.GetStringList( &list, PROFILE_GROUP + _T(".NonResizableExcludes") );
+	for( int i = 0; i < list.size(); ++i )
+		m_nonResizableExcludes.push_back( list[ i ].c_str() );
 
 	// Set initial enabled state for child controls
 	OnBnClickedChkEnable();
-
-	return TRUE;
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -120,21 +134,16 @@ BOOL CPageCommonFileDlg::OnApply()
 	GetDlgItemText( IDC_ED_FOLDERCOMBO_MAXHEIGHT, s );
 	g_profile.SetInt( PROFILE_GROUP, _T("FolderComboHeight"), _ttoi( s ) );
 
-	g_profile.ClearSection( PROFILE_GROUP + _T(".NonResizableExcludes") );
-	for( int i = 0; i != m_nonResizableExcludes.size(); ++i )
-	{
-		CString key; key.Format( _T("%d"), i );
-		g_profile.SetString( PROFILE_GROUP + _T(".NonResizableExcludes"), key, 
-			m_nonResizableExcludes[ i ] );
-	}
-	g_profile.ClearSection( PROFILE_GROUP + _T(".Excludes") );
+	vector<tstring> list;
 	for( int i = 0; i != m_excludes.size(); ++i )
-	{
-		CString key; key.Format( _T("%d"), i );
-		g_profile.SetString( PROFILE_GROUP + _T(".Excludes"), key, 
-			m_excludes[ i ] );
-	}
-	
+		list.push_back( m_excludes[ i ].GetString() );
+	g_profile.SetStringList( PROFILE_GROUP + _T(".Excludes"), list );
+
+	list.clear();
+	for( int i = 0; i != m_nonResizableExcludes.size(); ++i )
+		list.push_back( m_nonResizableExcludes[ i ].GetString() );
+	g_profile.SetStringList( PROFILE_GROUP + _T(".NonResizableExcludes"), list );
+
 	return base::OnApply();
 }
 

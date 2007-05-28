@@ -28,6 +28,7 @@ Global
 		ANSI Debug = ANSI Debug
 		ANSI Release = ANSI Release
 		Unicode Debug = Unicode Debug
+		Unicode Debug Symbols = Unicode Debug Symbols
 		Unicode Release = Unicode Release
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
@@ -37,6 +38,8 @@ Global
 		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.ANSI Release.Build.0 = ANSI Release|Win32
 		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
 		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Debug.Build.0 = Unicode Debug|Win32
+		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Debug Symbols.ActiveCfg = Unicode Debug Symbols|Win32
+		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Debug Symbols.Build.0 = Unicode Debug Symbols|Win32
 		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Release.ActiveCfg = Unicode Release|Win32
 		{2881FFBC-05A4-4513-A17D-290A22ACE6EA}.Unicode Release.Build.0 = Unicode Release|Win32
 		{3057F62D-451E-4507-A8B2-A7E625070EAC}.ANSI Debug.ActiveCfg = ANSI Debug|Win32
@@ -45,6 +48,8 @@ Global
 		{3057F62D-451E-4507-A8B2-A7E625070EAC}.ANSI Release.Build.0 = ANSI Release|Win32
 		{3057F62D-451E-4507-A8B2-A7E625070EAC}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
 		{3057F62D-451E-4507-A8B2-A7E625070EAC}.Unicode Debug.Build.0 = Unicode Debug|Win32
+		{3057F62D-451E-4507-A8B2-A7E625070EAC}.Unicode Debug Symbols.ActiveCfg = Unicode Debug Symbols|Win32
+		{3057F62D-451E-4507-A8B2-A7E625070EAC}.Unicode Debug Symbols.Build.0 = Unicode Debug Symbols|Win32
 		{3057F62D-451E-4507-A8B2-A7E625070EAC}.Unicode Release.ActiveCfg = Unicode Release|Win32
 		{3057F62D-451E-4507-A8B2-A7E625070EAC}.Unicode Release.Build.0 = Unicode Release|Win32
 		{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}.ANSI Debug.ActiveCfg = ANSI Debug|Win32
@@ -53,6 +58,8 @@ Global
 		{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}.ANSI Release.Build.0 = ANSI Release|Win32
 		{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
 		{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}.Unicode Debug.Build.0 = Unicode Debug|Win32
+		{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}.Unicode Debug Symbols.ActiveCfg = Unicode Debug Symbols|Win32
+		{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}.Unicode Debug Symbols.Build.0 = Unicode Debug Symbols|Win32
 		{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}.Unicode Release.ActiveCfg = Unicode Release|Win32
 		{6C8C287F-5433-4E11-8FC6-7D96BF4A8595}.Unicode Release.Build.0 = Unicode Release|Win32
 		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}.ANSI Debug.ActiveCfg = ANSI Debug|Win32
@@ -61,6 +68,8 @@ Global
 		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}.ANSI Release.Build.0 = ANSI Release|Win32
 		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
 		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}.Unicode Debug.Build.0 = Unicode Debug|Win32
+		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}.Unicode Debug Symbols.ActiveCfg = Unicode Debug Symbols|Win32
+		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}.Unicode Debug Symbols.Build.0 = Unicode Debug Symbols|Win32
 		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}.Unicode Release.ActiveCfg = Unicode Release|Win32
 		{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}.Unicode Release.Build.0 = Unicode Release|Win32
 		{E514AF89-F51D-4931-9771-DEEC73419ADE}.ANSI Debug.ActiveCfg = ANSI Debug|Win32
@@ -69,6 +78,8 @@ Global
 		{E514AF89-F51D-4931-9771-DEEC73419ADE}.ANSI Release.Build.0 = ANSI Release|Win32
 		{E514AF89-F51D-4931-9771-DEEC73419ADE}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
 		{E514AF89-F51D-4931-9771-DEEC73419ADE}.Unicode Debug.Build.0 = Unicode Debug|Win32
+		{E514AF89-F51D-4931-9771-DEEC73419ADE}.Unicode Debug Symbols.ActiveCfg = Unicode Debug Symbols|Win32
+		{E514AF89-F51D-4931-9771-DEEC73419ADE}.Unicode Debug Symbols.Build.0 = Unicode Debug Symbols|Win32
 		{E514AF89-F51D-4931-9771-DEEC73419ADE}.Unicode Release.ActiveCfg = Unicode Release|Win32
 		{E514AF89-F51D-4931-9771-DEEC73419ADE}.Unicode Release.Build.0 = Unicode Release|Win32
 	EndGlobalSection

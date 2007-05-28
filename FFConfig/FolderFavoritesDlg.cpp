@@ -116,9 +116,8 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	m_anchor.Add( m_sizeGrip, CDlgAnchor::ANCHOR_BOTTOMRIGHT );
 
 	// get dialog size from registry
-	CRect rc( 0, 0, 360, 271 ); MapDialogRect( rc );
-	int width = g_profile.GetInt( _T("main"), _T("FavoritesDlgWidth"), rc.Width() );
-	int height = g_profile.GetInt( _T("main"), _T("FavoritesDlgHeight"), rc.Height() );
+	int width = g_profile.GetInt( _T("main"), _T("FavoritesDlgWidth") );
+	int height = g_profile.GetInt( _T("main"), _T("FavoritesDlgHeight") );
 	SetWindowPos( NULL, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE );
 
 	return TRUE;  // return TRUE  unless you set the focus to a control

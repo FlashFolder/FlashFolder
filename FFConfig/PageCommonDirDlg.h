@@ -18,6 +18,8 @@
  */
 #pragma once
 
+#include "AutoPropertyPage.h"
+
 //-----------------------------------------------------------------------------------------------
 
 class CPageCommonDirDlg : public CAutoPropertyPage
@@ -25,9 +27,11 @@ class CPageCommonDirDlg : public CAutoPropertyPage
 public:
 	typedef CAutoPropertyPage base;
 
+	enum { IDD = IDD_PAGE_COMMON_DIRDLG };
+
 	CPageCommonDirDlg();
 
-	enum { IDD = IDD_PAGE_COMMON_DIRDLG };
+	virtual void ReadProfile( const Profile& profile );
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    
@@ -41,4 +45,5 @@ protected:
 private:
 	CComboBox m_cbPos;
 	std::vector<CString> m_excludes;
+	bool m_bReadDefaults;
 };

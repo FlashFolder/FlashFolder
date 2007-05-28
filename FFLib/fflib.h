@@ -18,25 +18,5 @@
 
 #pragma once
 
-#define DLLIMPORT extern "C" _declspec(dllimport)
-#define DLLEXPORT extern "C" _declspec(dllexport)
+extern RegistryProfile g_profile;
 
-#ifdef _USRDLL
-	#define DLLFUNC DLLEXPORT
-#else
-	#define DLLFUNC DLLIMPORT
-#endif
-
-//-----------------------------------------------------------------------------------------
-
-DLLFUNC bool IsHookInstalled();
-
-DLLFUNC bool InstallHook();
-
-DLLFUNC bool UninstallHook();
-
-DLLFUNC void SetProfileDefaults( bool bReset = false );
-
-//-----------------------------------------------------------------------------------------
-
-extern Profile g_profile;

@@ -28,12 +28,14 @@
 #pragma warning(disable:4995)  // disable strsafe.h warnings
 
 #include "fflib.h"
+#include "fflib_exports.h"
 #include "resource.h"
 #include "FileDlg_base.h"
 #include "CmnFileDlgHook.h"
 #include "MsoFileDlgHook.h"
 #include "CmnOpenWithDlgHook.h"
 #include "CmnFolderDlgHook.h"
+#include "../common/ProfileDefaults.h"
 
 using namespace NT;
 using namespace std;
@@ -64,9 +66,10 @@ WNDPROC g_wndProcToolWindowEditPath;
 
 TCHAR g_favIniFilePath[MAX_PATH+1];		// Path to INI-File with favorite folders
 
-Profile g_profile;   
+RegistryProfile g_profile;   
+MemoryProfile g_profileDefaults;
 
-//--- options, read from global INI file ---
+//--- options read from profile
 int g_globalHistoryMaxEntries;
 
 
@@ -749,7 +752,7 @@ void CreateToolWindow( bool isFileDialog )
 	EnumChildWindows(g_hToolWnd, ToolWndSetFont, (LPARAM) hFont);
 
 	//--- read options from global configuration
-	g_globalHistoryMaxEntries = g_profile.GetInt( _T("main"), _T("MaxGlobalHistoryEntries"), 20 );
+	g_globalHistoryMaxEntries = g_profile.GetInt( _T("main"), _T("MaxGlobalHistoryEntries") );
  
 	//--- enable toolbar buttons / leave disabled ---
 	
@@ -813,71 +816,6 @@ void SetTimer( DWORD interval )
 }
 
 }; //namespace FileDlgHookCallbacks
-
-//-----------------------------------------------------------------------------------------
-/**
- * Set default program settings when the first file dialog is opened by the current user.
-**/
-DLLFUNC void SetProfileDefaults( bool bReset )
-{
-	OutputDebugString( _T("[fflib] setting default profile data\n") );
-
-	if( bReset )
-	{
-		g_profile.Clear();
-	}
-	else
-	{
-		// For optimization: only set defaults if this is the first run of a new FlashFolder version.
-		int lastRevision = g_profile.GetInt( _T("main"), _T("LastRunRevision") );
-		if( lastRevision >= APP_VER_BUILD )
-			return;
-		g_profile.SetInt( _T("main"), _T("LastRunRevision"), APP_VER_BUILD );
-	}
-
-	tstring tcIniPath;
-	bool isTcInstalled = GetTotalCmdLocation( NULL, &tcIniPath );
-
-	g_profile.SetInt( _T("main"), _T("MaxGlobalHistoryEntries"), 15, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("main"), _T("UseTcFavorites"), isTcInstalled ? 1 : 0, Profile::DONT_OVERWRITE );
-	
-	//--- common file dialog
-
-	g_profile.SetInt( _T("CommonFileDlg"), _T("EnableHook"), 1, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("CommonFileDlg"), _T("MinWidth"), 650, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("CommonFileDlg"), _T("MinHeight"), 500, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("CommonFileDlg"), _T("Center"), 1, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("CommonFileDlg"), _T("FolderComboHeight"), 650, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("CommonFileDlg"), _T("FiletypesComboHeight"), 400, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("CommonFileDlg"), _T("ResizeNonResizableDialogs"), 1, Profile::DONT_OVERWRITE );
-	if( ! g_profile.SectionExists( _T("CommonFileDlg.NonResizableExcludes") ) )
-		g_profile.SetString( _T("CommonFileDlg.NonResizableExcludes"), _T("0"), _T("i_view32.exe") );
-	if( ! g_profile.SectionExists( _T("CommonFileDlg.Excludes") ) )
-		g_profile.SetString( _T("CommonFileDlg.Excludes"), _T("0"), _T("iTunes.exe") );
-
-	//--- common folder dialog
-
-	g_profile.SetInt( _T("CommonFolderDlg"), _T("EnableHook"), 1, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("CommonFolderDlg"), _T("MinWidth"), 400, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("CommonFolderDlg"), _T("MinHeight"), 500, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("CommonFolderDlg"), _T("Center"), 1, Profile::DONT_OVERWRITE );
-	if( ! g_profile.SectionExists( _T("CommonFolderDlg.Excludes") ) )
-		g_profile.SetString( _T("CommonFolderDlg.Excludes"), _T("0"), _T("iTunes.exe") );
-
-	//--- MSO file dialog
-
-	g_profile.SetInt( _T("MSOfficeFileDlg"), _T("EnableHook"), 0, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("MSOfficeFileDlg"), _T("MinWidth"), 650, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("MSOfficeFileDlg"), _T("MinHeight"), 500, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("MSOfficeFileDlg"), _T("Center"), 1, Profile::DONT_OVERWRITE );
-
-	//--- common "Open With" dialog
-
-	g_profile.SetInt( _T("CommonOpenWithDlg"), _T("EnableHook"), 0, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("CommonOpenWithDlg"), _T("MinWidth"), 400, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("CommonOpenWithDlg"), _T("MinHeight"), 500, Profile::DONT_OVERWRITE );
-	g_profile.SetInt( _T("CommonOpenWithDlg"), _T("Center"), 1, Profile::DONT_OVERWRITE );
-}
 
 //-----------------------------------------------------------------------------------------------
 // Check if hook for the current program and the given type of dialog is enabled.
@@ -946,8 +884,12 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 		FileDlgType fileDlgType = GetFileDlgType( hwnd );
 		if( fileDlgType != FDT_NONE )
 		{
-			g_profile.SetRoot( _T("zett42\\FlashFolder") );
-			SetProfileDefaults();
+			if( g_profileDefaults.IsEmpty() )
+			{
+				GetProfileDefaults( &g_profileDefaults );
+				g_profile.SetRoot( _T("zett42\\FlashFolder") );
+				g_profile.SetDefaults( &g_profileDefaults );
+			}
 
 			if( ! IsCurrentProgramEnabledForDialog( fileDlgType ) )
 				return CallNextHookEx( g_hHook, nCode, wParam, lParam );

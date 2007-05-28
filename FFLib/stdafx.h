@@ -27,6 +27,9 @@
 #include <memory>
 using namespace std;
 
+//--- STL headers
+#include <map>
+
 //--- own headers
 #include "../_version.h"
 #include "../common/tstring.h"

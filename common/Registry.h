@@ -34,7 +34,8 @@ public:
 	RegKey( HKEY hKeyAttach ) : m_hKey( hKeyAttach ) {}
 
 	/// \brief Constructor opens an existing regkey or creates a new one.
-	RegKey( HKEY hRoot, LPCTSTR pSubKey, DWORD desiredAccess = KEY_QUERY_VALUE, bool bCreate = false )
+	RegKey( HKEY hRoot, LPCTSTR pSubKey, DWORD desiredAccess = KEY_QUERY_VALUE, bool bCreate = false ) :
+		m_hKey( NULL )
 	{ 
 		if( bCreate )
 			Create( hRoot, pSubKey, desiredAccess );
@@ -100,14 +101,9 @@ public:
 	/// \brief Checks if a value of the currently open regkey exists. 
 	bool ValueExists( LPCTSTR pValueName )
 	{
-		tstring s = tstring( L"RegKey::ValueExists " ) + tstring( pValueName );
-		::OutputDebugString( s.c_str() );
 		if( ! m_hKey )
 			return false;
-		bool res = ::RegQueryValueEx( m_hKey, pValueName, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS;
-		if( res )
-			::OutputDebugString( L"  true" );
-		return res;
+		return ::RegQueryValueEx( m_hKey, pValueName, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS;
 	}
 
 	/// \brief Retrieves a string value from the currently open regkey.

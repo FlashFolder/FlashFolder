@@ -22,26 +22,47 @@
 //-----------------------------------------------------------------------------------------------
 
 CAutoPropertyPage::CAutoPropertyPage( UINT resId )
-	: CPropertyPage( resId )
+	: CPropertyPage( resId ),
+	m_isInitialized( false )
 {}
 
 //-----------------------------------------------------------------------------------------------
 
+const UINT WM_APP_AFTERINITDIALOG = WM_APP + 1;
+
 BEGIN_MESSAGE_MAP(CAutoPropertyPage, CPropertyPage)
+	ON_MESSAGE( WM_APP_AFTERINITDIALOG, OnAfterInitDialog )
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
 
-BOOL CAutoPropertyPage::OnNotify( WPARAM wp, LPARAM lp, LRESULT* pRes )
+BOOL CAutoPropertyPage::OnInitDialog()
 {
-	NMHDR* pnm = reinterpret_cast<NMHDR*>( lp );
-	return CPropertyPage::OnNotify( wp, lp, pRes );
+	CPropertyPage::OnInitDialog();
+
+	PostMessage( WM_APP_AFTERINITDIALOG );
+	return TRUE;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+LRESULT CAutoPropertyPage::OnAfterInitDialog( WPARAM, LPARAM )
+{
+	// this will be called after the _derived_ class has returned from OnInitDialog()
+	m_isInitialized = true;
+	return 0;	
 }
 
 //-----------------------------------------------------------------------------------------------
 
 BOOL CAutoPropertyPage::OnCommand( WPARAM wp, LPARAM lp )
 {
+	// avoid SetModified() during dialog initialization
+	if( ! m_isInitialized )
+		return CPropertyPage::OnCommand( wp, lp );
+
+	//--- set the modified flag if a child control has changed
+
 	UINT code = ( wp >> 16 ) & 0xFFFF;
 	CWnd* pWnd = CWnd::FromHandle( (HWND) lp );
 	DWORD style = pWnd->GetStyle();
@@ -52,7 +73,10 @@ BOOL CAutoPropertyPage::OnCommand( WPARAM wp, LPARAM lp )
 			SetModified();
 	}
 	else if( code == CBN_SELCHANGE || code == EN_CHANGE  )
+	{
 		SetModified();
+	}
 
 	return CPropertyPage::OnCommand( wp, lp );
 }
+

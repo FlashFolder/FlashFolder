@@ -18,12 +18,151 @@
  */
 
 #include "stdafx.h"
-#include "profile.h"
+#include "Profile.h"
 #include "Registry.h"
 
-//-----------------------------------------------------------------------------------
 
-void Profile::SetRoot( LPCTSTR rootPath )
+//===============================================================================================
+// Profile methods
+
+void Profile::GetStringList( std::vector<tstring>* pList, LPCTSTR pSectionName ) const
+{
+	pList->clear();
+	if( ! SectionExists( pSectionName ) )
+	{
+		if( m_pDefaults )
+			m_pDefaults->GetStringList( pList, pSectionName );
+		return;
+	}  
+	TCHAR key[ 32 ];
+	for( int i = 0;; ++i )
+	{
+		_stprintf( key, _T("%d"), i );
+		if( ! ValueExists( pSectionName, key ) )
+			break;
+		tstring val = GetString( pSectionName, key );
+		pList->push_back( val );
+	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void Profile::SetStringList( LPCTSTR pSectionName, const std::vector<tstring>& list )
+{
+	ClearSection( pSectionName );
+
+	TCHAR key[ 32 ];
+	for( int i = 0; i != list.size(); ++i )
+	{
+		_stprintf( key, _T("%d"), i );
+		SetString( pSectionName, key, list[ i ].c_str() );
+	}
+}
+
+//===============================================================================================
+// MemoryProfile methods
+
+bool MemoryProfile::ValueExists( LPCTSTR pSectionName, LPCTSTR pValueName ) const
+{
+	SectionMap::const_iterator itSec = m_data.find( pSectionName );
+	if( itSec == m_data.end() )
+		return false;
+	ValueMap::const_iterator it = itSec->second.find( pValueName );
+	return it != itSec->second.end();
+}
+
+//-----------------------------------------------------------------------------------------------
+
+bool MemoryProfile::SectionExists( LPCTSTR pSectionName ) const
+{
+	SectionMap::const_iterator itSec = m_data.find( pSectionName );
+	return itSec != m_data.end();
+}
+
+//-----------------------------------------------------------------------------------------------
+
+tstring MemoryProfile::GetString( LPCTSTR pSectionName, LPCTSTR pValueName ) const
+{
+	SectionMap::const_iterator itSec = m_data.find( pSectionName );
+	if( itSec != m_data.end() )
+	{
+		ValueMap::const_iterator it = itSec->second.find( pValueName );
+		if( it != itSec->second.end() )
+			return it->second;
+	}
+	const Profile* pDef = GetDefaults();
+	return pDef ? pDef->GetString( pSectionName, pValueName ) : _T("");
+}
+
+//-----------------------------------------------------------------------------------------------
+
+int MemoryProfile::GetInt( LPCTSTR pSectionName, LPCTSTR pValueName ) const
+{
+	SectionMap::const_iterator itSec = m_data.find( pSectionName );
+	if( itSec != m_data.end() )
+	{
+		ValueMap::const_iterator it = itSec->second.find( pValueName );
+		if( it != itSec->second.end() )
+			return _ttoi( it->second.c_str() );
+	}
+	const Profile* pDef = GetDefaults();
+	return pDef ? pDef->GetInt( pSectionName, pValueName ) : 0;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void MemoryProfile::SetString( LPCTSTR pSectionName, LPCTSTR pValueName, LPCTSTR pValue, DWORD flags )
+{
+	if( flags & DONT_OVERWRITE )
+		if( ValueExists( pSectionName, pValueName ) )
+			return;
+	m_data[ pSectionName ][ pValueName ] = pValue;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void MemoryProfile::SetInt( LPCTSTR pSectionName, LPCTSTR pValueName, int value, DWORD flags )
+{
+	if( flags & DONT_OVERWRITE )
+		if( ValueExists( pSectionName, pValueName ) )
+			return;
+	TCHAR sValue[ 64 ];
+	_stprintf( sValue, _T("%d"), value );
+	m_data[ pSectionName ][ pValueName ] = sValue;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void MemoryProfile::DeleteSection( LPCTSTR pSectionName )
+{
+    m_data.erase( pSectionName );	
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void MemoryProfile::ClearSection( LPCTSTR pSectionName )
+{
+	SectionMap::iterator itSec = m_data.find( pSectionName );
+	if( itSec == m_data.end() )
+		return;
+	itSec->second.clear();
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void MemoryProfile::DeleteValue( LPCTSTR pSectionName, LPCTSTR pValueName )
+{
+	SectionMap::iterator itSec = m_data.find( pSectionName );
+	if( itSec == m_data.end() )
+		return;
+	itSec->second.erase( pValueName );	
+}
+
+
+//===============================================================================================
+// RegistryProfile methods
+
+void RegistryProfile::SetRoot( LPCTSTR rootPath )
 {
 	m_hRootKey = HKEY_CURRENT_USER;
 	m_regPath = tstring( _T("Software\\") ) + tstring( rootPath ); 
@@ -40,7 +179,7 @@ void Profile::SetRoot( LPCTSTR rootPath )
 
 //-----------------------------------------------------------------------------------
 
-bool Profile::ValueExists( LPCTSTR pSectionName, LPCTSTR pValueName ) const
+bool RegistryProfile::ValueExists( LPCTSTR pSectionName, LPCTSTR pValueName ) const
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
 	RegKey key( m_hRootKey, path.c_str() ); 
@@ -49,7 +188,7 @@ bool Profile::ValueExists( LPCTSTR pSectionName, LPCTSTR pValueName ) const
 
 //-----------------------------------------------------------------------------------
 
-bool Profile::SectionExists( LPCTSTR pSectionName ) const
+bool RegistryProfile::SectionExists( LPCTSTR pSectionName ) const
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
 	RegKey key( m_hRootKey, path.c_str() ); 
@@ -58,25 +197,35 @@ bool Profile::SectionExists( LPCTSTR pSectionName ) const
 
 //-----------------------------------------------------------------------------------
 
-tstring Profile::GetString( LPCTSTR pSectionName, LPCTSTR pValueName, LPCTSTR pDefaultValue ) const
+tstring RegistryProfile::GetString( LPCTSTR pSectionName, LPCTSTR pValueName ) const
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
 	RegKey key( m_hRootKey, path.c_str() ); 
-	return key.GetString( pValueName, pDefaultValue );
+	tstring res;
+	if( key.GetString( &res, pValueName ) )
+		return res;
+
+	const Profile* pDef = GetDefaults();
+	return pDef ? pDef->GetString( pSectionName, pValueName ) : _T("");
 }
 
 //-----------------------------------------------------------------------------------
 
-int Profile::GetInt( LPCTSTR pSectionName, LPCTSTR pValueName, int defaultValue ) const
+int RegistryProfile::GetInt( LPCTSTR pSectionName, LPCTSTR pValueName ) const
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
 	RegKey key( m_hRootKey, path.c_str() ); 
-	return key.GetInt( pValueName, defaultValue );
+	int res;
+	if( key.GetInt( &res, pValueName ) )
+		return res;
+
+	const Profile* pDef = GetDefaults();
+	return pDef ? pDef->GetInt( pSectionName, pValueName ) : 0;
 }
 
 //-----------------------------------------------------------------------------------
 
-void Profile::SetString( LPCTSTR pSectionName, LPCTSTR pValueName, LPCTSTR pValue, DWORD flags )
+void RegistryProfile::SetString( LPCTSTR pSectionName, LPCTSTR pValueName, LPCTSTR pValue, DWORD flags )
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
 	RegKey key( m_hRootKey, path.c_str(), KEY_QUERY_VALUE | KEY_SET_VALUE, true ); 
@@ -90,7 +239,7 @@ void Profile::SetString( LPCTSTR pSectionName, LPCTSTR pValueName, LPCTSTR pValu
 
 //-----------------------------------------------------------------------------------
 
-void Profile::SetInt( LPCTSTR pSectionName, LPCTSTR pValueName, int value, DWORD flags )
+void RegistryProfile::SetInt( LPCTSTR pSectionName, LPCTSTR pValueName, int value, DWORD flags )
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
 	RegKey key( m_hRootKey, path.c_str(), KEY_QUERY_VALUE | KEY_SET_VALUE, true ); 
@@ -104,7 +253,7 @@ void Profile::SetInt( LPCTSTR pSectionName, LPCTSTR pValueName, int value, DWORD
 
 //-----------------------------------------------------------------------------------
 
-void Profile::DeleteSection( LPCTSTR pSectionName )
+void RegistryProfile::DeleteSection( LPCTSTR pSectionName )
 {
 	RegKey key( m_hRootKey, m_regPath.c_str(), DELETE );
 	key.DeleteKey( pSectionName );
@@ -112,7 +261,7 @@ void Profile::DeleteSection( LPCTSTR pSectionName )
 
 //-----------------------------------------------------------------------------------
 
-void Profile::ClearSection( LPCTSTR pSectionName )
+void RegistryProfile::ClearSection( LPCTSTR pSectionName )
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
 	RegKey key( m_hRootKey, path.c_str(), KEY_ALL_ACCESS );
@@ -121,7 +270,7 @@ void Profile::ClearSection( LPCTSTR pSectionName )
 
 //-----------------------------------------------------------------------------------
 
-void Profile::DeleteValue( LPCTSTR pSectionName, LPCTSTR pValueName )
+void RegistryProfile::DeleteValue( LPCTSTR pSectionName, LPCTSTR pValueName )
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
 	RegKey key( m_hRootKey, path.c_str(), KEY_SET_VALUE );
@@ -130,7 +279,7 @@ void Profile::DeleteValue( LPCTSTR pSectionName, LPCTSTR pValueName )
 
 //-----------------------------------------------------------------------------------------------
 
-void Profile::Clear()
+void RegistryProfile::Clear()
 {
 	RegKey key( m_hRootKey, m_regPath.c_str(), KEY_ALL_ACCESS );
 	key.Clear();

@@ -18,14 +18,20 @@
  */
 #include "stdafx.h"
 #include "FFConfig.h"
+#include "FFConfigDlg.h"
 #include "PageGeneric.h"
+
+using namespace std;
+
+//-----------------------------------------------------------------------------------------------
 
 const CString PROFILE_GROUP = _T("Main");
 
 //-----------------------------------------------------------------------------------------------
 
-CPageGeneric::CPageGeneric()
-	: base(CPageGeneric::IDD)
+CPageGeneric::CPageGeneric() :
+	base(CPageGeneric::IDD),
+	m_bReadDefaults( false )
 {}
 
 //-----------------------------------------------------------------------------------------------
@@ -38,6 +44,8 @@ void CPageGeneric::DoDataExchange(CDataExchange* pDX)
 //-----------------------------------------------------------------------------------------------
 
 BEGIN_MESSAGE_MAP(CPageGeneric, CPageGeneric::base)
+	ON_BN_CLICKED(IDC_BTN_RESET, OnBnClickedBtnReset)
+	ON_MESSAGE( CFFConfigDlg::WM_APP_PAGE_CHANGED, OnPageChanged )
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
@@ -55,11 +63,29 @@ BOOL CPageGeneric::OnInitDialog()
 	CString s;
 	s.LoadString( g_profile.IsShared() ? IDS_MU_SHARED : IDS_MU_INDIVIDUAL );
 	SetDlgItemText( IDC_ST_MULTIUSER, s );
-	
-	s.Format( _T("%d"), g_profile.GetInt( PROFILE_GROUP, _T("MaxGlobalHistoryEntries") ) );
-	SetDlgItemText( IDC_ED_MAX_DIRHISTORY, s );
 
-	return TRUE;
+	if( m_bReadDefaults )
+		ReadProfile( g_profileDefaults );
+	else
+		ReadProfile( g_profile );
+
+	GetDlgItem( IDC_ED_MAX_DIRHISTORY )->SetFocus();
+	return FALSE;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CPageGeneric::ReadProfile( const Profile& profile )
+{
+	if( ! GetSafeHwnd() )
+	{
+		m_bReadDefaults = true;
+		return;
+	}
+
+	CString s;
+	s.Format( _T("%d"), profile.GetInt( PROFILE_GROUP, _T("MaxGlobalHistoryEntries") ) );
+	SetDlgItemText( IDC_ED_MAX_DIRHISTORY, s );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -74,4 +100,35 @@ BOOL CPageGeneric::OnApply()
 	g_profile.SetInt( PROFILE_GROUP, _T("MaxGlobalHistoryEntries"), _ttoi( s ) );
 	
 	return base::OnApply();
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CPageGeneric::OnBnClickedBtnReset()
+{
+	CPropertySheet* pSheet = static_cast<CPropertySheet*>( GetParent() );
+	ASSERT( pSheet );
+	if( ! pSheet )
+		return;
+
+	int pageCount = pSheet->GetPageCount();
+	for( int i = 0; i < pageCount; ++i )
+	{
+		CAutoPropertyPage* pPage = static_cast<CAutoPropertyPage*>( pSheet->GetPage( i ) );
+		ASSERT( pPage );
+		if( pPage )
+		{
+			pPage->ReadProfile( g_profileDefaults );
+			pPage->SetModified();
+		}
+	}
+	GetDlgItem( IDC_BTN_RESET )->EnableWindow( FALSE );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+LRESULT CPageGeneric::OnPageChanged( WPARAM, LPARAM lp )
+{
+	GetDlgItem( IDC_BTN_RESET )->EnableWindow( TRUE );
+	return 0;
 }

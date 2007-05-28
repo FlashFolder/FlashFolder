@@ -39,4 +39,5 @@ private:
 };
 
 extern CFFConfigApp g_app;
-extern Profile g_profile;
+extern RegistryProfile g_profile;
+extern MemoryProfile g_profileDefaults;

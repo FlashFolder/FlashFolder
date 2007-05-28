@@ -54,9 +54,9 @@ bool CmnOpenWithDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 	           reinterpret_cast<HANDLE>( this ) );
 
 	//--- read settings from INI file ---
-	m_minFileDialogWidth = g_profile.GetInt( _T("CommonOpenWithDlg"), _T("MinWidth"), 650 );
-	m_minFileDialogHeight = g_profile.GetInt( _T("CommonOpenWithDlg"), _T("MinHeight"), 500 );
-	m_centerFileDialog = g_profile.GetInt( _T("CommonOpenWithDlg"), _T("Center"), 1 );
+	m_minFileDialogWidth = g_profile.GetInt( _T("CommonOpenWithDlg"), _T("MinWidth") );
+	m_minFileDialogHeight = g_profile.GetInt( _T("CommonOpenWithDlg"), _T("MinHeight") );
+	m_centerFileDialog = g_profile.GetInt( _T("CommonOpenWithDlg"), _T("Center") );
     
 	// modify window style to make it resizable
 	::SetWindowLong( m_hwndFileDlg, GWL_STYLE, 

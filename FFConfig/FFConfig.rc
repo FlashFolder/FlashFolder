@@ -91,10 +91,10 @@ BEGIN
 END
 
 IDD_PAGE_COMMON_OPENWITHDLG DIALOGEX 0, 0, 256, 110
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CLIPCHILDREN | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN | 
+    WS_CAPTION
 CAPTION "Dialogs::Common ""Open With""|Common ""Open With"" Dialog"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "&Enable FlashFolder for this dialog (Windows 2000 only)",
                     IDC_CHK_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,
@@ -116,28 +116,29 @@ BEGIN
                     WS_VSCROLL | WS_TABSTOP
 END
 
-IDD_PAGE_GENERIC DIALOGEX 0, 0, 197, 113
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CAPTION | WS_SYSMENU
+IDD_PAGE_GENERIC DIALOGEX 0, 0, 199, 157
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "General"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    GROUPBOX        "Multi-User",IDC_STATIC,7,11,183,43,0,WS_EX_TRANSPARENT
-    LTEXT           "Statisch",IDC_ST_MULTIUSER,14,22,151,8
+    PUSHBUTTON      "&Reset all options to default",IDC_BTN_RESET,7,7,112,14
+    GROUPBOX        "Multi-User",IDC_STATIC,7,33,185,43,0,WS_EX_TRANSPARENT
+    LTEXT           "Statisch",IDC_ST_MULTIUSER,14,44,151,8
     LTEXT           "To change this option, you need to reinstall FlashFolder.",
-                    IDC_STATIC,13,33,171,17,WS_DISABLED
+                    IDC_STATIC,13,55,171,17,WS_DISABLED
     LTEXT           "&Max. number of folder history entries:",IDC_STATIC,7,
-                    69,183,11
-    EDITTEXT        IDC_ED_MAX_DIRHISTORY,7,79,34,14,ES_AUTOHSCROLL
+                    91,185,11
+    EDITTEXT        IDC_ED_MAX_DIRHISTORY,7,101,34,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_SP_MAX_DIRHISTORY,"msctls_updown32",
                     UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
-                    UDS_ARROWKEYS,41,79,11,14
+                    UDS_ARROWKEYS,41,101,11,14
 END
 
 IDD_PAGE_MSO_FILEDLG DIALOGEX 0, 0, 195, 110
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CLIPCHILDREN | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN | 
+    WS_CAPTION
 CAPTION "Dialogs::MS Office ""Open/Save""|MS Office ""Open/Save"" Dialog"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "&Enable FlashFolder for this dialog",IDC_CHK_ENABLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,121,10
@@ -159,11 +160,11 @@ BEGIN
 END
 
 IDD_PAGE_COMMON_DIRDLG DIALOGEX 0, 0, 196, 103
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION 
 "Dialogs::Common ""Browse For Folder""|Common ""Browse For Folder""  Dialog"
 
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "&Enable FlashFolder for this dialog",IDC_CHK_ENABLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,120,10
@@ -183,11 +184,11 @@ BEGIN
                     WS_VSCROLL | WS_TABSTOP
 END
 
-IDD_PAGE_COMMON_FILEDLG DIALOGEX 0, 0, 197, 164
+IDD_PAGE_COMMON_FILEDLG DIALOGEX 0, 0, 197, 177
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CLIPCHILDREN | WS_CAPTION | 
     WS_SYSMENU
 CAPTION "Dialogs::Common ""Open/Save""|Common ""Open/Save"" Dialog"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "&Enable FlashFolder for this dialog",IDC_CHK_ENABLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,121,10
@@ -297,9 +298,9 @@ BEGIN
     IDD_PAGE_GENERIC, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 190
+        RIGHTMARGIN, 192
         TOPMARGIN, 7
-        BOTTOMMARGIN, 106
+        BOTTOMMARGIN, 150
     END
 
     IDD_PAGE_MSO_FILEDLG, DIALOG
@@ -326,7 +327,7 @@ BEGIN
         RIGHTMARGIN, 190
         VERTGUIDE, 60
         TOPMARGIN, 7
-        BOTTOMMARGIN, 157
+        BOTTOMMARGIN, 170
     END
 END
 #endif    // APSTUDIO_INVOKED

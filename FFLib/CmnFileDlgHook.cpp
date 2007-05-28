@@ -52,12 +52,12 @@ bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 	::SetProp( hwndFileDlg, FLASHFOLDER_HOOK_PROPERTY, NULL );
 
 	//--- read settings from INI file ---
-	m_minFileDialogWidth = g_profile.GetInt( _T("CommonFileDlg"), _T("MinWidth"), 650 );
-	m_minFileDialogHeight = g_profile.GetInt( _T("CommonFileDlg"), _T("MinHeight"), 500 );
-	m_centerFileDialog = g_profile.GetInt( _T("CommonFileDlg"), _T("Center"), 1 );
-	m_folderComboHeight = g_profile.GetInt( _T("CommonFileDlg"), _T("FolderComboHeight"), 400 );
-	m_filetypesComboHeight = g_profile.GetInt( _T("CommonFileDlg"), _T("FiletypesComboHeight"), 300 );
-	m_bResizeNonResizableDlgs = g_profile.GetInt( _T("CommonFileDlg"), _T("ResizeNonResizableDialogs"), 1 ) != 0;
+	m_minFileDialogWidth = g_profile.GetInt( _T("CommonFileDlg"), _T("MinWidth") );
+	m_minFileDialogHeight = g_profile.GetInt( _T("CommonFileDlg"), _T("MinHeight") );
+	m_centerFileDialog = g_profile.GetInt( _T("CommonFileDlg"), _T("Center") );
+	m_folderComboHeight = g_profile.GetInt( _T("CommonFileDlg"), _T("FolderComboHeight") );
+	m_filetypesComboHeight = g_profile.GetInt( _T("CommonFileDlg"), _T("FiletypesComboHeight") );
+	m_bResizeNonResizableDlgs = g_profile.GetInt( _T("CommonFileDlg"), _T("ResizeNonResizableDialogs") ) != 0;
 
     //--- check exclusion list for resizing of non-resizable dialogs
 
@@ -71,7 +71,7 @@ bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 		{
 			TCHAR key[10];
 			_stprintf( key, _T("%d"), i );
-			tstring path = g_profile.GetString( _T("CommonFileDlg.NonResizableExcludes"), key, _T("") );
+			tstring path = g_profile.GetString( _T("CommonFileDlg.NonResizableExcludes"), key );
 			if( path.empty() )
 				break;
 

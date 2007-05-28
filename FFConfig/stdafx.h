@@ -16,6 +16,8 @@
 // turns off MFC's hiding of some common and often safely ignored warning messages
 #define _AFX_ALL_WARNINGS
 
+#pragma warning(disable:4995)  // caused by strsafe.h
+
 //--- MFC headers
 
 #include <afxwin.h>         // MFC core and standard components
@@ -34,13 +36,13 @@
 
 //--- STD headers
 
+#include <strsafe.h>
 #include <vector>
 #include <map>
 #include <set>
 #include <string>
 #include <iterator>
 #include <cstdlib>
-#include <strsafe.h>
 
 //--- own headers
 // utilities
@@ -59,7 +61,6 @@
 #include "../common/DragListCtrl.h"
 #include "../common/EditEx.h"
 #include "../common/HyperLink.h"
-#include "../common/AutoPropertyPage.h"
 // UI - TreePropSheet headers
 #include "../common/TreePropSheet/TreePropSheet.h"
 #include "../common/TreePropSheet/PropPageFrame.h"

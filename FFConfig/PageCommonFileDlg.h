@@ -18,6 +18,8 @@
  */
 #pragma once
 
+#include "AutoPropertyPage.h"
+
 //-----------------------------------------------------------------------------------------------
 
 class CPageCommonFileDlg : public CAutoPropertyPage
@@ -25,9 +27,11 @@ class CPageCommonFileDlg : public CAutoPropertyPage
 public:
 	typedef CAutoPropertyPage base;
 
+	enum { IDD = IDD_PAGE_COMMON_FILEDLG };
+
 	CPageCommonFileDlg();
 
-	enum { IDD = IDD_PAGE_COMMON_FILEDLG };
+	virtual void ReadProfile( const Profile& profile );
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    
@@ -43,4 +47,5 @@ private:
 	CComboBox m_cbPos;
 	std::vector<CString> m_excludes;
 	std::vector<CString> m_nonResizableExcludes;
+	bool m_bReadDefaults;
 };

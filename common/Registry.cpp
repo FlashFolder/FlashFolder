@@ -69,8 +69,9 @@ bool RegKey::GetInt( int* pValue, LPCTSTR pValueName )
 
 bool RegKey::ClearKey( HKEY hKeyRoot )
 {
-	DWORD maxKeyNameLen = 0, maxValueNameLen = 0;
-	if( ::RegQueryInfoKey( hKeyRoot, NULL, NULL, NULL, NULL, &maxKeyNameLen, NULL, NULL, &maxValueNameLen, NULL, NULL, NULL ) 
+	DWORD keyCount = 0, maxKeyNameLen = 0, valueCount = 0, maxValueNameLen = 0;
+	if( ::RegQueryInfoKey( hKeyRoot, NULL, NULL, NULL, &keyCount, &maxKeyNameLen, NULL, 
+	                       &valueCount, &maxValueNameLen, NULL, NULL, NULL ) 
 		!= ERROR_SUCCESS )
 		return false;
 
@@ -80,13 +81,14 @@ bool RegKey::ClearKey( HKEY hKeyRoot )
 
 	std::vector<TCHAR> name( maxValueNameLen + 1 );
 	std::vector<tstring> nameList;
-	for( int i = 0;; ++i )
+	for( int i = 0; i < valueCount; ++i )
 	{
 		DWORD nameLen = name.size();
-		if( ::RegEnumValue( hKeyRoot, i, &name[ 0 ], &nameLen, NULL, NULL, NULL, NULL ) != ERROR_SUCCESS )
-			break;
-		nameList.push_back( &name[ 0 ] );
+		if( ::RegEnumValue( hKeyRoot, i, &name[ 0 ], &nameLen, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS )
+			nameList.push_back( &name[ 0 ] );
 	}
+	if( nameList.size() < valueCount )
+		isSuccess = false;
 	for( int i = 0; i != nameList.size(); ++i )
 		if( ::RegDeleteValue( hKeyRoot, nameList[ i ].c_str() ) != ERROR_SUCCESS )
 			isSuccess = false;
@@ -95,13 +97,14 @@ bool RegKey::ClearKey( HKEY hKeyRoot )
 
 	name.resize( maxKeyNameLen + 1 );
 	nameList.clear();
-	for( int i = 0;; ++i )
+	for( int i = 0; i < keyCount; ++i )
 	{
 		DWORD nameLen = name.size();
-		if( ::RegEnumKeyEx( hKeyRoot, i, &name[ 0 ], &nameLen, NULL, NULL, NULL, NULL ) != ERROR_SUCCESS )
-			break;
-		nameList.push_back( &name[ 0 ] );
+		if( ::RegEnumKeyEx( hKeyRoot, i, &name[ 0 ], &nameLen, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS )
+			nameList.push_back( &name[ 0 ] );
 	}	
+	if( nameList.size() < keyCount )
+		isSuccess = false;
 	for( int i = 0; i != nameList.size(); ++i )
 		if( ::SHDeleteKey( hKeyRoot, nameList[ i ].c_str() ) != ERROR_SUCCESS )
 			isSuccess = false;

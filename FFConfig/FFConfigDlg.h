@@ -33,16 +33,16 @@ public:
 
 	enum { IDD = IDD_FFCONFIG_DIALOG };
 
+	enum { WM_APP_PAGE_CHANGED = WM_APP + 0x100 };
+
 private:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 	virtual BOOL OnInitDialog();
+
+	afx_msg LRESULT OnPageChanged( WPARAM wp, LPARAM lp );
 	DECLARE_MESSAGE_MAP()
 
-	CGroupCheck m_chkCFO, m_chkCFD, m_chkMSO, m_chkCOW;
-	CComboBox m_cbCFO_pos, m_cbCFD_pos, m_cbMSO_pos, m_cbCOW_pos;
-
-	std::vector<CString> m_cfoNonResizableExcludes;
-
+private:
 	CPageGeneric m_pageGeneric;
 	CPageCommonFileDlg m_pageCommonFileDlg;
 	CPageCommonDirDlg m_pageCommonDirDlg;
