@@ -54,11 +54,11 @@ void GetProfileDefaults( Profile* pProfile )
 	//--- common file dialog
 
 	pProfile->SetInt( _T("CommonFileDlg"), _T("EnableHook"), 1 );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("MinWidth"), 650 );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("MinHeight"), 500 );
+	pProfile->SetInt( _T("CommonFileDlg"), _T("MinWidth"), MapDlgX( baseUnitX, 325 ) );
+	pProfile->SetInt( _T("CommonFileDlg"), _T("MinHeight"), MapDlgY( baseUnitY, 250 ) );
 	pProfile->SetInt( _T("CommonFileDlg"), _T("Center"), 1 );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("FolderComboHeight"), 650 );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("FiletypesComboHeight"), 400 );
+	pProfile->SetInt( _T("CommonFileDlg"), _T("FolderComboHeight"), MapDlgY( baseUnitY, 325 ) );
+	pProfile->SetInt( _T("CommonFileDlg"), _T("FiletypesComboHeight"), MapDlgY( baseUnitY, 200 ) );
 	pProfile->SetInt( _T("CommonFileDlg"), _T("ResizeNonResizableDialogs"), 1 );
 	pProfile->SetString( _T("CommonFileDlg.NonResizableExcludes"), _T("0"), _T("i_view32.exe") );
 	pProfile->SetString( _T("CommonFileDlg.Excludes"), _T("0"), _T("iTunes.exe") );
@@ -66,22 +66,22 @@ void GetProfileDefaults( Profile* pProfile )
 	//--- common folder dialog
 
 	pProfile->SetInt( _T("CommonFolderDlg"), _T("EnableHook"), 1 );
-	pProfile->SetInt( _T("CommonFolderDlg"), _T("MinWidth"), 400 );
-	pProfile->SetInt( _T("CommonFolderDlg"), _T("MinHeight"), 500 );
+	pProfile->SetInt( _T("CommonFolderDlg"), _T("MinWidth"), MapDlgX( baseUnitX, 200 ) );
+	pProfile->SetInt( _T("CommonFolderDlg"), _T("MinHeight"), MapDlgY( baseUnitY, 250 ) );
 	pProfile->SetInt( _T("CommonFolderDlg"), _T("Center"), 1 );
 	pProfile->SetString( _T("CommonFolderDlg.Excludes"), _T("0"), _T("iTunes.exe") );
 
 	//--- MSO file dialog
 
 	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("EnableHook"), 0 );
-	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("MinWidth"), 650 );
-	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("MinHeight"), 500 );
+	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("MinWidth"), MapDlgX( baseUnitX, 325 ) );
+	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("MinHeight"), MapDlgY( baseUnitY, 250 ) );
 	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("Center"), 1 );
 
 	//--- common "Open With" dialog
 
 	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("EnableHook"), 0 );
-	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinWidth"), 400 );
-	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinHeight"), 500 );
+	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinWidth"), MapDlgX( baseUnitX, 200 ) );
+	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinHeight"), MapDlgY( baseUnitY, 250 ) );
 	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("Center"), 1 );
 }
