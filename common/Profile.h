@@ -96,8 +96,8 @@ public:
 	virtual tstring GetString( LPCTSTR pSectionName, LPCTSTR pValueName ) const;
 	virtual int GetInt( LPCTSTR pSectionName, LPCTSTR pValueName ) const;
 
-	virtual void SetString( LPCTSTR pSectionName, LPCTSTR pValueName, LPCTSTR pValue, DWORD flags );
-	virtual void SetInt( LPCTSTR pSectionName, LPCTSTR pValueName, int value, DWORD flags );
+	virtual void SetString( LPCTSTR pSectionName, LPCTSTR pValueName, LPCTSTR pValue, DWORD flags = 0 );
+	virtual void SetInt( LPCTSTR pSectionName, LPCTSTR pValueName, int value, DWORD flags = 0 );
 
 	virtual void DeleteSection( LPCTSTR pSectionName );
 	virtual void ClearSection( LPCTSTR pSectionName );

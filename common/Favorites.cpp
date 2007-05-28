@@ -26,10 +26,13 @@ using namespace std;
 
 void GetDirFavorites( FavoritesList* pList, DirFavoritesSrc source )
 {
-	RegistryProfile profile( _T("zett42\\FlashFolder") );
-
 	tstring tcIniPath;
 	bool isTcInstalled = GetTotalCmdLocation( NULL, &tcIniPath );
+
+	RegistryProfile profile( _T("zett42\\FlashFolder") );
+	MemoryProfile defProfile;
+	defProfile.SetInt( _T("main"), _T("UseTcFavorites"), isTcInstalled ? 1 : 0 );
+	profile.SetDefaults( &defProfile );
 
 	if( source == DFS_DEFAULT )
 	{
