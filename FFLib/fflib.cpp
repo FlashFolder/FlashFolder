@@ -745,7 +745,7 @@ void CreateToolWindow( bool isFileDialog )
 		rcClient.bottom - rcClient.top - rcDiv.bottom * 2, 
 		g_hToolWnd, (HMENU) ID_FF_PATH, (HINSTANCE) g_hInstDll, NULL);
 	// enable auto-complete for the edit control
-	::SHAutoComplete( hEdit, SHACF_FILESYS_DIRS | SHACF_USETAB );
+	::SHAutoComplete( hEdit, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
 	//sub-class the edit control to handle key-stroke messages
 	g_wndProcToolWindowEditPath = (WNDPROC)  
 		SetWindowLong(hEdit, GWL_WNDPROC, (LONG) &ToolWindowEditPathProc);
