@@ -108,7 +108,7 @@ BOOL CAboutDlg::OnInitDialog()
 		SetDlgItemText( IDC_ST_FFLIB, s1 + s );
 	}
 
-	m_linkHomepage.SetURL( _T("http://sourceforge.net/projects/flashfolder/") );
+	m_linkHomepage.SetURL( _T("http://www.zett42.de/flashfolder/") );
 	m_linkBugReport.SetURL( _T("http://sourceforge.net/tracker/?group_id=195039&atid=951838") );
 	m_linkFeatureReq.SetURL( _T("http://sourceforge.net/tracker/?group_id=195039&atid=951841") );
 
