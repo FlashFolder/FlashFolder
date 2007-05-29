@@ -129,8 +129,8 @@
 		<Property Id="CptUI_Version">$(var.Version)</Property>
 		<Property Id="CptUI_VersionDisplay">$(var.VersionDisplay)</Property>
 		
-		<Binary Id="CptUI_BmpBanner" SourceFile="Bitmaps\banner.bmp" />
-		<Binary Id="CptUI_BmpDialog" SourceFile="Bitmaps\dialog.bmp" />		
+		<Binary Id="CptUI_BmpBanner" SourceFile="Bitmaps\banner.jpg" />
+		<Binary Id="CptUI_BmpDialog" SourceFile="Bitmaps\dialog.jpg" />		
 		<Icon Id="CptUI_ProductIcon" SourceFile="..\FFService\res\FlashFolder.ico" />
 
 	</Product>
