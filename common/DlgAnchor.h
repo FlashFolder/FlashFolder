@@ -1,20 +1,23 @@
-/* This file is part of FlashFolder. 
- * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+/*
+ *  CDlgAnchor class
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ *  uemakeXp development team
+ *  http://www.uemake.com
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  you may freely use or modify this code
+ *  -------------------------------------------------------------
+ *  Controls can be anchored to one or more edges of their parent
+ *  window.  Anchoring  a  control to its parent ensures that the
+ *  anchored edges  remain  in  the same position relative to the
+ *  edges  of  the  parent container when the parent container is
+ *  resized. Controls  can  be  also  docked to one edge of their
+ *  parent window or can be docked to all edges and fill it.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
+ *  Modifications by zett42 (zett42 at users.sourceforge.net):
+ *  - put all definitions into the CDlgAnchor class
+ *  - use std::map as internal data structure
+ *  - remove drawing artefacts/flickering by using DeferWindowPos() API
+ *  - moved implementation into .cpp file
  */
 #pragma once
 
