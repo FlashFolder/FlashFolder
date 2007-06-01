@@ -295,7 +295,7 @@ bool FileDlgGetCurrentFolder(HWND hwndFileDlg, LPTSTR folderPath )
     {
         pidlSize += 1024;
         pidl = (LPITEMIDLIST) realloc(pidl, pidlSize);
-        cb = SendMessage(hwndFileDlg, CDM_GETFOLDERIDLIST, pidlSize, (LPARAM) pidl);        
+        cb = (int) SendMessage(hwndFileDlg, CDM_GETFOLDERIDLIST, pidlSize, (LPARAM) pidl);        
     }
     while (cb > pidlSize);
 

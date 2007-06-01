@@ -86,7 +86,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 			::GetModuleFileName( NULL, exePath, MAX_PATH );
 
 			TCHAR s[512];
-			_stprintf( s, _T("[fflib] DLL_PROCESS_ATTACH (pid %08Xh, \"%s\")\n"), 
+			StringCbPrintf( s, sizeof(s), _T("[fflib] DLL_PROCESS_ATTACH (pid %08Xh, \"%s\")\n"), 
 				::GetCurrentProcessId(), exePath );
 			::OutputDebugString( s ); 
 
@@ -100,7 +100,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 		case DLL_PROCESS_DETACH:
 		{
 			TCHAR s[256];
-			_stprintf( s, _T("[fflib] DLL_PROCESS_DETACH (pid %08Xh)\n"), ::GetCurrentProcessId() );
+			StringCbPrintf( s, sizeof(s), _T("[fflib] DLL_PROCESS_DETACH (pid %08Xh)\n"), ::GetCurrentProcessId() );
 			::OutputDebugString( s ); 
 		}
 		break;
@@ -431,7 +431,7 @@ void DisplayMenu_Favorites()
 		StringCbCat( path, sizeof(path), _T("FFConfig.exe") );
 
 		TCHAR params[ 256 ] = _T("");
-		_sntprintf( params, sizeof(params) / sizeof(TCHAR) - 1, _T("%d --fav"), g_hFileDialog ); 
+		StringCbPrintf( params, sizeof(params),	_T("%d --fav"), g_hFileDialog ); 
 
 		::ShellExecute( g_hToolWnd, _T("open"), path, params, NULL, SW_SHOW );
 	}
@@ -467,7 +467,7 @@ void DisplayMenu_Config()
 	StringCbCat( path, sizeof(path), _T("FFConfig.exe") );
 	
 	TCHAR params[ 256 ] = _T("");
-	_sntprintf( params, sizeof(params) / sizeof(TCHAR) - 1, _T("%d"), g_hFileDialog ); 
+	StringCbPrintf( params, sizeof(params), _T("%d"), g_hFileDialog ); 
 	
 	if( id == 1 )
 	{
@@ -857,7 +857,7 @@ bool IsCurrentProgramEnabledForDialog( FileDlgType fileDlgType )
 		for( int i = 0;; ++i )
 		{
 			TCHAR key[10];
-			_stprintf( key, _T("%d"), i );
+			StringCbPrintf( key, sizeof(key), _T("%d"), i );
 			tstring path = g_profile.GetString( excludesGroup.c_str(), key );
 			if( path.empty() )
 				break;
@@ -972,7 +972,7 @@ DLLFUNC bool InstallHook()
         // Install the hook
 		g_hHook = ::SetWindowsHookEx( WH_CBT, HookProc, (HINSTANCE) g_hInstDll, 0 );
 
-		TCHAR s[256]; _stprintf( s, _T("[fflib] g_hHook = %08Xh\n"), g_hHook );
+		TCHAR s[256]; StringCbPrintf( s, sizeof(s), _T("[fflib] g_hHook = %08Xh\n"), g_hHook );
 		::OutputDebugString( s );
 
 		return g_hHook != NULL;
@@ -987,7 +987,7 @@ DLLFUNC bool UninstallHook()
 	// TODO: make thread safe 
     if( g_hHook != NULL )
     {
-		TCHAR s[256]; _stprintf( s, _T("[fflib] removing hook %08Xh...\n"), g_hHook );
+		TCHAR s[256]; StringCbPrintf( s, sizeof(s), _T("[fflib] removing hook %08Xh...\n"), g_hHook );
 		::OutputDebugString( s );
 
 		if( ::UnhookWindowsHookEx( g_hHook ) )
@@ -998,4 +998,3 @@ DLLFUNC bool UninstallHook()
     }
 	return false;
 }
-

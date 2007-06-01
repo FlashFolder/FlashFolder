@@ -19,6 +19,8 @@
 #include "stdafx.h"
 #include "AutoPropertyPage.h"
 
+#pragma warning(disable:4244) //convert to smaller type
+
 //-----------------------------------------------------------------------------------------------
 
 CAutoPropertyPage::CAutoPropertyPage( UINT resId )

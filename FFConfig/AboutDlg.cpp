@@ -20,6 +20,8 @@
 #include "FFConfig.h"
 #include "AboutDlg.h"
 
+#pragma warning(disable:4244)
+
 //-----------------------------------------------------------------------------------------
 
 bool GetFileVersion( VS_FIXEDFILEINFO* pVer, LPCTSTR pFilePath )

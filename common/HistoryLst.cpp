@@ -63,7 +63,7 @@ void HistoryLst::AddFolder( LPCTSTR s )
 	//add a file folder (directory) - remove the trailing '\' if exists
 	if( s != NULL )
 	{
-		int len = _tcslen( s );
+		size_t len = _tcslen( s );
 		if( s[len] != _T('\\') )
 			Add( s );
 		else
@@ -97,16 +97,14 @@ bool HistoryLst::LoadFromProfile( const Profile& profile, LPCTSTR sectionName )
 	m_list.clear();
 	for( int n = 0;; ++n )
 	{
-		TCHAR key[8];
-		_stprintf( key, _T("%d"), n );
+		TCHAR key[ 16 ];
+		StringCbPrintf( key, sizeof(key), _T("%d"), n );
 		tstring path = profile.GetString( sectionName, key );
 		if( path.empty() )
 			break;
 		m_list.push_back( path );
 	}
     return m_list.size() > 0;    
-
-	::OutputDebugString( _T("[fflib] HistoryLst::LoadFromProfile return\n") );
 }
 
 //---------------------------------------------------------------------------------------
@@ -116,23 +114,22 @@ void HistoryLst::SaveToProfile( Profile& profile, LPCTSTR sectionName )
 	::OutputDebugString( _T("[fflib] HistoryLst::SaveToProfile\n") );
 
 	// write new entries to profile
-	TCHAR key[8];
+	TCHAR key[ 16 ];
 	HISTORYLIST::const_iterator it;
 	int n = 0;
 	for( it = m_list.begin(); it != m_list.end(); it++ )
     {
-		_stprintf( key, _T("%d"), n );	
+		StringCbPrintf( key, sizeof(key), _T("%d"), n );	
 		profile.SetString( sectionName, key, it->c_str() );
 		n++;
 	}
 
     // delete all unused entries from profile
-	for( int n = m_list.size();; ++n ) 
+	for( size_t n = m_list.size();; ++n ) 
 	{
-		_stprintf( key, _T("%d"), n );
+		StringCbPrintf( key, sizeof(key), _T("%d"), n );	
 		if( profile.GetString( sectionName, key ).empty() )
 			break;
 		profile.DeleteValue( sectionName, key );
 	}
-	::OutputDebugString( _T("[fflib] HistoryLst::SaveToProfile return\n") );
 }

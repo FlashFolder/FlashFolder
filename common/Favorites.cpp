@@ -66,7 +66,7 @@ void GetDirFavorites( FavoritesList* pList, DirFavoritesSrc source )
 			TCHAR title[ 256 ] = _T("");
 			TCHAR targetPath[ MAX_PATH + 1 ] = _T("");
 
-			_stprintf( key, _T("menu%d"), i );
+			StringCbPrintf( key, sizeof(key), _T("menu%d"), i );
 			if( ::GetPrivateProfileString( _T("DirMenu"), key, _T(""), title, 
 					sizeof(title) / sizeof(TCHAR) - 1, tcIniPath.c_str() ) == 0 )
 				break;
@@ -74,7 +74,7 @@ void GetDirFavorites( FavoritesList* pList, DirFavoritesSrc source )
 			FavoritesItem item;
 			item.title = title;
 
-			_stprintf( key, _T("cmd%d"), i );
+			StringCbPrintf( key, sizeof(key), _T("cmd%d"), i );
 			if( ::GetPrivateProfileString( _T("DirMenu"), key, _T(""), cmd, 
 					sizeof(cmd) / sizeof(TCHAR) - 1, tcIniPath.c_str() ) > 0 )
 			{
@@ -86,7 +86,7 @@ void GetDirFavorites( FavoritesList* pList, DirFavoritesSrc source )
 					item.path = cmd;
 			}
 
-			_stprintf( key, _T("path%d"), i );
+			StringCbPrintf( key, sizeof(key), _T("path%d"), i );
 			if( ::GetPrivateProfileString( _T("DirMenu"), key, _T(""), targetPath, 
 					sizeof(targetPath) / sizeof(TCHAR) - 1, tcIniPath.c_str() ) > 0 )
 				item.targetpath = targetPath;		
@@ -102,12 +102,12 @@ void GetDirFavorites( FavoritesList* pList, DirFavoritesSrc source )
 		for( int i = 0;; ++i )
 		{
 			FavoritesItem item;
-			_stprintf( key, _T("%d"), i );
+			StringCbPrintf( key, sizeof(key), _T("%d"), i );
 			item.path = profile.GetString( _T("Favorites"), key );
 			if( item.path.empty() )
 				break;
 
-			_stprintf( key, _T("%d_title"), i );			
+			StringCbPrintf( key, sizeof(key), _T("%d_title"), i );			
 			item.title = profile.GetString( _T("Favorites"), key );
 			pList->push_back( item );
 		}
@@ -140,7 +140,7 @@ void SetDirFavorites( const FavoritesList& list, DirFavoritesSrc source )
 		TCHAR key[ 32 ];
 		for( int i = 0; i != list.size(); ++i )
 		{
-			_stprintf( key, _T("menu%d"), i + 1 );
+			StringCbPrintf( key, sizeof(key), _T("menu%d"), i + 1 );
 			::WritePrivateProfileString( _T("DirMenu"), key, list[i].title.c_str(), tcIniPath.c_str() );
 
 			tstring s;
@@ -148,11 +148,11 @@ void SetDirFavorites( const FavoritesList& list, DirFavoritesSrc source )
 				s = tstring( _T("cd ") ) + list[ i ].path;
 			else
 				s = list[ i ].path;
-			_stprintf( key, _T("cmd%d"), i + 1 );
+			StringCbPrintf( key, sizeof(key), _T("cmd%d"), i + 1 );
 			if( ! s.empty() )
 				::WritePrivateProfileString( _T("DirMenu"), key, s.c_str(), tcIniPath.c_str() );
 
-			_stprintf( key, _T("path%d"), i + 1 );
+			StringCbPrintf( key, sizeof(key), _T("path%d"), i + 1 );
 			if( ! list[i].targetpath.empty() )
 				::WritePrivateProfileString( _T("DirMenu"), key, list[i].targetpath.c_str(), tcIniPath.c_str() );
 		}
@@ -165,9 +165,9 @@ void SetDirFavorites( const FavoritesList& list, DirFavoritesSrc source )
 		TCHAR key[32];
 		for( int i = 0; i != list.size(); ++i )
 		{
-			_stprintf( key, _T("%d"), i );
+			StringCbPrintf( key, sizeof(key), _T("%d"), i );
 			profile.SetString( _T("Favorites"), key, list[i].path.c_str() );
-			_stprintf( key, _T("%d_title"), i );			
+			StringCbPrintf( key, sizeof(key), _T("%d_title"), i );			
 			profile.SetString( _T("Favorites"), key, list[i].title.c_str() );
 		}
 	}

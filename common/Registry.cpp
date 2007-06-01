@@ -19,6 +19,8 @@
 #include "stdafx.h"
 #include "Registry.h"
 
+#pragma warning(disable:4267) //convert to smaller type
+
 //-----------------------------------------------------------------------------------------------
 
 bool RegKey::GetString( tstring* pValue, LPCTSTR pValueName )
@@ -81,7 +83,7 @@ bool RegKey::ClearKey( HKEY hKeyRoot )
 
 	std::vector<TCHAR> name( maxValueNameLen + 1 );
 	std::vector<tstring> nameList;
-	for( int i = 0; i < valueCount; ++i )
+	for( int i = 0; i != valueCount; ++i )
 	{
 		DWORD nameLen = name.size();
 		if( ::RegEnumValue( hKeyRoot, i, &name[ 0 ], &nameLen, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS )
@@ -97,7 +99,7 @@ bool RegKey::ClearKey( HKEY hKeyRoot )
 
 	name.resize( maxKeyNameLen + 1 );
 	nameList.clear();
-	for( int i = 0; i < keyCount; ++i )
+	for( int i = 0; i != keyCount; ++i )
 	{
 		DWORD nameLen = name.size();
 		if( ::RegEnumKeyEx( hKeyRoot, i, &name[ 0 ], &nameLen, NULL, NULL, NULL, NULL ) == ERROR_SUCCESS )

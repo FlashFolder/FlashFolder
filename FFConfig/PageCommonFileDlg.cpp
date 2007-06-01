@@ -104,12 +104,12 @@ void CPageCommonFileDlg::ReadProfile( const Profile& profile )
 	vector<tstring> list;
 	m_excludes.clear();
 	profile.GetStringList( &list, PROFILE_GROUP + _T(".Excludes") );
-	for( int i = 0; i < list.size(); ++i )
+	for( int i = 0; i != list.size(); ++i )
 		m_excludes.push_back( list[ i ].c_str() );
 
 	m_nonResizableExcludes.clear();
 	profile.GetStringList( &list, PROFILE_GROUP + _T(".NonResizableExcludes") );
-	for( int i = 0; i < list.size(); ++i )
+	for( int i = 0; i != list.size(); ++i )
 		m_nonResizableExcludes.push_back( list[ i ].c_str() );
 
 	// Set initial enabled state for child controls

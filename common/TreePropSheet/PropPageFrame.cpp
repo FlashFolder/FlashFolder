@@ -148,7 +148,7 @@ CRect CPropPageFrame::CalcMsgArea()
 
 void CPropPageFrame::DrawMsg(CDC *pDc, CRect rect, LPCTSTR /*lpszMsg*/, DWORD /*dwFormat*/) 
 {
-	CFont	*pPrevFont = dynamic_cast<CFont*>(pDc->SelectStockObject(DEFAULT_GUI_FONT));
+	CFont	*pPrevFont = (CFont*) (pDc->SelectStockObject(DEFAULT_GUI_FONT));
 	int		nPrevBkMode = pDc->SetBkMode(TRANSPARENT);
 
 	pDc->DrawText(GetMsgText(), rect, GetMsgFormat());

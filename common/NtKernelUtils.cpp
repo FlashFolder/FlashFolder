@@ -40,8 +40,8 @@ bool MapNtFilePathToUserPath( LPTSTR pUserPath, unsigned userPathLen, LPCTSTR nt
     {
         // ntPath is a network path
 
-        _tcscpy( pUserPath, _T("\\\\") );
-        _tcsncat( pUserPath, &ntPath[25], userPathLen - 2 );
+		StringCchCopy( pUserPath, userPathLen, _T("\\\\") );
+        StringCchCat( pUserPath, userPathLen, &ntPath[25]);
         return true;
     }
     else
@@ -64,8 +64,8 @@ bool MapNtFilePathToUserPath( LPTSTR pUserPath, unsigned userPathLen, LPCTSTR nt
                     if( len <= _tcslen( ntPath ) &&
                         _tcsncmp( ntPath, ntDrivePath, len ) == 0 )
                     {
-                        _tcscpy( pUserPath, drive );
-                        _tcsncat( pUserPath, &ntPath[len], userPathLen - 2 );
+						StringCchCopy( pUserPath, userPathLen, drive );
+                        StringCchCat( pUserPath, userPathLen, &ntPath[len] );
                         return true;
                     }
                 }
@@ -93,19 +93,8 @@ bool MapUserPathToNtFilePath( LPTSTR pNtPath, unsigned ntPathLen, LPCTSTR userPa
     {
         // drive-based path
 
-        _tcscpy( pNtPath, _T("\\??\\") );
-        _tcsncat( pNtPath, userPath, ntPathLen - 4 ); 
-/*
-        TCHAR drive[] = _T(" :");
-        drive[0] = userPath[0];
-        if( ::QueryDosDevice( drive, pNtPath, ntPathLen ) )
-        {
-            unsigned len = _tcslen( pNtPath );
-            if( len < ntPathLen )
-                _tcsncat( pNtPath, &userPath[2], ntPathLen - len - 2 );
-            return true;
-        }
-*/
+		StringCchCopy( pNtPath, ntPathLen, _T("\\??\\") );
+        StringCchCat( pNtPath, ntPathLen, userPath ); 
     }
     
     return false;

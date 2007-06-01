@@ -128,7 +128,7 @@ public:
 	{
 		if( ! m_hKey )
 			return false;
-		DWORD size = ( _tcslen( pValue ) + 1 ) * sizeof(TCHAR);
+		DWORD size = DWORD( ( _tcslen( pValue ) + 1 ) * sizeof(TCHAR) );
 		return ::RegSetValueEx( m_hKey, pValueName, 0, REG_SZ, reinterpret_cast<const BYTE*>( pValue ), size )
 			== ERROR_SUCCESS; 
 	}

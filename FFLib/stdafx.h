@@ -14,7 +14,6 @@
 #include <objbase.h>
 #include <shlobj.h>
 #include <dlgs.h>
-#include <strsafe.h>
 #include <shlwapi.h>
 #include <shellapi.h>
 
@@ -22,14 +21,17 @@
 #include <tchar.h>
 #include <crtdbg.h>   //for _ASSERTE
 #include <cstdio>
-#include <vector>
-#include <string>
-#include <set>
 #include <memory>
 using namespace std;
 
 //--- STL headers
+#include <vector>
 #include <map>
+#include <set>
+#include <string>
+
+// include after all STD headers to avoid false warnings
+#include <strsafe.h>
 
 //--- own headers
 #include "../_version.h"

@@ -33,8 +33,8 @@ public:
 	void AddFolder( LPCTSTR s );
 	
     void SetMaxEntries( int count );
-    inline int GetMaxEntries() const { return m_maxEntries; };
-    inline int GetCount() const { return m_list.size(); };
+    inline size_t GetMaxEntries() const { return m_maxEntries; };
+    inline size_t GetCount() const { return m_list.size(); };
 	
     inline const tstring &operator [](int n) const { return m_list[n]; };
     inline const std::vector<tstring> &GetList() const { return m_list; };

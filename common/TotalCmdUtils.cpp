@@ -88,7 +88,7 @@ BOOL CALLBACK CTotalCmdUtils::FindSubWindows_Proc( HWND hwnd, LPARAM lParam )
             bool bIsActive = false;
             if( ! pData->m_thisptr->m_hwndActive )
             {
-                int len = _tcslen( wndtext );
+                size_t len = _tcslen( wndtext );
                 TCHAR* pLast = _tcsninc( wndtext, len - 1 );
                 if( *pLast == _T('>') )
                 {

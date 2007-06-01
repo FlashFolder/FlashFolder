@@ -20,13 +20,9 @@
 //-----------------------------------------------------------------------------------------------
 
 inline int MapDlgX( int templateUnitX, int baseUnitX )
-{
-	return __int64( templateUnitX ) * baseUnitX / 4;
-}
+	{ return int( __int64( templateUnitX ) * baseUnitX / 4 ); }
 inline int MapDlgY( int templateUnitY, int baseUnitY )
-{
-	return __int64( templateUnitY ) * baseUnitY / 8;
-}
+	{ return int( __int64( templateUnitY ) * baseUnitY / 8 ); }
 
 //-----------------------------------------------------------------------------------------
 /**

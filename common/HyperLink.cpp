@@ -22,6 +22,9 @@
 
 #include "atlconv.h"    // for Unicode conversion - requires #include <afxdisp.h> // MFC OLE automation classes
 
+#pragma warning(disable:4311)  //pointer conversion to int
+#pragma warning(disable:4312)  //UINT to pointer conversion
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE

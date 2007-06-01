@@ -70,7 +70,7 @@ bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 		for( int i = 0;; ++i )
 		{
 			TCHAR key[10];
-			_stprintf( key, _T("%d"), i );
+			StringCbPrintf( key, sizeof(key), _T("%d"), i );
 			tstring path = g_profile.GetString( _T("CommonFileDlg.NonResizableExcludes"), key );
 			if( path.empty() )
 				break;

@@ -37,7 +37,7 @@ void Profile::GetStringList( std::vector<tstring>* pList, LPCTSTR pSectionName )
 	TCHAR key[ 32 ];
 	for( int i = 0;; ++i )
 	{
-		_stprintf( key, _T("%d"), i );
+		StringCbPrintf( key, sizeof(key), _T("%d"), i );
 		if( ! ValueExists( pSectionName, key ) )
 			break;
 		tstring val = GetString( pSectionName, key );
@@ -54,7 +54,7 @@ void Profile::SetStringList( LPCTSTR pSectionName, const std::vector<tstring>& l
 	TCHAR key[ 32 ];
 	for( int i = 0; i != list.size(); ++i )
 	{
-		_stprintf( key, _T("%d"), i );
+		StringCbPrintf( key, sizeof(key), _T("%d"), i );
 		SetString( pSectionName, key, list[ i ].c_str() );
 	}
 }
@@ -127,7 +127,7 @@ void MemoryProfile::SetInt( LPCTSTR pSectionName, LPCTSTR pValueName, int value,
 		if( ValueExists( pSectionName, pValueName ) )
 			return;
 	TCHAR sValue[ 64 ];
-	_stprintf( sValue, _T("%d"), value );
+	StringCbPrintf( sValue, sizeof(sValue), _T("%d"), value );
 	m_data[ pSectionName ][ pValueName ] = sValue;
 }
 
