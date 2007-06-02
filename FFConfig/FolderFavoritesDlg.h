@@ -20,10 +20,8 @@
 
 //-----------------------------------------------------------------------------------------------
 
-class CFolderFavoritesDlg : public CDialog
+class CFolderFavoritesDlg : public CResizableDlg
 {
-	DECLARE_DYNAMIC(CFolderFavoritesDlg)
-
 public:
 	CFolderFavoritesDlg(CWnd* pParent = NULL);   
 
@@ -34,8 +32,6 @@ private:
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	virtual void OnCancel();
-	afx_msg void OnSize( UINT type, int cx, int cy );
-	afx_msg void OnGetMinMaxInfo( MINMAXINFO* pm );
 	afx_msg void OnBnClickedBtnBrowse();
 	afx_msg void OnLstFavs_ItemChanged(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedRdOwnFavorites();
@@ -55,8 +51,6 @@ private:
 	void UpdateSelItemEditControls();
 	void SaveDialogSize();
 
-	CDlgAnchor m_anchor;
-	CSizeGrip m_sizeGrip;
 	CDragListCtrl m_listFavs;
 	CEditEx m_edTitle;
 	CEditEx m_edPath;

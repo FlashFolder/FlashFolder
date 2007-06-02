@@ -19,7 +19,6 @@
 #include "stdafx.h"
 #include "FFConfig.h"
 #include "FolderFavoritesDlg.h"
-#include ".\folderfavoritesdlg.h"
 
 //-----------------------------------------------------------------------------------------------
 
@@ -36,9 +35,8 @@ struct ItemData
 
 //-----------------------------------------------------------------------------------------------
 
-IMPLEMENT_DYNAMIC(CFolderFavoritesDlg, CDialog)
 CFolderFavoritesDlg::CFolderFavoritesDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CFolderFavoritesDlg::IDD, pParent),
+	: CResizableDlg(CFolderFavoritesDlg::IDD, pParent),
 	m_sel( -1 )
 {}
 
@@ -46,7 +44,7 @@ CFolderFavoritesDlg::CFolderFavoritesDlg(CWnd* pParent /*=NULL*/)
 
 void CFolderFavoritesDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	CResizableDlg::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LST_FAVS, m_listFavs);
 	DDX_Control(pDX, IDC_ED_TITLE, m_edTitle);
 	DDX_Control(pDX, IDC_ED_PATH, m_edPath);
@@ -54,8 +52,7 @@ void CFolderFavoritesDlg::DoDataExchange(CDataExchange* pDX)
 
 //-----------------------------------------------------------------------------------------------
 
-BEGIN_MESSAGE_MAP(CFolderFavoritesDlg, CDialog)
-	ON_WM_SIZE()
+BEGIN_MESSAGE_MAP(CFolderFavoritesDlg, CResizableDlg)
 	ON_WM_GETMINMAXINFO()
 	ON_BN_CLICKED(IDC_BTN_BROWSE, OnBnClickedBtnBrowse)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LST_FAVS, OnLstFavs_ItemChanged)
@@ -75,7 +72,7 @@ END_MESSAGE_MAP()
 
 BOOL CFolderFavoritesDlg::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	CResizableDlg::OnInitDialog();
 
 	tstring tcIniPath;
 	bool isTcInstalled = GetTotalCmdLocation( NULL, &tcIniPath );
@@ -100,20 +97,20 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 
 	UpdateFavList();
 
-	m_sizeGrip.Create( this );
-	m_anchor.Init( this );
-	m_anchor.Add( IDC_LST_FAVS, CDlgAnchor::ANCHOR_ALL );
-	m_anchor.Add( IDC_ST_TITLE, CDlgAnchor::ANCHOR_BOTTOMLEFT );
-	m_anchor.Add( IDC_ST_PATH, CDlgAnchor::ANCHOR_BOTTOMLEFT );
-	m_anchor.Add( IDC_ED_TITLE, CDlgAnchor::ANCHOR_BOTTOMLEFT | CDlgAnchor::ANCHOR_RIGHT );
-	m_anchor.Add( IDC_ED_PATH, CDlgAnchor::ANCHOR_BOTTOMLEFT | CDlgAnchor::ANCHOR_RIGHT );
-	m_anchor.Add( IDC_BTN_BROWSE, CDlgAnchor::ANCHOR_BOTTOMRIGHT );
-	m_anchor.Add( IDC_RD_OWN_FAVORITES, CDlgAnchor::ANCHOR_BOTTOMLEFT );
-	m_anchor.Add( IDC_RD_TC_FAVORITES, CDlgAnchor::ANCHOR_BOTTOMLEFT );
-	m_anchor.Add( IDOK, CDlgAnchor::ANCHOR_BOTTOM );
-	m_anchor.Add( IDCANCEL, CDlgAnchor::ANCHOR_BOTTOM );
-	m_anchor.Add( IDC_BTN_REVERT, CDlgAnchor::ANCHOR_BOTTOM );
-	m_anchor.Add( m_sizeGrip, CDlgAnchor::ANCHOR_BOTTOMRIGHT );
+	Anchor( IDC_LST_FAVS, ANCHOR_ALL );
+	Anchor( IDC_ST_TITLE, ANCHOR_BOTTOMLEFT );
+	Anchor( IDC_ST_PATH, ANCHOR_BOTTOMLEFT );
+	Anchor( IDC_ED_TITLE, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
+	Anchor( IDC_ED_PATH, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
+	Anchor( IDC_BTN_BROWSE, ANCHOR_BOTTOMRIGHT );
+	Anchor( IDC_RD_OWN_FAVORITES, ANCHOR_BOTTOMLEFT );
+	Anchor( IDC_RD_TC_FAVORITES, ANCHOR_BOTTOMLEFT );
+	Anchor( IDOK, ANCHOR_BOTTOM );
+	Anchor( IDCANCEL, ANCHOR_BOTTOM );
+	Anchor( IDC_BTN_REVERT, ANCHOR_BOTTOM );
+
+	// Set size from dialog template as minimum size
+	SetMinSize();
 
 	// get dialog size from registry
 	int width = g_profile.GetInt( _T("main"), _T("FavoritesDlgWidth") );
@@ -121,24 +118,6 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	SetWindowPos( NULL, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE );
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
-}
-
-//-----------------------------------------------------------------------------------------------
-
-void CFolderFavoritesDlg::OnSize( UINT type, int cx, int cy )
-{
-	CDialog::OnSize( type, cx, cy );
-	m_anchor.OnSize();
-}
-
-//-----------------------------------------------------------------------------------------------
-
-void CFolderFavoritesDlg::OnGetMinMaxInfo( MINMAXINFO* pm )
-{
-	CDialog::OnGetMinMaxInfo( pm );
-	CRect rc( 0, 0, 250, 165 );	 MapDialogRect( rc );
-	pm->ptMinTrackSize.x = rc.Width();
-	pm->ptMinTrackSize.y = rc.Height();
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -201,7 +180,7 @@ void CFolderFavoritesDlg::OnOK()
 
 	SaveDialogSize();
 	
-	CDialog::OnOK();
+	CResizableDlg::OnOK();
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -209,7 +188,7 @@ void CFolderFavoritesDlg::OnOK()
 void CFolderFavoritesDlg::OnCancel() 
 { 
 	SaveDialogSize(); 
-	CDialog::OnCancel(); 
+	CResizableDlg::OnCancel(); 
 }
 
 //-----------------------------------------------------------------------------------------------

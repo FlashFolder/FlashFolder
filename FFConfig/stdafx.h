@@ -55,8 +55,7 @@
 #include "../common/Favorites.h"
 // UI
 #include "../common/GroupCheck.h"
-#include "../common/SizeGrip.h"
-#include "../common/DlgAnchor.h"
+#include "../common/ResizableDlg.h"
 #include "../common/FolderDlg.h"
 #include "../common/DragListCtrl.h"
 #include "../common/EditEx.h"
