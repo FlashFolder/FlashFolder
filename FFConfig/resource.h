@@ -61,6 +61,8 @@
 #define IDC_ST_BUGREPORT                1057
 #define IDC_ST_FEATUREREQ               1058
 #define IDC_ST_MULTIUSER                1059
+#define IDC_ST_HOMEPAGE2                1059
+#define IDC_ST_PROJECTPAGE              1059
 #define IDC_BTN_EXCLUDES                1060
 #define IDC_BTN_CHANGELOG               1061
 #define IDC_BTN_RESET                   1062
@@ -72,7 +74,6 @@
 #define IDC_ST_DOWNLOAD                 1068
 #define IDC_ED_TEXT                     1070
 #define IDC_RICHEDIT21                  1071
-#define IDC_BUTTON1                     1072
 #define IDC_BTN_DOWNLOAD                1072
 
 // Next default values for new objects

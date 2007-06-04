@@ -35,9 +35,10 @@ CAboutDlg::CAboutDlg( CWnd* pParent ) :
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_ST_HOMEPAGE, m_linkHomepage);
-	DDX_Control(pDX, IDC_ST_BUGREPORT, m_linkBugReport);
-	DDX_Control(pDX, IDC_ST_FEATUREREQ, m_linkFeatureReq);
+	DDX_Control( pDX, IDC_ST_HOMEPAGE, m_linkHomepage );
+	DDX_Control( pDX, IDC_ST_PROJECTPAGE, m_linkProjectPage );
+	DDX_Control( pDX, IDC_ST_BUGREPORT, m_linkBugReport );
+	DDX_Control( pDX, IDC_ST_FEATUREREQ, m_linkFeatureReq );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -85,6 +86,7 @@ BOOL CAboutDlg::OnInitDialog()
 	}
 
 	m_linkHomepage.SetURL( _T("http://www.zett42.de/flashfolder/") );
+	m_linkProjectPage.SetURL( _T("http://sourceforge.net/projects/flashfolder/") );
 	m_linkBugReport.SetURL( _T("http://sourceforge.net/tracker/?group_id=195039&atid=951838") );
 	m_linkFeatureReq.SetURL( _T("http://sourceforge.net/tracker/?group_id=195039&atid=951841") );
 

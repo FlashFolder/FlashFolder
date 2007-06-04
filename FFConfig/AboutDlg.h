@@ -34,6 +34,7 @@ private:
 	DECLARE_MESSAGE_MAP()
 
 	CHyperLink m_linkHomepage;
+	CHyperLink m_linkProjectPage;
 	CHyperLink m_linkBugReport;
 	CHyperLink m_linkFeatureReq;
 };
