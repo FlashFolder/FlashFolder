@@ -36,9 +36,22 @@ bool FileExists( LPCTSTR szName );
 bool IsFilePath( LPCTSTR path );
 bool IsRelativePath( LPCTSTR path );
 
+void GetTempFilePath( LPTSTR pResult, LPCTSTR pPrefix );
+
 bool IsIniSectionNotEmpty( LPCTSTR filename, LPCTSTR sectionName );
 
 void AddTextInput( std::vector<INPUT>* pInput, LPCTSTR pText );
+
+inline void ScreenToClientRect( HWND hwnd, RECT* prc )
+{
+	POINT pt1 = { prc->left, prc->top };
+	::ScreenToClient( hwnd, &pt1 );
+	POINT pt2 = { prc->right, prc->bottom };
+	::ScreenToClient( hwnd, &pt2 );
+	prc->left = pt1.x; prc->top = pt1.y; prc->right = pt2.x; prc->bottom = pt2.y;
+}
+
+//-----------------------------------------------------------------------------------------------
 
 enum FileDlgType { FDT_NONE, FDT_COMMON, FDT_MSOFFICE, FDT_COMMON_OPENWITH, FDT_COMMON_FOLDER };
 FileDlgType GetFileDlgType( HWND dlg );
@@ -64,15 +77,6 @@ const unsigned FILEDLG_CB_OLD_DRIVES = 1121;      // Win 3.1 style dialogs only
 // some control ID's of the MS Office file dialog
 const unsigned MSO2000_FILEDLG_ED_FILENAME = 48;
 const unsigned MSO2002_FILEDLG_ED_FILENAME = 54;
-
-inline void ScreenToClientRect( HWND hwnd, RECT* prc )
-{
-	POINT pt1 = { prc->left, prc->top };
-	::ScreenToClient( hwnd, &pt1 );
-	POINT pt2 = { prc->right, prc->bottom };
-	::ScreenToClient( hwnd, &pt2 );
-	prc->left = pt1.x; prc->top = pt1.y; prc->right = pt2.x; prc->bottom = pt2.y;
-}
 
 //-------------------------------------------------------------------------------------------------
 

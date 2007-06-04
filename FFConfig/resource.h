@@ -3,6 +3,7 @@
 // Used by FFConfig.rc
 //
 #define IDC_BTN_REVERT                  3
+#define IDC_EXPAND                      3
 #define IDD_FFCONFIG_DIALOG             102
 #define IDD_FFCONFIG                    102
 #define IDR_MAINFRAME                   128
@@ -20,6 +21,7 @@
 #define IDD_PAGE_MSO_FILEDLG            143
 #define IDD_PAGE_COMMON_DIRDLG          150
 #define IDD_PAGE_COMMON_FILEDLG         151
+#define IDD_UPDATECHECK                 154
 #define IDC_RD_INDIVIDUAL_PROFILES      1000
 #define IDC_RD_SHARED_PROFILE           1001
 #define IDC_ED_MAX_DIRHISTORY           1002
@@ -60,16 +62,26 @@
 #define IDC_ST_FEATUREREQ               1058
 #define IDC_ST_MULTIUSER                1059
 #define IDC_BTN_EXCLUDES                1060
-#define IDC_BUTTON1                     1061
+#define IDC_BTN_CHANGELOG               1061
 #define IDC_BTN_RESET                   1062
+#define IDC_ST_INSTVER                  1063
+#define IDC_ST_CURVER                   1064
+#define IDC_ST_ONLINEVER                1064
+#define IDC_ST_STATUS                   1065
+#define IDC_ST_EXPAND                   1066
+#define IDC_ST_DOWNLOAD                 1068
+#define IDC_ED_TEXT                     1070
+#define IDC_RICHEDIT21                  1071
+#define IDC_BUTTON1                     1072
+#define IDC_BTN_DOWNLOAD                1072
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        154
+#define _APS_NEXT_RESOURCE_VALUE        156
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1063
-#define _APS_NEXT_SYMED_VALUE           104
+#define _APS_NEXT_CONTROL_VALUE         1073
+#define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif

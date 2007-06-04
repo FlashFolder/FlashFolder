@@ -20,6 +20,7 @@
 #include "FFConfig.h"
 #include "FFConfigDlg.h"
 #include "FolderFavoritesDlg.h"
+#include "UpdateCheckDlg.h"
 #include "AboutDlg.h"
 #include "../common/ProfileDefaults.h"
 
@@ -69,14 +70,23 @@ BOOL CFFConfigApp::InitInstance()
 
 	CWinApp::InitInstance();
 
+	AfxInitRichEdit2();
+
 	HWND hwndParent = NULL;
 	if( __argc > 1 )
 		hwndParent = reinterpret_cast<HWND>( _ttoi64( __targv[ 1 ] ) );
 
-	enum { DLG_CONFIG, DLG_FAVS, DLG_ABOUT } dlgType = DLG_CONFIG;
+	enum 
+	{ 
+		DLG_CONFIG, DLG_FAVS, DLG_UPDATECHECK, DLG_ABOUT 
+	} 
+	dlgType = DLG_CONFIG;
+	
 	if( __argc > 2 )
 		if( _tcscmp( __targv[ 2 ], _T("--fav") ) == 0 )
 			dlgType = DLG_FAVS;
+		else if( _tcscmp( __targv[ 2 ], _T("--updatecheck") ) == 0 )
+			dlgType = DLG_UPDATECHECK;
 		else if( _tcscmp( __targv[ 2 ], _T("--about") ) == 0 )
 			dlgType = DLG_ABOUT;
 
@@ -94,6 +104,9 @@ BOOL CFFConfigApp::InitInstance()
 			break;
 		case DLG_FAVS:
 			pUniqueAppId = _T("FFFavorites.xmgn4ngertu4mnsf");
+			break;
+		case DLG_UPDATECHECK:
+			pUniqueAppId = _T("FFUpdateCheck.xmgn4ngertu4mnsf");
 			break;
 		case DLG_ABOUT:
 			pUniqueAppId = _T("FFAbout.xmgn4ngertu4mnsf");
@@ -124,6 +137,8 @@ BOOL CFFConfigApp::InitInstance()
 	GetProfileDefaults( &g_profileDefaults );
 	g_profile.SetDefaults( &g_profileDefaults );
 
+	// By specifying the handle of the parent window, dialogs of FFConfig behave like modal dialogs to
+	// the program where FlashFolder toolbar is currently attached to.
 	switch( dlgType )
 	{
 		case DLG_CONFIG:
@@ -136,6 +151,15 @@ BOOL CFFConfigApp::InitInstance()
 		case DLG_FAVS:
 		{
 			CFolderFavoritesDlg dlg( CWnd::FromHandle( hwndParent ) );
+			m_pMainWnd = &dlg;
+			dlg.DoModal();
+			break;
+		}
+		case DLG_UPDATECHECK:
+		{
+			// Do not specify the parent window here, so that a blocking network connection 
+			// doesn't block the current program where FlashFolder is attached to.
+			CUpdateCheckDlg dlg; 			
 			m_pMainWnd = &dlg;
 			dlg.DoModal();
 			break;

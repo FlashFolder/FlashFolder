@@ -20,6 +20,10 @@
 
 #include <string>
 
+#pragma warning(disable:4267) // size_t --> int
+
+//-----------------------------------------------------------------------------------------------
+
 template< typename T_iter, typename T_char >
 void SplitString( T_iter itDest, const T_char* pStr, T_char chSep = ',' )
 {
@@ -35,4 +39,26 @@ void SplitString( T_iter itDest, const T_char* pStr, T_char chSep = ',' )
 		pStr++;
 		p1 = pStr;
 	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+inline CStringW Utf8ToUtf16( LPCSTR pUtf8 )
+{
+	if( ! pUtf8 )
+		return L"";
+	CStringW buf;
+	int len = strlen( pUtf8 );
+	int res = ::MultiByteToWideChar( CP_UTF8, 0, pUtf8, len, buf.GetBuffer( len * 4 ), len * 4 );
+	if( res == ERROR_NO_UNICODE_TRANSLATION )
+		return L"";
+    buf.ReleaseBuffer( res );
+	return buf;
+}
+
+inline CString Utf8ToStr( LPCSTR pUtf8 )
+{
+	if( ! pUtf8 )
+		return _T("");
+	return Utf8ToUtf16( pUtf8 );
 }

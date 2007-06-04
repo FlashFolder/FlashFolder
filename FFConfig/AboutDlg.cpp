@@ -22,32 +22,6 @@
 
 #pragma warning(disable:4244)
 
-//-----------------------------------------------------------------------------------------
-
-bool GetFileVersion( VS_FIXEDFILEINFO* pVer, LPCTSTR pFilePath )
-{
-	memset( pVer, 0, sizeof(VS_FIXEDFILEINFO) );
-	DWORD dummy;
-	DWORD size = ::GetFileVersionInfoSize( pFilePath, &dummy );
-	if( size == 0 )
-		return false;
-
-	std::vector<char> verInfo( size );
-	if( ! ::GetFileVersionInfo( pFilePath, 0, size, &verInfo[0] ) )
-		return false;
-    
-	TCHAR name[] = _T("\\");
-	VS_FIXEDFILEINFO* pVerData = NULL;
-	UINT len = 0;
-	if( ! ::VerQueryValue( &verInfo[0], name, (void**) &pVerData, &len ) )
-		return false;
-	if( len < sizeof(VS_FIXEDFILEINFO) )
-		return false;
-	memcpy( pVer, pVerData, sizeof(VS_FIXEDFILEINFO) );
-
-	return true;
-}
-
 //-----------------------------------------------------------------------------------------------
 
 IMPLEMENT_DYNAMIC(CAboutDlg, CDialog)

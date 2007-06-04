@@ -18,21 +18,27 @@
 
 #pragma warning(disable:4995)  // caused by strsafe.h
 
-//--- MFC headers
+//--- WMFC headers
 
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
 #include <afxcmn.h>			// MFC support for Windows Common Controls
 #include <afxdlgs.h>
+
+//--- ATL headers
+
+#include <atlbase.h>
+#include <atlrx.h>
+
+//--- Windows headers
+
 #include <shlwapi.h>
 #include <shellapi.h>
 #include <shobjidl.h>
 #include <objbase.h>
 #include <shlobj.h>
-
-//--- ATL headers
-
-#include <atlbase.h>
+#include <urlmon.h>
+#include <Wininet.h>
 
 //--- STD headers
 
@@ -45,6 +51,10 @@
 #include <cstdlib>
 
 //--- own headers
+
+// TinyXML
+#include "../common/TinyXml/TinyXml.h"
+
 // utilities
 #include "../common/tstring.h"
 #include "../common/StringUtils.h"
@@ -53,6 +63,8 @@
 #include "../common/Registry.h"
 #include "../common/TotalCmdUtils.h"
 #include "../common/Favorites.h"
+#include "../common/DownloadThread.h"
+#include "../common/VersionInfo.h"
 // UI
 #include "../common/GroupCheck.h"
 #include "../common/ResizableDlg.h"
@@ -60,8 +72,10 @@
 #include "../common/DragListCtrl.h"
 #include "../common/EditEx.h"
 #include "../common/HyperLink.h"
+#include "../common/DlgExpander.h"
 // UI - TreePropSheet headers
 #include "../common/TreePropSheet/TreePropSheet.h"
 #include "../common/TreePropSheet/PropPageFrame.h"
 #include "../common/TreePropSheet/PropPageFrameDefault.h"
+
 

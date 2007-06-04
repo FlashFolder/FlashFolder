@@ -456,7 +456,8 @@ void DisplayMenu_Config()
 
 	HMENU hMenu = ::CreatePopupMenu();
 	::AppendMenu( hMenu, MF_STRING, 1, _T("Options...") );
-	::AppendMenu( hMenu, MF_STRING, 2, _T("About FlashFolder...") );
+	::AppendMenu( hMenu, MF_STRING, 2, _T("Check for updates") );
+	::AppendMenu( hMenu, MF_STRING, 3, _T("About FlashFolder...") );
 
 	int id = TrackPopupMenu(hMenu, 
 		TPM_LEFTALIGN | TPM_TOPALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD | TPM_NONOTIFY, 
@@ -474,6 +475,11 @@ void DisplayMenu_Config()
 		::ShellExecute( g_hFileDialog, _T("open"), path, params, NULL, SW_SHOW );
 	}
 	else if( id == 2 )
+	{
+		StringCbCat( params, sizeof(params), _T(" --updatecheck") );
+		::ShellExecute( g_hFileDialog, _T("open"), path, params, NULL, SW_SHOW );	
+	}
+	else if( id == 3 )
 	{
 		StringCbCat( params, sizeof(params), _T(" --about") );
 		::ShellExecute( g_hFileDialog, _T("open"), path, params, NULL, SW_SHOW );

@@ -21,55 +21,28 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
 
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
-    "#define _AFX_NO_OLE_RESOURCES\r\n"
-    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
-    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
-    "\r\n"
-    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
-    "LANGUAGE 9, 1\r\n"
-    "#pragma code_page(1252)\r\n"
-    "#include ""res\\FFConfig.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
-    "#include ""afxres.rc""         // Standard components\r\n"
-    "#endif\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\FFConfig.ico"
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
+
+IDD_UPDATECHECK DIALOGEX 0, 0, 260, 94
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Checking for new FlashFolder version"
+CLASS "FFUpdateCheck.xmgn4ngertu4mnsf"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "",IDC_ST_STATUS,7,13,246,18
+    CONTROL         "",IDC_ST_EXPAND,"Static",SS_BLACKFRAME | NOT WS_VISIBLE,
+                    0,35,260,31
+    LTEXT           "Your version:",IDC_STATIC,7,38,44,8
+    LTEXT           "1.0.0.0",IDC_ST_INSTVER,81,38,66,8
+    LTEXT           "Most recent version:",IDC_STATIC,7,53,67,8
+    LTEXT           "1.0.0.0",IDC_ST_ONLINEVER,81,53,66,8
+    PUSHBUTTON      "&Go to download site",IDC_BTN_DOWNLOAD,164,48,89,14
+    PUSHBUTTON      "Cancel",IDCANCEL,105,73,50,14
+END
 
 IDD_ABOUT DIALOGEX 0, 0, 212, 134
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | 
@@ -239,33 +212,33 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,146,177,50,14
 END
 
-IDD_FAVORITES DIALOGEX 0, 0, 360, 271
+IDD_FAVORITES DIALOGEX 0, 0, 255, 152
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | 
     WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "FlashFolder Favorites"
 CLASS "FFFavorites.xmgn4ngertu4mnsf"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "&Insert",IDC_BTN_ADD,7,7,40,14
-    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,49,7,40,14
+    PUSHBUTTON      "&Insert",IDC_BTN_ADD,7,8,40,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,49,8,40,14
     LTEXT           "Drag an item by mouse to change its position.",
-                    IDC_STATIC,100,10,147,8
+                    IDC_STATIC,100,11,147,8
     CONTROL         "",IDC_LST_FAVS,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
-                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,23,346,159
-    LTEXT           "&Path:",IDC_ST_PATH,7,187,18,8
-    EDITTEXT        IDC_ED_PATH,59,184,263,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "...",IDC_BTN_BROWSE,324,184,29,14,WS_DISABLED
-    LTEXT           "Title (optional):",IDC_ST_TITLE,7,203,50,8
-    EDITTEXT        IDC_ED_TITLE,59,200,294,14,ES_AUTOHSCROLL | WS_DISABLED
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,24,240,34
+    LTEXT           "&Path:",IDC_ST_PATH,8,67,18,8
+    EDITTEXT        IDC_ED_PATH,60,64,163,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "...",IDC_BTN_BROWSE,226,64,21,14,WS_DISABLED
+    LTEXT           "Title (optional):",IDC_ST_TITLE,8,83,50,8
+    EDITTEXT        IDC_ED_TITLE,60,80,187,14,ES_AUTOHSCROLL | WS_DISABLED
     CONTROL         "&Use FlashFolder favorites",IDC_RD_OWN_FAVORITES,"Button",
-                    BS_AUTORADIOBUTTON,7,221,97,10
+                    BS_AUTORADIOBUTTON,8,101,97,10
     CONTROL         "Use directory menu from Total Commander®",
-                    IDC_RD_TC_FAVORITES,"Button",BS_AUTORADIOBUTTON,7,233,
+                    IDC_RD_TC_FAVORITES,"Button",BS_AUTORADIOBUTTON,8,114,
                     159,10
-    DEFPUSHBUTTON   "OK",IDOK,97,250,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,154,250,50,14
-    PUSHBUTTON      "Re&vert",IDC_BTN_REVERT,211,250,50,14
+    DEFPUSHBUTTON   "OK",IDOK,45,130,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,102,130,50,14
+    PUSHBUTTON      "Re&vert",IDC_BTN_REVERT,159,130,50,14
 END
 
 
@@ -277,6 +250,14 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO 
 BEGIN
+    IDD_UPDATECHECK, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 253
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 87
+    END
+
     IDD_ABOUT, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -328,9 +309,62 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 170
     END
+
+    IDD_FAVORITES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 247
+        TOPMARGIN, 8
+        BOTTOMMARGIN, 144
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\FFConfig.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\FFConfig.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

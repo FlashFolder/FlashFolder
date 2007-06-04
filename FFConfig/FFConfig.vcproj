@@ -38,7 +38,7 @@
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="uxtheme.dll"
+				DelayLoadDLLs="uxtheme.dll;urlmon.dll;wininet.dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				TargetMachine="1"/>
@@ -98,7 +98,7 @@
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="uxtheme.dll"
+				DelayLoadDLLs="uxtheme.dll;urlmon.dll;wininet.dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -160,7 +160,7 @@
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="uxtheme.dll"
+				DelayLoadDLLs="uxtheme.dll;urlmon.dll;wininet.dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -224,7 +224,7 @@
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="uxtheme.dll"
+				DelayLoadDLLs="uxtheme.dll;urlmon.dll;wininet.dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				TargetMachine="1"/>
@@ -286,7 +286,7 @@
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="uxtheme.dll"
+				DelayLoadDLLs="uxtheme.dll;urlmon.dll;wininet.dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				TargetMachine="1"/>
@@ -394,6 +394,9 @@
 						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\UpdateCheckDlg.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -438,6 +441,9 @@
 			<File
 				RelativePath=".\stdafx.h">
 			</File>
+			<File
+				RelativePath=".\UpdateCheckDlg.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Ressourcendateien"
@@ -458,9 +464,12 @@
 		</Filter>
 		<Filter
 			Name="common_h"
-			Filter="*.h">
+			Filter="*.h;*.hpp;*.hxx">
 			<File
-				RelativePath="..\common\DlgAnchor.h">
+				RelativePath="..\common\DlgExpander.h">
+			</File>
+			<File
+				RelativePath="..\common\DownloadThread.h">
 			</File>
 			<File
 				RelativePath="..\common\DragListCtrl.h">
@@ -478,28 +487,31 @@
 				RelativePath="..\common\FolderDlg.h">
 			</File>
 			<File
-				RelativePath="..\common\GroupCheck.h">
-			</File>
-			<File
 				RelativePath="..\common\HistoryLst.h">
 			</File>
 			<File
 				RelativePath="..\common\HyperLink.h">
 			</File>
 			<File
+				RelativePath="..\common\MfcThread.h">
+			</File>
+			<File
+				RelativePath="..\common\NTKernelApi.h">
+			</File>
+			<File
+				RelativePath="..\common\NtKernelUtils.h">
+			</File>
+			<File
 				RelativePath="..\common\Profile.h">
 			</File>
 			<File
-				RelativePath="..\common\TreePropSheet\PropPageFrame.h">
-			</File>
-			<File
-				RelativePath="..\common\TreePropSheet\PropPageFrameDefault.h">
+				RelativePath="..\common\ProfileDefaults.h">
 			</File>
 			<File
 				RelativePath="..\common\Registry.h">
 			</File>
 			<File
-				RelativePath="..\common\SizeGrip.h">
+				RelativePath="..\common\ResizableDlg.h">
 			</File>
 			<File
 				RelativePath="..\common\StringUtils.h">
@@ -508,17 +520,20 @@
 				RelativePath="..\common\TotalCmdUtils.h">
 			</File>
 			<File
-				RelativePath="..\common\TreePropSheet\TreePropSheet.h">
+				RelativePath="..\common\tstring.h">
 			</File>
 			<File
-				RelativePath="..\common\tstring.h">
+				RelativePath="..\common\VersionInfo.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="common_cpp"
 			Filter="*.cpp">
 			<File
-				RelativePath="..\common\DlgAnchor.cpp">
+				RelativePath="..\common\DlgExpander.cpp">
+			</File>
+			<File
+				RelativePath="..\common\DownloadThread.cpp">
 			</File>
 			<File
 				RelativePath="..\common\DragListCtrl.cpp">
@@ -557,7 +572,7 @@
 				RelativePath="..\common\Registry.cpp">
 			</File>
 			<File
-				RelativePath="..\common\SizeGrip.cpp">
+				RelativePath="..\common\ResizableDlg.cpp">
 			</File>
 			<File
 				RelativePath="..\common\TotalCmdUtils.cpp">
@@ -565,6 +580,145 @@
 			<File
 				RelativePath="..\common\TreePropSheet\TreePropSheet.cpp">
 			</File>
+			<File
+				RelativePath="..\common\VersionInfo.cpp">
+			</File>
+			<Filter
+				Name="TinyXml"
+				Filter="">
+				<File
+					RelativePath="..\common\TinyXml\tinystr.cpp">
+					<FileConfiguration
+						Name="Unicode Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Unicode Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ANSI Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ANSI Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Unicode Debug Symbols|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\common\TinyXml\tinyxml.cpp">
+					<FileConfiguration
+						Name="Unicode Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Unicode Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ANSI Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ANSI Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Unicode Debug Symbols|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\common\TinyXml\tinyxmlerror.cpp">
+					<FileConfiguration
+						Name="Unicode Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Unicode Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ANSI Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ANSI Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Unicode Debug Symbols|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\common\TinyXml\tinyxmlparser.cpp">
+					<FileConfiguration
+						Name="Unicode Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Unicode Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ANSI Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ANSI Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Unicode Debug Symbols|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

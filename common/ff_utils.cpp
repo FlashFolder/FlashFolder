@@ -82,6 +82,16 @@ bool IsRelativePath( LPCTSTR path )
 	return true;
 }
 
+//-----------------------------------------------------------------------------------------------
+
+void GetTempFilePath( LPTSTR pResult, LPCTSTR pPrefix )
+{
+	pResult[ 0 ] = 0;
+	TCHAR tempDir[ MAX_PATH + 1 ] = _T("");
+	::GetTempPath( MAX_PATH, tempDir );
+	::GetTempFileName( tempDir, pPrefix, 0, pResult );  
+}
+
 //-----------------------------------------------------------------------------------------
 
 bool IsIniSectionNotEmpty( LPCTSTR filename, LPCTSTR sectionName )
@@ -120,6 +130,7 @@ void AddTextInput( std::vector<INPUT>* pInput, LPCTSTR pText )
 		pInput->push_back( inp );
 	}
 }
+
 
 //-----------------------------------------------------------------------------------------
 // GetFileDlgType()
