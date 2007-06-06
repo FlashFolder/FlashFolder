@@ -59,7 +59,7 @@ END
 // Dialog
 //
 
-IDD_TOOLWND DIALOGEX 0, 0, 186, 13
+IDD_TOOLWND DIALOGEX 0, 0, 186, 14
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CLIPCHILDREN
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -79,7 +79,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 179
         TOPMARGIN, 7
-        BOTTOMMARGIN, 7
+        BOTTOMMARGIN, 8
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -103,6 +103,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 ID_FF_TOOLBAR           BITMAP                  "res\\toolbar1.bmp"
+ID_FF_TOOLBAR_XP        BITMAP                  "res\\toolbar_new.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

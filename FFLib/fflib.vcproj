@@ -543,6 +543,9 @@
 				RelativePath="res\toolbar1.bmp">
 			</File>
 			<File
+				RelativePath=".\res\toolbar_new.bmp">
+			</File>
+			<File
 				RelativePath=".\res\xp_manifest.xml">
 			</File>
 		</Filter>

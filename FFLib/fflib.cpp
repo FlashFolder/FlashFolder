@@ -726,10 +726,15 @@ void CreateToolWindow( bool isFileDialog )
 		tbButtons.push_back( btn );
 	}
 	
+	// select 32-bit bitmap for toolbar if Win XP or later is running
+	OSVERSIONINFO osVer = { sizeof(osVer) };  ::GetVersionEx( &osVer );
+	DWORD ver = osVer.dwMajorVersion << 8 | osVer.dwMinorVersion;
+	UINT tbBitmapId = ver >= 0x0501 ? ID_FF_TOOLBAR_XP : ID_FF_TOOLBAR;
+
     HWND hTb = ::CreateToolbarEx( g_hToolWnd, WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | 
 		CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS, 
-		ID_FF_TOOLBAR, tbButtons.size(), (HINSTANCE) g_hInstDll, ID_FF_TOOLBAR, &tbButtons[ 0 ], 
-		tbButtons.size(), 16,15, 16,15, sizeof(TBBUTTON) );
+		ID_FF_TOOLBAR, tbButtons.size(), (HINSTANCE) g_hInstDll, tbBitmapId, &tbButtons[ 0 ], 
+		tbButtons.size(), 16,16, 16,16, sizeof(TBBUTTON) );
 	::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS );
 	::SendMessage( hTb, TB_AUTOSIZE, 0, 0 );
 
