@@ -52,10 +52,11 @@ public:
 	};  
 
 public:
-	CResizableDlg() {}
+	CResizableDlg() { Construct(); }
 	
 	explicit CResizableDlg( UINT idTempl, CWnd* pParent = NULL ) :
-		CDialog( idTempl, pParent ) {}
+		CDialog( idTempl, pParent ) 
+	{ Construct(); }
 
 	/// \brief Set minimum dialog size 
 	void SetMinSize( int width, int height )       { m_ptMin = CPoint( width, height ); }
@@ -82,6 +83,9 @@ public:
 	void AnchorRemoveAll()                         { m_controls.clear(); }
 
 protected:
+	void Construct()
+		{ m_ptMin = CPoint( 0, 0 ); }
+
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV-Unterstützung
 	virtual BOOL OnInitDialog();
 

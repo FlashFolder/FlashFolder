@@ -49,8 +49,6 @@ BOOL CResizableDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	m_ptMin = CPoint( 0, 0 );
-
 	GetClientRect( m_rcClient ); 
 
 	m_sizeGrip.Create( WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | SBS_SIZEGRIP | SBS_SIZEBOXBOTTOMRIGHTALIGN,
@@ -113,6 +111,9 @@ void CResizableDlg::AnchorUpdateAll()
 void CResizableDlg::OnSize( UINT type, int cx, int cy ) 
 {
 	CDialog::OnSize( type, cx, cy );
+
+	if( type != SIZE_MAXIMIZED && type != SIZE_RESTORED )
+		return;
 
 	if( m_sizeGrip.GetSafeHwnd() )
 	{
@@ -205,6 +206,5 @@ void CResizableDlg::OnSize( UINT type, int cx, int cy )
 
 void CResizableDlg::OnGetMinMaxInfo( MINMAXINFO* pm )
 {
-	CDialog::OnGetMinMaxInfo( pm );
 	pm->ptMinTrackSize = m_ptMin;
 }
