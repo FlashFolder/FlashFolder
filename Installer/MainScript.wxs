@@ -34,8 +34,9 @@
 		<!-- Let WiX randomize Packacke-ID since this ID should change on every compilation -->
 		<Package 
 			Id="????????-????-????-????-????????????"
-			Description="$(loc.CptUI_PackageDescription)" Comments="$(loc.CptUI_PackageComments)"
-			InstallerVersion="200" Compressed="yes" />
+			Description="$(loc.CptUI_PackageDescription)" 
+			Comments="v$(var.Version)"
+			InstallerVersion="200" Compressed="no" />
 
 		<Upgrade Id="5F7D22D7-9FCF-46F2-B899-D118AB900C28">
 			<!-- detect whether the same or a newer version is already installed -->
