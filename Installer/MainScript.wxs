@@ -36,7 +36,7 @@
 			Id="????????-????-????-????-????????????"
 			Description="$(loc.CptUI_PackageDescription)" 
 			Comments="v$(var.Version)"
-			InstallerVersion="200" Compressed="no" />
+			InstallerVersion="200" Compressed="yes" />
 
 		<Upgrade Id="5F7D22D7-9FCF-46F2-B899-D118AB900C28">
 			<!-- detect whether the same or a newer version is already installed -->
