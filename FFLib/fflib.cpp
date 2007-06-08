@@ -725,12 +725,22 @@ void CreateToolWindow( bool isFileDialog )
 		TBBUTTON btn = { 6, ID_FF_CONFIG,    TBSTATE_ENABLED, BTNS_BUTTON | BTNS_WHOLEDROPDOWN, 0, 0, 0, 0 };
 		tbButtons.push_back( btn );
 	}
-	
-	// select 32-bit bitmap for toolbar if Win XP or later is running
-	OSVERSIONINFO osVer = { sizeof(osVer) };  ::GetVersionEx( &osVer );
-	DWORD ver = osVer.dwMajorVersion << 8 | osVer.dwMinorVersion;
-	UINT tbBitmapId = ver >= 0x0501 ? ID_FF_TOOLBAR_XP : ID_FF_TOOLBAR;
 
+	//--- check whether 32 bpp bitmap for toolbar is supported by OS (if OS >= WinXP AND application
+	//    has specified the XP manifest) 
+
+	UINT tbBitmapId = ID_FF_TOOLBAR;
+	if( HMODULE hMod = ::GetModuleHandle( _T("comctl32.dll") ) )
+		if(	DLLGETVERSIONPROC pGetVersion = reinterpret_cast<DLLGETVERSIONPROC>( 
+				::GetProcAddress( hMod, "DllGetVersion" ) ) )
+		{
+			DLLVERSIONINFO ver = { sizeof(ver) };
+			if( pGetVersion( &ver ) == NOERROR  )
+				if( ver.dwMajorVersion >= 6 )
+					tbBitmapId = ID_FF_TOOLBAR_XP;
+		}
+
+	//--- create the toolbar
     HWND hTb = ::CreateToolbarEx( g_hToolWnd, WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | 
 		CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS, 
 		ID_FF_TOOLBAR, tbButtons.size(), (HINSTANCE) g_hInstDll, tbBitmapId, &tbButtons[ 0 ], 
