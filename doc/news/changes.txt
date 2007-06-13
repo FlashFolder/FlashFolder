@@ -1,6 +1,13 @@
 Changelog for project FlashFolder
 =================================
 
+v1.7.76 beta
+
+CHG: redesigned toolbar icons that use truecolor (including alpha channel for WinXP)
+ADD: manual update check functionality
+
+---------------
+
 v1.7.60 beta
 
 FIX: added "iTunes.exe" to exclusion lists for common "Open/Save" and
