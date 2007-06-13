@@ -188,7 +188,7 @@ void WINAPI MyServiceStart( DWORD argc, LPTSTR *argv )
 
 //---------------------------------------------------------------------------
 
-int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int nCmdShow )         
+int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )         
 { 
 	DebugOut( _T("Process started") );
 
