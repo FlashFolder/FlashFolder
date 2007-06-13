@@ -1,0 +1,19 @@
+News for project FlashFolder
+============================
+
+v1.7.60 beta
+
+This release fixes bugs, provides a workaround for iTunes incompatibility and features a reworked options dialog. Also notable is the new auto-complete functionality for the path edit control of the FlashFolder toolbar.
+
+Download:
+http://sourceforge.net/project/showfiles.php?group_id=195039&package_id=230057&release_id=512091
+
+---------------
+
+v1.7.26 beta
+
+This is mainly a bug-fix release. 
+Most importantly FlashFolder now works better with the MS Office file open/save dialogs: The current directory is now displayed correctly, the "view all files" button works and the directory of the opened file is added to the history menu.
+
+Download:
+http://sourceforge.net/project/showfiles.php?group_id=195039&package_id=230057&release_id=504964

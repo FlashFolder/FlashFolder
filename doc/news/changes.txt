@@ -1,0 +1,44 @@
+Changelog for project FlashFolder
+=================================
+
+v1.7.60 beta
+
+FIX: added "iTunes.exe" to exclusion lists for common "Open/Save" and
+     "Browse for folder" dialogs (issues #1723650, #1723659)
+FIX: TotalCmd left / right dir not shown if FTP is connected (issue #1710592)
+
+ADD: Editable exclusion lists for incompatible programs
+ADD: "Reset to defaults" button in config dialog (issue #1713475)
+ADD: auto-complete for the edit control of the FF toolbar (issue #1714729)
+
+CHG: Options-dialog now uses a tree-based layout for better clarity
+CHG: Complete rework of profile defaults handling. Defaults are no longer
+     written to registry on first run but are kept in-memory.
+CHG: use DPI-dependent values for all default dimensions in profile
+CHG: new truecolor installer bitmaps (.jpg) that also reduce the
+     installer size a little
+
+---------------
+
+v1.7.26 beta
+
+FIX: current dir not shown for MSO dialogs (issue 1709666)
+FIX: button "view all files" did not work for MSO dialogs
+FIX: Alt+F4 closed tool window (issue 1709749)
+FIX: path longer than with of edit control could not be entererd 
+     (issue 1709739)
+FIX: text in path edit control was clipped if Windows high dpi 
+     setting was activated (issue 1709186)
+FIX: file dialog was not always positioned according to FlashFolder 
+     options and could be cropped at the screen borders (Issues #1709218, #1709647)
+ADD: put hyperlinks into the about box
+
+---------------
+
+v1.7.8 beta
+
+FIX: File dialog is moved across screen borders when centered (issue #1709218)	  
+FIX: Alt+F4 closes FlashFolder toolbar (issue #1709749)	  
+FIX: Path longer than width of edit control cannot be entered (issue #1709739)	  
+FIX: Browse For Folder Dialog doesn't use position option (issue #1709647)
+FIX: Support of Windows high DPI setting (issue #1709186)

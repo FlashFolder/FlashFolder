@@ -1,6 +1,0 @@
-FlashFolder is an extension for file-related common dialogs (e.g. open/save dialog) seen in most Windows programs. A small toolbar docks onto these dialogs that provides menus for quick access to recently-used folders, favorite folders and more.
-
-Version 1.7.60 (beta) fixes bugs, provides a workaround for iTunes incompatibility and features a reworked options dialog. Also notable is the new auto-complete functionality for the path edit control of the FlashFolder toolbar.
-
-Download:
-http://sourceforge.net/project/showfiles.php?group_id=195039&package_id=230057&release_id=512091

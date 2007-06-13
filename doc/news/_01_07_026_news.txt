@@ -1,7 +1,0 @@
-FlashFolder is an extension for file-related common dialogs (e.g. open/save dialog) seen in most Windows programs. A small toolbar docks onto these dialogs that provides menus for quick access to recently-used folders, favorite folders and more.
-
-Version 1.7.26 (beta) is mainly a bug-fix release. 
-Most importantly FlashFolder now works better with the MS Office file open/save dialogs: The current directory is now displayed correctly, the "view all files" button works and the directory of the opened file is added to the history menu.
-
-Download:
-http://sourceforge.net/project/showfiles.php?group_id=195039&package_id=230057&release_id=504964
