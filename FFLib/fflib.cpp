@@ -727,7 +727,7 @@ void CreateToolWindow( bool isFileDialog )
 	}
 
 	//--- check whether 32 bpp bitmap for toolbar is supported by OS (if OS >= WinXP AND application
-	//    has specified the XP manifest) 
+	//    has XP manifest AND display is in truecolor mode) 
 
 	UINT tbBitmapId = ID_FF_TOOLBAR;
 	if( HMODULE hMod = ::GetModuleHandle( _T("comctl32.dll") ) )
@@ -737,7 +737,12 @@ void CreateToolWindow( bool isFileDialog )
 			DLLVERSIONINFO ver = { sizeof(ver) };
 			if( pGetVersion( &ver ) == NOERROR  )
 				if( ver.dwMajorVersion >= 6 )
-					tbBitmapId = ID_FF_TOOLBAR_XP;
+				{
+					HDC hScreenIC = ::CreateIC( _T("DISPLAY"), NULL, NULL, NULL );
+					if( ::GetDeviceCaps( hScreenIC, BITSPIXEL ) >= 24 )
+						tbBitmapId = ID_FF_TOOLBAR_XP;
+					::DeleteDC( hScreenIC );
+				}
 		}
 
 	//--- create the toolbar
