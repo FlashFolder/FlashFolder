@@ -151,6 +151,7 @@ bool GetTotalCmdLocation( tstring* pInstallDir, tstring* pIniPath )
 		{
 			tstring instDir = reg.GetString( _T("InstallDir") );
 			::ExpandEnvironmentStrings( instDir.c_str(), pathBuf, MAX_PATH );
+			::PathAddBackslash( pathBuf );
 			instDir = pathBuf;
 			if( needInstDir && ! instDir.empty() )
 			{
@@ -162,9 +163,14 @@ bool GetTotalCmdLocation( tstring* pInstallDir, tstring* pIniPath )
 			if( needIniPath && ! iniPath.empty() )
 			{
 				::ExpandEnvironmentStrings( iniPath.c_str(), pathBuf, MAX_PATH );
+				tstring tmpPath;
+				if( IsRelativePath( pathBuf ) )
+					tmpPath = instDir + tstring( pathBuf );
+				else
+					tmpPath = pathBuf;
+				::PathCanonicalize( pathBuf, tmpPath.c_str() );
 				*pIniPath = pathBuf;
-				if( IsRelativePath( pIniPath->c_str() ) )
-					*pIniPath = instDir + tstring( _T("\\") ) + *pIniPath;
+
 				needIniPath = false;
 			}
 		}
@@ -176,7 +182,8 @@ bool GetTotalCmdLocation( tstring* pInstallDir, tstring* pIniPath )
 	{
 		TCHAR path[ MAX_PATH + 1 ] = _T("");
 		::GetWindowsDirectory( path, MAX_PATH );
-		StringCbCat( path, sizeof(path), _T("\\wincmd.ini") );	
+		::PathAddBackslash( path );
+		StringCbCat( path, sizeof(path), _T("wincmd.ini") );	
 		if( FileExists( path ) )
 		{
 			*pIniPath = path;
