@@ -35,13 +35,14 @@ using namespace std;
 
 //--- own headers
 #include "../_version.h"
-#include "../common/tstring.h"
-#include "../common/Profile.h"
-#include "../common/ff_utils.h"
-#include "../common/NtKernelApi.h"
-#include "../common/NtKernelUtils.h"
-#include "../common/HistoryLst.h"
-#include "../common/TotalCmdUtils.h"
-#include "../common/Registry.h"
+#include "../commonUtils/tstring.h"
+#include "../commonUtils/Utils.h"
+#include "../commonUtils/Profile.h"
+#include "../commonUtils/NtKernelApi.h"
+#include "../commonUtils/NtKernelUtils.h"
+#include "../commonUtils/TotalCmdUtils.h"
+#include "../commonUtils/Registry.h"
 #include "../common/Favorites.h"
+#include "../common/ff_utils.h"
+#include "../common/HistoryLst.h"
 

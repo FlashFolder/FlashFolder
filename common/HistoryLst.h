@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include "tstring.h"
-#include "profile.h"
 #include <vector>
 
 //----------------------------------------------------------------------------------

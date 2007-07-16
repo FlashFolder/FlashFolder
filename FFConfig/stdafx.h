@@ -53,29 +53,30 @@
 //--- own headers
 
 // TinyXML
-#include "../common/TinyXml/TinyXml.h"
+#include "../commonUtils/TinyXml/TinyXml.h"
 
 // utilities
-#include "../common/tstring.h"
-#include "../common/StringUtils.h"
-#include "../common/Profile.h"
-#include "../common/ff_utils.h"
-#include "../common/Registry.h"
-#include "../common/TotalCmdUtils.h"
-#include "../common/Favorites.h"
-#include "../common/DownloadThread.h"
-#include "../common/VersionInfo.h"
+#include "../commonUtils/tstring.h"
+#include "../commonUtils/Utils.h"
+#include "../commonUtils/StringUtils.h"
+#include "../commonUtils/Profile.h"
+#include "../commonUtils/Registry.h"
+#include "../commonUtils/TotalCmdUtils.h"
+#include "../commonUtils/DownloadThread.h"
+#include "../commonUtils/VersionInfo.h"
 // UI
-#include "../common/GroupCheck.h"
-#include "../common/ResizableDlg.h"
-#include "../common/FolderDlg.h"
-#include "../common/DragListCtrl.h"
-#include "../common/EditEx.h"
-#include "../common/HyperLink.h"
-#include "../common/DlgExpander.h"
+#include "../commonUtils/GroupCheck.h"
+#include "../commonUtils/ResizableDlg.h"
+#include "../commonUtils/FolderDlg.h"
+#include "../commonUtils/DragListCtrl.h"
+#include "../commonUtils/EditEx.h"
+#include "../commonUtils/HyperLink.h"
+#include "../commonUtils/DlgExpander.h"
 // UI - TreePropSheet headers
-#include "../common/TreePropSheet/TreePropSheet.h"
-#include "../common/TreePropSheet/PropPageFrame.h"
-#include "../common/TreePropSheet/PropPageFrameDefault.h"
+#include "../commonUtils/TreePropSheet/TreePropSheet.h"
+#include "../commonUtils/TreePropSheet/PropPageFrame.h"
+#include "../commonUtils/TreePropSheet/PropPageFrameDefault.h"
 
-
+// project-specific
+#include "../common/ff_utils.h"
+#include "../common/Favorites.h"

@@ -466,81 +466,21 @@
 			Name="common_h"
 			Filter="*.h;*.hpp;*.hxx">
 			<File
-				RelativePath="..\common\DlgExpander.h">
-			</File>
-			<File
-				RelativePath="..\common\DownloadThread.h">
-			</File>
-			<File
-				RelativePath="..\common\DragListCtrl.h">
-			</File>
-			<File
-				RelativePath="..\common\EditEx.h">
-			</File>
-			<File
 				RelativePath="..\common\Favorites.h">
 			</File>
 			<File
 				RelativePath="..\common\ff_utils.h">
 			</File>
 			<File
-				RelativePath="..\common\FolderDlg.h">
-			</File>
-			<File
 				RelativePath="..\common\HistoryLst.h">
 			</File>
 			<File
-				RelativePath="..\common\HyperLink.h">
-			</File>
-			<File
-				RelativePath="..\common\MfcThread.h">
-			</File>
-			<File
-				RelativePath="..\common\NTKernelApi.h">
-			</File>
-			<File
-				RelativePath="..\common\NtKernelUtils.h">
-			</File>
-			<File
-				RelativePath="..\common\Profile.h">
-			</File>
-			<File
 				RelativePath="..\common\ProfileDefaults.h">
-			</File>
-			<File
-				RelativePath="..\common\Registry.h">
-			</File>
-			<File
-				RelativePath="..\common\ResizableDlg.h">
-			</File>
-			<File
-				RelativePath="..\common\StringUtils.h">
-			</File>
-			<File
-				RelativePath="..\common\TotalCmdUtils.h">
-			</File>
-			<File
-				RelativePath="..\common\tstring.h">
-			</File>
-			<File
-				RelativePath="..\common\VersionInfo.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="common_cpp"
 			Filter="*.cpp">
-			<File
-				RelativePath="..\common\DlgExpander.cpp">
-			</File>
-			<File
-				RelativePath="..\common\DownloadThread.cpp">
-			</File>
-			<File
-				RelativePath="..\common\DragListCtrl.cpp">
-			</File>
-			<File
-				RelativePath="..\common\EditEx.cpp">
-			</File>
 			<File
 				RelativePath="..\common\Favorites.cpp">
 			</File>
@@ -548,177 +488,265 @@
 				RelativePath="..\common\ff_utils.cpp">
 			</File>
 			<File
-				RelativePath="..\common\FolderDlg.cpp">
-			</File>
-			<File
-				RelativePath="..\common\GroupCheck.cpp">
-			</File>
-			<File
 				RelativePath="..\common\HistoryLst.cpp">
 			</File>
+		</Filter>
+		<Filter
+			Name="commonUtils_h"
+			Filter="*.h;*.hpp;*.hxx">
 			<File
-				RelativePath="..\common\HyperLink.cpp">
+				RelativePath="..\commonUtils\DlgExpander.h">
 			</File>
 			<File
-				RelativePath="..\common\Profile.cpp">
+				RelativePath="..\commonUtils\DownloadThread.h">
 			</File>
 			<File
-				RelativePath="..\common\TreePropSheet\PropPageFrame.cpp">
+				RelativePath="..\commonUtils\DragListCtrl.h">
 			</File>
 			<File
-				RelativePath="..\common\TreePropSheet\PropPageFrameDefault.cpp">
+				RelativePath="..\commonUtils\EditEx.h">
 			</File>
 			<File
-				RelativePath="..\common\Registry.cpp">
+				RelativePath="..\commonUtils\FolderDlg.h">
 			</File>
 			<File
-				RelativePath="..\common\ResizableDlg.cpp">
+				RelativePath="..\commonUtils\GroupCheck.h">
 			</File>
 			<File
-				RelativePath="..\common\TotalCmdUtils.cpp">
+				RelativePath="..\commonUtils\HighColorTab.hpp">
 			</File>
 			<File
-				RelativePath="..\common\TreePropSheet\TreePropSheet.cpp">
+				RelativePath="..\commonUtils\HyperLink.h">
 			</File>
 			<File
-				RelativePath="..\common\VersionInfo.cpp">
+				RelativePath="..\commonUtils\MfcThread.h">
 			</File>
-			<Filter
-				Name="TinyXml"
-				Filter="">
-				<File
-					RelativePath="..\common\TinyXml\tinystr.cpp">
-					<FileConfiguration
-						Name="Unicode Debug|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Unicode Release|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ANSI Release|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ANSI Debug|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Unicode Debug Symbols|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\common\TinyXml\tinyxml.cpp">
-					<FileConfiguration
-						Name="Unicode Debug|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Unicode Release|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ANSI Release|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ANSI Debug|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Unicode Debug Symbols|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\common\TinyXml\tinyxmlerror.cpp">
-					<FileConfiguration
-						Name="Unicode Debug|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Unicode Release|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ANSI Release|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ANSI Debug|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Unicode Debug Symbols|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\common\TinyXml\tinyxmlparser.cpp">
-					<FileConfiguration
-						Name="Unicode Debug|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Unicode Release|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ANSI Release|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ANSI Debug|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Unicode Debug Symbols|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-				</File>
-			</Filter>
+			<File
+				RelativePath="..\commonUtils\NTKernelApi.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\NtKernelUtils.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\Profile.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreePropSheet\PropPageFrame.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreePropSheet\PropPageFrameDefault.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\Registry.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\ResizableDlg.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\StringUtils.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TinyXml\tinyxml.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TotalCmdUtils.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\tstring.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\Utils.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\VersionInfo.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="commonUtils_cpp"
+			Filter="*.cpp">
+			<File
+				RelativePath="..\commonUtils\DlgExpander.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\DownloadThread.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\DragListCtrl.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\EditEx.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\FolderDlg.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\GroupCheck.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\HyperLink.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\Profile.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreePropSheet\PropPageFrame.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreePropSheet\PropPageFrameDefault.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\Registry.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\ResizableDlg.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TinyXml\tinystr.cpp">
+				<FileConfiguration
+					Name="Unicode Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ANSI Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ANSI Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode Debug Symbols|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TinyXml\tinyxml.cpp">
+				<FileConfiguration
+					Name="Unicode Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ANSI Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ANSI Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode Debug Symbols|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TinyXml\tinyxmlerror.cpp">
+				<FileConfiguration
+					Name="Unicode Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ANSI Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ANSI Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode Debug Symbols|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TinyXml\tinyxmlparser.cpp">
+				<FileConfiguration
+					Name="Unicode Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ANSI Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ANSI Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode Debug Symbols|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TotalCmdUtils.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\Utils.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\VersionInfo.cpp">
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

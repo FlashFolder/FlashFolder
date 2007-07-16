@@ -15,41 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#if !defined(_FF_UTILS_H__INCLUDED_)
-#define _FF_UTILS_H__INCLUDED_
-
-#include <windows.h>
-#include <tchar.h>
-#include <map>
-#include <vector>
-#include <string>
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
-//-------------------------------------------------------------------------------------------------
-
-void GetAppDir( HINSTANCE hInstApp, LPTSTR szDir );
-bool DirectoryExists( LPCTSTR szName );
-bool FileExists( LPCTSTR szName ); 
-bool IsFilePath( LPCTSTR path );
-bool IsRelativePath( LPCTSTR path );
-
-void GetTempFilePath( LPTSTR pResult, LPCTSTR pPrefix );
-
-bool IsIniSectionNotEmpty( LPCTSTR filename, LPCTSTR sectionName );
-
-void AddTextInput( std::vector<INPUT>* pInput, LPCTSTR pText );
-
-inline void ScreenToClientRect( HWND hwnd, RECT* prc )
-{
-	POINT pt1 = { prc->left, prc->top };
-	::ScreenToClient( hwnd, &pt1 );
-	POINT pt2 = { prc->right, prc->bottom };
-	::ScreenToClient( hwnd, &pt2 );
-	prc->left = pt1.x; prc->top = pt1.y; prc->right = pt2.x; prc->bottom = pt2.y;
-}
 
 //-----------------------------------------------------------------------------------------------
 
@@ -78,6 +44,3 @@ const unsigned FILEDLG_CB_OLD_DRIVES = 1121;      // Win 3.1 style dialogs only
 const unsigned MSO2000_FILEDLG_ED_FILENAME = 48;
 const unsigned MSO2002_FILEDLG_ED_FILENAME = 54;
 
-//-------------------------------------------------------------------------------------------------
-
-#endif // !defined(_FF_UTILS_H__INCLUDED_)
