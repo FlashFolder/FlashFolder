@@ -738,8 +738,11 @@ void CreateToolWindow( bool isFileDialog )
 			if( pGetVersion( &ver ) == NOERROR  )
 				if( ver.dwMajorVersion >= 6 )
 				{
+					// This is awkward - toolbar alpha channel should work with >= 16 bpp.
+					// TB_SETIMAGELIST should be the way but I couldn't figure out how to get it
+					// work everywhere (e.g. in explorer the toolbar shows no icons).
 					HDC hScreenIC = ::CreateIC( _T("DISPLAY"), NULL, NULL, NULL );
-					if( ::GetDeviceCaps( hScreenIC, BITSPIXEL ) >= 24 )
+					if( ::GetDeviceCaps( hScreenIC, BITSPIXEL ) >= 32 )
 						tbBitmapId = ID_FF_TOOLBAR_XP;
 					::DeleteDC( hScreenIC );
 				}
