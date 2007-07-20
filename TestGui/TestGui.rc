@@ -154,18 +154,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// RT_MANIFEST
-//
-
-#if defined(APSTUDIO_INVOKED) || defined(MANIFEST_ENABLED)
-#if defined(APSTUDIO_INVOKED)
-$(MANIFEST_ENABLED)     RT_MANIFEST             "res\\manifest.xml"
-#else
-                        RT_MANIFEST             "res\\manifest.xml"
-#endif
-#endif
 #endif    // Deutsch (Deutschland) resources
 /////////////////////////////////////////////////////////////////////////////
 

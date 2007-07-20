@@ -50,7 +50,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG MANIFEST_ENABLED"
+				PreprocessorDefinitions="_DEBUG;MANIFEST_ENABLED"
 				Culture="1031"
 				AdditionalIncludeDirectories="$(IntDir)"/>
 			<Tool
@@ -104,7 +104,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG MANIFEST_ENABLED"
+				PreprocessorDefinitions="NDEBUG;MANIFEST_ENABLED"
 				Culture="1031"
 				AdditionalIncludeDirectories="$(IntDir)"/>
 			<Tool
@@ -158,7 +158,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG MANIFEST_ENABLED"
+				PreprocessorDefinitions="NDEBUG;MANIFEST_ENABLED"
 				Culture="1031"
 				AdditionalIncludeDirectories="$(IntDir)"/>
 			<Tool
@@ -212,7 +212,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG MANIFEST_ENABLED"
+				PreprocessorDefinitions="_DEBUG;MANIFEST_ENABLED"
 				Culture="1031"
 				AdditionalIncludeDirectories="$(IntDir)"/>
 			<Tool
@@ -266,7 +266,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG MANIFEST_ENABLED"
+				PreprocessorDefinitions="_DEBUG;MANIFEST_ENABLED"
 				Culture="1031"
 				AdditionalIncludeDirectories="$(IntDir)"/>
 			<Tool
@@ -496,7 +496,7 @@
 			Name="common_cpp"
 			Filter="">
 			<File
-				RelativePath="..\common\FolderDlg.cpp">
+				RelativePath="..\commonUtils\FolderDlg.cpp">
 			</File>
 		</Filter>
 	</Files>
