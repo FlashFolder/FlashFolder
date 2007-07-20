@@ -53,29 +53,30 @@
 //--- own headers
 
 // TinyXML
-#include "../commonUtils/TinyXml/TinyXml.h"
+#include <TinyXml/TinyXml.h>
 
 // utilities
-#include "../commonUtils/tstring.h"
-#include "../commonUtils/Utils.h"
-#include "../commonUtils/StringUtils.h"
-#include "../commonUtils/Profile.h"
-#include "../commonUtils/Registry.h"
-#include "../commonUtils/TotalCmdUtils.h"
-#include "../commonUtils/DownloadThread.h"
-#include "../commonUtils/VersionInfo.h"
+#include <tstring.h>
+#include <Utils.h>
+#include <StringUtils.h>
+#include <Profile.h>
+#include <Registry.h>
+#include <TotalCmdUtils.h>
+#include <DownloadThread.h>
+#include <VersionInfo.h>
 // UI
-#include "../commonUtils/GroupCheck.h"
-#include "../commonUtils/ResizableDlg.h"
-#include "../commonUtils/FolderDlg.h"
-#include "../commonUtils/DragListCtrl.h"
-#include "../commonUtils/EditEx.h"
-#include "../commonUtils/HyperLink.h"
-#include "../commonUtils/DlgExpander.h"
+#include <GdiUtils.h>
+#include <GroupCheck.h>
+#include <ResizableDlg.h>
+#include <FolderDlg.h>
+#include <EditEx.h>
+#include <HyperLink.h>
+#include <DlgExpander.h>
+#include <TreeListCtrl/EditableTreeListCtrl.h>
 // UI - TreePropSheet headers
-#include "../commonUtils/TreePropSheet/TreePropSheet.h"
-#include "../commonUtils/TreePropSheet/PropPageFrame.h"
-#include "../commonUtils/TreePropSheet/PropPageFrameDefault.h"
+#include <TreePropSheet/TreePropSheet.h>
+#include <TreePropSheet/PropPageFrame.h>
+#include <TreePropSheet/PropPageFrameDefault.h>
 
 // project-specific
 #include "../common/ff_utils.h"

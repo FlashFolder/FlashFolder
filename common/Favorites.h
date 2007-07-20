@@ -20,19 +20,12 @@
 
 struct FavoritesItem
 {
-	tstring path;         ///< file path or TC command (required)
+	tstring command;      ///< file path or TC command (required)
 	tstring title;        ///< menu item title
 	tstring targetpath;   ///< unused, round-trip data from TC
 };
 
 typedef std::vector<FavoritesItem> FavoritesList;
 
-enum DirFavoritesSrc
-{
-	DFS_DEFAULT,
-	DFS_FLASHFOLDER,
-	DFS_TOTALCMD
-};
-
-void GetDirFavorites( FavoritesList* pList, DirFavoritesSrc source = DFS_DEFAULT );
-void SetDirFavorites( const FavoritesList& list, DirFavoritesSrc source = DFS_DEFAULT );
+void GetDirFavorites( FavoritesList* pList );
+void SetDirFavorites( const FavoritesList& list );

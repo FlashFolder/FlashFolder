@@ -62,3 +62,21 @@ inline CString Utf8ToStr( LPCSTR pUtf8 )
 		return _T("");
 	return Utf8ToUtf16( pUtf8 );
 }
+
+//-----------------------------------------------------------------------------------------------
+
+// trim an std::basic_string 
+template<typename T>
+void trim( T& s, const T& t = T(' ') + T('\t') + T('\r') + T('\n') )
+{
+	T::size_type p1, p2;
+	p1 = s.find_first_not_of( t );
+	if( p1 == T::npos )
+	{
+		s.clear();
+		return;
+	}
+	p2 = s.find_last_not_of( t ) + 1;
+	s = s.substr( p1, p2 - p1 );
+}
+

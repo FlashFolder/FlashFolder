@@ -46,20 +46,23 @@ void CEditEx::OnPaint()
 		CPaintDC dc( this );
 		CRect rc; GetClientRect( rc );
 		dc.FillSolidRect( rc, ::GetSysColor( COLOR_WINDOW ) );
-		dc.SetTextColor( ::GetSysColor( COLOR_GRAYTEXT ) );
+		COLORREF color = m_hintColor;
+		if( m_hintColor & 0xFF000000 )
+			color = ::GetSysColor( m_hintColor & 0xFFFFFF );
+		dc.SetTextColor( color );
 		dc.SetBkMode( TRANSPARENT );
 
-		if( ! m_helpFont.GetSafeHandle() )
-		{
-			LOGFONT lf;
-			CFont sysFont; sysFont.CreateStockObject( DEFAULT_GUI_FONT );
-			GetFont()->GetLogFont( &lf );
-			lf.lfItalic = true;
-            m_helpFont.CreateFontIndirect( &lf );
-		}
+		CFont font;
+		LOGFONT lf;
+		GetFont()->GetLogFont( &lf );
+		if( m_hintFontStyle & FF_ITALIC )
+            lf.lfItalic = true;
+		if( m_hintFontStyle & FF_BOLD )
+            lf.lfWeight = FW_BOLD;
+        font.CreateFontIndirect( &lf );
 
-		CFont* oldFont = dc.SelectObject( &m_helpFont );		
-		dc.DrawText( m_helpText, rc, DT_SINGLELINE | DT_VCENTER );
+		CFont* oldFont = dc.SelectObject( &font );		
+		dc.DrawText( m_hintText, rc, DT_SINGLELINE | DT_VCENTER );
 		dc.SelectObject( oldFont );
 	}
 }

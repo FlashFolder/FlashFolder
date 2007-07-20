@@ -20,7 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -81,7 +81,7 @@
 			CharacterSet="1">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				MinimalRebuild="FALSE"
 				RuntimeLibrary="0"
@@ -143,7 +143,7 @@
 			CharacterSet="1">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				MinimalRebuild="FALSE"
 				RuntimeLibrary="0"
@@ -206,7 +206,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -268,7 +268,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -450,6 +450,9 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 			<File
+				RelativePath=".\res\dragging.cur">
+			</File>
+			<File
 				RelativePath=".\res\FFConfig.ico">
 			</File>
 			<File
@@ -460,6 +463,12 @@
 			</File>
 			<File
 				RelativePath=".\res\manifest.xml">
+			</File>
+			<File
+				RelativePath=".\res\menuitem.ico">
+			</File>
+			<File
+				RelativePath=".\res\submenu.ico">
 			</File>
 		</Filter>
 		<Filter
@@ -504,10 +513,16 @@
 				RelativePath="..\commonUtils\DragListCtrl.h">
 			</File>
 			<File
+				RelativePath="..\commonUtils\TreeListCtrl\EditableTreeListCtrl.h">
+			</File>
+			<File
 				RelativePath="..\commonUtils\EditEx.h">
 			</File>
 			<File
 				RelativePath="..\commonUtils\FolderDlg.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\GdiUtils.h">
 			</File>
 			<File
 				RelativePath="..\commonUtils\GroupCheck.h">
@@ -520,6 +535,9 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\MfcThread.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreeListCtrl\MultiSelTree.h">
 			</File>
 			<File
 				RelativePath="..\commonUtils\NTKernelApi.h">
@@ -552,6 +570,9 @@
 				RelativePath="..\commonUtils\TotalCmdUtils.h">
 			</File>
 			<File
+				RelativePath="..\commonUtils\TreeListCtrl\TreeListCtrl.h">
+			</File>
+			<File
 				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.h">
 			</File>
 			<File
@@ -568,6 +589,9 @@
 			Name="commonUtils_cpp"
 			Filter="*.cpp">
 			<File
+				RelativePath="..\commonUtils\BalloonHelp.cpp">
+			</File>
+			<File
 				RelativePath="..\commonUtils\DlgExpander.cpp">
 			</File>
 			<File
@@ -575,6 +599,9 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\DragListCtrl.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreeListCtrl\EditableTreeListCtrl.cpp">
 			</File>
 			<File
 				RelativePath="..\commonUtils\EditEx.cpp">
@@ -587,6 +614,9 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\HyperLink.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreeListCtrl\MultiSelTree.cpp">
 			</File>
 			<File
 				RelativePath="..\commonUtils\Profile.cpp">
@@ -737,6 +767,9 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\TotalCmdUtils.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreeListCtrl\TreeListCtrl.cpp">
 			</File>
 			<File
 				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.cpp">

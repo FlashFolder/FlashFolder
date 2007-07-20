@@ -67,3 +67,7 @@ private:
 /// \brief Get install-directory and path of .INI-file of Total Commander
 bool GetTotalCmdLocation( tstring* pInstallDir = NULL, tstring* pIniPath = NULL );
 
+/// Split a TC command
+void SplitTcCommand( LPCTSTR pCmd, tstring* pToken, tstring* pArgs = NULL );
+
+

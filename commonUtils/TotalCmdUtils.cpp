@@ -20,6 +20,7 @@
 #include "stdafx.h"
 
 #include "TotalCmdUtils.h"
+#include "StringUtils.h"
 
 //-------------------------------------------------------------------------------------------------
 
@@ -195,3 +196,22 @@ bool GetTotalCmdLocation( tstring* pInstallDir, tstring* pIniPath )
 	return false;
 }
 
+//-----------------------------------------------------------------------------------------------
+
+void SplitTcCommand( LPCTSTR pCmd, tstring* pToken, tstring* pArgs )
+{
+	*pToken = _T("");
+	if( pArgs )
+		*pArgs = _T("");
+
+	LPCTSTR p = _tcschr( pCmd, ' ' );
+	if( p )
+	{
+		*pToken = tstring( pCmd, p - pCmd );
+		if( pArgs )
+		{
+			while( *p == ' ' ) ++p;
+			*pArgs = p;
+		}
+	}
+}

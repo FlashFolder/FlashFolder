@@ -13,6 +13,35 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MENUITEM            ICON                    "res\\menuitem.ico"
+IDI_SUBMENU             ICON                    "res\\submenu.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_DRAGCURSOR          CURSOR                  "res\\dragging.cur"
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // Englisch (USA) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
@@ -214,33 +243,53 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,146,177,50,14
 END
 
-IDD_FAVORITES DIALOGEX 0, 0, 255, 152
+IDD_FAVORITES DIALOGEX 0, 0, 272, 146
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | 
     WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "FlashFolder Favorites"
+CAPTION "Edit FlashFolder Favorites"
 CLASS "FFFavorites.xmgn4ngertu4mnsf"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "&Insert",IDC_BTN_ADD,7,8,40,14
-    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,49,8,40,14
-    LTEXT           "Drag an item by mouse to change its position.",
-                    IDC_STATIC,100,11,147,8
-    CONTROL         "",IDC_LST_FAVS,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
-                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,24,240,34
-    LTEXT           "&Path:",IDC_ST_PATH,8,67,18,8
-    EDITTEXT        IDC_ED_PATH,60,64,163,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "...",IDC_BTN_BROWSE,226,64,21,14,WS_DISABLED
-    LTEXT           "Title (optional):",IDC_ST_TITLE,8,83,50,8
-    EDITTEXT        IDC_ED_TITLE,60,80,187,14,ES_AUTOHSCROLL | WS_DISABLED
-    CONTROL         "&Use FlashFolder favorites",IDC_RD_OWN_FAVORITES,"Button",
-                    BS_AUTORADIOBUTTON,8,101,97,10
-    CONTROL         "Use directory menu from Total Commander®",
-                    IDC_RD_TC_FAVORITES,"Button",BS_AUTORADIOBUTTON,8,114,
-                    159,10
-    DEFPUSHBUTTON   "OK",IDOK,45,130,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,102,130,50,14
-    PUSHBUTTON      "Re&vert",IDC_BTN_REVERT,159,130,50,14
+    PUSHBUTTON      "&New item",IDC_BTN_ADD,8,8,40,14
+    PUSHBUTTON      "New &divider",IDC_BTN_ADD_DIVIDER,49,8,51,14
+    PUSHBUTTON      "New &submenu",IDC_BTN_ADD_SUBMENU,102,8,60,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,163,8,40,14,WS_DISABLED
+    PUSHBUTTON      "I&mport...",IDC_BTN_IMPORT,214,8,50,14
+    LTEXT           "&Favorites menu:",IDC_ST_FAVMENU,8,25,53,8
+    LTEXT           "Statisch",IDC_ST_TREE_PLACEHOLDER,8,35,256,28,NOT 
+                    WS_VISIBLE,WS_EX_STATICEDGE
+    LTEXT           "&Title:",IDC_ST_TITLE,8,70,17,8
+    EDITTEXT        IDC_ED_TITLE,66,67,198,14,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "&Path / command:",IDC_ST_PATH,8,87,55,8
+    EDITTEXT        IDC_ED_COMMAND,66,84,177,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "...",IDC_BTN_BROWSE,243,84,21,14,WS_DISABLED
+    LTEXT           "T&arget path (optional):",IDC_ST_TARGETPATH,8,99,44,16
+    EDITTEXT        IDC_ED_TARGETPATH,66,101,177,14,ES_AUTOHSCROLL | 
+                    WS_DISABLED
+    PUSHBUTTON      "...",IDC_BTN_TARGETBROWSE,243,101,21,14,WS_DISABLED
+    DEFPUSHBUTTON   "OK",IDOK,104,124,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,159,124,50,14
+    PUSHBUTTON      "Re&vert",IDC_BTN_REVERT,214,124,50,14,WS_DISABLED
+END
+
+IDD_IMPORT DIALOGEX 0, 0, 332, 113
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Import Total Commander® directory menu"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "&Get directory menu from installed Total Commander®",
+                    IDC_CHK_INSTALLED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    8,13,187,10
+    LTEXT           "&Path of wincmd.ini:",IDC_STATIC,8,31,62,8
+    EDITTEXT        IDC_ED_PATH,8,41,295,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE,303,41,21,14
+    CONTROL         "I&nsert after selected menu item",IDC_RD_APPEND,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,8,63,117,10
+    DEFPUSHBUTTON   "OK",IDOK,220,91,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,274,91,50,14
+    CONTROL         "&Replace existing menu",IDC_RD_REPLACE,"Button",
+                    BS_AUTORADIOBUTTON,8,74,87,10
 END
 
 
@@ -314,10 +363,18 @@ BEGIN
 
     IDD_FAVORITES, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 247
+        LEFTMARGIN, 8
+        RIGHTMARGIN, 264
         TOPMARGIN, 8
-        BOTTOMMARGIN, 144
+        BOTTOMMARGIN, 138
+    END
+
+    IDD_IMPORT, DIALOG
+    BEGIN
+        LEFTMARGIN, 8
+        RIGHTMARGIN, 324
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 105
     END
 END
 #endif    // APSTUDIO_INVOKED

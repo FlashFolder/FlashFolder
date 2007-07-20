@@ -22,6 +22,10 @@
 #define IDD_PAGE_COMMON_DIRDLG          150
 #define IDD_PAGE_COMMON_FILEDLG         151
 #define IDD_UPDATECHECK                 154
+#define IDD_IMPORT                      156
+#define IDC_DRAGCURSOR                  157
+#define IDI_MENUITEM                    158
+#define IDI_SUBMENU                     159
 #define IDC_RD_INDIVIDUAL_PROFILES      1000
 #define IDC_RD_SHARED_PROFILE           1001
 #define IDC_ED_MAX_DIRHISTORY           1002
@@ -45,13 +49,17 @@
 #define IDC_BTN_ADD                     1035
 #define IDC_BTN_REMOVE                  1036
 #define IDC_RD_OWN_FAVORITES            1037
+#define IDC_BTN_ADD_DIVIDER             1037
 #define IDC_RD_TC_FAVORITES             1038
+#define IDC_BTN_ADD_SUBMENU             1038
 #define IDC_ED_TITLE                    1041
 #define IDC_ED_PATH                     1042
 #define IDC_BTN_BROWSE                  1043
-#define IDC_LST_FAVS                    1044
+#define IDC_ED_TARGETPATH               1044
 #define IDC_ST_TITLE                    1045
 #define IDC_ST_PATH                     1046
+#define IDC_ST_TARGETPATH               1047
+#define IDC_BTN_TARGETBROWSE            1048
 #define IDC_ST_SERVICE                  1049
 #define IDC_ST_FFSERVICE                1049
 #define IDC_ST_FFLIB                    1050
@@ -75,14 +83,22 @@
 #define IDC_ED_TEXT                     1070
 #define IDC_RICHEDIT21                  1071
 #define IDC_BTN_DOWNLOAD                1072
+#define IDC_CHK_INSTALLED               1073
+#define IDC_RD_APPEND                   1074
+#define IDC_BTN_IMPORT                  1074
+#define IDC_RD_REPLACE                  1075
+#define IDC_ST_TREE_PLACEHOLDER         1075
+#define IDC_ST_FAVMENU                  1076
+#define IDC_LST_FAVS                    1077
+#define IDC_ED_COMMAND                  1078
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        156
+#define _APS_NEXT_RESOURCE_VALUE        160
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1073
+#define _APS_NEXT_CONTROL_VALUE         1079
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif
