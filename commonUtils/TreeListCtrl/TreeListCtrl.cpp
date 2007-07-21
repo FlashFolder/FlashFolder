@@ -53,6 +53,9 @@ const RECT TREE_SUBITEM_MARGINS = { 0, 0, 3, 3 };
 const RECT TREE_FIRSTCOLUMN_TEXT_MARGINS = { 0, 0, 2, 2 };
 const RECT TREE_BUTTON_SIZE = { 0, 0, 2, 2 };
 
+// "unique" ID for tooltip timer
+const UINT ID_TOOLTIP_TIMER = 0xE89A347F;
+
 
 //============================================================================================
 //  CTreeListCtrl_header methods
@@ -261,6 +264,14 @@ void CTreeListCtrl_header::OnDividerDblClick( NMHDR* _pnm, LRESULT* pResult )
 	m_pParent->SetColumnAutoWidth( pnm->iItem, CTreeListCtrl::AW_FIT_ITEMS, rcMin.right );
 }
 
+//============================================================================================
+//  CTreeListCtrl_tooltip methods
+//============================================================================================
+
+BEGIN_MESSAGE_MAP( CTreeListCtrl_tooltip, CWnd )
+	ON_WM_NCHITTEST()
+END_MESSAGE_MAP()
+
 
 //============================================================================================
 //  CTreeListCtrl_tree methods
@@ -279,6 +290,7 @@ BEGIN_MESSAGE_MAP(CTreeListCtrl_tree, CTreeListCtrl_tree::base)
 	ON_WM_MOUSEMOVE()
 	ON_WM_KEYDOWN()
 	ON_MESSAGE( TVM_INSERTITEM, OnInsertItem )
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------
@@ -287,7 +299,8 @@ CTreeListCtrl_tree::CTreeListCtrl_tree() :
 	m_pParent( NULL ),
 	m_lastClientWidth( -1 ),
 	m_isRedrawEnabled( true ),
-	m_isOnPaint( false )
+	m_isOnPaint( false ),
+	m_isMouseOver( false )
 {
 	// create initial sys-color dependent objects
 	HandleSysColorChange();
@@ -299,6 +312,20 @@ int CTreeListCtrl_tree::OnCreate( LPCREATESTRUCT pcs)
 {
 	if( base::OnCreate( pcs ) == -1 )
 		return -1;
+
+	//--- create tooltip control for clipped text (see OnMouseMove())
+
+	m_tooltip.CreateEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, _T(""), TTS_NOPREFIX | TTS_ALWAYSTIP, 
+		CRect(0,0,0,0),	this, 0 ); 
+
+	memset( &m_toolInfo, 0, sizeof(m_toolInfo) );
+	m_toolInfo.cbSize = sizeof(m_toolInfo);
+	m_toolInfo.uFlags = TTF_TRACK | TTF_TRANSPARENT;
+	m_toolInfo.hwnd = GetSafeHwnd();
+
+	m_tooltip.SendMessage( TTM_SETMAXTIPWIDTH, 0, SHRT_MAX );
+	m_tooltip.SendMessage( TTM_ADDTOOL, 0, reinterpret_cast<LPARAM>( &m_toolInfo ) );
+
 	return 0;
 }
 
@@ -917,12 +944,107 @@ void CTreeListCtrl_tree::OnNcCalcSize( BOOL bCalcValidRects, NCCALCSIZE_PARAMS F
 
 //---------------------------------------------------------------------------------
 
-void CTreeListCtrl_tree::OnMouseMove(UINT nFlags, CPoint point) 
+void CTreeListCtrl_tree::OnMouseMove( UINT nFlags, CPoint pt ) 
 {
-	base::OnMouseMove(nFlags, point);
+	//--- show tooltip if subitem text under mouse cursor is clipped
 
-	//TODO: make tooltip when subitem text under mouse cursor is clipped
-	//
+	CRect rcClient;
+	GetClientRect( rcClient );
+
+	CRect rcParent;
+	m_pParent->GetClientRect( rcParent );
+	m_pParent->MapWindowPoints( this, rcParent );  
+
+	int nCol = -1;
+	CRect rcCol;
+	UINT htFlags = 0;
+	HTREEITEM hItem = HitTest( pt, &htFlags );
+	if( hItem && ! ( htFlags & TVHT_ONITEMINDENT ) )
+	{
+		int colCount = m_pParent->m_headerCtrl.GetItemCount();
+		for( int i = 0; i < colCount; ++i )
+		{
+			m_pParent->m_headerCtrl.GetItemRect( i, &rcCol );
+
+			int subWidth = m_pParent->GetItemTextWidth( hItem, i );
+
+			rcCol.right = min( rcCol.right, rcCol.left + subWidth );
+
+			if( pt.x >= rcCol.left && pt.x < rcCol.right )
+			{
+				if( subWidth > rcCol.Width() || rcCol.right > rcParent.right )
+					nCol = i;
+				break;
+			}
+		}
+	}
+	
+	if( nCol != -1 )
+	{
+		m_tooltip.SetFont( GetFont(), FALSE );
+
+		CString s = m_pParent->GetItemText( hItem, nCol );
+		m_toolInfo.lpszText = const_cast<LPTSTR>( s.GetString() );
+		m_tooltip.SendMessage( TTM_UPDATETIPTEXT, 0, reinterpret_cast<LPARAM>( &m_toolInfo ) );
+
+		CRect rcSubItem; 
+		if( nCol == 0 )
+			GetItemRect( hItem, rcSubItem, TRUE );
+		else
+		{
+			GetItemRect( hItem, rcSubItem, FALSE );
+			rcSubItem.left = rcCol.left;
+		}
+		ClientToScreen( rcSubItem );
+		
+		m_tooltip.SendMessage( TTM_TRACKPOSITION, 0, MAKELONG( rcSubItem.left, rcSubItem.top ) );
+		
+		if( ! m_tooltip.IsWindowVisible() )
+			m_tooltip.SendMessage( 
+				TTM_TRACKACTIVATE, TRUE, reinterpret_cast<LPARAM>( &m_toolInfo ) );
+	}
+	else
+	{
+		m_tooltip.SendMessage( 
+			TTM_TRACKACTIVATE, FALSE, reinterpret_cast<LPARAM>( &m_toolInfo ) );
+	}
+
+	if( ! m_isMouseOver )
+	{
+		m_isMouseOver = true;
+		// create a timer for checking when to hide the tooltip
+		SetTimer( ID_TOOLTIP_TIMER, 250, NULL );
+	}
+	
+	base::OnMouseMove(nFlags, pt );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CTreeListCtrl_tree::OnTimer( UINT_PTR id )
+{
+	if( id != ID_TOOLTIP_TIMER )
+		return;
+
+	//--- hide tooltip if cursor is outside of window
+
+	CRect rc, rcParent;
+	GetClientRect( rc );
+	ClientToScreen( rc );
+	m_pParent->GetWindowRect( rcParent );
+	rc.left = rcParent.left;
+	rc.right = rcParent.right;
+
+	POINT pt;
+	GetCursorPos( &pt );
+
+    if( ! rc.PtInRect( pt ) )
+	{
+		m_isMouseOver = false;
+		m_tooltip.SendMessage( 
+			TTM_TRACKACTIVATE, FALSE, reinterpret_cast<LPARAM>( &m_toolInfo ) );
+		KillTimer( ID_TOOLTIP_TIMER );
+	}
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -964,6 +1086,7 @@ void CTreeListCtrl_tree::OnKeyDown( UINT ch, UINT repCnt, UINT flags )
 		else 
 			handled = false;
 	}    
+
 	if( ! handled )
 		base::OnKeyDown( ch, repCnt, flags );
 }
@@ -1092,6 +1215,7 @@ BOOL CTreeListCtrl::OnInitDialog()
 	//--- create horiz. scrollbar
 	m_horizScrollBar.Create( WS_CHILD | WS_VISIBLE | SBS_HORZ | SBS_BOTTOMALIGN,
 		CRect(0,0,0,0), this, IDC_HSCROLL );
+
 
 	return TRUE;
 }
@@ -1335,6 +1459,44 @@ BOOL CTreeListCtrl::SetColumnWidth( int nCol, int width )
 }
 
 //-----------------------------------------------------------------------------------------------
+/// get unclipped width of subitem text
+
+int CTreeListCtrl::GetItemTextWidth( HTREEITEM hItem, int nCol )
+{
+	CRect subItemMargins = TREE_SUBITEM_MARGINS;
+	MapDialogRect( subItemMargins );
+
+	CWindowDC dc( &m_tree );
+
+	CFont* pFont = m_tree.GetFont();
+	if( ! pFont )
+		pFont = CFont::FromHandle( (HFONT) ::GetStockObject( DEFAULT_GUI_FONT ) );
+	AutoSelectObj trSelFont( dc, *pFont );
+
+	return GetItemTextWidth( hItem, nCol, dc, subItemMargins );
+}
+
+//-----------------------------------------------------------------------------------------------
+/// get unclipped width of subitem text (optimized for batch calculation of multiple items)
+
+int CTreeListCtrl::GetItemTextWidth( HTREEITEM hItem, int nCol, CDC& dc, const CRect& subItemMargins )
+{
+	CString text = GetItemText( hItem, nCol );
+	CRect rc = CRect( 0, 0, 1, 1 );
+	dc.DrawText( text, rc, DT_CALCRECT | DT_SINGLELINE | DT_HIDEPREFIX ); 
+	rc.right += subItemMargins.right * 2;
+    if( nCol == 0 )
+	{
+		// add tree indentation + icon size to text width
+		CRect rcIndent;
+		m_tree.GetItemRect( hItem, rcIndent, TRUE );
+		rc.right += rcIndent.left;
+	}
+
+	return rc.right;
+}
+
+//-----------------------------------------------------------------------------------------------
 
 void CTreeListCtrl::SetColumnAutoWidth( int nCol, AutoWidthType type, int minWidth )
 {
@@ -1380,7 +1542,6 @@ void CTreeListCtrl::SetColumnAutoWidth( int nCol, AutoWidthType type, int minWid
 	CFont* pFont = m_tree.GetFont();
 	if( ! pFont )
 		pFont = CFont::FromHandle( (HFONT) ::GetStockObject( DEFAULT_GUI_FONT ) );
-
 	AutoSelectObj trSelFont( trdc, *pFont );
 
 	CRect subItemMargins = TREE_SUBITEM_MARGINS;
@@ -1390,19 +1551,9 @@ void CTreeListCtrl::SetColumnAutoWidth( int nCol, AutoWidthType type, int minWid
 	for( HTREEITEM hItem = m_tree.GetFirstVisibleItem(); hItem;
 		hItem = m_tree.GetNextVisibleItem( hItem ) )
 	{
-		CString text = GetItemText( hItem, nCol );
-		CRect rc = CRect( 0, 0, 1, 1 );
-		trdc.DrawText( text, rc, DT_CALCRECT | DT_SINGLELINE | DT_HIDEPREFIX ); 
-		rc.right += subItemMargins.right * 2;
-        if( nCol == 0 )
-		{
-			// add tree indentation + icon size to text width
-			CRect rcIndent;
-			m_tree.GetItemRect( hItem, rcIndent, TRUE );
-			rc.right += rcIndent.left;
-		}
-		if( rc.right > maxItemWidth )
-			maxItemWidth = rc.right;
+		int width = GetItemTextWidth( hItem, nCol, trdc, subItemMargins );
+		if( width > maxItemWidth )
+			maxItemWidth = width;
 	}
 
 	if( type == AW_FIT_ITEMS_OR_HEADER )

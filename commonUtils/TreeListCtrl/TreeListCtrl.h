@@ -65,6 +65,15 @@ private:
 
 };
 
+//--------------------------------------------------------------------------------------------
+// Tooltip control used by CTreeListCtrl
+
+class CTreeListCtrl_tooltip : public CWnd
+{
+protected:
+	DECLARE_MESSAGE_MAP()
+	afx_msg UINT OnNcHitTest( CPoint pt ) { return HTTRANSPARENT; }
+};
 
 //--------------------------------------------------------------------------------------------
 // Tree control used by CTreeListCtrl
@@ -97,6 +106,7 @@ protected:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnKeyDown( UINT ch, UINT repCnt, UINT flags );
 	afx_msg LRESULT OnInsertItem( WPARAM wp, LPARAM lp );
+	afx_msg void OnTimer( UINT_PTR id );
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -117,6 +127,9 @@ private:
 	CPen m_penForLines;
 	CBrush m_brushForLines;
 	COLORREF m_clrBtnShadow, m_clrWindow, m_clrWindowText, m_clrHighlight, m_clrHighlightText;
+	bool m_isMouseOver;
+	CTreeListCtrl_tooltip m_tooltip;
+	TOOLINFO m_toolInfo;
 };
 
 
@@ -260,6 +273,8 @@ public:
 		return ( fmt.flags & CTreeListCtrl::FMT_DIVIDER ) != 0;	
 	}
 
+	int GetItemTextWidth( HTREEITEM hItem, int nCol );
+
 	//--- imagelist methods
 
 	/// set image list
@@ -293,6 +308,8 @@ protected:
 	///  Override this in derived class to handle tree insertions.\n
 	virtual HTREEITEM OnInsertItem( const TVINSERTSTRUCT& tvi ) 
 		{ return reinterpret_cast<HTREEITEM>( m_tree.Default() ); }
+
+	int GetItemTextWidth( HTREEITEM hItem, int nCol, CDC& dc, const CRect& subItemMargins );
 
 private:
 	void AdjustSizeAndPosition( bool bScroll );
