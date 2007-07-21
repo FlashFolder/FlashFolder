@@ -18,43 +18,27 @@
  */
 #pragma once
 
-#include <string>
-
 #pragma warning(disable:4267) // size_t --> int
 
 //-----------------------------------------------------------------------------------------------
 
-template< typename T_iter, typename T_char >
-void SplitString( T_iter itDest, const T_char* pStr, T_char chSep = ',' )
+inline CStringW Utf8ToUtf16( LPCSTR pUtf8 )
 {
-	const T_char* p1 = pStr;
-	for(;;)
-	{
-		while( *pStr != chSep && *pStr != 0 )
-			++pStr;
-		std::basic_string<T_char> tmp( p1, pStr - p1 );
-		*itDest++ = tmp.c_str();
-		if( *pStr == 0 )
-			break;
-		pStr++;
-		p1 = pStr;
-	}
+	if( ! pUtf8 )
+		return L"";
+	CStringW buf;
+	int len = strlen( pUtf8 );
+	int res = ::MultiByteToWideChar( CP_UTF8, 0, pUtf8, len, buf.GetBuffer( len * 4 ), len * 4 );
+	if( res == ERROR_NO_UNICODE_TRANSLATION )
+		return L"";
+    buf.ReleaseBuffer( res );
+	return buf;
 }
 
-//-----------------------------------------------------------------------------------------------
-
-// trim an std::basic_string 
-template<typename T>
-void trim( T& s, const T& t = T(' ') + T('\t') + T('\r') + T('\n') )
+inline CString Utf8ToStr( LPCSTR pUtf8 )
 {
-	T::size_type p1, p2;
-	p1 = s.find_first_not_of( t );
-	if( p1 == T::npos )
-	{
-		s.clear();
-		return;
-	}
-	p2 = s.find_last_not_of( t ) + 1;
-	s = s.substr( p1, p2 - p1 );
+	if( ! pUtf8 )
+		return _T("");
+	return Utf8ToUtf16( pUtf8 );
 }
 

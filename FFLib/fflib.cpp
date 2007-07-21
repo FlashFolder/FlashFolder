@@ -388,8 +388,8 @@ void DisplayMenu_Favorites()
 		vector<tstring> simpleDirList;
 		for( int i = 0; i != dirList.size(); ++i )
 		{
-			if( IsFilePath( dirList[ i ].path.c_str() ) )
-				simpleDirList.push_back( dirList[ i ].path );
+			if( IsFilePath( dirList[ i ].command.c_str() ) )
+				simpleDirList.push_back( dirList[ i ].command );
 			else if( dirList[ i ].title == _T("-") )
 				simpleDirList.push_back( _T("-") );
 		}
@@ -412,13 +412,13 @@ void DisplayMenu_Favorites()
 			//check if current folder already exists in the list
 			bool bExists = false;
 			for( int i = 0; i != dirList.size() && ! bExists; ++i )
-				bExists = _tcsicmp( dirList[ i ].path.c_str(), path ) == 0;	
+				bExists = _tcsicmp( dirList[ i ].command.c_str(), path ) == 0;	
 
 			if( ! bExists )
 			{
 				FavoritesItem item;
 				item.title = path;
-				item.path = path;
+				item.command = path;
 				dirList.push_back( item );
 				SetDirFavorites( dirList );
 			}

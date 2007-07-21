@@ -59,6 +59,7 @@
 #include <tstring.h>
 #include <Utils.h>
 #include <StringUtils.h>
+#include <UnicodeUtils.h>
 #include <Profile.h>
 #include <Registry.h>
 #include <TotalCmdUtils.h>
