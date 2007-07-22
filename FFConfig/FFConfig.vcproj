@@ -610,6 +610,9 @@
 				RelativePath="..\commonUtils\FolderDlg.cpp">
 			</File>
 			<File
+				RelativePath="..\commonUtils\GdiUtils.cpp">
+			</File>
+			<File
 				RelativePath="..\commonUtils\GroupCheck.cpp">
 			</File>
 			<File

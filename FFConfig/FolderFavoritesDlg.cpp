@@ -108,7 +108,7 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	ScreenToClient( rcTree );
 	m_tree.Create( this, rcTree, IDC_LST_FAVS );
 	m_tree.SetWindowPos( GetDlgItem( IDC_ST_FAVMENU ), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-
+	m_tree.SetFont( GetFont() );
 	m_tree.GetHeaderCtrl().ModifyStyle( HDS_BUTTONS, 0 );
 
 	CRect rcItem( 0, 0, 1, 12 ); MapDialogRect( rcItem );
