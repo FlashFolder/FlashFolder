@@ -259,11 +259,11 @@ CAPTION "Edit FlashFolder Favorites"
 CLASS "FFFavorites.xmgn4ngertu4mnsf"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "&New item",IDC_BTN_ADD,8,8,42,14
-    PUSHBUTTON      "New &divider",IDC_BTN_ADD_DIVIDER,49,8,51,14
-    PUSHBUTTON      "New &submenu",IDC_BTN_ADD_SUBMENU,100,8,57,14
+    PUSHBUTTON      "&New item",IDC_BTN_ADD,8,8,43,14
+    PUSHBUTTON      "New &divider",IDC_BTN_ADD_DIVIDER,51,8,51,14
+    PUSHBUTTON      "New &submenu",IDC_BTN_ADD_SUBMENU,102,8,57,14
     PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,162,8,40,14,WS_DISABLED
-    PUSHBUTTON      "I&mport...",IDC_BTN_IMPORT,207,8,50,14
+    PUSHBUTTON      "I&mport...",IDC_BTN_IMPORT,207,8,44,14
     LTEXT           "&Favorites menu:",IDC_ST_FAVMENU,8,25,53,8
     LTEXT           "Statisch",IDC_ST_TREE_PLACEHOLDER,8,35,256,28,NOT 
                     WS_VISIBLE,WS_EX_STATICEDGE

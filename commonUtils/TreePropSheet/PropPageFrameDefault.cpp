@@ -187,20 +187,23 @@ CRect CPropPageFrameDefault::CalcCaptionArea()
 
 void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaption, HICON hIcon)
 {
+	//--- draw background
+
 	COLORREF	clrLeft = ::GetSysColor( COLOR_HIGHLIGHT );
-	COLORREF	clrRight = pDc->GetPixel(rect.right-1, rect.top);	
+	COLORREF	clrRight = ::GetSysColor( COLOR_BTNFACE );	
 	TRIVERTEX gVert[ 2 ] = { 
 		rect.left, rect.top,     ( clrLeft & 0xFF ) << 8, clrLeft & 0xFF00, ( clrLeft & 0xFF0000 ) >> 8, 0,
 		rect.right, rect.bottom, ( clrRight & 0xFF ) << 8, clrRight & 0xFF00, ( clrRight & 0xFF0000 ) >> 8, 0
 	};
 	GRADIENT_RECT gRect = { 0, 1 };
-	pDc-> GradientFill( gVert, 2, &gRect, 1, GRADIENT_FILL_RECT_H );
+	pDc->GradientFill( gVert, 2, &gRect, 1, GRADIENT_FILL_RECT_H );
 	
 	CDialog* pParent = (CDialog*) GetParent();
 	CRect rcMargin( 0, 0, 2, 1 );
 	pParent->MapDialogRect( rcMargin );
 
-	// draw icon
+	//--- draw icon
+
 	if (hIcon && m_Images.GetSafeHandle() && m_Images.GetImageCount() == 1)
 	{
 		IMAGEINFO	ii;
@@ -210,18 +213,44 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 		rect.left+= (ii.rcImage.right-ii.rcImage.left) + 3;
 	}
 
-	// draw text
+	//--- draw text
+
 	rect.left += rcMargin.Width();
 
-	int				nBkStyle = pDc->SetBkMode(TRANSPARENT);
-	CFont			*pFont = (CFont*)pDc->SelectStockObject(SYSTEM_FONT);
+	int	nBkStyle = pDc->SetBkMode(TRANSPARENT);
+
+	// get correct themed font
+	LOGFONT lf;
+	bool isThemed = false;
+	if( m_osVer >= 0x0501 )
+		isThemed = ::IsThemeActive();
+	if( isThemed )
+	{
+		if( HTHEME hTheme = ::OpenThemeData( m_hWnd, L"TREEVIEW") )
+		{
+			::GetThemeSysFont( hTheme, TMT_MSGBOXFONT, &lf );
+			::CloseThemeData(hTheme);
+		}
+	}
+	else
+	{
+		NONCLIENTMETRICS ncm = { sizeof(ncm) };
+		::SystemParametersInfo( SPI_GETNONCLIENTMETRICS, sizeof(ncm), &ncm, 0 );
+		lf = ncm.lfMessageFont;
+	}	
+
+	lf.lfWeight = FW_BOLD;
+	CFont font;
+	font.CreateFontIndirect( &lf );
+	CFont* pOldFont = pDc->SelectObject( &font );
+
 	COLORREF clrPrev = pDc->SetTextColor( GetSysColor( COLOR_HIGHLIGHTTEXT ) );
 
 	pDc->DrawText(lpszCaption, rect, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
 	pDc->SetTextColor(clrPrev);
 	pDc->SetBkMode(nBkStyle);
-	pDc->SelectObject(pFont);
+	pDc->SelectObject(pOldFont);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -254,7 +283,10 @@ BOOL CPropPageFrameDefault::OnEraseBkgnd(CDC* pDC)
 	}
 	else
 	{
-		return CWnd::OnEraseBkgnd(pDC);
+		BOOL res = CWnd::OnEraseBkgnd(pDC);
+		CRect rc; GetClientRect( rc );
+		pDC->DrawEdge( rc, EDGE_ETCHED, BF_BOTTOM );
+		return res;
 	}
 }
 
