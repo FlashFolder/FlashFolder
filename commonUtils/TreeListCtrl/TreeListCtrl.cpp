@@ -76,9 +76,10 @@ END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------
 
-CTreeListCtrl_header::CTreeListCtrl_header()
+CTreeListCtrl_header::CTreeListCtrl_header() :
+	m_pTreeCtrl( NULL ),
+	m_isTracking( false )
 {
-	m_pTreeCtrl = NULL;
 	m_penForHeaderTrack.CreatePen( PS_SOLID, 2, 0x444444 );
 }
 
@@ -89,8 +90,6 @@ int CTreeListCtrl_header::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CHeaderCtrl::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	
-	SendMessage( WM_SETFONT, (WPARAM) ::GetStockObject( DEFAULT_GUI_FONT ), 0) ;
-
 	return 0;
 }
 
@@ -113,6 +112,7 @@ void CTreeListCtrl_header::OnTrack( NMHDR* _pnm, LRESULT* result)
 	{
 		case HDN_BEGINTRACK:
 		{
+			m_isTracking = true;
 			s_lastSectionWidth = width;
 			s_lastMoverLineX = -1;
 
@@ -126,11 +126,14 @@ void CTreeListCtrl_header::OnTrack( NMHDR* _pnm, LRESULT* result)
 		{
 			if( s_isFullDrag && ! s_hFocusItem )
 			{
-				// While tracking, unfocus the tree control to avoid drawing 
-				// artefacts of focused item.
+				// While tracking, focus rect is disabled to avoid drawing artefacts
 				s_hFocusItem = m_pTreeCtrl->GetFocusedItem();
 				if( s_hFocusItem )
-					m_pTreeCtrl->SetItemState( s_hFocusItem, 0, TVIS_FOCUSED );
+				{
+					CRect rcItem;
+					m_pTreeCtrl->GetItemRect( s_hFocusItem, rcItem, FALSE );
+					m_pTreeCtrl->InvalidateRect( rcItem );
+				}
 			}
 
 			if( s_lastSectionWidth != width )
@@ -197,6 +200,8 @@ void CTreeListCtrl_header::OnTrack( NMHDR* _pnm, LRESULT* result)
 
 		case HDN_ENDTRACK:
 		{
+			m_isTracking = false;
+
 			// nothing to do if the header item was not moved
 			if( s_lastMoverLineX == -1 )
 				break;
@@ -204,7 +209,12 @@ void CTreeListCtrl_header::OnTrack( NMHDR* _pnm, LRESULT* result)
 			if( s_isFullDrag )
 			{
 				if( s_hFocusItem )
-					m_pTreeCtrl->SetItemState( s_hFocusItem, TVIS_FOCUSED, TVIS_FOCUSED );
+				{
+					// show focus rectangle again
+					CRect rcItem;
+					m_pTreeCtrl->GetItemRect( s_hFocusItem, rcItem, FALSE );
+					m_pTreeCtrl->InvalidateRect( rcItem );
+				}
 			}
 			else 
 			{
@@ -375,6 +385,13 @@ BOOL CTreeListCtrl_tree::OnEraseBkgnd( CDC* pDC )
 
 void CTreeListCtrl_tree::DrawTreeGraphics( CDC& dc, LPNMTVCUSTOMDRAW pnm, const RECT &rcSubItem )
 {
+	COLORREF bkColor = GetBkColor();
+	if( bkColor == -1 )
+		bkColor = m_clrWindow;
+	COLORREF textColor = GetTextColor();
+	if( textColor == -1 )
+		textColor = m_clrWindowText;
+
 	int indentUnit = GetIndent();
 	int indent = ( pnm->iLevel ) * indentUnit;
 
@@ -413,27 +430,33 @@ void CTreeListCtrl_tree::DrawTreeGraphics( CDC& dc, LPNMTVCUSTOMDRAW pnm, const 
 	{
 		//--- draw the expand / collapse button
 
-		CRect btnSize = TREE_BUTTON_SIZE;
-		m_pParent->MapDialogRect( btnSize );
-		CRect rcBtn = CRect( cx - btnSize.Width(), cy - btnSize.Height(), 
-			cx + btnSize.Width() + 1, cy + btnSize.Height() + 1 );		
-
 		if( m_pParent->m_hTheme )
 		{
 			//--- draw themed button
 
 			int state = ( GetItemState( hItem, TVIS_STATEIMAGEMASK ) & TVIS_EXPANDED ) != 0 ? 
 				GLPS_OPENED : GLPS_CLOSED;
+			SIZE size = { 0 };
+			::GetThemePartSize( m_pParent->m_hTheme, dc, TVP_GLYPH, state, NULL, TS_TRUE, &size );
+			int x = cx - size.cx / 2;
+			int y = cy - size.cy / 2;
+			CRect rcBtn = CRect( x, y, x + size.cx, y + size.cy );		
+			dc.FillSolidRect( rcBtn, bkColor );
 			::DrawThemeBackground( m_pParent->m_hTheme, dc, TVP_GLYPH, state, rcBtn, NULL );
 		}
 		else
 		{
 			//--- draw unthemed button that mimics the default look for Win2k / XP
 
+			CRect btnSize = TREE_BUTTON_SIZE;
+			m_pParent->MapDialogRect( btnSize );
+			CRect rcBtn = CRect( cx - btnSize.Width(), cy - btnSize.Height(), 
+				cx + btnSize.Width() + 1, cy + btnSize.Height() + 1 );		
+
 			AutoSelectObj sel_pen( dc, m_penForLines );
 			dc.Rectangle( rcBtn.left, rcBtn.top, rcBtn.right, rcBtn.bottom );
 
-			CPen pen( PS_SOLID, 1, ::GetSysColor( COLOR_WINDOWTEXT ) );
+			CPen pen( PS_SOLID, 1, textColor );
 			AutoSelectObj sel_pen1( dc, pen );
 			dc.MoveTo( rcBtn.left + 2, cy );
 			dc.LineTo( rcBtn.right - 2, cy );
@@ -563,7 +586,8 @@ void CTreeListCtrl_tree::OnCustomDraw( NMHDR* _pnm, LRESULT *pResult )
 
 	//----- draw the sub items -----------------------------------------------
 
-	if( pnm->nmcd.uItemState & CDIS_FOCUS )
+	if( pnm->nmcd.uItemState & CDIS_FOCUS && 
+		! m_pParent->GetHeaderCtrl().IsTracking() )
 		dc.DrawFocusRect( rcSel );
 
 	// Getting the bounding box for painting enhances the performance by only processing these
@@ -685,7 +709,7 @@ void CTreeListCtrl_tree::OnCustomDraw( NMHDR* _pnm, LRESULT *pResult )
 		{
 			//--- draw text
 
-			DWORD dtFlags = DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS | DT_HIDEPREFIX;
+			DWORD dtFlags = DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX;
 			HDITEM hditem;
 			hditem.mask = HDI_FORMAT;
 			m_pHeaderCtrl->GetItem( nCol, &hditem );
@@ -1197,25 +1221,22 @@ BOOL CTreeListCtrl::OnInitDialog()
 
 	VerifyThemeState();
 
-	SendMessage( WM_SETFONT, (WPARAM) ::GetStockObject( DEFAULT_GUI_FONT ), 0 );
-
 	//--- Create header ctrl and link it to the tree ctrl
     m_headerCtrl.LinkToParentCtrl( this );
 	m_headerCtrl.Create( WS_CHILD | WS_VISIBLE | CCS_TOP | HDS_BUTTONS | HDS_HORZ,
 		CRect(0,0,0,0), this, IDC_HEADER );
-    m_headerCtrl.LinkToTreeCtrl(&m_tree);
+    m_headerCtrl.LinkToTreeCtrl( &m_tree );
 
 	//--- create tree ctrl ----
 	m_tree.LinkToParentCtrl( this );
 	m_tree.Create( WS_CHILD | WS_VISIBLE | WS_TABSTOP |
 		TVS_HASBUTTONS | TVS_FULLROWSELECT | TVS_LINESATROOT | TVS_SHOWSELALWAYS | TVS_NOTOOLTIPS, 
 		CRect(0,0,0,0), this, IDC_TREE );
-    m_tree.LinkToHeaderCtrl(&m_headerCtrl);
+    m_tree.LinkToHeaderCtrl( &m_headerCtrl );
 
 	//--- create horiz. scrollbar
 	m_horizScrollBar.Create( WS_CHILD | WS_VISIBLE | SBS_HORZ | SBS_BOTTOMALIGN,
 		CRect(0,0,0,0), this, IDC_HSCROLL );
-
 
 	return TRUE;
 }
@@ -1596,6 +1617,8 @@ void CTreeListCtrl::OnSetFont( CFont* pFont )
 	CDialog::OnSetFont( pFont );
 	if( m_tree.GetSafeHwnd() )
 		m_tree.SetFont( pFont );
+	if( m_headerCtrl.GetSafeHwnd() )
+		m_headerCtrl.SetFont( pFont );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -1629,7 +1652,6 @@ void CTreeListCtrl::OnSysColorChange()
 	m_headerCtrl.SendMessage( WM_SYSCOLORCHANGE );
 	m_horizScrollBar.SendMessage( WM_SYSCOLORCHANGE );
 }
-
 
 //-----------------------------------------------------------------------------------------------
 //=== BEGIN WinXP themed border implementation

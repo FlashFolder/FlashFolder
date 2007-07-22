@@ -51,6 +51,8 @@ public:
 		return rc.right - rc.left;
 	}
 
+	bool IsTracking() const { return m_isTracking; }
+
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnTrack( NMHDR * pnm, LRESULT* result );
@@ -62,7 +64,7 @@ private:
 	CPen m_penForHeaderTrack;
 	CTreeListCtrl_tree *m_pTreeCtrl;
 	CTreeListCtrl* m_pParent;
-
+    bool m_isTracking;
 };
 
 //--------------------------------------------------------------------------------------------
@@ -353,5 +355,7 @@ private:
 	DWORD m_options;
 
 	InsertMarkPos m_insertMark;
+
+	CFont m_font;
 };
 
