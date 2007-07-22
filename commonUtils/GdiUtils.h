@@ -1,4 +1,21 @@
-
+/* This file is part of FlashFolder. 
+ * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
 /// \brief Various classes / functions for easing GDI API programming.
 
 #pragma once
@@ -99,4 +116,27 @@ inline DWORD BlendColor( DWORD col1, DWORD col2, int blend = 128 )
     c2 = ( col2 & 0xFF00FF00 ) >> 8;
     c3 = c1 + ( ( ( c2 - c1 ) * blend ) >> 8 );
     return res | ( ( c3 & 0xFF00FF ) << 8 );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+/// Preferred way to get the standard font for text in dialog boxes as opposed to
+/// GetStockObject( DEFAULT_GUI_FONT ) which returns the wrong font on XP / Vista and doesn't 
+/// respect themes.
+void GetSysMessageFont( LOGFONT* plf, HWND hwnd );
+
+#ifdef _MFC_VER
+inline void CreateSysMessageFont( CFont* pFont, HWND hwnd )
+{
+	LOGFONT lf;
+	GetSysMessageFont( &lf, hwnd );
+	pFont->CreateFontIndirect( &lf );
+}
+#endif
+
+inline HFONT CreateSysMessageFont( HWND hwnd )
+{
+	LOGFONT lf;
+	GetSysMessageFont( &lf, hwnd );
+	return ::CreateFontIndirect( &lf );	
 }

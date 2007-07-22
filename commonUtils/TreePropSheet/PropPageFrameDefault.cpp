@@ -219,26 +219,9 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 
 	int	nBkStyle = pDc->SetBkMode(TRANSPARENT);
 
-	// get correct themed font
+	// get correctly themed font
 	LOGFONT lf;
-	bool isThemed = false;
-	if( m_osVer >= 0x0501 )
-		isThemed = ::IsThemeActive();
-	if( isThemed )
-	{
-		if( HTHEME hTheme = ::OpenThemeData( m_hWnd, L"TREEVIEW") )
-		{
-			::GetThemeSysFont( hTheme, TMT_MSGBOXFONT, &lf );
-			::CloseThemeData(hTheme);
-		}
-	}
-	else
-	{
-		NONCLIENTMETRICS ncm = { sizeof(ncm) };
-		::SystemParametersInfo( SPI_GETNONCLIENTMETRICS, sizeof(ncm), &ncm, 0 );
-		lf = ncm.lfMessageFont;
-	}	
-
+	GetSysMessageFont( &lf, GetSafeHwnd() );
 	lf.lfWeight = FW_BOLD;
 	CFont font;
 	font.CreateFontIndirect( &lf );
