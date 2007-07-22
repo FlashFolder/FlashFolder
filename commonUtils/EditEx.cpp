@@ -61,8 +61,13 @@ void CEditEx::OnPaint()
             lf.lfWeight = FW_BOLD;
         font.CreateFontIndirect( &lf );
 
-		CFont* oldFont = dc.SelectObject( &font );		
-		dc.DrawText( m_hintText, rc, DT_SINGLELINE | DT_VCENTER );
+		CFont* oldFont = dc.SelectObject( &font );
+
+		DWORD margins = GetMargins();
+		rc.left += margins & 0xFFFF;
+		rc.right -= margins >> 16;
+
+		dc.DrawText( m_hintText, rc, DT_SINGLELINE | DT_VCENTER | DT_EDITCONTROL );
 		dc.SelectObject( oldFont );
 	}
 }
