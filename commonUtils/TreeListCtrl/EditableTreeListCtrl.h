@@ -96,6 +96,8 @@ private:
 	void CopyChildren( TreeData* pData, std::set<HTREEITEM>* pCopiedItems, HTREEITEM hItemRoot );
 	void CopyItem( TreeData* pData, HTREEITEM hItem );
 	void InsertItems( HTREEITEM hParent, HTREEITEM hInsertAfter, const TreeData& data );
+	void InsertItems_worker( HTREEITEM hParent, HTREEITEM hInsertAfter, const TreeData& data,
+	                  bool isParentExpanded );
 	bool IsChildOf( HTREEITEM hItem, const CTreeItemList& list );
 	void InsertDummyItem( HTREEITEM hParent );
 

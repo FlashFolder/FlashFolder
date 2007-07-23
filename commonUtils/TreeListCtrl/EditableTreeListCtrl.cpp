@@ -147,7 +147,7 @@ void CEditableTreeListCtrl::OnMouseMove( UINT flags, CPoint pt )
 
 			isFolderInsert = false;
 
-			if( IsItemFolder( hItem ) )
+			if( GetTree().ItemHasChildren( hItem ) )
 			{
 				// mouse cursor is over a parent item --> check if user wants to append to sub-tree
 
@@ -329,6 +329,7 @@ void CEditableTreeListCtrl::OnCaptureChanged( CWnd* pWnd )
 		//--- insert items
 		GetTree().SelectAll( FALSE );
 		HTREEITEM hInsertAfter = m_hLastInsertPos ? m_hLastInsertPos : TVI_FIRST;
+		
 		InsertItems( m_hLastInsertParent, hInsertAfter, treeData );
 
 		//--- delete selected items
@@ -365,14 +366,14 @@ void CEditableTreeListCtrl::OnTimer( UINT_PTR id )
 	}
 
 
-	//--- if cursor is above a '+' button for some time during drag-n-drop, then expand the item
+	//--- if cursor is above a parent item for some time during drag-n-drop, then expand the item
 
 	UINT htFlags = 0;
 	HTREEITEM hNewButton = GetTree().HitTest( ptClient, &htFlags );
 	if( hNewButton && 
 		( htFlags & ( TVHT_ONITEMBUTTON | TVHT_ONITEM ) ) &&
 		GetTree().ItemHasChildren( hNewButton ) && 
-		GetTree().GetItemState( hNewButton, TVIS_EXPANDED ) != 0 )
+		( GetTree().GetItemState( hNewButton, TVIS_EXPANDED ) & TVIS_EXPANDED ) == 0 )
 	{
 		if( hNewButton != m_hLastButton )
 		{
@@ -381,7 +382,7 @@ void CEditableTreeListCtrl::OnTimer( UINT_PTR id )
 		else
 		{
 			DWORD time = ::GetTickCount();
-			if( time - m_lastButtonTime > 1000 )
+			if( time - m_lastButtonTime > 1500 )
 			{
 				GetTree().Expand( hNewButton, TVE_EXPAND );
 				hNewButton = NULL;
@@ -435,6 +436,7 @@ BOOL CEditableTreeListCtrl::OnKeyDown( NMHDR* pnm_, LRESULT* pResult )
 		if( HTREEITEM hFocusedItem = GetTree().GetFocusedItem() )
 		{
 			GetTree().SelectAll( FALSE );
+
 			InsertItems( GetTree().GetParentItem( hFocusedItem ), hFocusedItem, m_clipboard );
 		}
 	}
@@ -592,6 +594,18 @@ void CEditableTreeListCtrl::CopyItem( TreeData* pData, HTREEITEM hItem )
 void CEditableTreeListCtrl::InsertItems( 
 	HTREEITEM hParent, HTREEITEM hInsertAfter, const TreeData& data )
 {
+	bool isExpanded = true;
+	if( hParent )
+		isExpanded = ( GetTree().GetItemState( hParent, TVIS_EXPANDED ) & TVIS_EXPANDED ) != 0;
+	
+	InsertItems_worker( hParent, hInsertAfter, data, isExpanded );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CEditableTreeListCtrl::InsertItems_worker( 
+	HTREEITEM hParent, HTREEITEM hInsertAfter, const TreeData& data, bool isParentExpanded )
+{
 	TVINSERTSTRUCT ins = { 0 };
 	ins.hParent = hParent;
 	ins.hInsertAfter = hInsertAfter;
@@ -620,15 +634,15 @@ void CEditableTreeListCtrl::InsertItems(
         if( ! childData.childs.empty() )
 		{
 			// recursion
-			InsertItems( hItem, TVI_FIRST, childData );
+			InsertItems_worker( hItem, TVI_FIRST, childData, childData.isExpanded && isParentExpanded );
 
 			if( childData.isExpanded )
-			{
 				GetTree().Expand( hItem, TVE_EXPAND );
-			}
 		}
 
-		GetTree().SetItemState( hItem, TVIS_SELECTED | TVIS_FOCUSED, TVIS_SELECTED | TVIS_FOCUSED );
+		// only select expanded child items
+		if( isParentExpanded )
+			GetTree().SetItemState( hItem, TVIS_SELECTED | TVIS_FOCUSED, TVIS_SELECTED | TVIS_FOCUSED );
 
 		ins.hInsertAfter = hItem;
 	}
