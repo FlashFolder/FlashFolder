@@ -61,7 +61,7 @@ END
 
 IDD_TOOLWND DIALOGEX 0, 0, 186, 14
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CLIPCHILDREN
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 8, "MS Shell Dlg 2", 400, 0, 0x1
 BEGIN
 END
 
@@ -146,4 +146,3 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-

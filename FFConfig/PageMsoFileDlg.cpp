@@ -83,11 +83,14 @@ void CPageMsoFileDlg::ReadProfile( const Profile& profile )
 		return;
 	}
 
+	LOGFONT lf;
+	GetObject( *GetFont(), sizeof(lf), &lf );
+
 	CString s;
 	CheckDlgButton( IDC_CHK_ENABLE, profile.GetInt( PROFILE_GROUP, _T("EnableHook") ) );
-	s.Format( _T("%d"), profile.GetInt( PROFILE_GROUP, _T("MinWidth") ) );
+	s.Format( _T("%d"), MapProfileX( *this, profile.GetInt( PROFILE_GROUP, _T("MinWidth") ) ) );
 	SetDlgItemText( IDC_ED_MINWIDTH, s );
-	s.Format( _T("%d"), profile.GetInt( PROFILE_GROUP, _T("MinHeight") ) );
+	s.Format( _T("%d"), MapProfileY( *this, profile.GetInt( PROFILE_GROUP, _T("MinHeight") ) ) );
 	SetDlgItemText( IDC_ED_MINHEIGHT, s );
 	m_cbPos.SetCurSel( profile.GetInt( PROFILE_GROUP, _T("Center") ) );
 	

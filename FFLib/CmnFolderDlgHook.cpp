@@ -54,8 +54,8 @@ bool CmnFolderDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 	::SetProp( hwndFileDlg, FLASHFOLDER_HOOK_PROPERTY, NULL );
 
 	//--- read settings from INI file ---
-	m_minFileDialogWidth = g_profile.GetInt( _T("CommonFolderDlg"), _T("MinWidth") );
-	m_minFileDialogHeight = g_profile.GetInt( _T("CommonFolderDlg"), _T("MinHeight") );
+	m_minFileDialogWidth = MapProfileX( hwndTool, g_profile.GetInt( _T("CommonFolderDlg"), _T("MinWidth") ) );
+	m_minFileDialogHeight = MapProfileY( hwndTool, g_profile.GetInt( _T("CommonFolderDlg"), _T("MinHeight") ) );
 	m_centerFileDialog = g_profile.GetInt( _T("CommonFolderDlg"), _T("Center") );
 
 	return true;

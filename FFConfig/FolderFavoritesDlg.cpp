@@ -130,19 +130,13 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	m_tree.GetTree().SetImageList( &m_treeIcons, TVSIL_NORMAL );
 
 	int colWidth;
-	colWidth = g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_title") );
-	if( colWidth == -1 )
-		colWidth = MapDialogX( *this, 110 );
+	colWidth = MapProfileX( *this, g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_title") ) );
 	m_tree.InsertColumn( 0, _T("Title"), LVCFMT_LEFT, colWidth );
 
-	colWidth = g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_command") );
-	if( colWidth == -1 )
-		colWidth = MapDialogX( *this, 130 );
+	colWidth = MapProfileX( *this, g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_command") ) );
 	m_tree.InsertColumn( 1, _T("Command"), LVCFMT_LEFT, colWidth );
 
-	colWidth = g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_targetPath") );
-	if( colWidth == -1 )
-		colWidth = MapDialogX( *this, 130 );
+	colWidth = MapProfileX( *this, g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_targetPath") ) );
 	m_tree.InsertColumn( 2, _T("Target path"), LVCFMT_LEFT, colWidth );
 
 	LoadFavorites();
@@ -165,13 +159,9 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	// Set size from dialog template as minimum size
 	SetMinSize();
 
-	// get dialog size from registry
-	int width = g_profile.GetInt( _T("main"), _T("FavoritesDlgWidth") );
-	if( width == -1 )
-		width = MapDialogX( *this, 400 );
-	int height = g_profile.GetInt( _T("main"), _T("FavoritesDlgHeight") );
-	if( height == -1 )
-		height = MapDialogY( *this, 350 );
+	// get dialog size from profile
+	int width = MapProfileX( *this, g_profile.GetInt( _T("main"), _T("FavoritesDlgWidth") ) );
+	int height = MapProfileY( *this, g_profile.GetInt( _T("main"), _T("FavoritesDlgHeight") ) );
 
 	SetWindowPos( NULL, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE );
 

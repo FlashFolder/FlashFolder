@@ -499,6 +499,9 @@
 			<File
 				RelativePath="..\common\HistoryLst.cpp">
 			</File>
+			<File
+				RelativePath="..\common\ProfileDefaults.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="commonUtils_h"

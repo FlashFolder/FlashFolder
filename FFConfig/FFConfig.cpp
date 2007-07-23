@@ -22,7 +22,6 @@
 #include "FolderFavoritesDlg.h"
 #include "UpdateCheckDlg.h"
 #include "AboutDlg.h"
-#include "../common/ProfileDefaults.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
