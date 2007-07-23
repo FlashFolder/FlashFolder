@@ -140,3 +140,38 @@ inline HFONT CreateSysMessageFont( HWND hwnd )
 	GetSysMessageFont( &lf, hwnd );
 	return ::CreateFontIndirect( &lf );	
 }
+
+//-----------------------------------------------------------------------------------------------
+
+/// Convenience wrapper for MapDialogRect()
+inline int MapDialogX( HWND hDlg, int x )
+{
+	RECT rc = { 0, 0, x, 1 };
+	MapDialogRect( hDlg, &rc );
+	return rc.right;
+}
+
+/// Convenience wrapper for MapDialogRect()
+inline int MapDialogY( HWND hDlg, int y )
+{
+	RECT rc = { 0, 0, 1, y };
+	MapDialogRect( hDlg, &rc );
+	return rc.bottom;
+}
+
+/// Convenience wrapper for MapDialogRect()
+inline POINT MapDialogPoint( HWND hDlg, POINT pt )
+{
+	RECT rc = { 0, 0, pt.x, pt.y };
+	MapDialogRect( hDlg, &rc );
+	POINT res = { rc.right, rc.bottom };
+	return res;
+}
+
+/// Convenience wrapper for MapDialogRect()
+inline RECT MapDialogRect( HWND hDlg, const RECT& rc )
+{
+	RECT res = rc;
+	MapDialogRect( hDlg, &res );
+	return res;
+}

@@ -44,9 +44,6 @@ void GetProfileDefaults( Profile* pProfile )
 	bool isTcInstalled = GetTotalCmdLocation( NULL, &tcIniPath );
 	pProfile->SetInt( _T("main"), _T("UseTcFavorites"), isTcInstalled ? 1 : 0 );
 
-	pProfile->SetInt( _T("main"), _T("FavoritesDlgWidth"), MapDlgX( baseUnitX, 360 ) );
-	pProfile->SetInt( _T("main"), _T("FavoritesDlgHeight"), MapDlgY( baseUnitY, 270 ) );
-
 	//--- common file dialog
 
 	pProfile->SetInt( _T("CommonFileDlg"), _T("EnableHook"), 1 );
@@ -80,4 +77,13 @@ void GetProfileDefaults( Profile* pProfile )
 	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinWidth"), MapDlgX( baseUnitX, 200 ) );
 	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinHeight"), MapDlgY( baseUnitY, 250 ) );
 	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("Center"), 1 );
+
+	//--- favorites editor
+
+	pProfile->SetInt( _T("main"), _T("FavoritesDlgWidth"), -1 );
+	pProfile->SetInt( _T("main"), _T("FavoritesDlgHeight"), -1 );
+	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_title"), -1 );
+	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_command"), -1 );
+	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_targetPath"), -1 );
+
 }

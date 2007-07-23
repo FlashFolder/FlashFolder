@@ -129,13 +129,21 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	m_treeIcons.Add( hIcon );
 	m_tree.GetTree().SetImageList( &m_treeIcons, TVSIL_NORMAL );
 
-	CRect rcCol;
-	rcCol = CRect( 0, 0, 130, 1 ); MapDialogRect( rcCol );
-	m_tree.InsertColumn( 0, _T("Title"), LVCFMT_LEFT, rcCol.Width() );
-	rcCol = CRect( 0, 0, 150, 1 ); MapDialogRect( rcCol );
-	m_tree.InsertColumn( 1, _T("Command"), LVCFMT_LEFT, rcCol.Width() );
-	rcCol = CRect( 0, 0, 150, 1 ); MapDialogRect( rcCol );
-	m_tree.InsertColumn( 2, _T("Target path"), LVCFMT_LEFT, rcCol.Width() );
+	int colWidth;
+	colWidth = g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_title") );
+	if( colWidth == -1 )
+		colWidth = MapDialogX( *this, 110 );
+	m_tree.InsertColumn( 0, _T("Title"), LVCFMT_LEFT, colWidth );
+
+	colWidth = g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_command") );
+	if( colWidth == -1 )
+		colWidth = MapDialogX( *this, 130 );
+	m_tree.InsertColumn( 1, _T("Command"), LVCFMT_LEFT, colWidth );
+
+	colWidth = g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_targetPath") );
+	if( colWidth == -1 )
+		colWidth = MapDialogX( *this, 130 );
+	m_tree.InsertColumn( 2, _T("Target path"), LVCFMT_LEFT, colWidth );
 
 	LoadFavorites();
 
@@ -159,7 +167,12 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 
 	// get dialog size from registry
 	int width = g_profile.GetInt( _T("main"), _T("FavoritesDlgWidth") );
+	if( width == -1 )
+		width = MapDialogX( *this, 400 );
 	int height = g_profile.GetInt( _T("main"), _T("FavoritesDlgHeight") );
+	if( height == -1 )
+		height = MapDialogY( *this, 350 );
+
 	SetWindowPos( NULL, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE );
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -334,6 +347,16 @@ void CFolderFavoritesDlg::SaveDialogSize()
 	CRect rc; GetWindowRect( rc );
 	g_profile.SetInt( _T("main"), _T("FavoritesDlgWidth"), rc.Width() );
 	g_profile.SetInt( _T("main"), _T("FavoritesDlgHeight"), rc.Height() );
+
+	int colWidth;
+	colWidth = m_tree.GetHeaderCtrl().GetItemWidth( COL_TITLE );
+	g_profile.SetInt( _T("Favorites.Options"), _T("ColWidth_title"), colWidth );
+
+	colWidth = m_tree.GetHeaderCtrl().GetItemWidth( COL_COMMAND );
+	g_profile.SetInt( _T("Favorites.Options"), _T("ColWidth_command"), colWidth );
+
+	colWidth = m_tree.GetHeaderCtrl().GetItemWidth( COL_TARGETPATH );
+	g_profile.SetInt( _T("Favorites.Options"), _T("ColWidth_targetPath"), colWidth );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -637,6 +660,6 @@ void CFolderFavoritesDlg::OnBnClickedBtnImport()
 {
 	// TODO: Fügen Sie hier Ihren Kontrollbehandlungscode für die Benachrichtigung ein.
 
-	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+//	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
 }
 
