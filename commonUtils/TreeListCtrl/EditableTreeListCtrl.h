@@ -32,6 +32,15 @@ public:
 		m_isDragging( false )
 	{}
 
+	/// insert item - takes care of "dummy" items
+	HTREEITEM InsertItem( LPTVINSERTSTRUCT lpInsertStruct );
+	/// insert item - takes care of "dummy" items
+	HTREEITEM InsertItem( LPCTSTR lpszItem, int nImage, int nSelectedImage, 
+	                      HTREEITEM hParent = TVI_ROOT, HTREEITEM hInsertAfter = TVI_LAST );
+	/// insert item - takes care of "dummy" items
+	HTREEITEM InsertItem( LPCTSTR lpszItem, HTREEITEM hParent = TVI_ROOT, HTREEITEM hInsertAfter = TVI_LAST )
+		{ return InsertItem( lpszItem, -1, -1, hParent, hInsertAfter ); }
+
 	/// Mark an item to be a "folder" (meaning it can contain other items)
 	void SetItemIsFolder( HTREEITEM hItem );
 	/// Check if an item is a "folder" (if it can contain other items, even if it is currently empty)
@@ -100,9 +109,6 @@ private:
 	                  bool isParentExpanded );
 	bool IsChildOf( HTREEITEM hItem, const CTreeItemList& list );
 	void InsertDummyItem( HTREEITEM hParent );
-
-	// overrides CTreeListCtrl
-	virtual HTREEITEM OnInsertItem( const TVINSERTSTRUCT& tvi );
 
 private:
 	bool m_isDragging;

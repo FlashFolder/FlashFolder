@@ -189,6 +189,13 @@ public:
 		InsertMarkPos() : hParent( NULL ), hItem( NULL ), isBefore( false ) {}
 	};
 
+	/// custom notification messages send in form of WM_NOTIFY
+	enum
+	{
+		/// Send after an item was inserted. NMTREEVIEW::itemNew contains info about new item.
+		TVN_INSERTITEM = TVN_LAST + 1
+	};
+
 public:
 	CTreeListCtrl();
 
@@ -235,6 +242,10 @@ public:
 	/// insert item
 	HTREEITEM InsertItem( LPCTSTR lpszItem, HTREEITEM hParent = TVI_ROOT, HTREEITEM hInsertAfter = TVI_LAST )
 		{ return m_tree.InsertItem( lpszItem, hParent, hInsertAfter ); }
+	/// insert item
+	HTREEITEM InsertItem( LPCTSTR lpszItem, int nImage, int nSelectedImage, 
+	                      HTREEITEM hParent = TVI_ROOT, HTREEITEM hInsertAfter = TVI_LAST )
+		{ return m_tree.InsertItem( lpszItem, nImage, nSelectedImage, hParent, hInsertAfter ); }
 
 	/// delete single item
 	BOOL DeleteItem( HTREEITEM hItem ) { return m_tree.DeleteItem( hItem ); }
@@ -306,10 +317,6 @@ protected:
 	afx_msg LRESULT VerifyThemeState( WPARAM wp = 0, LPARAM lp = 0 );
 	afx_msg void OnSysColorChange();
 	DECLARE_MESSAGE_MAP()
-
-	///  Override this in derived class to handle tree insertions.\n
-	virtual HTREEITEM OnInsertItem( const TVINSERTSTRUCT& tvi ) 
-		{ return reinterpret_cast<HTREEITEM>( m_tree.Default() ); }
 
 	int GetItemTextWidth( HTREEITEM hItem, int nCol, CDC& dc, const CRect& subItemMargins );
 

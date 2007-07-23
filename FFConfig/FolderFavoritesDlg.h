@@ -33,6 +33,8 @@ private:
 	virtual void OnOK();
 	virtual void OnCancel();
 	afx_msg void OnTree_SelChanged(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTree_InsertItem(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTree_DeleteItem(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnEnChangeEdTitle();
 	afx_msg void OnEnChangeEdCommand();
 	afx_msg void OnEnChangeEdTargetPath();
@@ -43,6 +45,7 @@ private:
 	afx_msg void OnBnClickedBtnImport();
 	afx_msg void OnBnClickedBtnBrowse();
 	afx_msg void OnBnClickedBtnTargetbrowse();
+	afx_msg void OnBnClickedBtnRevert();
 	DECLARE_MESSAGE_MAP()
 
 	void LoadFavorites();
@@ -61,6 +64,4 @@ private:
 	CEditEx m_edTargetPath;
 
 	HTREEITEM m_hSelItem;
-public:
-	afx_msg void OnBnClickedBtnRevert();
 };

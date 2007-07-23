@@ -84,6 +84,8 @@ BEGIN_MESSAGE_MAP(CFolderFavoritesDlg, CResizableDlg)
 	ON_WM_GETMINMAXINFO()
 	ON_BN_CLICKED( IDC_BTN_BROWSE, OnBnClickedBtnBrowse )
 	ON_NOTIFY( TVN_SELCHANGED, IDC_LST_FAVS, OnTree_SelChanged )
+	ON_NOTIFY( CEditableTreeListCtrl::TVN_INSERTITEM, IDC_LST_FAVS, OnTree_InsertItem )
+	ON_NOTIFY( TVN_DELETEITEM, IDC_LST_FAVS, OnTree_DeleteItem )
 	ON_EN_CHANGE( IDC_ED_TITLE, OnEnChangeEdTitle )
 	ON_EN_CHANGE( IDC_ED_COMMAND, OnEnChangeEdCommand )
 	ON_EN_CHANGE( IDC_ED_TARGETPATH, OnEnChangeEdTargetPath )
@@ -203,7 +205,7 @@ void CFolderFavoritesDlg::LoadFavorites_worker( HTREEITEM hParent, const Favorit
 		{
 			// insert submenu recursively
 
-			hItem = m_tree.GetTree().InsertItem( fav.title.substr( 1 ).c_str(), 0, 0, hParent, TVI_LAST );
+			hItem = m_tree.InsertItem( fav.title.substr( 1 ).c_str(), 0, 0, hParent, TVI_LAST );
 			++iItem;
 
 			LoadFavorites_worker( hItem, favs, iItem );			
@@ -212,7 +214,7 @@ void CFolderFavoritesDlg::LoadFavorites_worker( HTREEITEM hParent, const Favorit
 		{
 			// insert divider
 			
-			hItem = m_tree.GetTree().InsertItem( _T(""), -1, -1, hParent, TVI_LAST );
+			hItem = m_tree.InsertItem( _T(""), -1, -1, hParent, TVI_LAST );
 			m_tree.SetItemDivider( hItem );
 
 			++iItem;
@@ -221,7 +223,7 @@ void CFolderFavoritesDlg::LoadFavorites_worker( HTREEITEM hParent, const Favorit
 		{
 			// insert normal item
 
-			hItem = m_tree.GetTree().InsertItem( fav.title.c_str(), 1, 1, hParent, TVI_LAST );
+			hItem = m_tree.InsertItem( fav.title.c_str(), 1, 1, hParent, TVI_LAST );
 			m_tree.SetItemText( hItem, COL_COMMAND, fav.command.c_str() );
 			m_tree.SetItemText( hItem, COL_TARGETPATH, fav.targetpath.c_str() );
 
@@ -455,6 +457,22 @@ void CFolderFavoritesDlg::OnTree_SelChanged( NMHDR *pNMHDR, LRESULT *pResult )
 
 //-----------------------------------------------------------------------------------------------
 
+void CFolderFavoritesDlg::OnTree_InsertItem( NMHDR *pNMHDR, LRESULT *pResult )
+{
+	*pResult = 0;
+	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CFolderFavoritesDlg::OnTree_DeleteItem( NMHDR *pNMHDR, LRESULT *pResult )
+{
+	*pResult = 0;
+	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+}
+
+//-----------------------------------------------------------------------------------------------
+
 void CFolderFavoritesDlg::OnEnChangeEdTitle()
 {
 	CString title;
@@ -529,7 +547,7 @@ void CFolderFavoritesDlg::OnBnClickedBtnAdd()
 	else
 		hInsert = TVI_LAST;
 
-	HTREEITEM hItem = m_tree.GetTree().InsertItem( _T("-untitled-"), 1, 1, hParent, hInsert );
+	HTREEITEM hItem = m_tree.InsertItem( _T("-untitled-"), 1, 1, hParent, hInsert );
 
 	m_tree.GetTree().SelectAll( FALSE );
 	m_tree.GetTree().SetItemState( hItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
@@ -552,7 +570,7 @@ void CFolderFavoritesDlg::OnBnClickedBtnAddDivider()
 	else
 		hInsert = TVI_LAST;
 
-	HTREEITEM hItem = m_tree.GetTree().InsertItem( _T(""), -1, -1, hParent, hInsert );
+	HTREEITEM hItem = m_tree.InsertItem( _T(""), -1, -1, hParent, hInsert );
 	m_tree.SetItemDivider( hItem );
 
 	m_tree.GetTree().SelectAll( FALSE );
@@ -576,7 +594,7 @@ void CFolderFavoritesDlg::OnBnClickedBtnAddSubmenu()
 	else
 		hInsert = TVI_LAST;
 
-	HTREEITEM hItem = m_tree.GetTree().InsertItem( _T("Submenu"), 0, 0, hParent, hInsert );
+	HTREEITEM hItem = m_tree.InsertItem( _T("Submenu"), 0, 0, hParent, hInsert );
 	m_tree.SetItemIsFolder( hItem );
 
 	m_tree.GetTree().Expand( hItem, TVE_EXPAND );

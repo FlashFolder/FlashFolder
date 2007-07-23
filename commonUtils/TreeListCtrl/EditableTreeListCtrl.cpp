@@ -480,13 +480,12 @@ BOOL CEditableTreeListCtrl::OnDeleteItem( NMHDR* pnm_, LRESULT* pResult )
 
 //-----------------------------------------------------------------------------------------------
 
-HTREEITEM CEditableTreeListCtrl::OnInsertItem( const TVINSERTSTRUCT& tvi )
-{
+HTREEITEM CEditableTreeListCtrl::InsertItem( LPTVINSERTSTRUCT pti ) 
+{ 
 	// remove the dummy item if exists
 
-	HTREEITEM hEmpty = GetTree().GetChildItem( tvi.hParent );
-
-	HTREEITEM hNewItem = CTreeListCtrl::OnInsertItem( tvi );
+	HTREEITEM hEmpty = GetTree().GetChildItem( pti->hParent );
+	HTREEITEM hNewItem = GetTree().InsertItem( pti );
 
 	if( m_dummyItems.find( hEmpty ) != m_dummyItems.end() )
 		GetTree().DeleteItem( hEmpty );
@@ -494,11 +493,24 @@ HTREEITEM CEditableTreeListCtrl::OnInsertItem( const TVINSERTSTRUCT& tvi )
 	return hNewItem;
 }
 
+HTREEITEM CEditableTreeListCtrl::InsertItem( LPCTSTR lpszItem, int nImage, int nSelectedImage, 
+					  HTREEITEM hParent, HTREEITEM hInsertAfter )
+{ 
+	TVINSERTSTRUCT tvi;
+	tvi.hParent = hParent;
+	tvi.hInsertAfter = hInsertAfter;
+	tvi.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+	tvi.item.pszText = const_cast<LPTSTR>( lpszItem );
+	tvi.item.iImage = nImage;
+	tvi.item.iSelectedImage = nSelectedImage;
+	return InsertItem( &tvi ); 
+}
+
 //-----------------------------------------------------------------------------------------------
 
 void CEditableTreeListCtrl::InsertDummyItem( HTREEITEM hParent )
 {
-	HTREEITEM hDummy = GetTree().InsertItem( _T("-empty-"), -1, -1, hParent );
+	HTREEITEM hDummy = InsertItem( _T("-empty-"), -1, -1, hParent );
 	CTreeListCtrl::ItemFormat fmt;
 	fmt.flags = FMT_COLOR | FMT_ITALIC;
 	fmt.textColor = ::GetSysColor( COLOR_GRAYTEXT );
@@ -617,7 +629,7 @@ void CEditableTreeListCtrl::InsertItems_worker(
 
 		ins.item.iImage = childData.iImage;
 		ins.item.lParam = childData.lParam;
-		HTREEITEM hItem = GetTree().InsertItem( &ins );
+		HTREEITEM hItem = InsertItem( &ins );
 
 		if( childData.format.flags != 0 )
 			SetItemFormat( hItem, childData.format );

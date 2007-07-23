@@ -1134,8 +1134,19 @@ BOOL CTreeListCtrl_tree::OnWndMsg( UINT message, WPARAM wp, LPARAM lp, LRESULT* 
 
 LRESULT CTreeListCtrl_tree::OnInsertItem( WPARAM wp, LPARAM lp )
 {
+	LRESULT res = Default();
+
 	TVINSERTSTRUCT* pIns = reinterpret_cast<TVINSERTSTRUCT*>( lp );
-	return reinterpret_cast<LRESULT>( m_pParent->OnInsertItem( *pIns ) );
+
+	// provide TVN_INSERT notification which is not done by original tree control
+	NMTREEVIEW nm = { 0 };
+	nm.itemNew = pIns->item;
+	nm.hdr.code = CTreeListCtrl::TVN_INSERTITEM;
+	nm.hdr.idFrom = m_pParent->GetDlgCtrlID();
+	nm.hdr.hwndFrom = m_pParent->GetSafeHwnd();
+	m_pParent->GetParent()->SendMessage( WM_NOTIFY, nm.hdr.idFrom, reinterpret_cast<LPARAM>( &nm ) );
+
+	return res;
 }
 
 
