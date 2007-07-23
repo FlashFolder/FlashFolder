@@ -71,9 +71,9 @@ void GetProfileDefaults( Profile* pProfile )
 
 	//--- favorites editor
 
-	pProfile->SetInt( _T("main"), _T("FavoritesDlgWidth"), 532 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("main"), _T("FavoritesDlgHeight"), 431 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_title"), 110 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_command"), 130 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_targetPath"), 130 + DIALOG_UNITS_FLAG );
+	pProfile->SetInt( _T("main"), _T("FavoritesDlgWidth"), 450 + DIALOG_UNITS_FLAG );
+	pProfile->SetInt( _T("main"), _T("FavoritesDlgHeight"), 330 + DIALOG_UNITS_FLAG );
+	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_title"), 130 + DIALOG_UNITS_FLAG );
+	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_command"), 140 + DIALOG_UNITS_FLAG );
+	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_targetPath"), 140 + DIALOG_UNITS_FLAG );
 }
