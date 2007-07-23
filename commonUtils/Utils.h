@@ -53,3 +53,12 @@ inline void ScreenToClientRect( HWND hwnd, RECT* prc )
 	::ScreenToClient( hwnd, &pt2 );
 	prc->left = pt1.x; prc->top = pt1.y; prc->right = pt2.x; prc->bottom = pt2.y;
 }
+
+/// Get runtime OS version, high-byte = major version, low-byte = minor version.
+/// e.g. 0x0500 = Win2k, 0x0501 = WinXP, 0x0600 = Vista
+inline WORD GetOsVersion()
+{
+	OSVERSIONINFO ovi = { sizeof(ovi) };
+	::GetVersionEx( &ovi );
+	return static_cast<WORD>( ovi.dwMajorVersion << 8 | ovi.dwMinorVersion );
+}

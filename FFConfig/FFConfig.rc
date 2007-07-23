@@ -37,6 +37,13 @@ IDI_SUBMENU             ICON                    "res\\submenu.ico"
 //
 
 IDC_DRAGCURSOR          CURSOR                  "res\\dragging.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+
 #endif    // Deutsch (Deutschland) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -102,16 +109,13 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,80,114,50,14
 END
 
-IDD_PAGE_COMMON_OPENWITHDLG DIALOGEX 0, 0, 256, 110
+IDD_PAGE_COMMON_OPENWITHDLG DIALOGEX 0, 0, 196, 110
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN | 
     WS_CAPTION
 CAPTION "Dialogs::Common ""Open With""|Common ""Open With"" Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "&Enable FlashFolder for this dialog (Windows 2000 only)",
-                    IDC_CHK_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,
-                    11,191,10
-    PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,202,9,47,12
+    PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,133,9,47,12
     LTEXT           "WARNING: EXPERIMENTAL FEATURE!",IDC_STATIC,7,23,122,8
     LTEXT           "Min. width:",IDC_STATIC,7,45,50,8
     EDITTEXT        IDC_ED_MINWIDTH,60,42,44,14,ES_AUTOHSCROLL
@@ -126,6 +130,8 @@ BEGIN
     LTEXT           "&Position:",IDC_STATIC,7,80,53,8
     COMBOBOX        IDC_CB_POSITION,60,78,106,101,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP
+    CONTROL         "&Enable FlashFolder for this dialog",IDC_CHK_ENABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,121,10
 END
 
 IDD_PAGE_GENERIC DIALOGEX 0, 0, 199, 157
@@ -329,7 +335,7 @@ BEGIN
     IDD_PAGE_COMMON_OPENWITHDLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 249
+        RIGHTMARGIN, 189
         VERTGUIDE, 60
         TOPMARGIN, 7
         BOTTOMMARGIN, 103

@@ -40,7 +40,8 @@ CFFConfigDlg::CFFConfigDlg(CWnd* pParent /*=NULL*/)
 	AddPage( &m_pageGeneric );
 	AddPage( &m_pageCommonFileDlg );
 	AddPage( &m_pageCommonDirDlg );
-	AddPage( &m_pageCommonOpenWithDlg );
+	if( GetOsVersion() <= 0x0500 )
+		AddPage( &m_pageCommonOpenWithDlg );
 	AddPage( &m_pageMsoFileDlg );
 
 	// See http://support.microsoft.com/default.aspx?scid=kb%3Ben-us%3BQ158552 for why 
