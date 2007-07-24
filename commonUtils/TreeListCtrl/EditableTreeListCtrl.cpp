@@ -398,6 +398,53 @@ void CEditableTreeListCtrl::OnTimer( UINT_PTR id )
 
 //-----------------------------------------------------------------------------------------------
 
+void CEditableTreeListCtrl::Cut()
+{
+	m_clipboard.childs.clear();
+	CTreeItemList selection;
+	GetTree().GetSelectedList( selection );
+	CopyItemList( &m_clipboard, selection );
+
+	DeleteItemList( selection );	
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CEditableTreeListCtrl::Copy()
+{
+	m_clipboard.childs.clear();
+	CTreeItemList selection;
+	GetTree().GetSelectedList( selection );
+	CopyItemList( &m_clipboard, selection );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CEditableTreeListCtrl::Paste()
+{
+	AutoRedraw redraw( GetTree() );
+
+	HTREEITEM hParent = TVI_ROOT, hInsert = TVI_LAST;
+	if( HTREEITEM hFocusedItem = GetTree().GetFocusedItem() )
+	{
+		hParent = GetTree().GetParentItem( hFocusedItem );
+		hInsert = hFocusedItem;
+	}
+	GetTree().SelectAll( FALSE );
+	InsertItems( hParent, hInsert, m_clipboard );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CEditableTreeListCtrl::Delete()
+{
+	CTreeItemList selection;
+	GetTree().GetSelectedList( selection );
+	DeleteItemList( selection );
+}
+
+//-----------------------------------------------------------------------------------------------
+
 BOOL CEditableTreeListCtrl::OnKeyDown( NMHDR* pnm_, LRESULT* pResult )
 {
 	NMTVKEYDOWN* pnm = reinterpret_cast<NMTVKEYDOWN*>( pnm_ );
@@ -409,42 +456,19 @@ BOOL CEditableTreeListCtrl::OnKeyDown( NMHDR* pnm_, LRESULT* pResult )
 
 	if( isCtrl && ( chl == 'c' || ch == VK_INSERT ) )
 	{
-		//--- copy
-
-		m_clipboard.childs.clear();
-		CTreeItemList selection;
-		GetTree().GetSelectedList( selection );
-		CopyItemList( &m_clipboard, selection );
+		Copy();
 	}
 	else if( isCtrl && chl == 'x' || isShift && ch == VK_DELETE )
 	{
-		//--- cut
-
-		m_clipboard.childs.clear();
-		CTreeItemList selection;
-		GetTree().GetSelectedList( selection );
-		CopyItemList( &m_clipboard, selection );
-
-		DeleteItemList( selection );
+		Cut();
 	}
 	else if( isCtrl && chl == 'v' || isShift && ch == VK_INSERT )
 	{
-		//--- paste
-
-		AutoRedraw redraw( GetTree() );
-
-		if( HTREEITEM hFocusedItem = GetTree().GetFocusedItem() )
-		{
-			GetTree().SelectAll( FALSE );
-
-			InsertItems( GetTree().GetParentItem( hFocusedItem ), hFocusedItem, m_clipboard );
-		}
+		Paste();
 	}
 	else if( ch == VK_DELETE )
 	{
-		CTreeItemList selection;
-		GetTree().GetSelectedList( selection );
-		DeleteItemList( selection );
+		Delete();
 	}
 
 	return FALSE; // enable parent to handle message
@@ -607,7 +631,7 @@ void CEditableTreeListCtrl::InsertItems(
 	HTREEITEM hParent, HTREEITEM hInsertAfter, const TreeData& data )
 {
 	bool isExpanded = true;
-	if( hParent )
+	if( hParent && hParent != TVI_ROOT )
 		isExpanded = ( GetTree().GetItemState( hParent, TVIS_EXPANDED ) & TVIS_EXPANDED ) != 0;
 	
 	InsertItems_worker( hParent, hInsertAfter, data, isExpanded );

@@ -64,4 +64,6 @@ private:
 	CEditEx m_edTargetPath;
 
 	HTREEITEM m_hSelItem;
+public:
+	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
 };

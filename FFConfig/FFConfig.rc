@@ -43,6 +43,20 @@ IDC_DRAGCURSOR          CURSOR                  "res\\dragging.cur"
 // Menu
 //
 
+IDR_FAVORITES_CONTEXTMENU MENU 
+BEGIN
+    POPUP "FavContext"
+    BEGIN
+        MENUITEM "&New item",                   ID_FAVCONTEXT_NEWITEM
+        MENUITEM "New &divider",                ID_FAVCONTEXT_NEWDIVIDER
+        MENUITEM "New &submenu",                ID_FAVCONTEXT_NEWSUBMENU
+        MENUITEM SEPARATOR
+        MENUITEM "&Cut\tCtrl+X",                ID_FAVCONTEXT_CUT
+        MENUITEM "C&opy\tCtrl+C",               ID_FAVCONTEXT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_FAVCONTEXT_PASTE
+        MENUITEM "D&elete\tDel",                ID_FAVCONTEXT_REMOVE
+    END
+END
 
 #endif    // Deutsch (Deutschland) resources
 /////////////////////////////////////////////////////////////////////////////

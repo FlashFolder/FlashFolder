@@ -247,13 +247,13 @@ UINT CMultiSelTree::GetItemState(HTREEITEM hItem, UINT nStateMask) const
 BOOL CMultiSelTree::SelectItem(HTREEITEM hItem)
 {
 	if (m_bMulti) {
-		TRACE(_T("Use SetItemState or FocusItem when in multi-select mode\n"));
+		TRACE(_T("Use SetItemState or SetFocusedItem when in multi-select mode\n"));
 		ASSERT(FALSE);
 	}
 	return CTreeCtrl::SelectItem(hItem);
 }
 
-BOOL CMultiSelTree::FocusItem(HTREEITEM hItem)
+BOOL CMultiSelTree::SetFocusedItem(HTREEITEM hItem)
 {
 	ASSERT(m_bMulti);
 

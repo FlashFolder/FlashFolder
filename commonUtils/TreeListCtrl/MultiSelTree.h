@@ -71,7 +71,7 @@ public:
 	//Note: GetSelectedItem should be taken as GetFocusedItem
 	// when in multi-select mode
 	HTREEITEM GetFocusedItem() const {ASSERT(m_bMulti);return CTreeCtrl::GetSelectedItem();};
-	BOOL FocusItem(HTREEITEM hItem);
+	BOOL SetFocusedItem(HTREEITEM hItem);
 
 	BOOL SetMultiSelect(BOOL bMulti);
 	BOOL IsMultiSelect() const {return m_bMulti;};

@@ -96,6 +96,7 @@ BEGIN_MESSAGE_MAP(CFolderFavoritesDlg, CResizableDlg)
 	ON_BN_CLICKED( IDC_BTN_IMPORT, OnBnClickedBtnImport )
 	ON_BN_CLICKED(IDC_BTN_TARGETBROWSE, OnBnClickedBtnTargetbrowse)
 	ON_BN_CLICKED(IDC_BTN_REVERT, OnBnClickedBtnRevert)
+	ON_WM_CONTEXTMENU()
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
@@ -622,19 +623,7 @@ void CFolderFavoritesDlg::OnBnClickedBtnAddSubmenu()
 
 void CFolderFavoritesDlg::OnBnClickedBtnRemove()
 {
-	CTreeItemList selection;
-	m_tree.GetTree().GetSelectedList( selection );
-	m_tree.DeleteItemList( selection );
-
-	// if an "-empty-" item is selected, then update button state by reselecting the item
-	HTREEITEM hItem = m_tree.GetTree().GetFocusedItem();
-	if( m_tree.IsItemDummy( hItem ) )
-	{
-		m_tree.GetTree().SelectAll( FALSE );
-		m_tree.GetTree().SetItemState( hItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
-	}
-
-	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+	m_tree.Delete();
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -642,6 +631,93 @@ void CFolderFavoritesDlg::OnBnClickedBtnRemove()
 void CFolderFavoritesDlg::OnBnClickedBtnRevert()
 {
 	LoadFavorites();
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CFolderFavoritesDlg::OnContextMenu(CWnd* pWnd, CPoint pt )
+{
+	if( pWnd != &m_tree.GetTree() )
+	{
+		CDialog::OnContextMenu( pWnd, pt );
+		return;
+	}
+
+	CPoint menuPos;
+
+	if( pt.x != -1 || pt.y != -1 )
+	{
+		// Context menu has been invoked by mouse, position it at cursor pos.
+
+		menuPos = pt;		
+	}
+	else
+	{
+		// Context menu handler has not been invoked by mouse, e.g. by Shift+F10.
+		// Set context menu position to focused item, if any.
+
+		if( HTREEITEM hFocused = m_tree.GetTree().GetFocusedItem() )
+		{
+			CRect rc; 
+			m_tree.GetTree().GetItemRect( hFocused, rc, TRUE );
+			menuPos = CPoint( rc.left + MapDialogX( *this, 24 ), rc.bottom );
+		}
+		else
+		{
+			menuPos = MapDialogPoint( *this, CPoint( 8, 16 ) );			
+		}
+
+		// Clip menu pos to tree rectangle (since focused item could be scolled out of view).
+		CRect rcClient;
+		m_tree.GetClientRect( rcClient );
+		m_tree.MapWindowPoints( &m_tree.GetTree(), rcClient );
+		menuPos.x = min( max( rcClient.left, menuPos.x ), rcClient.right - MapDialogX( *this, 40 ) );
+		menuPos.y = min( max( rcClient.top, menuPos.y ), rcClient.bottom - MapDialogY( *this, 20 ) );	
+
+		m_tree.GetTree().ClientToScreen( &menuPos );
+	}
+
+	CMenu menu;
+	menu.LoadMenu( IDR_FAVORITES_CONTEXTMENU );
+
+	if( m_tree.GetTree().GetSelectedCount() == 0 )
+	{
+		menu.EnableMenuItem( ID_FAVCONTEXT_CUT, MF_BYCOMMAND | MF_GRAYED );
+		menu.EnableMenuItem( ID_FAVCONTEXT_COPY, MF_BYCOMMAND | MF_GRAYED );
+		menu.EnableMenuItem( ID_FAVCONTEXT_REMOVE, MF_BYCOMMAND | MF_GRAYED );
+	}
+	if( ! m_tree.CanPaste() )
+		menu.EnableMenuItem( ID_FAVCONTEXT_PASTE, MF_BYCOMMAND | MF_GRAYED );
+
+    UINT cmd = (UINT) menu.GetSubMenu( 0 )->TrackPopupMenu( TPM_RETURNCMD | TPM_LEFTALIGN, menuPos.x, menuPos.y, this );
+	if( cmd == 0 )
+		return;
+
+	switch( cmd )
+	{
+		case ID_FAVCONTEXT_NEWITEM:
+			OnBnClickedBtnAdd();
+			break;
+		case ID_FAVCONTEXT_NEWDIVIDER:
+			OnBnClickedBtnAddDivider();
+			break;
+		case ID_FAVCONTEXT_NEWSUBMENU:
+			OnBnClickedBtnAddSubmenu();
+			break;
+		case ID_FAVCONTEXT_CUT:
+			m_tree.Cut();
+			break;
+		case ID_FAVCONTEXT_COPY:
+			m_tree.Copy();
+			break;
+		case ID_FAVCONTEXT_PASTE:
+			m_tree.Paste();
+			break;
+		case ID_FAVCONTEXT_REMOVE:
+			m_tree.Delete();
+			break;
+		default: ASSERT( false );
+	}
 }
 
 //-----------------------------------------------------------------------------------------------

@@ -68,6 +68,17 @@ public:
 	/// Specifiy drag cursor resource.
 	void SetDragCursor( HINSTANCE hInstance, LPCTSTR resourceId );
 
+	/// cut operation (Ctrl+X)
+	void Cut();
+	/// copy operation (Ctrl+C)
+	void Copy();
+	/// paste operation (Ctrl+V)
+	void Paste();
+	/// delete operation (Del)
+	void Delete();
+	/// is paste enabled (if cut / copy occured previously)
+	bool CanPaste() const { return ! m_clipboard.childs.empty(); }
+
 protected:
 	virtual BOOL OnInitDialog();
 	afx_msg BOOL OnBeginDrag( NMHDR* pnm_, LRESULT* pRes );

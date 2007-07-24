@@ -109,6 +109,8 @@ protected:
 	afx_msg void OnKeyDown( UINT ch, UINT repCnt, UINT flags );
 	afx_msg LRESULT OnInsertItem( WPARAM wp, LPARAM lp );
 	afx_msg void OnTimer( UINT_PTR id );
+	afx_msg void OnRButtonDown( UINT nFlags, CPoint pt );
+	afx_msg void OnRButtonUp( UINT nFlags, CPoint pt );
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -316,6 +318,7 @@ protected:
 	afx_msg void OnNcPaint();
 	afx_msg LRESULT VerifyThemeState( WPARAM wp = 0, LPARAM lp = 0 );
 	afx_msg void OnSysColorChange();
+	void OnContextMenu(CWnd* pWnd, CPoint pt );
 	DECLARE_MESSAGE_MAP()
 
 	int GetItemTextWidth( HTREEITEM hItem, int nCol, CDC& dc, const CRect& subItemMargins );

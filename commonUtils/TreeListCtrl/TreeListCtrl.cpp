@@ -301,6 +301,8 @@ BEGIN_MESSAGE_MAP(CTreeListCtrl_tree, CTreeListCtrl_tree::base)
 	ON_WM_KEYDOWN()
 	ON_MESSAGE( TVM_INSERTITEM, OnInsertItem )
 	ON_WM_TIMER()
+	ON_WM_RBUTTONDOWN()
+	ON_WM_RBUTTONUP()
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------
@@ -1149,6 +1151,41 @@ LRESULT CTreeListCtrl_tree::OnInsertItem( WPARAM wp, LPARAM lp )
 	return res;
 }
 
+//-----------------------------------------------------------------------------------------------
+
+void CTreeListCtrl_tree::OnRButtonDown( UINT nFlags, CPoint pt )
+{
+	// Don't call default handler, since it	messes things up when we want to provide a context menu.
+
+	// Select / focus item under mouse cursor as necessary.
+	UINT flags = 0;
+	HTREEITEM hItem = HitTest( pt, &flags );
+	if( hItem && ! ( flags & TVHT_ONITEMINDENT ) )
+	{
+		UINT state = TVIS_FOCUSED;
+		if( ( GetItemState( hItem, TVIS_SELECTED ) & TVIS_SELECTED ) == 0 )
+		{
+			SelectAll( FALSE );
+			state |= TVIS_SELECTED;
+		}
+		SetItemState( hItem, state, state );
+	}
+	else
+	{
+		SetFocusedItem( NULL );
+		SelectAll( FALSE );
+	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CTreeListCtrl_tree::OnRButtonUp( UINT nFlags, CPoint pt )
+{
+	// Send context menu message that is hidden by default right-click handler of tree control.
+	SendMessage( WM_CONTEXTMENU, 
+		reinterpret_cast<WPARAM>( m_pParent->GetSafeHwnd() ), GetMessagePos() );
+}
+
 
 //============================================================================================
 //  CTreeListCtrl methods
@@ -1165,6 +1202,7 @@ BEGIN_MESSAGE_MAP(CTreeListCtrl, CDialog)
 	ON_MESSAGE( WM_THEMECHANGED, VerifyThemeState )
 	ON_MESSAGE( WM_STYLECHANGED, VerifyThemeState )
 	ON_WM_SYSCOLORCHANGE()
+	ON_WM_CONTEXTMENU()
 END_MESSAGE_MAP()
 
 //--------------------------------------------------------------------------------------------
@@ -1662,6 +1700,17 @@ void CTreeListCtrl::OnSysColorChange()
 	m_tree.HandleSysColorChange();
 	m_headerCtrl.SendMessage( WM_SYSCOLORCHANGE );
 	m_horizScrollBar.SendMessage( WM_SYSCOLORCHANGE );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CTreeListCtrl::OnContextMenu(CWnd* pWnd, CPoint pt )
+{
+	// forward WM_CONTEXTMENU from CTreeCtrl to parent of CTreeListCtrl
+	CDialog::OnContextMenu( pWnd, pt );
+	
+	const MSG* pMsg = GetCurrentMessage();
+	GetParent()->SendMessage( WM_CONTEXTMENU, pMsg->wParam, pMsg->lParam );
 }
 
 //-----------------------------------------------------------------------------------------------
