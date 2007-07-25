@@ -122,7 +122,11 @@ inline DWORD BlendColor( DWORD col1, DWORD col2, int blend = 128 )
 
 /// Preferred way to get the standard font for text in dialog boxes as opposed to
 /// GetStockObject( DEFAULT_GUI_FONT ) which returns the wrong font on XP / Vista and doesn't 
-/// respect themes.
+/// respect themes.\n
+/// NOTE: When using a high-DPI setting, the resulting font size is too big, i.e. the font size
+/// differs from the dialog font that was set in the dialog template.
+ 
+
 void GetSysMessageFont( LOGFONT* plf, HWND hwnd );
 
 #ifdef _MFC_VER
