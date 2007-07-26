@@ -28,7 +28,8 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 #ifdef _MSC_VER
-	#pragma warning(disable:4018)		//conflict between signed/unsigned
+	#pragma warning(disable:4018)		// conflict between signed/unsigned
+	#pragma warning(disable:4244)		// numeric conversion
 #endif
 
 //-----------------------------------------------------------------------------------------------
