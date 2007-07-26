@@ -52,7 +52,7 @@ END
 // RT_MANIFEST
 //
 
-1                       RT_MANIFEST             "res\\xp_manifest.xml"
+ISOLATIONAWARE_MANIFEST_RESOURCE_ID        RT_MANIFEST             "res\\xp_manifest.xml"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -146,4 +146,3 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-
