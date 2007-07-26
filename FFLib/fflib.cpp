@@ -63,7 +63,7 @@ auto_ptr<FileDlgHook_base> g_spOpenWithDlgHook;   // ptr to the hook instance
 
 HWND g_hToolWnd = NULL;					// handle of cool external tool window
 WNDPROC g_wndProcToolWindowEditPath;
-HIMAGELIST g_hToolbarImages; 
+HIMAGELIST g_hToolbarImages = NULL; 
 
 TCHAR g_favIniFilePath[MAX_PATH+1];		// Path to INI-File with favorite folders
 
@@ -841,8 +841,11 @@ void OnDestroy( bool isOkBtnPressed )
 	g_hFileDialog = NULL;
 
 	//--- destroy additional resources
-	::ImageList_Destroy( g_hToolbarImages );
-	g_hToolbarImages = NULL;
+	if( g_hToolbarImages )
+	{
+		::ImageList_Destroy( g_hToolbarImages );
+		g_hToolbarImages = NULL;
+	}
 }
 
 void SetTimer( DWORD interval )
