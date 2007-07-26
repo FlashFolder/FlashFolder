@@ -210,6 +210,8 @@ void CFolderFavoritesDlg::LoadFavorites_worker( HTREEITEM hParent, const Favorit
 			// insert submenu recursively
 
 			hItem = m_tree.InsertItem( fav.title.substr( 1 ).c_str(), 0, 0, hParent, TVI_LAST );
+			m_tree.SetItemIsFolder( hItem );
+
 			++iItem;
 
 			LoadFavorites_worker( hItem, favs, iItem );			
@@ -287,6 +289,11 @@ void CFolderFavoritesDlg::SaveFavorites_worker( FavoritesList& favs, HTREEITEM h
 
 			if( m_tree.HasRealChildren( hItem ) )
 				SaveFavorites_worker( favs, hItem );
+
+			// end of submenu
+			FavoritesItem fav;
+			fav.title = _T("--");
+			favs.push_back( fav );
 		}
 		else
 		{
@@ -313,13 +320,6 @@ void CFolderFavoritesDlg::SaveFavorites_worker( FavoritesList& favs, HTREEITEM h
 				favs.push_back( fav );		
 			}
 		}
-	}
-	if( hParent != TVI_ROOT )
-	{
-		// end of submenu
-		FavoritesItem fav;
-		fav.title = _T("--");
-		favs.push_back( fav );
 	}
 }
 
