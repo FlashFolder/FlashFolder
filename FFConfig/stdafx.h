@@ -18,7 +18,7 @@
 
 #pragma warning(disable:4995)  // caused by strsafe.h
 
-//--- WMFC headers
+//--- MFC headers
 
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions

@@ -20,6 +20,8 @@
 #include "FFConfig.h"
 #include "FolderFavoritesDlg.h"
 
+#pragma warning(disable:4244) // numeric conversion
+
 //-----------------------------------------------------------------------------------------------
 
 enum FavCols
