@@ -186,6 +186,11 @@ void CFolderFavoritesDlg::LoadFavorites()
 	LoadFavorites_worker( TVI_ROOT, favs, iItem );
 
 	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( FALSE );
+
+	// select first item (if any)
+	m_tree.GetTree().SelectAll( FALSE );
+	if( HTREEITEM hItem = m_tree.GetTree().GetChildItem( TVI_ROOT ) )
+		m_tree.GetTree().SetItemState( hItem, TVIS_SELECTED | TVIS_FOCUSED, TVIS_SELECTED | TVIS_FOCUSED );
 }
 
 //-----------------------------------------------------------------------------------------------
