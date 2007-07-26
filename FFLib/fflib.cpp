@@ -55,7 +55,7 @@ HHOOK g_hHook = NULL;						// handle of the hook
 //-----------------------------------------------------------------------------------------
 // global variables that are "local" to each instance of the DLL  
 //-----------------------------------------------------------------------------------------
-HMODULE g_hInstDll = NULL;
+HINSTANCE g_hInstDll = NULL;
 HWND g_hFileDialog = NULL;				// handle of file open/save dialog 
 
 auto_ptr<FileDlgHook_base> g_spFileDlgHook;   // ptr to the hook instance
@@ -63,6 +63,7 @@ auto_ptr<FileDlgHook_base> g_spOpenWithDlgHook;   // ptr to the hook instance
 
 HWND g_hToolWnd = NULL;					// handle of cool external tool window
 WNDPROC g_wndProcToolWindowEditPath;
+HIMAGELIST g_hToolbarImages = NULL; 
 
 TCHAR g_favIniFilePath[MAX_PATH+1];		// Path to INI-File with favorite folders
 
@@ -76,7 +77,7 @@ int g_globalHistoryMaxEntries;
 //-----------------------------------------------------------------------------------------
 // DLL entry point
 //-----------------------------------------------------------------------------------------
-BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved )
+BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved )
 {
     switch( ul_reason_for_call )
     {
@@ -589,7 +590,7 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			
 				NMTTDISPINFO* pTTT = reinterpret_cast<NMTTDISPINFO*>( pnm );
 
-				pTTT->hinst = (HINSTANCE) g_hInstDll;
+				pTTT->hinst = g_hInstDll;
 			
 				if( pTTT->hdr.idFrom == ID_FF_LASTDIR )
 				{
@@ -726,34 +727,33 @@ void CreateToolWindow( bool isFileDialog )
 		tbButtons.push_back( btn );
 	}
 
-	//--- check whether 32 bpp bitmap for toolbar is supported by OS (if OS >= WinXP AND application
-	//    has XP manifest AND display is in truecolor mode) 
+	// Check whether the 32 bpp version of the toolbar bitmap is supported. 
+	// For this, OS must be >= WinXP and display mode >= 16 bpp.
+	bool isToolbar32bpp = false;
+	OSVERSIONINFO ovi = { sizeof(ovi) };
+	::GetVersionEx( &ovi );
+	if( ( ovi.dwMajorVersion << 8 | ovi.dwMinorVersion ) >= 0x0501 )
+	{
+		HDC hScreenIC = ::CreateIC( _T("DISPLAY"), NULL, NULL, NULL );
+		isToolbar32bpp = ::GetDeviceCaps( hScreenIC, BITSPIXEL ) >= 16;
+		::DeleteDC( hScreenIC );
+	}
 
-	UINT tbBitmapId = ID_FF_TOOLBAR;
-	if( HMODULE hMod = ::GetModuleHandle( _T("comctl32.dll") ) )
-		if(	DLLGETVERSIONPROC pGetVersion = reinterpret_cast<DLLGETVERSIONPROC>( 
-				::GetProcAddress( hMod, "DllGetVersion" ) ) )
-		{
-			DLLVERSIONINFO ver = { sizeof(ver) };
-			if( pGetVersion( &ver ) == NOERROR  )
-				if( ver.dwMajorVersion >= 6 )
-				{
-					// This is awkward - toolbar alpha channel should work with >= 16 bpp.
-					// TB_SETIMAGELIST should be the way but I couldn't figure out how to get it
-					// work everywhere (e.g. in explorer the toolbar shows no icons).
-					HDC hScreenIC = ::CreateIC( _T("DISPLAY"), NULL, NULL, NULL );
-					if( ::GetDeviceCaps( hScreenIC, BITSPIXEL ) >= 32 )
-						tbBitmapId = ID_FF_TOOLBAR_XP;
-					::DeleteDC( hScreenIC );
-				}
-		}
-
-	//--- create the toolbar
     HWND hTb = ::CreateToolbarEx( g_hToolWnd, WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | 
 		CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS, 
-		ID_FF_TOOLBAR, tbButtons.size(), (HINSTANCE) g_hInstDll, tbBitmapId, &tbButtons[ 0 ], 
-		tbButtons.size(), 16,16, 16,16, sizeof(TBBUTTON) );
+		ID_FF_TOOLBAR, tbButtons.size(), 
+		isToolbar32bpp ? NULL : g_hInstDll, isToolbar32bpp ? 0 : ID_FF_TOOLBAR, 
+		&tbButtons[ 0 ], tbButtons.size(), 16,16, 16,16, sizeof(TBBUTTON) );
+
 	::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS );
+
+	if( isToolbar32bpp )
+	{
+		g_hToolbarImages = ::ImageList_LoadImage( g_hInstDll, MAKEINTRESOURCE( ID_FF_TOOLBAR_XP ), 
+			16, 1, CLR_NONE, IMAGE_BITMAP, LR_CREATEDIBSECTION );
+		::SendMessage( hTb, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>( g_hToolbarImages ) );
+	}
+
 	::SendMessage( hTb, TB_AUTOSIZE, 0, 0 );
 
 	// calculate width of the toolbar from position of last button (TB_GETMAXSIZE has a bug under Win2k!)
@@ -772,7 +772,7 @@ void CreateToolWindow( bool isFileDialog )
 		xEdit, rcDiv.bottom, 
 		rcClient.right - rcClient.left - xEdit - rcDivR.right, 
 		rcClient.bottom - rcClient.top - rcDiv.bottom * 2, 
-		g_hToolWnd, (HMENU) ID_FF_PATH, (HINSTANCE) g_hInstDll, NULL);
+		g_hToolWnd, (HMENU) ID_FF_PATH, g_hInstDll, NULL);
 	// enable auto-complete for the edit control
 	::SHAutoComplete( hEdit, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
 	//sub-class the edit control to handle key-stroke messages
@@ -839,6 +839,13 @@ void OnDestroy( bool isOkBtnPressed )
 	::DestroyWindow( g_hToolWnd );
 	g_hToolWnd = NULL;
 	g_hFileDialog = NULL;
+
+	//--- destroy additional resources
+	if( g_hToolbarImages )
+	{
+		::ImageList_Destroy( g_hToolbarImages );
+		g_hToolbarImages = NULL;
+	}
 }
 
 void SetTimer( DWORD interval )
@@ -999,7 +1006,7 @@ DLLFUNC bool InstallHook()
 		::OutputDebugString( _T("[fflib] creating hook...\n") );
 
         // Install the hook
-		g_hHook = ::SetWindowsHookEx( WH_CBT, HookProc, (HINSTANCE) g_hInstDll, 0 );
+		g_hHook = ::SetWindowsHookEx( WH_CBT, HookProc, g_hInstDll, 0 );
 
 		TCHAR s[256]; StringCbPrintf( s, sizeof(s), _T("[fflib] g_hHook = %08Xh\n"), g_hHook );
 		::OutputDebugString( s );
