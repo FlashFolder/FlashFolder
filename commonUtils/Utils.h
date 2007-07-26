@@ -45,15 +45,6 @@ bool IsIniSectionNotEmpty( LPCTSTR filename, LPCTSTR sectionName );
 
 void AddTextInput( std::vector<INPUT>* pInput, LPCTSTR pText );
 
-inline void ScreenToClientRect( HWND hwnd, RECT* prc )
-{
-	POINT pt1 = { prc->left, prc->top };
-	::ScreenToClient( hwnd, &pt1 );
-	POINT pt2 = { prc->right, prc->bottom };
-	::ScreenToClient( hwnd, &pt2 );
-	prc->left = pt1.x; prc->top = pt1.y; prc->right = pt2.x; prc->bottom = pt2.y;
-}
-
 /// Get runtime OS version, high-byte = major version, low-byte = minor version.
 /// e.g. 0x0500 = Win2k, 0x0501 = WinXP, 0x0600 = Vista
 inline WORD GetOsVersion()

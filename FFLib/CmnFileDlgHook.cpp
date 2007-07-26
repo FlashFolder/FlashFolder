@@ -54,9 +54,9 @@ bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 	//--- read settings from INI file ---
 	m_minFileDialogWidth = MapProfileX( hwndTool, g_profile.GetInt( _T("CommonFileDlg"), _T("MinWidth") ) );
 	m_minFileDialogHeight = MapProfileY( hwndTool, g_profile.GetInt( _T("CommonFileDlg"), _T("MinHeight") ) );
-	m_centerFileDialog = g_profile.GetInt( _T("CommonFileDlg"), _T("Center") ) );
+	m_centerFileDialog = g_profile.GetInt( _T("CommonFileDlg"), _T("Center") );
 	m_folderComboHeight = MapProfileY( hwndTool, g_profile.GetInt( _T("CommonFileDlg"), _T("FolderComboHeight") ) );
-	m_filetypesComboHeight = MapProfileY( hwndToolg_profile.GetInt( _T("CommonFileDlg"), _T("FiletypesComboHeight") ) );
+	m_filetypesComboHeight = MapProfileY( hwndTool, g_profile.GetInt( _T("CommonFileDlg"), _T("FiletypesComboHeight") ) );
 	m_bResizeNonResizableDlgs = g_profile.GetInt( _T("CommonFileDlg"), _T("ResizeNonResizableDialogs") ) != 0;
 
     //--- check exclusion list for resizing of non-resizable dialogs

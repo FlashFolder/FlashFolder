@@ -29,3 +29,5 @@ typedef std::vector<FavoritesItem> FavoritesList;
 
 void GetDirFavorites( FavoritesList* pList );
 void SetDirFavorites( const FavoritesList& list );
+
+int GetFavItemByPath( const FavoritesList& favs, LPCTSTR pPath );

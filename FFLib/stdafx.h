@@ -5,6 +5,7 @@
 
 #define WINVER 0x0501
 #define _WIN32_WINNT 0x0501
+#define _WIN32_WINDOWS 0x0501 
 #define _WIN32_IE 0x0600
 
 //--- windows headers
@@ -16,6 +17,7 @@
 #include <dlgs.h>
 #include <shlwapi.h>
 #include <shellapi.h>
+#include <uxtheme.h>
 
 //--- crt headers
 #include <tchar.h>
@@ -37,6 +39,7 @@ using namespace std;
 #include "../_version.h"
 #include "../commonUtils/tstring.h"
 #include "../commonUtils/Utils.h"
+#include "../commonUtils/GdiUtils.h"
 #include "../commonUtils/Profile.h"
 #include "../commonUtils/NtKernelApi.h"
 #include "../commonUtils/NtKernelUtils.h"
@@ -45,4 +48,6 @@ using namespace std;
 #include "../common/Favorites.h"
 #include "../common/ff_utils.h"
 #include "../common/HistoryLst.h"
+#include "../common/ProfileDefaults.h"
+
 

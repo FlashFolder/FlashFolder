@@ -202,6 +202,7 @@ int DisplayFolderMenu( HMENU hMenu, int buttonID )
 	int id = TrackPopupMenu(hMenu, 
 		TPM_LEFTALIGN | TPM_TOPALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD | TPM_NONOTIFY, 
 		rc.left, rc.bottom, 0, g_hToolWnd, NULL);
+
 	if( id > 0 )
 	{
         // get directory path from menu item text
@@ -378,31 +379,81 @@ void DisplayMenu_OpenDirs()
 //-----------------------------------------------------------------------------------------
 // display favorite folders menu
 
+void CreateMenu_Favorites( HMENU hMenu, const FavoritesList& favs, size_t& iItem )
+{
+	while( iItem < favs.size() )
+	{
+		const FavoritesList::value_type& fav = favs[ iItem ];
+		
+		if( fav.title == _T("--") )
+		{
+			// end of submenu
+
+			++iItem;
+			return;
+		}
+		else if( fav.title.size() > 1 && fav.title.substr( 0, 1 ) == _T("-") )
+		{
+			// insert submenu recursively
+
+			HMENU hSubMenu = ::CreatePopupMenu();
+			::AppendMenu( hMenu, MF_POPUP | MF_STRING, reinterpret_cast<UINT_PTR>( hSubMenu ),
+				fav.title.substr( 1 ).c_str() );
+
+			++iItem;
+
+			CreateMenu_Favorites( hSubMenu, favs, iItem );			
+		}
+		else if( fav.title == _T("-") )
+		{
+			// insert divider
+			
+			::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
+
+			++iItem;
+		}
+		else
+		{
+			// insert normal item
+
+			::AppendMenu( hMenu, MF_STRING, iItem + 1, fav.title.c_str() );
+
+			++iItem;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
 void DisplayMenu_Favorites()
 {
+	//--- create menu
+
+	FavoritesList favs;
+	GetDirFavorites( &favs );
+
     HMENU hMenu = ::CreatePopupMenu();
+	size_t iItem = 0;
+	CreateMenu_Favorites( hMenu, favs, iItem );
 
-	FavoritesList dirList;
-	GetDirFavorites( &dirList );
-	if( dirList.size() > 0 )
-	{
-		vector<tstring> simpleDirList;
-		for( int i = 0; i != dirList.size(); ++i )
-		{
-			if( IsFilePath( dirList[ i ].command.c_str() ) )
-				simpleDirList.push_back( dirList[ i ].command );
-			else if( dirList[ i ].title == _T("-") )
-				simpleDirList.push_back( _T("-") );
-		}
-		CreateFolderMenu( simpleDirList, hMenu );
-		AppendMenu(hMenu, MF_SEPARATOR, 0, NULL);
-	}
+	if( ! favs.empty() )
+		::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
 
-	AppendMenu(hMenu, MF_STRING, 1000, _T("&Add current folder") );
-	AppendMenu(hMenu, MF_STRING, 1001, _T("&Configure...") );
-	
-	int id = DisplayFolderMenu( hMenu, ID_FF_FAVORITES );
-	
+	::AppendMenu( hMenu, MF_STRING, 1000, _T("&Add current folder") );
+	::AppendMenu( hMenu, MF_STRING, 1001, _T("&Configure...") );
+
+	//--- show menu
+
+	HWND hTb = GetDlgItem( g_hToolWnd, ID_FF_TOOLBAR );
+	RECT rc;
+	::SendMessage( hTb, TB_GETRECT, ID_FF_FAVORITES, reinterpret_cast<LPARAM>( &rc ) );
+	ClientToScreenRect( hTb, &rc );
+
+	int id = ::TrackPopupMenu( hMenu, TPM_RETURNCMD | TPM_NONOTIFY, 
+		rc.left, rc.bottom, 0, g_hToolWnd, NULL );
+
+	//--- execute selected command
+
 	if( id == 1000 )
 	{
 		//--- add current folder to favorite folders 
@@ -410,23 +461,21 @@ void DisplayMenu_Favorites()
 		TCHAR path[ MAX_PATH + 1 ];
 		if( g_spFileDlgHook->GetFolder( path ) )
 		{
-			//check if current folder already exists in the list
-			bool bExists = false;
-			for( int i = 0; i != dirList.size() && ! bExists; ++i )
-				bExists = _tcsicmp( dirList[ i ].command.c_str(), path ) == 0;	
-
-			if( ! bExists )
+			// add item only if current folder doesn't already exists in the list
+			if( GetFavItemByPath( favs, path ) == -1 )
 			{
 				FavoritesItem item;
 				item.title = path;
-				item.command = path;
-				dirList.push_back( item );
-				SetDirFavorites( dirList );
+				item.command = tstring( _T("cd ") ) + path;
+				favs.push_back( item );
+				SetDirFavorites( favs );
 			}
 		}
 	}
 	else if( id == 1001 )
 	{
+		//--- start the favorites editor
+
 		TCHAR path[ MAX_PATH + 1 ] = _T("");
 		GetAppDir( g_hInstDll, path );
 		StringCbCat( path, sizeof(path), _T("FFConfig.exe") );
@@ -436,8 +485,32 @@ void DisplayMenu_Favorites()
 
 		::ShellExecute( g_hToolWnd, _T("open"), path, params, NULL, SW_SHOW );
 	}
+	else if( id > 0 )
+	{
+		//--- execute favorites menu item
 
-	DestroyMenu(hMenu);
+		const FavoritesItem& fav = favs[ id - 1 ];
+
+		tstring path;
+		tstring token, args;
+		SplitTcCommand( fav.command.c_str(), &token, &args );
+
+		if( _tcsicmp( token.c_str(), _T("cd") ) == 0 )
+			path = args;
+		else if( IsFilePath( fav.command.c_str() ) )
+			path = fav.command;
+
+		if( ! path.empty() )
+			if( DirectoryExists( path.c_str() ) )
+			{
+				SetDlgItemText( g_hToolWnd, ID_FF_PATH, path.c_str() );
+			
+				SetForegroundWindow( g_hFileDialog );
+				g_spFileDlgHook->SetFolder( path.c_str() );
+			}
+	}		
+
+	DestroyMenu( hMenu );
 
 	SetForegroundWindow( g_hFileDialog );
 }

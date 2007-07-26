@@ -89,3 +89,26 @@ void SetDirFavorites( const FavoritesList& list )
 		++nItem;
 	}
 }
+
+//-----------------------------------------------------------------------------------------------
+
+int GetFavItemByPath( const FavoritesList& favs, LPCTSTR pPath )
+{
+	for( size_t i = 0; i < favs.size(); ++i )
+	{
+		const FavoritesItem& fav = favs[ i ];
+
+		tstring itemPath;
+		tstring token, args;
+		SplitTcCommand( fav.command.c_str(), &token, &args );
+
+		if( _tcsicmp( token.c_str(), _T("cd") ) == 0 )
+			itemPath = args;
+		else if( IsFilePath( fav.command.c_str() ) )
+			itemPath = fav.command;
+
+		if( _tcsicmp( itemPath.c_str(), pPath ) == 0 )
+			return i;
+	}
+	return -1;
+}

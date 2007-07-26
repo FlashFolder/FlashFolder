@@ -179,3 +179,26 @@ inline RECT MapDialogRect( HWND hDlg, const RECT& rc )
 	MapDialogRect( hDlg, &res );
 	return res;
 }
+
+//-----------------------------------------------------------------------------------------------
+
+/// Convenience wrapper for ScreenToClient() API
+inline void ScreenToClientRect( HWND hwnd, RECT* prc )
+{
+	POINT pt1 = { prc->left, prc->top };
+	::ScreenToClient( hwnd, &pt1 );
+	POINT pt2 = { prc->right, prc->bottom };
+	::ScreenToClient( hwnd, &pt2 );
+	prc->left = pt1.x; prc->top = pt1.y; prc->right = pt2.x; prc->bottom = pt2.y;
+}
+
+/// Convenience wrapper for ClientToScreen() API
+inline void ClientToScreenRect( HWND hwnd, RECT* prc )
+{
+	POINT pt1 = { prc->left, prc->top };
+	::ClientToScreen( hwnd, &pt1 );
+	POINT pt2 = { prc->right, prc->bottom };
+	::ClientToScreen( hwnd, &pt2 );
+	prc->left = pt1.x; prc->top = pt1.y; prc->right = pt2.x; prc->bottom = pt2.y;
+}
+

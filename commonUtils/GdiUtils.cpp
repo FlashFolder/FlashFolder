@@ -20,6 +20,10 @@
 #include "stdafx.h"
 #include "GdiUtils.h"
 
+#ifndef TMT_MSGBOXFONT
+	#define TMT_MSGBOXFONT 805
+#endif
+
 //-----------------------------------------------------------------------------------------------
 
 void GetSysMessageFont( LOGFONT* plf, HWND hwnd )
