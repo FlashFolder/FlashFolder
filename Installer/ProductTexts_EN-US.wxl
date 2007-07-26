@@ -9,7 +9,7 @@
 	<String Id="CptUI_ProductName">FlashFolder</String>
 	<String Id="CptUI_ProductWizard">FlashFolder Setup Wizard</String>
 	<String Id="CptUI_ProductManufacturer">zett42</String>
-	<String Id="CptUI_PackageDescription">FlashFolder is an extension for file-related common dialogs (e.g. open/save dialog) that enables quick access to recently used folders and more.</String>
+	<String Id="CptUI_PackageDescription">FlashFolder extends the file-related common dialogs (e.g. open/save dialog) to provide quick access to your mostly used folders and more.</String>
 	<String Id="CptUI_PackageDescriptionShort">An extension for file-related common dialogs</String>
 
 	<String Id="CptUI_Wizard">Setup Wizard</String>
