@@ -47,7 +47,6 @@ BOOL CALLBACK CTotalCmdUtils::FindTopWnd_Proc( HWND hwnd, LPARAM lParam )
     return TRUE;
 }
 
-
 //-------------------------------------------------------------------------------------------------
 
 bool CTotalCmdUtils::GetDirs( LPTSTR pLeftDir, unsigned leftDirLen, 
@@ -58,21 +57,84 @@ bool CTotalCmdUtils::GetDirs( LPTSTR pLeftDir, unsigned leftDirLen,
 
     if( m_hwndLeft && m_hwndRight )
     {
-        ::GetWindowText( m_hwndLeft, pLeftDir, leftDirLen );
-        ::GetWindowText( m_hwndRight, pRightDir, rightDirLen );        
+		if( pLeftDir )
+			::GetWindowText( m_hwndLeft, pLeftDir, leftDirLen );
+		if( pRightDir )
+			::GetWindowText( m_hwndRight, pRightDir, rightDirLen );        
         return true;
     }
 
+	// Find the child windows which contain the left / right path
     CFindSubWindowsData data;
     data.m_thisptr = this;
-    data.m_pLeftDir = pLeftDir;
-    data.m_leftDirLen = leftDirLen;
-    data.m_pRightDir = pRightDir;
-    data.m_rightDirLen = rightDirLen;
-    
     ::EnumChildWindows( m_hwnd, FindSubWindows_Proc, reinterpret_cast<LPARAM>( &data ) );
+
+	// Determine left and right windows
+	
+	if( m_hwndLeft && m_hwndRight )
+	{
+		RECT rc1, rc2;
+		::GetWindowRect( m_hwndLeft, &rc1 );
+		::GetWindowRect( m_hwndRight, &rc2 );
+		if( rc1.left > rc2.left )
+			std::swap( m_hwndLeft, m_hwndRight );
+	}
+	if( m_hwndLeft )
+	{
+		::GetWindowText( m_hwndLeft, pLeftDir, leftDirLen );
+		// remove filter
+		if( TCHAR* p = _tcsrchr( pLeftDir, '\\' ) )
+			*(++p) = 0;
+	}
+	if( m_hwndRight )
+	{
+		::GetWindowText( m_hwndRight, pRightDir, rightDirLen );
+		// remove filter
+		if( TCHAR* p = _tcsrchr( pRightDir, '\\' ) )
+			*(++p) = 0;
+	}
     
     return m_hwndLeft || m_hwndRight;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+bool CTotalCmdUtils::GetActiveDir( LPTSTR pDir, unsigned len )
+{
+	pDir[ 0 ] = 0;
+	if( ! m_hwndActive )
+		GetDirs();
+
+    TCHAR wndtext[ MAX_PATH + 1 ] = _T("");
+    if( ::GetWindowText( m_hwndActive, wndtext, MAX_PATH ) > 0 )
+	{
+        size_t len = _tcslen( wndtext );
+        TCHAR* pLast = _tcsninc( wndtext, len - 1 );
+        if( *pLast == _T('>') )
+			*pLast = 0;
+
+		StringCchCopy( pDir, len, wndtext );
+
+		return true;
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+bool CTotalCmdUtils::IsTcmdPathControl( HWND hwnd )
+{
+    TCHAR wndtext[ MAX_PATH + 1 ] = _T("");
+    if( ::GetWindowText( hwnd, wndtext, MAX_PATH ) > 0 )
+        if( IsFilePath( wndtext ) )
+        {
+            // check if this is not the command line label
+            size_t len = _tcslen( wndtext );
+            TCHAR* pLast = _tcsninc( wndtext, len - 1 );
+            return *pLast != '>';
+		}
+	return false;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -99,24 +161,10 @@ BOOL CALLBACK CTotalCmdUtils::FindSubWindows_Proc( HWND hwnd, LPARAM lParam )
 
             if( ! bIsActive )
             {
-                RECT rc;
-                ::GetWindowRect( hwnd, &rc );
-                POINT pt = { rc.left, rc.top };
-                ::ScreenToClient( pData->m_thisptr->m_hwnd, &pt );
-                if( pt.x < 20 )
-                {
+                if( ! pData->m_thisptr->m_hwndLeft )
                     pData->m_thisptr->m_hwndLeft = hwnd;
-                    ::GetWindowText( hwnd, pData->m_pLeftDir, pData->m_leftDirLen );
-                    TCHAR* p = _tcsrchr( pData->m_pLeftDir, _T('\\') );
-                    if( p ) *p = 0;
-                }
-                else
-                {
+                else if( ! pData->m_thisptr->m_hwndRight )
                     pData->m_thisptr->m_hwndRight = hwnd;
-                    ::GetWindowText( hwnd, pData->m_pRightDir, pData->m_rightDirLen );                
-                    TCHAR* p = _tcsrchr( pData->m_pRightDir, _T('\\') ); 
-                    if( p ) *p = 0;
-                }
             }
         }
 
@@ -214,4 +262,38 @@ void SplitTcCommand( LPCTSTR pCmd, tstring* pToken, tstring* pArgs )
 			*pArgs = p;
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+bool SetTcCurrentPathesW( HWND hWndTC, LPCWSTR pPath1, LPCWSTR pPath2, DWORD flags )
+{
+	if( ! hWndTC )
+		hWndTC = CTotalCmdUtils::FindTopTCmdWnd();
+	if( ! hWndTC )
+		return false;
+
+	// Pathes must be ANSI encoded for TC
+	char ansiBuf[ MAX_PATH + 1 ];
+	char cmdBuf[ MAX_PATH * 2 + 4 ];
+	char chFlags[ 3 ] = "";
+
+	::WideCharToMultiByte( CP_ACP, 0, pPath1, -1, cmdBuf, MAX_PATH, 0, NULL );
+	::WideCharToMultiByte( CP_ACP, 0, pPath2, -1, ansiBuf, MAX_PATH, 0, NULL );
+	StringCbCatA( cmdBuf, sizeof(cmdBuf), "\r" );
+	StringCbCatA( cmdBuf, sizeof(cmdBuf), ansiBuf );
+	if( flags & STC_SOURCE_AND_TARGET )
+		StringCbCatA( chFlags, sizeof(chFlags), "S" );
+	if( flags & STC_BACKGROUND_TAB )
+		StringCbCatA( chFlags, sizeof(chFlags), "T" );
+	int len = strlen( cmdBuf );
+	StringCbCatA( cmdBuf + len + 1, sizeof(cmdBuf) - len - 1, chFlags );
+
+	// prepare TC protocol
+	COPYDATASTRUCT cd;
+	cd.dwData = 'C' | 'D' << 8;
+	cd.cbData = len + 1 + strlen( chFlags );
+	cd.lpData = cmdBuf;
+
+	return ::SendMessage( hWndTC, WM_COPYDATA, 0, reinterpret_cast<LPARAM>( &cd ) ) != 0;
 }

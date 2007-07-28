@@ -41,6 +41,17 @@ void GetAppDir( HINSTANCE hInstApp, LPTSTR szDir)
 	if( p ) p[1] = 0;
 }
 
+//-----------------------------------------------------------------------------------------------
+
+void GetAppFilename( HINSTANCE hInstApp, LPTSTR pName )
+{
+	*pName = 0;
+	TCHAR exePath[ MAX_PATH + 1 ] = _T("");
+	::GetModuleFileName( NULL, exePath, MAX_PATH );
+	if( LPTSTR p = _tcsrchr( exePath, _T('\\') ) )
+		StringCchCopy( pName, MAX_PATH, p + 1 );
+}
+
 //-----------------------------------------------------------------------------------------
 
 bool IsFilePath( LPCTSTR path )

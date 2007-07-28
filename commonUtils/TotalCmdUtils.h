@@ -28,7 +28,10 @@ class CTotalCmdUtils
 {
 public:
     CTotalCmdUtils( HWND hwndTotalCmd = NULL ) { SetTCmdWnd( hwndTotalCmd ); }
-    
+
+    static HWND FindTopTCmdWnd();
+	static bool IsTcmdPathControl( HWND hwnd );
+
     void SetTCmdWnd( HWND hwndTotalCmd ) 
     { 
         m_hwnd = hwndTotalCmd; 
@@ -37,20 +40,19 @@ public:
 
     HWND GetTCmdWnd() const { return m_hwnd; }
 
-    static HWND FindTopTCmdWnd();
+    bool GetDirs( LPTSTR pLeftDir = NULL, unsigned leftDirLen = 0, 
+                  LPTSTR pRightDir = NULL, unsigned rightDirLen = 0 );
+	bool GetActiveDir( LPTSTR pDir, unsigned len );
 
-    bool GetDirs( LPTSTR pLeftDir, unsigned leftDirLen, 
-                  LPTSTR pRightDir, unsigned rightDirLen );
+	HWND GetLeftPathWnd() const { return m_hwndLeft; }
+	HWND GetRightPathWnd() const { return m_hwndRight; }
+	HWND GetActivePathWnd() const { return m_hwndActive; }
 
 private:
     struct CFindSubWindowsData
     {
         CTotalCmdUtils* m_thisptr;
-        LPTSTR m_pLeftDir;
-        LPTSTR m_pRightDir;
-        unsigned m_leftDirLen, m_rightDirLen;
-
-        CFindSubWindowsData() { memset( this, 0, sizeof(*this) ); }
+		CFindSubWindowsData() : m_thisptr( NULL ) {}
     };
 
 private:
@@ -70,4 +72,13 @@ bool GetTotalCmdLocation( tstring* pInstallDir = NULL, tstring* pIniPath = NULL 
 /// Split a TC command
 void SplitTcCommand( LPCTSTR pCmd, tstring* pToken, tstring* pArgs = NULL );
 
+/// Bit flags for SetTcCurrentPathes()
+enum 
+{
+	STC_SOURCE_AND_TARGET = 0x0001,
+	STC_BACKGROUND_TAB    = 0x0002
+};
+
+/// Set current TC pathes
+bool SetTcCurrentPathesW( HWND hWndTC, LPCWSTR pPath1, LPCWSTR pPath2, DWORD flags = 0 );
 

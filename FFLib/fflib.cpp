@@ -46,7 +46,8 @@ using namespace std;
 
 #pragma data_seg( ".shared" )
 
-HHOOK g_hHook = NULL;						// handle of the hook
+HHOOK g_hHook = NULL;            // handle of the "window activate" hook
+HHOOK g_hMouseHook = NULL;       // handle of the mouse hook
 
 #pragma data_seg()
 #pragma comment( linker, "/SECTION:.shared,RWS" )
@@ -72,8 +73,15 @@ MemoryProfile g_profileDefaults;
 
 WORD g_osVersion = 0;
 
+TCHAR g_currentExePath[ MAX_PATH + 1 ] = _T("");
+LPCTSTR g_currentExeName = _T("");
+TCHAR g_currentExeDir[ MAX_PATH + 1 ] = _T("");
+
+HWND g_hwndTcFavmenuClick = NULL;
+
 //--- options read from profile
 int g_globalHistoryMaxEntries;
+
 
 
 //-----------------------------------------------------------------------------------------
@@ -85,12 +93,17 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
     {
 		case DLL_PROCESS_ATTACH:
 		{
-			TCHAR exePath[ MAX_PATH + 1 ] = _T("");
-			::GetModuleFileName( NULL, exePath, MAX_PATH );
+			::GetModuleFileName( NULL, g_currentExePath, MAX_PATH );
+			if( LPTSTR p = _tcsrchr( g_currentExePath, _T('\\') ) )
+			{
+				g_currentExeName = p + 1;
+				StringCbCopy( g_currentExeDir, sizeof(g_currentExeDir), g_currentExePath );
+				g_currentExeDir[ p - g_currentExePath ] = 0;
+			}
 
 			TCHAR s[512];
 			StringCbPrintf( s, sizeof(s), _T("[fflib] DLL_PROCESS_ATTACH (pid %08Xh, \"%s\")\n"), 
-				::GetCurrentProcessId(), exePath );
+				::GetCurrentProcessId(), g_currentExePath );
 			::OutputDebugString( s ); 
 
 			//save the HInstance of the DLL
@@ -99,6 +112,11 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 			::DisableThreadLibraryCalls( hModule );
 
 			g_osVersion = GetOsVersion();
+
+			// API hooks for TC favmenu
+			if( _tcsicmp( g_currentExeName, _T("totalcmd.exe") ) == 0 )
+			{
+			}
 		}
 		break;
 
@@ -111,6 +129,24 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 		break;
     }
     return TRUE;
+}
+
+//-----------------------------------------------------------------------------------------------
+// Make sure the DLL gets not unloaded as long as the window is subclassed.
+// This can occur if the FlashFolder service stops while a file dialog is open.
+// Intentionally there is no balancing FreeLibrary() call since I couldn't find
+// a good place to call it. 
+
+void MakeSureDllKeepsLoaded()
+{
+	static bool s_isLoaded = false;
+	if( s_isLoaded )
+		return;
+	s_isLoaded = true;
+
+	TCHAR dllPath[ MAX_PATH + 1 ];
+	::GetModuleFileName( (HMODULE) g_hInstDll, dllPath, MAX_PATH ); 
+	::LoadLibrary( dllPath );
 }
 
 //-----------------------------------------------------------------------------------------
@@ -306,13 +342,6 @@ void DisplayMenu_OpenDirs()
     if( res != STATUS_SUCCESS )
         return;
 
-    //--- get application EXE dir - will be ignored by the handle-enumeration and added
-    //    later on top of the menu
-    TCHAR exeDir[MAX_PATH+1];
-    ::GetModuleFileName( NULL, exeDir, MAX_PATH );
-    LPTSTR pExeDirBs = _tcsrchr( exeDir, _T('\\') );
-    if( pExeDirBs ) *pExeDirBs = 0;
-
     //--- for each file handle of the current process: get the dir path and add it to the set
     
     set<tstring, CNoCaseCompare> dirset;
@@ -357,14 +386,14 @@ void DisplayMenu_OpenDirs()
         }
 
         // add the directory path - the set eleminates duplicates
-        if( _tcsicmp( filepath, exeDir ) != 0 )
+        if( _tcsicmp( filepath, g_currentExeDir ) != 0 )
             dirset.insert( filepath );
     } //for       
 
     vector<tstring> dirlist( dirset.size() + 1 );
 
     //--- add application dir to the folder list
-    dirlist[0] = exeDir;
+    dirlist[0] = g_currentExeDir;
 
     //--- copy the in-use-folders to the list
     vector<tstring>::iterator it = dirlist.begin();  it++;
@@ -383,7 +412,7 @@ void DisplayMenu_OpenDirs()
 //-----------------------------------------------------------------------------------------
 // display favorite folders menu
 
-void CreateMenu_Favorites( HMENU hMenu, const FavoritesList& favs, size_t& iItem )
+void FavMenu_Create( HMENU hMenu, const FavoritesList& favs, size_t& iItem )
 {
 	while( iItem < favs.size() )
 	{
@@ -406,7 +435,7 @@ void CreateMenu_Favorites( HMENU hMenu, const FavoritesList& favs, size_t& iItem
 
 			++iItem;
 
-			CreateMenu_Favorites( hSubMenu, favs, iItem );			
+			FavMenu_Create( hSubMenu, favs, iItem );			
 		}
 		else if( fav.title == _T("-") )
 		{
@@ -429,16 +458,11 @@ void CreateMenu_Favorites( HMENU hMenu, const FavoritesList& favs, size_t& iItem
 
 //-----------------------------------------------------------------------------------------------
 
-void DisplayMenu_Favorites()
+int FavMenu_Display( HWND hWndParent, int x, int y, const FavoritesList& favs )
 {
-	//--- create menu
-
-	FavoritesList favs;
-	GetDirFavorites( &favs );
-
     HMENU hMenu = ::CreatePopupMenu();
 	size_t iItem = 0;
-	CreateMenu_Favorites( hMenu, favs, iItem );
+	FavMenu_Create( hMenu, favs, iItem );
 
 	if( ! favs.empty() )
 		::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
@@ -446,48 +470,70 @@ void DisplayMenu_Favorites()
 	::AppendMenu( hMenu, MF_STRING, 1000, _T("&Add current folder") );
 	::AppendMenu( hMenu, MF_STRING, 1001, _T("&Configure...") );
 
+	int id = ::TrackPopupMenu( hMenu, TPM_RETURNCMD | TPM_NONOTIFY, 
+		x, y, 0, hWndParent, NULL );
+
+	::DestroyMenu( hMenu );
+
+    return id;	
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void FavMenu_StartEditor( HWND hWndParent )
+{
+	TCHAR path[ MAX_PATH + 1 ] = _T("");
+	GetAppDir( g_hInstDll, path );
+	StringCbCat( path, sizeof(path), _T("FFConfig.exe") );
+
+	TCHAR params[ 256 ] = _T("");
+	StringCbPrintf( params, sizeof(params),	_T("%d --fav"), hWndParent ); 
+
+	::ShellExecute( hWndParent, _T("open"), path, params, NULL, SW_SHOW );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void FavMenu_AddDir( FavoritesList& favs, LPCTSTR pPath )
+{
+	// add item only if current folder doesn't already exists in the list
+	if( GetFavItemByPath( favs, pPath ) == -1 )
+	{
+		FavoritesItem item;
+		item.title = pPath;
+		item.command = tstring( _T("cd ") ) + pPath;
+		favs.push_back( item );
+		SetDirFavorites( favs );
+	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void FavMenu_DisplayForFileDialog()
+{
 	//--- show menu
+
+	FavoritesList favs;
+	GetDirFavorites( &favs );
 
 	HWND hTb = GetDlgItem( g_hToolWnd, ID_FF_TOOLBAR );
 	RECT rc;
 	::SendMessage( hTb, TB_GETRECT, ID_FF_FAVORITES, reinterpret_cast<LPARAM>( &rc ) );
 	ClientToScreenRect( hTb, &rc );
 
-	int id = ::TrackPopupMenu( hMenu, TPM_RETURNCMD | TPM_NONOTIFY, 
-		rc.left, rc.bottom, 0, g_hToolWnd, NULL );
+	int id = FavMenu_Display( g_hToolWnd, rc.left, rc.bottom, favs );
 
 	//--- execute selected command
 
 	if( id == 1000 )
 	{
-		//--- add current folder to favorite folders 
-
 		TCHAR path[ MAX_PATH + 1 ];
 		if( g_spFileDlgHook->GetFolder( path ) )
-		{
-			// add item only if current folder doesn't already exists in the list
-			if( GetFavItemByPath( favs, path ) == -1 )
-			{
-				FavoritesItem item;
-				item.title = path;
-				item.command = tstring( _T("cd ") ) + path;
-				favs.push_back( item );
-				SetDirFavorites( favs );
-			}
-		}
+			FavMenu_AddDir( favs, path );
 	}
 	else if( id == 1001 )
 	{
-		//--- start the favorites editor
-
-		TCHAR path[ MAX_PATH + 1 ] = _T("");
-		GetAppDir( g_hInstDll, path );
-		StringCbCat( path, sizeof(path), _T("FFConfig.exe") );
-
-		TCHAR params[ 256 ] = _T("");
-		StringCbPrintf( params, sizeof(params),	_T("%d --fav"), g_hFileDialog ); 
-
-		::ShellExecute( g_hToolWnd, _T("open"), path, params, NULL, SW_SHOW );
+		FavMenu_StartEditor( g_hFileDialog );
 	}
 	else if( id > 0 )
 	{
@@ -514,9 +560,65 @@ void DisplayMenu_Favorites()
 			}
 	}		
 
-	DestroyMenu( hMenu );
-
 	SetForegroundWindow( g_hFileDialog );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void FavMenu_DisplayForTotalCmd( HWND hWndParent, int x, int y, HWND hwndClicked )
+{
+	//--- show favmenu
+
+	FavoritesList favs;
+	GetDirFavorites( &favs );
+
+	int id = FavMenu_Display( hWndParent, x, y, favs );
+
+	//--- execute selected command
+
+	if( id == 1000 )
+	{
+		TCHAR path[ MAX_PATH + 1 ] = _T("");
+		if( hwndClicked )
+		{
+			// Favmenu was invoked by mouse - take path from clicked TC path control.
+			::GetWindowText( hwndClicked, path, MAX_PATH );
+			// remove filter
+			if( TCHAR* p = _tcsrchr( path, '\\' ) )
+				*(++p) = 0;
+		}
+		else
+		{
+			// Favmenu was not invoked by mouse - take path from TC commandline label.
+			CTotalCmdUtils tc( CTotalCmdUtils::FindTopTCmdWnd() );
+			tc.GetActiveDir( path, MAX_PATH );
+		}
+		if( path[ 0 ] != 0 )
+			FavMenu_AddDir( favs, path );
+	}
+	else if( id == 1001 )
+	{
+		FavMenu_StartEditor( hWndParent );
+	}
+	else if( id > 0 )
+	{
+		//--- execute favorites menu item
+
+		const FavoritesItem& fav = favs[ id - 1 ];
+
+		tstring path;
+		tstring token, args;
+		SplitTcCommand( fav.command.c_str(), &token, &args );
+
+		if( _tcsicmp( token.c_str(), _T("cd") ) == 0 )
+			path = args;
+		else if( IsFilePath( fav.command.c_str() ) )
+			path = fav.command;
+
+		if( ! path.empty() )
+			if( DirectoryExists( path.c_str() ) )
+				SetTcCurrentPathesW( NULL, path.c_str(), fav.targetpath.c_str(), STC_SOURCE_AND_TARGET );
+	}	
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -652,7 +754,7 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         DisplayMenu_OpenDirs();
                         break;
 					case ID_FF_FAVORITES:
-						DisplayMenu_Favorites();
+						FavMenu_DisplayForFileDialog();
 						break;
 					case ID_FF_CONFIG:
 						DisplayMenu_Config();
@@ -965,43 +1067,64 @@ bool IsCurrentProgramEnabledForDialog( FileDlgType fileDlgType )
 	if( g_profile.GetInt( pProfileGroup, _T("EnableHook") ) == 0 )
 		return false;
 
-    // Get EXE filename of current program.
-	TCHAR procPath[ MAX_PATH + 1 ] = _T("");
-	::GetModuleFileName( NULL, procPath, MAX_PATH );
-    if( TCHAR* pProcExe = _tcsrchr( procPath, _T('\\') ) )
+	// Check if EXE filename is in the excludes list for given dialog type.
+	tstring excludesGroup = pProfileGroup;
+	excludesGroup += _T(".Excludes");
+	for( int i = 0;; ++i )
 	{
-		++pProcExe;
-
-		// Check if EXE filename is in the excludes list for given dialog type.
-		tstring excludesGroup = pProfileGroup;
-		excludesGroup += _T(".Excludes");
-		for( int i = 0;; ++i )
-		{
-			TCHAR key[10];
-			StringCbPrintf( key, sizeof(key), _T("%d"), i );
-			tstring path = g_profile.GetString( excludesGroup.c_str(), key );
-			if( path.empty() )
-				break;
-			if( _tcsicmp( pProcExe, path.c_str() ) == 0 )
-				return false;
-		}
+		TCHAR key[10];
+		StringCbPrintf( key, sizeof(key), _T("%d"), i );
+		tstring path = g_profile.GetString( excludesGroup.c_str(), key );
+		if( path.empty() )
+			break;
+		if( _tcsicmp( g_currentExeName, path.c_str() ) == 0 )
+			return false;
 	}
 	return true;
 }
 
 //-----------------------------------------------------------------------------------------
+// This function gets called in the context of the hooked process.
 
-LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Hook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
 {
+	HWND hwnd = reinterpret_cast<HWND>( wParam );
+
+	if( nCode == HCBT_CREATEWND )
+	{
+		CBT_CREATEWND* pcb = reinterpret_cast<CBT_CREATEWND*>( lParam );
+
+		// Replace original TC favmenu with custom menu (also see Hook_Mouse()).
+		if( g_hwndTcFavmenuClick )
+		{
+			TCHAR className[ 256 ] = _T("");
+			::GetClassName( hwnd, className, 255 );
+			if( _tcscmp( className, _T("#32768") ) == 0 )
+			{
+				HWND hwndClicked = g_hwndTcFavmenuClick;
+				// avoid infinite recursion
+				g_hwndTcFavmenuClick = NULL;
+
+				if( HWND hTC = CTotalCmdUtils::FindTopTCmdWnd() )
+				{
+					POINT pt; ::GetCursorPos( &pt );
+					FavMenu_DisplayForTotalCmd( hTC, pt.x, pt.y, hwndClicked );
+
+					// Suppress original TC favmenu
+					::PostMessage( hTC, WM_CANCELMODE, 0, 0 ); 
+				}
+			}
+		}
+
+		return CallNextHookEx( g_hHook, nCode, wParam, lParam );
+	}
+
+
 	// Check whether a file dialog is already hooked.
 	// For now, we can only handle one running file dialog per application, but
 	// this should be enough in nearly all cases.
-    if( nCode == HCBT_ACTIVATE && g_hFileDialog == NULL )
-	{ 
-		// HCBT_ACTIVATE gets called in the context of the process belonging to the dialog
-
-		HWND hwnd = reinterpret_cast<HWND>( wParam );
-
+	if( nCode == HCBT_ACTIVATE && g_hFileDialog == NULL )
+	{
 		FileDlgType fileDlgType = GetFileDlgType( hwnd );
 		if( fileDlgType != FDT_NONE )
 		{
@@ -1055,15 +1178,9 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 
-			// Make sure the DLL gets not unloaded as long as the window is subclassed.
-			// This can occur if the FlashFolder service stops while a file dialog is open.
-			// Intentionally there is no balancing FreeLibrary() call since I couldn't find
-			// a good place to call it. 
-			TCHAR dllPath[ MAX_PATH + 1 ];
-			::GetModuleFileName( (HMODULE) g_hInstDll, dllPath, MAX_PATH ); 
-			::LoadLibrary( dllPath );  
+			MakeSureDllKeepsLoaded();
 
-			return 0;                
+			return 0;
 		}
 	}
 
@@ -1071,6 +1188,41 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
    	return CallNextHookEx( g_hHook, nCode, wParam, lParam );
 }
 
+//-----------------------------------------------------------------------------------------------
+// This function gets called in the context of the hooked process.
+
+LRESULT CALLBACK Hook_Mouse( int nCode, WPARAM wParam, LPARAM lParam )
+{
+	if( nCode < 0 )
+		return ::CallNextHookEx( g_hMouseHook, nCode, wParam, lParam );
+
+	if( nCode == HC_ACTION )
+	{
+		MOUSEHOOKSTRUCT* pmh = reinterpret_cast<MOUSEHOOKSTRUCT*>( lParam );
+	
+		// Check if this is a doubleclick in the TC path control. Remember this for the next
+		// time a popup menu is created.
+
+		if( wParam == WM_LBUTTONDBLCLK )
+		{
+			if( _tcsicmp( g_currentExeName, _T("totalcmd.exe") ) == 0 )
+			{			
+				g_hwndTcFavmenuClick = NULL;
+
+				if( CTotalCmdUtils::IsTcmdPathControl( pmh->hwnd ) &&
+                    ! IsShiftKeyPressed() )
+				{
+					g_hwndTcFavmenuClick = pmh->hwnd;
+
+					// Keep DLL loaded to keep g_hwndTcFavmenuClick in memory.
+					MakeSureDllKeepsLoaded();
+				}
+			}
+		}
+	}
+
+	return ::CallNextHookEx( g_hMouseHook, nCode, wParam, lParam );
+}
 
 //=========================================================================================
 //  Installation / Deinstallation Functions (DLL-Export)
@@ -1088,12 +1240,15 @@ DLLFUNC bool InstallHook()
 	// TODO: make thread safe 
     if( g_hHook == NULL )
     {
-		::OutputDebugString( _T("[fflib] creating hook...\n") );
+		::OutputDebugString( _T("[fflib] creating hooks...\n") );
 
         // Install the hook
-		g_hHook = ::SetWindowsHookEx( WH_CBT, HookProc, g_hInstDll, 0 );
+		g_hHook = ::SetWindowsHookEx( WH_CBT, Hook_CBT, g_hInstDll, 0 );
+		g_hMouseHook = ::SetWindowsHookEx( WH_MOUSE, Hook_Mouse, g_hInstDll, 0 );
 
-		TCHAR s[256]; StringCbPrintf( s, sizeof(s), _T("[fflib] g_hHook = %08Xh\n"), g_hHook );
+		TCHAR s[256]; 
+		StringCbPrintf( s, sizeof(s), 
+			_T("[fflib] g_hHook = %08Xh, g_hMouseHook = %08Xh\n"), g_hHook, g_hMouseHook );
 		::OutputDebugString( s );
 
 		return g_hHook != NULL;
@@ -1106,16 +1261,24 @@ DLLFUNC bool InstallHook()
 DLLFUNC bool UninstallHook()
 {  
 	// TODO: make thread safe 
+	
     if( g_hHook != NULL )
     {
-		TCHAR s[256]; StringCbPrintf( s, sizeof(s), _T("[fflib] removing hook %08Xh...\n"), g_hHook );
+		TCHAR s[256]; StringCbPrintf( s, sizeof(s), _T("[fflib] removing WH_CBT hook %08Xh...\n"), g_hHook );
 		::OutputDebugString( s );
 
 		if( ::UnhookWindowsHookEx( g_hHook ) )
-		{
 			g_hHook = NULL;
-			return true;
-		}
     }
-	return false;
+
+	if( g_hMouseHook != NULL )
+    {
+		TCHAR s[256]; StringCbPrintf( s, sizeof(s), _T("[fflib] removing WH_MOUSE hook %08Xh...\n"), g_hMouseHook );
+		::OutputDebugString( s );
+
+		if( ::UnhookWindowsHookEx( g_hMouseHook ) )
+			g_hMouseHook = NULL;
+    }
+
+	return ! g_hHook && ! g_hMouseHook;
 }

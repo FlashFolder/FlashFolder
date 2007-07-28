@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="FALSE"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib imagehlp.lib"
 				OutputFile="..\exe\fflib6439.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -120,7 +120,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="FALSE"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib imagehlp.lib"
 				OutputFile="..\exe\fflib6439.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -198,7 +198,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="FALSE"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib imagehlp.lib"
 				OutputFile="..\exe\fflib6439.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -274,7 +274,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="FALSE"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib imagehlp.lib"
 				OutputFile="..\exe\fflib6439.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -350,7 +350,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="FALSE"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib imagehlp.lib"
 				OutputFile="..\exe\fflib6439.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"

@@ -23,6 +23,7 @@
 #include <vector>
 
 void GetAppDir( HINSTANCE hInstApp, LPTSTR szDir );
+void GetAppFilename( HINSTANCE hInstApp, LPTSTR pName );
 
 inline bool DirectoryExists( LPCTSTR szName )
 {
@@ -53,3 +54,10 @@ inline WORD GetOsVersion()
 	::GetVersionEx( &ovi );
 	return static_cast<WORD>( ovi.dwMajorVersion << 8 | ovi.dwMinorVersion );
 }
+
+inline bool IsShiftKeyPressed() 
+	{ return (GetKeyState(VK_SHIFT) & (1 << (sizeof(SHORT)*8-1))) != 0; }
+inline bool IsCtrlKeyPressed()  
+	{ return (GetKeyState(VK_CONTROL) & (1 << (sizeof(SHORT)*8-1))) != 0; }
+inline bool IsAltKeyPressed()  
+	{ return (GetKeyState(VK_MENU) & (1 << (sizeof(SHORT)*8-1))) != 0; }
