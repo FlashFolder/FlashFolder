@@ -143,14 +143,14 @@ BOOL CFFConfigApp::InitInstance()
 	{
 		case DLG_CONFIG:
 		{
-			CFFConfigDlg dlg( CWnd::FromHandle( hwndParent ) );
+			CFFConfigDlg dlg( hwndParent ? CWnd::FromHandle( hwndParent ) : NULL );
 			m_pMainWnd = &dlg;
 			dlg.DoModal();
 			break;
 		}
 		case DLG_FAVS:
 		{
-			CFolderFavoritesDlg dlg( CWnd::FromHandle( hwndParent ) );
+			CFolderFavoritesDlg dlg( hwndParent ? CWnd::FromHandle( hwndParent ) : NULL );
 			m_pMainWnd = &dlg;
 			dlg.DoModal();
 			break;
@@ -166,7 +166,7 @@ BOOL CFFConfigApp::InitInstance()
 		}
 		case DLG_ABOUT:
 		{
-			CAboutDlg dlg( CWnd::FromHandle( hwndParent ) );
+			CAboutDlg dlg( hwndParent ? CWnd::FromHandle( hwndParent ) : NULL );
 			m_pMainWnd = &dlg;
 			dlg.DoModal();
 			break;

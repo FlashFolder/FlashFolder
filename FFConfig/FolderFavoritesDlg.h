@@ -46,6 +46,7 @@ private:
 	afx_msg void OnBnClickedBtnBrowse();
 	afx_msg void OnBnClickedBtnTargetbrowse();
 	afx_msg void OnBnClickedBtnRevert();
+	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
 	DECLARE_MESSAGE_MAP()
 
 	void LoadFavorites();
@@ -64,6 +65,6 @@ private:
 	CEditEx m_edTargetPath;
 
 	HTREEITEM m_hSelItem;
-public:
-	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
+
+	bool m_isOwned;
 };

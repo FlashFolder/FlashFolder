@@ -597,7 +597,7 @@ void FavMenu_DisplayForTotalCmd( HWND hWndParent, int x, int y, HWND hwndClicked
 	}
 	else if( id == 1001 )
 	{
-		FavMenu_StartEditor( hWndParent );
+		FavMenu_StartEditor( NULL );
 	}
 	else if( id > 0 )
 	{

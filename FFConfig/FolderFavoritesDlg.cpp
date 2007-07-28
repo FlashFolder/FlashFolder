@@ -67,7 +67,8 @@ CString GetDefaultTitle( const CString& cmd )
 
 CFolderFavoritesDlg::CFolderFavoritesDlg(CWnd* pParent /*=NULL*/)
 	: CResizableDlg(CFolderFavoritesDlg::IDD, pParent),
-	m_hSelItem( NULL )
+	m_hSelItem( NULL ),
+	m_isOwned( pParent ? true : false )
 {}
 
 //-----------------------------------------------------------------------------------------------
@@ -106,6 +107,12 @@ END_MESSAGE_MAP()
 BOOL CFolderFavoritesDlg::OnInitDialog()
 {
 	CResizableDlg::OnInitDialog();
+
+	if( m_isOwned )
+	{
+		ModifyStyle( WS_MINIMIZEBOX, 0, SWP_FRAMECHANGED );
+		GetSystemMenu( FALSE )->EnableMenuItem( SC_MINIMIZE, MF_BYCOMMAND | MF_GRAYED );
+	}
 
 	//--- Create and populate tree control
 	
