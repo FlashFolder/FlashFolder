@@ -45,7 +45,6 @@ using namespace std;
 #include <NtKernelUtils.h>
 #include <TotalCmdUtils.h>
 #include <Registry.h>
-#include <ApiHook.h>
 
 //--- common project files
 #include "../_version.h"

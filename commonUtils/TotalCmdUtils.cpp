@@ -24,16 +24,7 @@
 
 //-------------------------------------------------------------------------------------------------
 
-HWND CTotalCmdUtils::FindTopTCmdWnd()
-{
-    HWND hwnd = NULL;
-    ::EnumWindows( FindTopWnd_Proc, reinterpret_cast<LPARAM>( &hwnd ) );
-    return hwnd;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-BOOL CALLBACK CTotalCmdUtils::FindTopWnd_Proc( HWND hwnd, LPARAM lParam )
+BOOL CALLBACK FindTopWnd_Proc( HWND hwnd, LPARAM lParam )
 {
     TCHAR classname[256] = _T("");
     if( ::GetClassName( hwnd, classname, 255 ) > 0 )
@@ -48,6 +39,34 @@ BOOL CALLBACK CTotalCmdUtils::FindTopWnd_Proc( HWND hwnd, LPARAM lParam )
 }
 
 //-------------------------------------------------------------------------------------------------
+
+HWND FindTopTcWnd( bool currentThreadOnly )
+{
+    HWND hwnd = NULL;
+	if( currentThreadOnly )
+		::EnumThreadWindows( ::GetCurrentThreadId(), FindTopWnd_Proc, reinterpret_cast<LPARAM>( &hwnd ) );
+	else
+		::EnumWindows( FindTopWnd_Proc, reinterpret_cast<LPARAM>( &hwnd ) );
+    return hwnd;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool IsTcPathControl( HWND hwnd )
+{
+    TCHAR wndtext[ MAX_PATH + 1 ] = _T("");
+    if( ::GetWindowText( hwnd, wndtext, MAX_PATH ) > 0 )
+        if( IsFilePath( wndtext ) )
+        {
+            // check if this is not the command line label
+            size_t len = _tcslen( wndtext );
+            TCHAR* pLast = _tcsninc( wndtext, len - 1 );
+            return *pLast != '>';
+		}
+	return false;
+}
+
+//-----------------------------------------------------------------------------------------------
 
 bool CTotalCmdUtils::GetDirs( LPTSTR pLeftDir, unsigned leftDirLen, 
                               LPTSTR pRightDir, unsigned rightDirLen )
@@ -80,19 +99,9 @@ bool CTotalCmdUtils::GetDirs( LPTSTR pLeftDir, unsigned leftDirLen,
 			std::swap( m_hwndLeft, m_hwndRight );
 	}
 	if( m_hwndLeft )
-	{
-		::GetWindowText( m_hwndLeft, pLeftDir, leftDirLen );
-		// remove filter
-		if( TCHAR* p = _tcsrchr( pLeftDir, '\\' ) )
-			*(++p) = 0;
-	}
+		GetPathFromTcControl( m_hwndLeft, pLeftDir, leftDirLen );
 	if( m_hwndRight )
-	{
-		::GetWindowText( m_hwndRight, pRightDir, rightDirLen );
-		// remove filter
-		if( TCHAR* p = _tcsrchr( pRightDir, '\\' ) )
-			*(++p) = 0;
-	}
+		GetPathFromTcControl( m_hwndRight, pRightDir, rightDirLen );
     
     return m_hwndLeft || m_hwndRight;
 }
@@ -118,22 +127,6 @@ bool CTotalCmdUtils::GetActiveDir( LPTSTR pDir, unsigned len )
 		return true;
 	}
 
-	return false;
-}
-
-//-----------------------------------------------------------------------------------------------
-
-bool CTotalCmdUtils::IsTcmdPathControl( HWND hwnd )
-{
-    TCHAR wndtext[ MAX_PATH + 1 ] = _T("");
-    if( ::GetWindowText( hwnd, wndtext, MAX_PATH ) > 0 )
-        if( IsFilePath( wndtext ) )
-        {
-            // check if this is not the command line label
-            size_t len = _tcslen( wndtext );
-            TCHAR* pLast = _tcsninc( wndtext, len - 1 );
-            return *pLast != '>';
-		}
 	return false;
 }
 
@@ -269,7 +262,7 @@ void SplitTcCommand( LPCTSTR pCmd, tstring* pToken, tstring* pArgs )
 bool SetTcCurrentPathesW( HWND hWndTC, LPCWSTR pPath1, LPCWSTR pPath2, DWORD flags )
 {
 	if( ! hWndTC )
-		hWndTC = CTotalCmdUtils::FindTopTCmdWnd();
+		hWndTC = FindTopTcWnd();
 	if( ! hWndTC )
 		return false;
 
@@ -296,4 +289,17 @@ bool SetTcCurrentPathesW( HWND hWndTC, LPCWSTR pPath1, LPCWSTR pPath2, DWORD fla
 	cd.lpData = cmdBuf;
 
 	return ::SendMessage( hWndTC, WM_COPYDATA, 0, reinterpret_cast<LPARAM>( &cd ) ) != 0;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void GetPathFromTcControl( HWND hwnd, LPTSTR pPath, size_t nSize )
+{ 
+	pPath[ 0 ] = 0;
+	::GetWindowText( hwnd, pPath, nSize );
+	if( TCHAR* p = _tcsrchr( pPath, '\\' ) )
+		if( p - pPath > 2 )
+			*p = 0;
+		else
+			*(++p) = 0;
 }

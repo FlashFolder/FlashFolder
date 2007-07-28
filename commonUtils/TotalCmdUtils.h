@@ -29,9 +29,6 @@ class CTotalCmdUtils
 public:
     CTotalCmdUtils( HWND hwndTotalCmd = NULL ) { SetTCmdWnd( hwndTotalCmd ); }
 
-    static HWND FindTopTCmdWnd();
-	static bool IsTcmdPathControl( HWND hwnd );
-
     void SetTCmdWnd( HWND hwndTotalCmd ) 
     { 
         m_hwnd = hwndTotalCmd; 
@@ -81,4 +78,14 @@ enum
 
 /// Set current TC pathes
 bool SetTcCurrentPathesW( HWND hWndTC, LPCWSTR pPath1, LPCWSTR pPath2, DWORD flags = 0 );
+
+/// Get HWND of TC that is topmost in z-order
+HWND FindTopTcWnd( bool currentThreadOnly = false );
+
+/// Check if a HWND identifies one of the left/right path controls of TC
+bool IsTcPathControl( HWND hwnd );
+
+/// Get the directory path from a TC path control (strips backslash and filter)
+void GetPathFromTcControl( HWND hwnd, LPTSTR pPath, size_t nSize ); 
+
 

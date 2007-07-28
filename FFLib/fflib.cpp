@@ -305,7 +305,7 @@ void DisplayMenu_OpenDirs()
 
     //--- get current Total Commander folders and add them to the menu
 
-	CTotalCmdUtils tcmdUtils( CTotalCmdUtils::FindTopTCmdWnd() );
+	CTotalCmdUtils tcmdUtils( FindTopTcWnd() );
     if( tcmdUtils.GetTCmdWnd() )
     {
         TCHAR leftDir[MAX_PATH+1] = _T("");
@@ -564,6 +564,8 @@ void FavMenu_DisplayForFileDialog()
 }
 
 //-----------------------------------------------------------------------------------------------
+// Show the FlashFolder favorites menu inside Total Commander. To be invoked in the context of
+// the GUI thread of the TC process.
 
 void FavMenu_DisplayForTotalCmd( HWND hWndParent, int x, int y, HWND hwndClicked )
 {
@@ -582,15 +584,12 @@ void FavMenu_DisplayForTotalCmd( HWND hWndParent, int x, int y, HWND hwndClicked
 		if( hwndClicked )
 		{
 			// Favmenu was invoked by mouse - take path from clicked TC path control.
-			::GetWindowText( hwndClicked, path, MAX_PATH );
-			// remove filter
-			if( TCHAR* p = _tcsrchr( path, '\\' ) )
-				*(++p) = 0;
+			GetPathFromTcControl( hwndClicked, path, MAX_PATH );
 		}
 		else
 		{
 			// Favmenu was not invoked by mouse - take path from TC commandline label.
-			CTotalCmdUtils tc( CTotalCmdUtils::FindTopTCmdWnd() );
+			CTotalCmdUtils tc( FindTopTcWnd( true ) );
 			tc.GetActiveDir( path, MAX_PATH );
 		}
 		if( path[ 0 ] != 0 )
@@ -617,7 +616,8 @@ void FavMenu_DisplayForTotalCmd( HWND hWndParent, int x, int y, HWND hwndClicked
 
 		if( ! path.empty() )
 			if( DirectoryExists( path.c_str() ) )
-				SetTcCurrentPathesW( NULL, path.c_str(), fav.targetpath.c_str(), STC_SOURCE_AND_TARGET );
+				SetTcCurrentPathesW( FindTopTcWnd( true ), 
+					path.c_str(), fav.targetpath.c_str(), STC_SOURCE_AND_TARGET );
 	}	
 }
 
@@ -1094,8 +1094,10 @@ LRESULT CALLBACK Hook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
 	{
 		CBT_CREATEWND* pcb = reinterpret_cast<CBT_CREATEWND*>( lParam );
 
-		// Replace original TC favmenu with custom menu (also see Hook_Mouse()).
-		if( g_hwndTcFavmenuClick )
+		// If in the context of TC process and a left/right path control was doubleclicked
+		// before, replace TC favmenu with custom menu (also see Hook_Mouse()).
+		if( g_hwndTcFavmenuClick && 
+			_tcsicmp( g_currentExeName, _T("totalcmd.exe") ) == 0 )
 		{
 			TCHAR className[ 256 ] = _T("");
 			::GetClassName( hwnd, className, 255 );
@@ -1105,7 +1107,7 @@ LRESULT CALLBACK Hook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
 				// avoid infinite recursion
 				g_hwndTcFavmenuClick = NULL;
 
-				if( HWND hTC = CTotalCmdUtils::FindTopTCmdWnd() )
+				if( HWND hTC = FindTopTcWnd( true ) )
 				{
 					POINT pt; ::GetCursorPos( &pt );
 					FavMenu_DisplayForTotalCmd( hTC, pt.x, pt.y, hwndClicked );
@@ -1209,7 +1211,7 @@ LRESULT CALLBACK Hook_Mouse( int nCode, WPARAM wParam, LPARAM lParam )
 			{			
 				g_hwndTcFavmenuClick = NULL;
 
-				if( CTotalCmdUtils::IsTcmdPathControl( pmh->hwnd ) &&
+				if( IsTcPathControl( pmh->hwnd ) &&
                     ! IsShiftKeyPressed() )
 				{
 					g_hwndTcFavmenuClick = pmh->hwnd;
