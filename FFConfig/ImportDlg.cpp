@@ -54,8 +54,8 @@ BOOL CImportDlg::OnInitDialog()
 	if( GetTotalCmdLocation( &dummy, &tcIniPath ) )
 	{
 		m_installedIniPath = tcIniPath.c_str();
-		m_installedIniPath.MakeLower();
 		SetDlgItemText( IDC_ED_PATH, m_installedIniPath );
+		GetDlgItem( IDC_CHK_INSTALLED )->EnableWindow( TRUE );
 	}
 	CheckDlgButton( IDC_RD_APPEND, 1 );
 

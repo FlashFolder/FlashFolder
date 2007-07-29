@@ -347,7 +347,8 @@ CAPTION "Import Total Commander® directory menu"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "&Get from installed Total Commander",IDC_CHK_INSTALLED,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,11,130,10
+                    "Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,8,11,
+                    130,10
     LTEXT           "&Path of wincmd.ini:",IDC_STATIC,8,28,71,8
     EDITTEXT        IDC_ED_PATH,8,39,295,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_BTN_BROWSE,304,39,21,14
