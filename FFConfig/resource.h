@@ -28,6 +28,7 @@
 #define IDI_MENUITEM                    158
 #define IDI_SUBMENU                     159
 #define IDR_FAVORITES_CONTEXTMENU       160
+#define IDD_PAGE_TOTALCMD               162
 #define IDC_RD_INDIVIDUAL_PROFILES      1000
 #define IDC_RD_SHARED_PROFILE           1001
 #define IDC_ED_MAX_DIRHISTORY           1002
@@ -93,6 +94,7 @@
 #define IDC_ST_FAVMENU                  1076
 #define IDC_LST_FAVS                    1077
 #define IDC_ED_COMMAND                  1078
+#define IDC_CHECK1                      1083
 #define ID_FAVCONTEXT_NEWITEM           32771
 #define ID_FAVCONTEXT_NEWDIVIDER        32772
 #define ID_FAVCONTEXT_NEWSUBMENU        32773
@@ -105,9 +107,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        162
+#define _APS_NEXT_RESOURCE_VALUE        163
 #define _APS_NEXT_COMMAND_VALUE         32778
-#define _APS_NEXT_CONTROL_VALUE         1083
+#define _APS_NEXT_CONTROL_VALUE         1084
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif

@@ -1214,10 +1214,19 @@ LRESULT CALLBACK Hook_Mouse( int nCode, WPARAM wParam, LPARAM lParam )
 				if( IsTcPathControl( pmh->hwnd ) &&
                     ! IsShiftKeyPressed() )
 				{
-					g_hwndTcFavmenuClick = pmh->hwnd;
-
-					// Keep DLL loaded to keep g_hwndTcFavmenuClick in memory.
-					MakeSureDllKeepsLoaded();
+					if( g_profileDefaults.IsEmpty() )
+					{
+						GetProfileDefaults( &g_profileDefaults );
+						g_profile.SetRoot( _T("zett42\\FlashFolder") );
+						g_profile.SetDefaults( &g_profileDefaults );
+					}
+                    if( g_profile.GetInt( _T("TotalCmd"), _T("EnableHook") ) != 0 )
+					{
+						g_hwndTcFavmenuClick = pmh->hwnd;
+						
+						// Keep DLL loaded to keep g_hwndTcFavmenuClick in memory.
+						MakeSureDllKeepsLoaded();
+					}
 				}
 			}
 		}

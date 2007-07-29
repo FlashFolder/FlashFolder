@@ -58,6 +58,45 @@ BEGIN
     END
 END
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PAGE_TOTALCMD DIALOGEX 0, 0, 211, 103
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "Programs::Total Commander|Total Commander Integration"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "&Enable Total Commander® integration",IDC_CHK_ENABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,139,10
+    LTEXT           "If enabled, this allows you to use the FlashFolder favorites menu instead of Total Commander's own directory menu when you double-click on the title line with the current path.",
+                    IDC_STATIC,18,28,183,35
+    LTEXT           "You can still open the TC menu by using Shift+Doubleclick, by pressing the shortcut key or by clicking the directory menu button.",
+                    IDC_STATIC,18,65,183,31
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_PAGE_TOTALCMD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 204
+        VERTGUIDE, 18
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 96
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
 #endif    // Deutsch (Deutschland) resources
 /////////////////////////////////////////////////////////////////////////////
 

@@ -31,10 +31,6 @@ void GetProfileDefaults( Profile* pProfile )
 
 	pProfile->SetInt( _T("main"), _T("MaxGlobalHistoryEntries"), 15 );
 
-	tstring tcIniPath;
-	bool isTcInstalled = GetTotalCmdLocation( NULL, &tcIniPath );
-	pProfile->SetInt( _T("main"), _T("UseTcFavorites"), isTcInstalled ? 1 : 0 );
-
 	//--- common file dialog
 
 	pProfile->SetInt( _T("CommonFileDlg"), _T("EnableHook"), 1 );
@@ -68,6 +64,10 @@ void GetProfileDefaults( Profile* pProfile )
 	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinWidth"), 267 + DIALOG_UNITS_FLAG );
 	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinHeight"), 308 + DIALOG_UNITS_FLAG );
 	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("Center"), 1 );
+
+	//--- Total Commander integration
+
+	pProfile->SetInt( _T("TotalCmd"), _T("EnableHook"), 1 );
 
 	//--- favorites editor
 

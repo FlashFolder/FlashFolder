@@ -365,6 +365,9 @@
 				RelativePath=".\PageMsoFileDlg.cpp">
 			</File>
 			<File
+				RelativePath=".\PageTotalcmd.cpp">
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp">
 				<FileConfiguration
 					Name="Unicode Debug|Win32">
@@ -440,6 +443,9 @@
 			</File>
 			<File
 				RelativePath=".\PageMsoFileDlg.h">
+			</File>
+			<File
+				RelativePath=".\PageTotalcmd.h">
 			</File>
 			<File
 				RelativePath=".\Resource.h">
