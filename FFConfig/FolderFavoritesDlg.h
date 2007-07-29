@@ -50,7 +50,8 @@ private:
 	DECLARE_MESSAGE_MAP()
 
 	void LoadFavorites();
-	void LoadFavorites_worker( HTREEITEM hParent, HTREEITEM hInsertAfter, const FavoritesList& favs, size_t& iItem );
+	void LoadFavorites_worker( HTREEITEM hParent, HTREEITEM hInsertAfter, 
+		const FavoritesList& favs, size_t& iItem, bool bSelectInsertedItems = false );
 	void SaveFavorites();
 	void SaveFavorites_worker( FavoritesList& favs, HTREEITEM hParent );
 

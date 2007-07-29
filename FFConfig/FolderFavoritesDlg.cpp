@@ -206,14 +206,15 @@ void CFolderFavoritesDlg::LoadFavorites()
 //-----------------------------------------------------------------------------------------------
 
 void CFolderFavoritesDlg::LoadFavorites_worker( 
-	HTREEITEM hParent, HTREEITEM hInsertAfter, const FavoritesList& favs, size_t& iItem )
+	HTREEITEM hParent, HTREEITEM hInsertAfter, const FavoritesList& favs, size_t& iItem, 
+	bool bSelectInsertedItems )
 {
 	while( iItem < favs.size() )
 	{
 		const FavoritesList::value_type& fav = favs[ iItem ];
-		
-		HTREEITEM hItem = hInsertAfter;
 
+		HTREEITEM hItem = NULL;
+		
 		if( fav.title == _T("--") )
 		{
 			// end of submenu
@@ -225,18 +226,18 @@ void CFolderFavoritesDlg::LoadFavorites_worker(
 		{
 			// insert submenu recursively
 
-			hItem = m_tree.InsertItem( fav.title.substr( 1 ).c_str(), 0, 0, hParent, hItem );
+			hItem = m_tree.InsertItem( fav.title.substr( 1 ).c_str(), 0, 0, hParent, hInsertAfter );
 			m_tree.SetItemIsFolder( hItem );
 
 			++iItem;
 
-			LoadFavorites_worker( hItem, TVI_LAST, favs, iItem );			
+			LoadFavorites_worker( hItem, TVI_FIRST, favs, iItem, false );			
 		}
 		else if( fav.title == _T("-") )
 		{
 			// insert divider
 			
-			hItem = m_tree.InsertItem( _T(""), -1, -1, hParent, hItem );
+			hItem = m_tree.InsertItem( _T(""), -1, -1, hParent, hInsertAfter );
 			m_tree.SetItemDivider( hItem );
 
 			++iItem;
@@ -245,12 +246,18 @@ void CFolderFavoritesDlg::LoadFavorites_worker(
 		{
 			// insert normal item
 
-			hItem = m_tree.InsertItem( fav.title.c_str(), 1, 1, hParent, hItem );
+			hItem = m_tree.InsertItem( fav.title.c_str(), 1, 1, hParent, hInsertAfter );
 			m_tree.SetItemText( hItem, COL_COMMAND, fav.command.c_str() );
 			m_tree.SetItemText( hItem, COL_TARGETPATH, fav.targetpath.c_str() );
 
 			++iItem;
 		}
+
+		// select inserted root items
+		if( bSelectInsertedItems )
+			m_tree.GetTree().SetItemState( hItem, TVIS_SELECTED, TVIS_SELECTED );
+
+		hInsertAfter = hItem;
 	}
 }
 
@@ -740,6 +747,7 @@ void CFolderFavoritesDlg::OnContextMenu(CWnd* pWnd, CPoint pt )
 }
 
 //-----------------------------------------------------------------------------------------------
+/// Import menu from Total Commander
 
 void CFolderFavoritesDlg::OnBnClickedBtnImport()
 {
@@ -762,6 +770,7 @@ void CFolderFavoritesDlg::OnBnClickedBtnImport()
 		}
 		else if( m_hSelItem )
 		{
+			m_tree.GetTree().SelectAll( false );
 			hInsertAfter = m_hSelItem;
 			hParent = m_tree.GetTree().GetParentItem( m_hSelItem );
 			if( ! hParent )
@@ -769,7 +778,7 @@ void CFolderFavoritesDlg::OnBnClickedBtnImport()
 		}
 
 		size_t iItem = 0;
-		LoadFavorites_worker( hParent, hInsertAfter, favs, iItem );
+		LoadFavorites_worker( hParent, hInsertAfter, favs, iItem, true );
 
 		if( dlg.GetReplaceExisting() )
 		{
