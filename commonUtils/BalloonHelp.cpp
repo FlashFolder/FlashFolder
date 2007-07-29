@@ -153,12 +153,12 @@ void CBalloonHelp::LaunchBalloon(const CString& strTitle, const CString& strCont
    CBalloonHelp* pbh = new CBalloonHelp;
    if ( NULL != szIcon )
    {
-      // Note: Since i'm scaling the icon anyway, i'll allow it to become larger
-      // than the standard small icon if the close button is.
-      CSize sizeIcon(max(::GetSystemMetrics(SM_CXSIZE), ::GetSystemMetrics(SM_CXSMICON)), max(::GetSystemMetrics(SM_CYSIZE), ::GetSystemMetrics(SM_CYSMICON)));
-      HICON hIcon = (HICON)::LoadImage(NULL, szIcon, IMAGE_ICON, sizeIcon.cx, sizeIcon.cy, LR_SHARED);
-      if (NULL != hIcon)
-         pbh->SetIconScaled(hIcon, sizeIcon.cx, sizeIcon.cy);
+		CSize sizeIcon( ::GetSystemMetrics( SM_CXSMICON ), ::GetSystemMetrics( SM_CXSMICON ) );
+		CSize sizeIconLoad = sizeIcon;
+		if( sizeIcon.cx > 16 )
+			sizeIconLoad = CSize( 32, 32 );
+		if( HICON hIcon = (HICON)::LoadImage(NULL, szIcon, IMAGE_ICON, sizeIconLoad.cx, sizeIconLoad.cy, LR_SHARED) )
+			pbh->SetIconScaled(hIcon, sizeIcon.cx, sizeIcon.cy);
    }
 
    pbh->Create(strTitle, strContent, ptAnchor, unOptions|unDELETE_THIS_ON_CLOSE, 
@@ -509,9 +509,12 @@ BOOL CBalloonHelp::Create(const CString& strTitle, const CString& strContent,
    // if no fonts set, use defaults
    if ( NULL == m_pContentFont )
    {
-      m_pContentFont = new CFont;
-      if ( !m_pContentFont->CreateStockObject(DEFAULT_GUI_FONT) )
-         return FALSE;
+		m_pContentFont = new CFont;
+
+		NONCLIENTMETRICS ncm = { sizeof(ncm) };
+		::SystemParametersInfo( SPI_GETNONCLIENTMETRICS, sizeof(ncm), &ncm, 0 );
+		
+		m_pContentFont->CreateFontIndirect( &ncm.lfStatusFont );        
    }
 
    // title font defaults to bold version of content font
@@ -716,14 +719,14 @@ CSize CBalloonHelp::DrawHeader(CDC* pDC, bool bDraw)
    // calc & draw close button
    if ( m_unOptions & unSHOW_CLOSE_BUTTON )
    {
-      int nBtnWidth = ::GetSystemMetrics(SM_CXSIZE);
+      int nBtnWidth = ::GetSystemMetrics(SM_CXSMICON);
       // if something is already in the header (icon) leave space
       if ( sizeHdr.cx > 0 )
          sizeHdr.cx += nTIP_MARGIN;
       sizeHdr.cx += nBtnWidth;
-      sizeHdr.cy = max(sizeHdr.cy, ::GetSystemMetrics(SM_CYSIZE));
+      sizeHdr.cy = max(sizeHdr.cy, ::GetSystemMetrics(SM_CYSMICON));
       if (bDraw)
-         pDC->DrawFrameControl(CRect(rectClient.right-nBtnWidth,0,rectClient.right,::GetSystemMetrics(SM_CYSIZE)), DFC_CAPTION, DFCS_CAPTIONCLOSE|DFCS_FLAT);
+         pDC->DrawFrameControl(CRect(rectClient.right-nBtnWidth,0,rectClient.right,::GetSystemMetrics(SM_CYSMICON)), DFC_CAPTION, DFCS_CAPTIONCLOSE|DFCS_FLAT);
       rectClient.right -= nBtnWidth;
    }
 
@@ -747,7 +750,9 @@ CSize CBalloonHelp::DrawHeader(CDC* pDC, bool bDraw)
       {
          pDC->SetBkMode(TRANSPARENT);
          pDC->SetTextColor(m_crForeground);
-         pDC->DrawText(strTitle, &rectClient, DT_CENTER | DT_NOPREFIX  | DT_EXPANDTABS | DT_SINGLELINE);
+         CRect rc = rectClient;
+         rc.left += nTIP_MARGIN;
+         pDC->DrawText(strTitle, &rc, DT_NOPREFIX  | DT_EXPANDTABS | DT_SINGLELINE);
       }
 
       // cleanup
@@ -1147,8 +1152,8 @@ void CBalloonHelp::OnLButtonDown(UINT, CPoint point)
    {
       CRect rect;
       GetClientRect(&rect);
-      rect.left = rect.right-::GetSystemMetrics(SM_CXSIZE);
-      rect.bottom = rect.top+::GetSystemMetrics(SM_CYSIZE);
+      rect.left = rect.right-::GetSystemMetrics(SM_CXSMICON);
+      rect.bottom = rect.top+::GetSystemMetrics(SM_CYSMICON);
       if ( rect.PtInRect(point) )
       {
          m_uCloseState |= DFCS_PUSHED;
@@ -1168,8 +1173,8 @@ void CBalloonHelp::OnLButtonUp(UINT, CPoint point)
       m_uCloseState &= ~DFCS_PUSHED;
       CRect rect;
       GetClientRect(&rect);
-      rect.left = rect.right-::GetSystemMetrics(SM_CXSIZE);
-      rect.bottom = rect.top+::GetSystemMetrics(SM_CYSIZE);
+      rect.left = rect.right-::GetSystemMetrics(SM_CXSMICON);
+      rect.bottom = rect.top+::GetSystemMetrics(SM_CYSMICON);
       if ( rect.PtInRect(point) )
          HideBalloon();
    }
@@ -1203,8 +1208,8 @@ void CBalloonHelp::OnMouseMove(UINT, CPoint point)
    {
       CRect rect;
       GetClientRect(&rect);
-      rect.left = rect.right-::GetSystemMetrics(SM_CXSIZE);
-      rect.bottom = rect.top+::GetSystemMetrics(SM_CYSIZE);
+      rect.left = rect.right-::GetSystemMetrics(SM_CXSMICON);
+      rect.bottom = rect.top+::GetSystemMetrics(SM_CYSMICON);
       CClientDC dc(this);
       UINT uState = DFCS_CAPTIONCLOSE;
       BOOL bPushed = m_uCloseState&DFCS_PUSHED;

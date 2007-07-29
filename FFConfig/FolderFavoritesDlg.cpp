@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "FFConfig.h"
 #include "FolderFavoritesDlg.h"
+#include "ImportDlg.h"
 
 #pragma warning(disable:4244) // numeric conversion
 
@@ -192,7 +193,7 @@ void CFolderFavoritesDlg::LoadFavorites()
 
 	size_t iItem = 0;
 
-	LoadFavorites_worker( TVI_ROOT, favs, iItem );
+	LoadFavorites_worker( TVI_ROOT, TVI_LAST, favs, iItem );
 
 	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( FALSE );
 
@@ -204,13 +205,14 @@ void CFolderFavoritesDlg::LoadFavorites()
 
 //-----------------------------------------------------------------------------------------------
 
-void CFolderFavoritesDlg::LoadFavorites_worker( HTREEITEM hParent, const FavoritesList& favs, size_t& iItem )
+void CFolderFavoritesDlg::LoadFavorites_worker( 
+	HTREEITEM hParent, HTREEITEM hInsertAfter, const FavoritesList& favs, size_t& iItem )
 {
 	while( iItem < favs.size() )
 	{
 		const FavoritesList::value_type& fav = favs[ iItem ];
 		
-		HTREEITEM hItem = NULL;
+		HTREEITEM hItem = hInsertAfter;
 
 		if( fav.title == _T("--") )
 		{
@@ -223,18 +225,18 @@ void CFolderFavoritesDlg::LoadFavorites_worker( HTREEITEM hParent, const Favorit
 		{
 			// insert submenu recursively
 
-			hItem = m_tree.InsertItem( fav.title.substr( 1 ).c_str(), 0, 0, hParent, TVI_LAST );
+			hItem = m_tree.InsertItem( fav.title.substr( 1 ).c_str(), 0, 0, hParent, hItem );
 			m_tree.SetItemIsFolder( hItem );
 
 			++iItem;
 
-			LoadFavorites_worker( hItem, favs, iItem );			
+			LoadFavorites_worker( hItem, TVI_LAST, favs, iItem );			
 		}
 		else if( fav.title == _T("-") )
 		{
 			// insert divider
 			
-			hItem = m_tree.InsertItem( _T(""), -1, -1, hParent, TVI_LAST );
+			hItem = m_tree.InsertItem( _T(""), -1, -1, hParent, hItem );
 			m_tree.SetItemDivider( hItem );
 
 			++iItem;
@@ -243,7 +245,7 @@ void CFolderFavoritesDlg::LoadFavorites_worker( HTREEITEM hParent, const Favorit
 		{
 			// insert normal item
 
-			hItem = m_tree.InsertItem( fav.title.c_str(), 1, 1, hParent, TVI_LAST );
+			hItem = m_tree.InsertItem( fav.title.c_str(), 1, 1, hParent, hItem );
 			m_tree.SetItemText( hItem, COL_COMMAND, fav.command.c_str() );
 			m_tree.SetItemText( hItem, COL_TARGETPATH, fav.targetpath.c_str() );
 
@@ -738,8 +740,43 @@ void CFolderFavoritesDlg::OnContextMenu(CWnd* pWnd, CPoint pt )
 
 void CFolderFavoritesDlg::OnBnClickedBtnImport()
 {
-	// TODO: Fügen Sie hier Ihren Kontrollbehandlungscode für die Benachrichtigung ein.
+	CImportDlg dlg( this );
+	if( dlg.DoModal() == IDOK )
+	{
+		FavoritesList favs;
+		GetTcFavorites( &favs, dlg.GetTcIniPath() );
 
-//	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+		AutoRedraw( m_tree.GetSafeHwnd() );
+
+		HTREEITEM hInsertAfter = TVI_LAST;
+		HTREEITEM hParent = TVI_ROOT;
+
+		if( dlg.GetReplaceExisting() )
+		{
+			m_tree.DeleteAllItems();
+			hInsertAfter = TVI_LAST;
+			hParent = TVI_ROOT;
+		}
+		else if( m_hSelItem )
+		{
+			hInsertAfter = m_hSelItem;
+			hParent = m_tree.GetTree().GetParentItem( m_hSelItem );
+			if( ! hParent )
+				hParent = TVI_ROOT;
+		}
+
+		size_t iItem = 0;
+		LoadFavorites_worker( hParent, hInsertAfter, favs, iItem );
+
+		if( dlg.GetReplaceExisting() )
+		{
+			// select first item (if any)
+			m_tree.GetTree().SelectAll( FALSE );
+			if( HTREEITEM hItem = m_tree.GetTree().GetChildItem( TVI_ROOT ) )
+				m_tree.GetTree().SetItemState( hItem, TVIS_SELECTED | TVIS_FOCUSED, TVIS_SELECTED | TVIS_FOCUSED );
+		}
+		
+		GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+	}
 }
 

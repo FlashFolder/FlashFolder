@@ -347,6 +347,9 @@
 				RelativePath=".\FolderFavoritesDlg.cpp">
 			</File>
 			<File
+				RelativePath=".\ImportDlg.cpp">
+			</File>
+			<File
 				RelativePath=".\PageCommonDirDlg.cpp">
 			</File>
 			<File
@@ -419,6 +422,9 @@
 			</File>
 			<File
 				RelativePath=".\FolderFavoritesDlg.h">
+			</File>
+			<File
+				RelativePath=".\ImportDlg.h">
 			</File>
 			<File
 				RelativePath=".\PageCommonDirDlg.h">
@@ -506,6 +512,9 @@
 		<Filter
 			Name="commonUtils_h"
 			Filter="*.h;*.hpp;*.hxx">
+			<File
+				RelativePath="..\commonUtils\BalloonHelp.h">
+			</File>
 			<File
 				RelativePath="..\commonUtils\DlgExpander.h">
 			</File>

@@ -48,6 +48,15 @@
 // All the other people who have provided suggestions, feeback, and code on the
 // CP forums.  This class would not be half as useful as it is without you all.
 //
+//-----------------------------------------------------------------------------
+//
+// July/2007 - changes by zett42:
+// - fixes from comments at Codeproject (http://www.codeproject.com/miscctrl/balloonhelp.asp)
+// - fixed icon metrics for XP (use only SM_CXICON/SM_CYICON for icon and button size)
+// - title text is now left aligned instead of awkward centering
+// - fixed default font: now uses tooltip font from system metrics rather than
+//   wrong DEFAULT_GUI_FONT
+//
 // ******************************************************************************
 
 #ifndef _BALLOON_HELP_H_INCLUDED_

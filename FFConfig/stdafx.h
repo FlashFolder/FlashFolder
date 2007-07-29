@@ -74,6 +74,7 @@
 #include <HyperLink.h>
 #include <DlgExpander.h>
 #include <TreeListCtrl/EditableTreeListCtrl.h>
+#include <BalloonHelp.h>
 // UI - TreePropSheet headers
 #include <TreePropSheet/TreePropSheet.h>
 #include <TreePropSheet/PropPageFrame.h>
