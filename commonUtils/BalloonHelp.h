@@ -56,6 +56,7 @@
 // - title text is now left aligned instead of awkward centering
 // - fixed default font: now uses tooltip font from system metrics rather than
 //   wrong DEFAULT_GUI_FONT
+// - made tooltip corners less rounded to look more like system tooltip
 //
 // ******************************************************************************
 

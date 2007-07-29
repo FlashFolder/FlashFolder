@@ -921,7 +921,7 @@ void CBalloonHelp::PositionWindow()
    CRgn regionRound;
    CRgn regionComplete;
    region.CreatePolygonRgn(&ptTail[0], 3, ALTERNATE);
-   regionRound.CreateRoundRectRgn(ptTopLeft.x,ptTopLeft.y,ptBottomRight.x,ptBottomRight.y,nTIP_MARGIN*3,nTIP_MARGIN*3);
+   regionRound.CreateRoundRectRgn(ptTopLeft.x,ptTopLeft.y,ptBottomRight.x,ptBottomRight.y,nTIP_MARGIN*2,nTIP_MARGIN*2);
    regionComplete.CreateRectRgn(0,0,1,1);
    regionComplete.CombineRgn(&region, &regionRound, RGN_OR);
 
