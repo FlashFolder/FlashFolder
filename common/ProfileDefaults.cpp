@@ -53,7 +53,7 @@ void GetProfileDefaults( Profile* pProfile )
 
 	//--- MSO file dialog
 
-	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("EnableHook"), 0 );
+	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("EnableHook"), 1 );
 	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("MinWidth"), 433 + DIALOG_UNITS_FLAG );
 	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("MinHeight"), 308 + DIALOG_UNITS_FLAG );
 	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("Center"), 1 );

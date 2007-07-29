@@ -208,13 +208,13 @@ END
 IDD_PAGE_MSO_FILEDLG DIALOGEX 0, 0, 195, 110
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN | 
     WS_CAPTION
-CAPTION "Dialogs::MS Office ""Open/Save""|MS Office ""Open/Save"" Dialog"
+CAPTION "Dialogs::MS Office ""Open/Save""|MS Office 2003 ""Open/Save"" Dialog"
+
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "&Enable FlashFolder for this dialog",IDC_CHK_ENABLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,121,10
     PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,133,8,47,14
-    LTEXT           "WARNING: EXPERIMENTAL FEATURE!",IDC_STATIC,7,23,122,8
     LTEXT           "Min. width:",IDC_STATIC,7,45,50,8
     EDITTEXT        IDC_ED_MINWIDTH,60,42,44,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_SP_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | 
