@@ -195,7 +195,7 @@ void CFolderFavoritesDlg::LoadFavorites()
 
 	LoadFavorites_worker( TVI_ROOT, TVI_LAST, favs, iItem );
 
-	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( FALSE );
+	EnableDlgItem( *this, IDC_BTN_REVERT, FALSE );
 
 	// select first item (if any)
 	m_tree.GetTree().SelectAll( FALSE );
@@ -408,7 +408,17 @@ void CFolderFavoritesDlg::OnBnClickedBtnTargetbrowse()
 void CFolderFavoritesDlg::UpdateSelItemEditControls()
 {
 	if( ! m_hSelItem )
+	{
+		// clear edit controls without updating tree
+		HTREEITEM oldSel = m_hSelItem; m_hSelItem = NULL;
+		SetDlgItemText( IDC_ED_COMMAND, _T("") );
+		SetDlgItemText( IDC_ED_TARGETPATH, _T("") );
+		SetDlgItemText( IDC_ED_TITLE, _T("") );
+		m_edTitle.SetHintText( _T("") );
+		m_hSelItem = oldSel;
 		return;
+	}
+
 	CString title, command, targetPath;
 	if( ! m_tree.IsItemDummy( m_hSelItem ) )
 	{
@@ -417,7 +427,7 @@ void CFolderFavoritesDlg::UpdateSelItemEditControls()
 		targetPath = m_tree.GetItemText( m_hSelItem, COL_TARGETPATH );
 	}
 
-	// set edit controls, but disable "reverse update" of list control
+	// disable "reverse update" of list control
 	HTREEITEM curSel = m_hSelItem;
 	m_hSelItem = NULL;
 
@@ -436,52 +446,45 @@ void CFolderFavoritesDlg::UpdateSelItemEditControls()
 }
 
 //-----------------------------------------------------------------------------------------------
+// Update states/content of controls upon selection change in tree
 
 void CFolderFavoritesDlg::OnTree_SelChanged( NMHDR *pNMHDR, LRESULT *pResult )
 {
 	*pResult = 0;
 	LPNMTREEVIEW pnm = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
 
-	// clear edit controls without updating tree
-	HTREEITEM oldSel = m_hSelItem; m_hSelItem = NULL;
-	SetDlgItemText( IDC_ED_COMMAND, _T("") );
-	SetDlgItemText( IDC_ED_TARGETPATH, _T("") );
-	SetDlgItemText( IDC_ED_TITLE, _T("") );
-	m_edTitle.SetHintText( _T("") );
-	m_hSelItem = oldSel;
-
-	// reset button states
-	GetDlgItem( IDC_BTN_REMOVE )->EnableWindow( FALSE );
-	GetDlgItem( IDC_ED_COMMAND )->EnableWindow( FALSE );
-	GetDlgItem( IDC_ED_TARGETPATH )->EnableWindow( FALSE );
-	GetDlgItem( IDC_ED_TITLE )->EnableWindow( FALSE );
-	GetDlgItem( IDC_BTN_BROWSE )->EnableWindow( FALSE );
-	GetDlgItem( IDC_BTN_TARGETBROWSE )->EnableWindow( FALSE );
-
-	// set new button states
-
-	if( pnm->itemNew.hItem )
+	HTREEITEM hFocus = m_tree.GetTree().GetFocusedItem();
+	if( hFocus != m_hSelItem )
 	{
-		m_hSelItem = pnm->itemNew.hItem;
+		m_hSelItem = hFocus;
+
 		UpdateSelItemEditControls();
 
-		if( ! m_tree.IsItemDummy( pnm->itemNew.hItem ) )
+		BOOL bBtnRemove = FALSE;
+		BOOL bEdTitle = FALSE;
+		BOOL bCommandAndTarget = FALSE;
+
+		if( ! m_tree.IsItemDummy( m_hSelItem ) )
 		{
-			GetDlgItem( IDC_BTN_REMOVE )->EnableWindow( TRUE );
+			bBtnRemove = TRUE;
 
-			if( ! m_tree.IsItemDivider( pnm->itemNew.hItem ) )
+			if( ! m_tree.IsItemDivider( m_hSelItem ) )
 			{
-				GetDlgItem( IDC_ED_TITLE )->EnableWindow( TRUE );
+				bEdTitle = TRUE;
 
-				if( ! m_tree.GetTree().ItemHasChildren( pnm->itemNew.hItem ) )
+				if( ! m_tree.GetTree().ItemHasChildren( m_hSelItem ) )
 				{
-					GetDlgItem( IDC_ED_COMMAND )->EnableWindow( TRUE );
-					GetDlgItem( IDC_ED_TARGETPATH )->EnableWindow( TRUE );
-					GetDlgItem( IDC_BTN_BROWSE )->EnableWindow( TRUE );
-					GetDlgItem( IDC_BTN_TARGETBROWSE )->EnableWindow( TRUE );
+					bCommandAndTarget = TRUE;
 				}
 			}
 		}
+		
+		EnableDlgItem( *this, IDC_BTN_REMOVE, bBtnRemove );
+		EnableDlgItem( *this, IDC_ED_TITLE, bEdTitle );
+		EnableDlgItem( *this, IDC_ED_COMMAND, bCommandAndTarget );
+		EnableDlgItem( *this, IDC_ED_TARGETPATH, bCommandAndTarget );
+		EnableDlgItem( *this, IDC_BTN_BROWSE, bCommandAndTarget );
+		EnableDlgItem( *this, IDC_BTN_TARGETBROWSE, bCommandAndTarget );
 	}
 }
 
@@ -490,7 +493,7 @@ void CFolderFavoritesDlg::OnTree_SelChanged( NMHDR *pNMHDR, LRESULT *pResult )
 void CFolderFavoritesDlg::OnTree_InsertItem( NMHDR *pNMHDR, LRESULT *pResult )
 {
 	*pResult = 0;
-	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+	EnableDlgItem( *this, IDC_BTN_REVERT );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -498,7 +501,7 @@ void CFolderFavoritesDlg::OnTree_InsertItem( NMHDR *pNMHDR, LRESULT *pResult )
 void CFolderFavoritesDlg::OnTree_DeleteItem( NMHDR *pNMHDR, LRESULT *pResult )
 {
 	*pResult = 0;
-	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+	EnableDlgItem( *this, IDC_BTN_REVERT );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -523,7 +526,7 @@ void CFolderFavoritesDlg::OnEnChangeEdTitle()
 
 		m_tree.SetItemText( m_hSelItem, COL_TITLE, title );
 
-		GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+		EnableDlgItem( *this, IDC_BTN_REVERT );
 	}
 }
 
@@ -545,7 +548,7 @@ void CFolderFavoritesDlg::OnEnChangeEdCommand()
 
 		m_tree.SetItemText( m_hSelItem, COL_COMMAND, cmd );
 
-		GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+		EnableDlgItem( *this, IDC_BTN_REVERT );
 	}
 }
 
@@ -559,7 +562,7 @@ void CFolderFavoritesDlg::OnEnChangeEdTargetPath()
 		path.Trim();
 		m_tree.SetItemText( m_hSelItem, COL_TARGETPATH, path );
 
-		GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+		EnableDlgItem( *this, IDC_BTN_REVERT );
 	}
 }
 
@@ -583,7 +586,7 @@ void CFolderFavoritesDlg::OnBnClickedBtnAdd()
 	m_tree.GetTree().SetItemState( hItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
 	m_tree.GetTree().EnsureVisible( hItem );
 
-	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+	EnableDlgItem( *this, IDC_BTN_REVERT );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -607,7 +610,7 @@ void CFolderFavoritesDlg::OnBnClickedBtnAddDivider()
 	m_tree.GetTree().SetItemState( hItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
 	m_tree.GetTree().EnsureVisible( hItem );
 
-	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+	EnableDlgItem( *this, IDC_BTN_REVERT );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -632,7 +635,7 @@ void CFolderFavoritesDlg::OnBnClickedBtnAddSubmenu()
 	m_tree.GetTree().SetItemState( hItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
 	m_tree.GetTree().EnsureVisible( hItem );
 
-	GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+	EnableDlgItem( *this, IDC_BTN_REVERT );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -776,7 +779,7 @@ void CFolderFavoritesDlg::OnBnClickedBtnImport()
 				m_tree.GetTree().SetItemState( hItem, TVIS_SELECTED | TVIS_FOCUSED, TVIS_SELECTED | TVIS_FOCUSED );
 		}
 		
-		GetDlgItem( IDC_BTN_REVERT )->EnableWindow( TRUE );
+		EnableDlgItem( *this, IDC_BTN_REVERT );
 	}
 }
 

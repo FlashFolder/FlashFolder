@@ -61,3 +61,18 @@ inline bool IsCtrlKeyPressed()
 	{ return (GetKeyState(VK_CONTROL) & (1 << (sizeof(SHORT)*8-1))) != 0; }
 inline bool IsAltKeyPressed()  
 	{ return (GetKeyState(VK_MENU) & (1 << (sizeof(SHORT)*8-1))) != 0; }
+
+
+/// Set enabled state of dialog control but switch focus if it is on a disabled item.\n
+/// Otherwise, if using EnableWindow() alone, focus can be lost and cannot be 
+/// activated again by using keyboard.
+inline void EnableDlgItem( HWND hDlg, UINT idCtrl, BOOL bEnable = TRUE )
+{
+	HWND hCtrl = ::GetDlgItem( hDlg, idCtrl );
+	if( ! hCtrl )
+		return;
+	HWND hFocus = ::GetFocus();
+	::EnableWindow( hCtrl, bEnable );
+	if( ! bEnable && hFocus == hCtrl )
+		::SendMessage( hDlg, WM_NEXTDLGCTL, 0, 0 );			
+}
