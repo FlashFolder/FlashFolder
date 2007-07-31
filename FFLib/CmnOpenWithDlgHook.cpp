@@ -119,6 +119,7 @@ LRESULT CALLBACK CmnOpenWithDlgHook::HookWindowProc(
 
 		case WM_ACTIVATE:
 			g_pHook->m_isWindowActive = LOWORD(wParam) != 0;
+			FileDlgHookCallbacks::OnActivate( wParam, lParam );
 		break;
 
 		case WM_SIZE:

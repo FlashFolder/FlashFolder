@@ -1,5 +1,5 @@
-/* This file is part of FlashFolder. 
- * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+/* This file is part of FlashFolder.
+ * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net )
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,38 +18,35 @@
  */
 #pragma once
 
-#include "PageGeneric.h"
-#include "PageCommonFileDlg.h"
-#include "PageCommonDirDlg.h"
-#include "PageCommonOpenWithDlg.h"
-#include "PageMsoFileDlg.h"
-#include "PageTotalCmd.h"
-#include "PageShortcuts.h"
+#include "AutoPropertyPage.h"
 
 //-----------------------------------------------------------------------------------------------
 
-class CFFConfigDlg : public TreePropSheet::CTreePropSheet
+class CPageShortcuts : public CAutoPropertyPage
 {
 public:
-	CFFConfigDlg(CWnd* pParent = NULL);	// standard constructor
+	typedef CAutoPropertyPage base;
 
-	enum { IDD = IDD_FFCONFIG_DIALOG };
+	enum { IDD = IDD_PAGE_SHORTCUTS };
 
-	enum { WM_APP_PAGE_CHANGED = WM_APP + 0x100 };
+	CPageShortcuts();
 
-private:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+	virtual void ReadProfile( const Profile& profile );
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    
 	virtual BOOL OnInitDialog();
+	virtual BOOL OnApply();
+	afx_msg void OnLvnItemchangedLstShortcuts(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnShortcutChange();
+	afx_msg void OnBnClickedBtnClear();
 
-	afx_msg LRESULT OnPageChanged( WPARAM wp, LPARAM lp );
 	DECLARE_MESSAGE_MAP()
 
 private:
-	CPageGeneric m_pageGeneric;
-	CPageCommonFileDlg m_pageCommonFileDlg;
-	CPageCommonDirDlg m_pageCommonDirDlg;
-	CPageCommonOpenWithDlg m_pageCommonOpenWithDlg;
-	CPageMsoFileDlg m_pageMsoFileDlg;
-	CPageTotalcmd m_pageTotalcmd;
-	CPageShortcuts m_pageShortcuts;
+	CListCtrl m_lstShortcuts;
+	CHotKeyCtrl m_hotkeyCtrl;
+	int m_selItem;
+	bool m_bReadDefaults;
+	std::map<CString,CString> m_mapTitleToCmd;
 };

@@ -35,8 +35,9 @@ namespace FileDlgHookCallbacks
 	void OnFolderChange();
     void OnResize();
 	void OnEnable( bool bEnable );
-	void OnDestroy( bool isOkBtnPressed );
 	void OnShow( bool bShow );
+	void OnActivate( WPARAM wParam, LPARAM lParam );
+	void OnDestroy( bool isOkBtnPressed );
 	void SetTimer( DWORD interval );
 };
 

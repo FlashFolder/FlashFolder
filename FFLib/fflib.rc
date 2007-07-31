@@ -124,7 +124,7 @@ BEGIN
     ID_FF_GLOBALHIST        "Global folder history"
     ID_FF_FAVORITES         "Favorite folders"
     ID_FF_SHOWALL           "View all files (*.*)"
-    ID_FF_OPENDIRS          "Folders of currently open files"
+    ID_FF_OPENDIRS          "Folders of open files"
 END
 
 STRINGTABLE 

@@ -365,6 +365,9 @@
 				RelativePath=".\PageMsoFileDlg.cpp">
 			</File>
 			<File
+				RelativePath=".\PageShortcuts.cpp">
+			</File>
+			<File
 				RelativePath=".\PageTotalcmd.cpp">
 			</File>
 			<File
@@ -443,6 +446,9 @@
 			</File>
 			<File
 				RelativePath=".\PageMsoFileDlg.h">
+			</File>
+			<File
+				RelativePath=".\PageShortcuts.h">
 			</File>
 			<File
 				RelativePath=".\PageTotalcmd.h">

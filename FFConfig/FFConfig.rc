@@ -66,7 +66,7 @@ END
 
 IDD_PAGE_TOTALCMD DIALOGEX 0, 0, 211, 103
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
-CAPTION "Programs::Total Commander|Total Commander Integration"
+CAPTION "Total Commander Integration"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "&Enable Total Commander® integration",IDC_CHK_ENABLE,
@@ -75,6 +75,21 @@ BEGIN
                     IDC_STATIC,18,28,183,35
     LTEXT           "You can still open the TC menu by using Shift+Doubleclick, by pressing the shortcut key or by clicking the directory menu button.",
                     IDC_STATIC,18,65,183,31
+END
+
+IDD_PAGE_SHORTCUTS DIALOGEX 0, 0, 232, 156
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CAPTION
+CAPTION "Keyboard Shortcuts"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Select function:",IDC_STATIC,7,7,51,8
+    CONTROL         "",IDC_LST_SHORTCUTS,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,18,218,111
+    LTEXT           "&Press shortcut key:",IDC_STATIC,7,138,71,8
+    CONTROL         "",IDC_HOTKEY,"msctls_hotkey32",WS_DISABLED | WS_BORDER | 
+                    WS_TABSTOP,75,135,114,14
+    PUSHBUTTON      "&Clear",IDC_BTN_CLEAR,191,135,34,14,WS_DISABLED
 END
 
 
@@ -93,6 +108,14 @@ BEGIN
         VERTGUIDE, 18
         TOPMARGIN, 7
         BOTTOMMARGIN, 96
+    END
+
+    IDD_PAGE_SHORTCUTS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 225
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 149
     END
 END
 #endif    // APSTUDIO_INVOKED
