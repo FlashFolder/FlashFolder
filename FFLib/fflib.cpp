@@ -150,6 +150,9 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 
 void MakeSureDllKeepsLoaded()
 {
+	// TEST whether not loading DLL make upgrade installs more stable (issue #1763646)
+	return;
+
 	static bool s_isLoaded = false;
 	if( s_isLoaded )
 		return;
