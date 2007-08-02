@@ -18,6 +18,9 @@
  */
 
 #include <stdafx.h>
+#include <shlwapi.h>
+
+#include <assert.h>
 
 #include "utils.h"
 
@@ -75,6 +78,27 @@ bool IsRelativePath( LPCTSTR path )
 	if( _istalpha( path[0] ) && path[1] == _T(':') )
 		return false;
 	return true;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+int ComparePath( LPCTSTR path1, LPCTSTR path2 )
+{
+	TCHAR temp1[ MAX_PATH + 1 ];
+	TCHAR temp2[ MAX_PATH + 1 ];
+	if( ! ::PathCanonicalize( temp1, path1 ) )
+	{
+		assert( false );
+		return 1;
+	}
+	::PathRemoveBackslash( temp1 );
+	if( ! ::PathCanonicalize( temp2, path2 ) )
+	{
+		assert( false );
+		return 1;
+	}
+	::PathRemoveBackslash( temp2 );
+	return _tcsicmp( temp1, temp2 );
 }
 
 //-----------------------------------------------------------------------------------------------

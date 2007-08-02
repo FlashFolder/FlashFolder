@@ -51,6 +51,9 @@ void GetDirFavorites( FavoritesList* pList )
 		StringCbPrintf( key, sizeof(key), _T("%d_targetPath"), i );			
 		item.targetpath = profile.GetString( _T("Favorites"), key );
 
+		StringCbPrintf( key, sizeof(key), _T("%d_iconPath"), i );			
+		item.iconPath = profile.GetString( _T("Favorites"), key );
+
 		pList->push_back( item );
 	}
 }
@@ -84,6 +87,12 @@ void SetDirFavorites( const FavoritesList& list )
 		{
 			StringCbPrintf( key, sizeof(key), _T("%d_targetPath"), nItem );
 			profile.SetString( _T("Favorites"), key, list[i].targetpath.c_str() );
+		}
+
+		if( ! list[ i ].iconPath.empty() )
+		{
+			StringCbPrintf( key, sizeof(key), _T("%d_iconPath"), nItem );
+			profile.SetString( _T("Favorites"), key, list[i].iconPath.c_str() );
 		}
 
 		++nItem;

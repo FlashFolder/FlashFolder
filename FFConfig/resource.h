@@ -66,8 +66,11 @@
 #define IDC_BTN_TARGETBROWSE            1048
 #define IDC_ST_SERVICE                  1049
 #define IDC_ST_FFSERVICE                1049
+#define IDC_ST_ICONPATH                 1049
 #define IDC_ST_FFLIB                    1050
+#define IDC_ED_ICONPATH                 1050
 #define IDC_ST_FFCONFIG                 1051
+#define IDC_BTN_ICONBROWSE              1051
 #define IDC_CB_POSITION                 1053
 #define IDC_ST_HOMEPAGE                 1056
 #define IDC_ST_BUGREPORT                1057
@@ -111,7 +114,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        164
+#define _APS_NEXT_RESOURCE_VALUE        165
 #define _APS_NEXT_COMMAND_VALUE         32778
 #define _APS_NEXT_CONTROL_VALUE         1087
 #define _APS_NEXT_SYMED_VALUE           105

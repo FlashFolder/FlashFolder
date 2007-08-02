@@ -22,7 +22,8 @@ struct FavoritesItem
 {
 	tstring command;      ///< file path or TC command (required)
 	tstring title;        ///< menu item title
-	tstring targetpath;   ///< unused, round-trip data from TC
+	tstring targetpath;   ///< target path for TC
+	tstring iconPath;     ///< path to icon + "," + iconId 
 };
 
 typedef std::vector<FavoritesItem> FavoritesList;

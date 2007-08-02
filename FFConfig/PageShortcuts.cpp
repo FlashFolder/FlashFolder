@@ -20,6 +20,8 @@
 #include "FFConfig.h"
 #include "PageShortcuts.h"
 
+#pragma warning(disable:4244) // numeric conversions
+
 using namespace std;
 
 //-----------------------------------------------------------------------------------------------

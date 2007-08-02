@@ -42,6 +42,9 @@ bool IsRelativePath( LPCTSTR path );
 
 void GetTempFilePath( LPTSTR pResult, LPCTSTR pPrefix );
 
+int ComparePath( LPCTSTR path1, LPCTSTR path2 );
+
+
 bool IsIniSectionNotEmpty( LPCTSTR filename, LPCTSTR sectionName );
 
 void AddTextInput( std::vector<INPUT>* pInput, LPCTSTR pText );

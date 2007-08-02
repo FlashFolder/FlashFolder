@@ -17,7 +17,6 @@
  *
  */
 #include "StdAfx.h"
-#include "resource.h"
 #include "EditableTreeListCtrl.h"
 #include "gdiUtils.h"
 

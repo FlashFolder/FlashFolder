@@ -93,6 +93,7 @@ BEGIN_MESSAGE_MAP(CFolderFavoritesDlg, CResizableDlg)
 	ON_EN_CHANGE( IDC_ED_TITLE, OnEnChangeEdTitle )
 	ON_EN_CHANGE( IDC_ED_COMMAND, OnEnChangeEdCommand )
 	ON_EN_CHANGE( IDC_ED_TARGETPATH, OnEnChangeEdTargetPath )
+	ON_EN_CHANGE( IDC_ED_ICONPATH, OnEnChangeEdIconPath )
 	ON_BN_CLICKED( IDC_BTN_ADD, OnBnClickedBtnAdd )
 	ON_BN_CLICKED( IDC_BTN_ADD_DIVIDER, OnBnClickedBtnAddDivider )
 	ON_BN_CLICKED( IDC_BTN_ADD_SUBMENU, OnBnClickedBtnAddSubmenu )
@@ -101,6 +102,7 @@ BEGIN_MESSAGE_MAP(CFolderFavoritesDlg, CResizableDlg)
 	ON_BN_CLICKED(IDC_BTN_TARGETBROWSE, OnBnClickedBtnTargetbrowse)
 	ON_BN_CLICKED(IDC_BTN_REVERT, OnBnClickedBtnRevert)
 	ON_WM_CONTEXTMENU()
+	ON_BN_CLICKED(IDC_BTN_ICONBROWSE, OnBnClickedBtnIconbrowse)
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
@@ -158,11 +160,14 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	Anchor( IDC_ST_TITLE, ANCHOR_BOTTOMLEFT );
 	Anchor( IDC_ST_PATH, ANCHOR_BOTTOMLEFT );
 	Anchor( IDC_ST_TARGETPATH, ANCHOR_BOTTOMLEFT );
+	Anchor( IDC_ST_ICONPATH, ANCHOR_BOTTOMLEFT );
 	Anchor( IDC_ED_TITLE, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
 	Anchor( IDC_ED_COMMAND, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
 	Anchor( IDC_ED_TARGETPATH, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
+	Anchor( IDC_ED_ICONPATH, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
 	Anchor( IDC_BTN_BROWSE, ANCHOR_BOTTOMRIGHT );
 	Anchor( IDC_BTN_TARGETBROWSE, ANCHOR_BOTTOMRIGHT );
+	Anchor( IDC_BTN_ICONBROWSE, ANCHOR_BOTTOMRIGHT );
 	Anchor( IDOK, ANCHOR_BOTTOMRIGHT );
 	Anchor( IDCANCEL, ANCHOR_BOTTOMRIGHT );
 	Anchor( IDC_BTN_REVERT, ANCHOR_BOTTOMRIGHT );
@@ -229,6 +234,7 @@ void CFolderFavoritesDlg::LoadFavorites_worker(
 			hItem = m_tree.InsertItem( fav.title.substr( 1 ).c_str(), 0, 0, hParent, hInsertAfter );
 			m_tree.SetItemIsFolder( hItem );
 
+
 			++iItem;
 
 			LoadFavorites_worker( hItem, TVI_FIRST, favs, iItem, false );			
@@ -252,6 +258,8 @@ void CFolderFavoritesDlg::LoadFavorites_worker(
 
 			++iItem;
 		}
+
+		m_tree.GetTree().SetItemData( hItem, 0 );
 
 		// select inserted root items
 		if( bSelectInsertedItems )
@@ -289,6 +297,9 @@ void CFolderFavoritesDlg::SaveFavorites_worker( FavoritesList& favs, HTREEITEM h
 	for( HTREEITEM hItem = m_tree.GetTree().GetChildItem( hParent ); hItem; 
 	     hItem = m_tree.GetTree().GetNextItem( hItem, TVGN_NEXT ) )
 	{
+		if( m_tree.IsItemDummy( hItem ) )
+			continue;
+
 		CString title = m_tree.GetItemText( hItem, COL_TITLE ).GetString();
 		// remove special tokens
 		if( title == _T("-") || title == _T("--") )
@@ -338,12 +349,19 @@ void CFolderFavoritesDlg::SaveFavorites_worker( FavoritesList& favs, HTREEITEM h
 					command = _T("cd ") + command;
 				fav.command = command.GetString();
 				
-
 				fav.targetpath = m_tree.GetItemText( hItem, COL_TARGETPATH ).GetString();
 				favs.push_back( fav );		
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+CString CFolderFavoritesDlg::GetItemIconPath( HTREEITEM hItem ) const
+{
+	stdext::hash_map<HTREEITEM, CString>::const_iterator it = m_iconPathes.find( hItem );
+	return it != m_iconPathes.end() ? it->second : _T(""); 
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -418,20 +436,22 @@ void CFolderFavoritesDlg::UpdateSelItemEditControls()
 	{
 		// clear edit controls without updating tree
 		HTREEITEM oldSel = m_hSelItem; m_hSelItem = NULL;
+		SetDlgItemText( IDC_ED_TITLE, _T("") );
 		SetDlgItemText( IDC_ED_COMMAND, _T("") );
 		SetDlgItemText( IDC_ED_TARGETPATH, _T("") );
-		SetDlgItemText( IDC_ED_TITLE, _T("") );
+		SetDlgItemText( IDC_ED_ICONPATH, _T("") );
 		m_edTitle.SetHintText( _T("") );
 		m_hSelItem = oldSel;
 		return;
 	}
 
-	CString title, command, targetPath;
+	CString title, command, targetPath, iconPath;
 	if( ! m_tree.IsItemDummy( m_hSelItem ) )
 	{
 		title = m_tree.GetItemText( m_hSelItem, COL_TITLE );
 		command = m_tree.GetItemText( m_hSelItem, COL_COMMAND );
 		targetPath = m_tree.GetItemText( m_hSelItem, COL_TARGETPATH );
+		iconPath = GetItemIconPath( m_hSelItem );
 	}
 
 	// disable "reverse update" of list control
@@ -439,7 +459,8 @@ void CFolderFavoritesDlg::UpdateSelItemEditControls()
 	m_hSelItem = NULL;
 
 	CString defTitle = GetDefaultTitle( command );
-	if( title == _T("-untitled-") || title == defTitle )
+
+	if( title == _T("-untitled-") || ComparePath( title, defTitle ) == 0 )
 	{
 		m_edTitle.SetHintText( title );
 		title = _T("");
@@ -448,6 +469,7 @@ void CFolderFavoritesDlg::UpdateSelItemEditControls()
 
 	SetDlgItemText( IDC_ED_COMMAND, command );
 	SetDlgItemText( IDC_ED_TARGETPATH, targetPath );
+	SetDlgItemText( IDC_ED_ICONPATH, iconPath );
 	
 	m_hSelItem = curSel;
 }
@@ -488,9 +510,11 @@ void CFolderFavoritesDlg::OnTree_SelChanged( NMHDR *pNMHDR, LRESULT *pResult )
 		
 		EnableDlgItem( *this, IDC_BTN_REMOVE, bBtnRemove );
 		EnableDlgItem( *this, IDC_ED_TITLE, bEdTitle );
+		EnableDlgItem( *this, IDC_ED_ICONPATH, bEdTitle );
+		EnableDlgItem( *this, IDC_BTN_ICONBROWSE, bEdTitle );
 		EnableDlgItem( *this, IDC_ED_COMMAND, bCommandAndTarget );
-		EnableDlgItem( *this, IDC_ED_TARGETPATH, bCommandAndTarget );
 		EnableDlgItem( *this, IDC_BTN_BROWSE, bCommandAndTarget );
+		EnableDlgItem( *this, IDC_ED_TARGETPATH, bCommandAndTarget );
 		EnableDlgItem( *this, IDC_BTN_TARGETBROWSE, bCommandAndTarget );
 	}
 }
@@ -509,6 +533,10 @@ void CFolderFavoritesDlg::OnTree_DeleteItem( NMHDR *pNMHDR, LRESULT *pResult )
 {
 	*pResult = 0;
 	EnableDlgItem( *this, IDC_BTN_REVERT );
+
+	// delete additional data associated with item
+	NMTREEVIEW* pnm = reinterpret_cast<NMTREEVIEW*>( pNMHDR );
+	m_iconPathes.erase( pnm->itemOld.hItem );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -568,6 +596,23 @@ void CFolderFavoritesDlg::OnEnChangeEdTargetPath()
 		GetDlgItemText( IDC_ED_TARGETPATH, path );
 		path.Trim();
 		m_tree.SetItemText( m_hSelItem, COL_TARGETPATH, path );
+
+		EnableDlgItem( *this, IDC_BTN_REVERT );
+	}
+}
+
+void CFolderFavoritesDlg::OnEnChangeEdIconPath()
+{
+	// update current list item
+	if( m_hSelItem )
+	{
+		CString path;
+		GetDlgItemText( IDC_ED_ICONPATH, path );
+		path.Trim();
+		m_iconPathes[ m_hSelItem ] = path;
+
+		path.MakeLower();
+
 
 		EnableDlgItem( *this, IDC_BTN_REVERT );
 	}
@@ -792,3 +837,37 @@ void CFolderFavoritesDlg::OnBnClickedBtnImport()
 	}
 }
 
+//-----------------------------------------------------------------------------------------------
+
+void CFolderFavoritesDlg::OnBnClickedBtnIconbrowse()
+{
+	int index = -1;
+	CString path; GetDlgItemText( IDC_ED_ICONPATH, path );
+	int p = path.ReverseFind( ',' );
+	if( p != -1 )
+	{
+		path = path.Left( p );
+		index = _ttoi( path.Mid( p + 1 ) );
+	}
+
+	if( ! FileExists( path ) )
+	{
+		path = _T("%SystemRoot%\\system32\\shell32.dll");
+		index = 0;
+	}
+
+	if( ::PickIconDlg( *this, path.GetBuffer( MAX_PATH ), MAX_PATH + 1, &index ) )
+	{
+		path.ReleaseBuffer();
+		if( index != -1 )
+		{
+			CString sindex; sindex.Format( _T(",%d"), index );
+			path += sindex;
+			//HICON hIcon = ::ExtractIcon( AfxGetInstanceHandle(), path, index );
+		}
+		TCHAR unexpandedPath[ MAX_PATH + 1 ] = _T("");
+		if( ::PathUnExpandEnvStrings( path, unexpandedPath, MAX_PATH ) )
+			path = unexpandedPath;
+		SetDlgItemText( IDC_ED_ICONPATH, path );
+	}
+}

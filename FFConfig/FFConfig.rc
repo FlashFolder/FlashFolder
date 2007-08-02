@@ -73,7 +73,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,139,10
     LTEXT           "If enabled, this allows you to use the FlashFolder favorites menu instead of Total Commander's own directory menu when you double-click on the title line with the current path.",
                     IDC_STATIC,18,28,183,35
-    LTEXT           "You can still open the TC menu by using Shift+Doubleclick, by pressing the shortcut key or by clicking the directory menu button.",
+    LTEXT           "You can still open the TC menu by using Ctrl+Doubleclick, by pressing the shortcut key or by clicking the directory menu button.",
                     IDC_STATIC,18,65,183,31
 END
 
@@ -334,7 +334,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,228,167,50,14
 END
 
-IDD_FAVORITES DIALOGEX 0, 0, 285, 146
+IDD_FAVORITES DIALOGEX 0, 0, 286, 162
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | 
     WS_VISIBLE | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Edit FlashFolder Favorites"
@@ -347,20 +347,24 @@ BEGIN
     PUSHBUTTON      "&Delete",IDC_BTN_REMOVE,172,8,50,14,WS_DISABLED
     PUSHBUTTON      "I&mport...",IDC_BTN_IMPORT,227,8,49,14
     LTEXT           "&Favorites menu:",IDC_ST_FAVMENU,8,25,53,8
-    LTEXT           "Statisch",IDC_ST_TREE_PLACEHOLDER,8,35,269,28,NOT 
+    LTEXT           "Statisch",IDC_ST_TREE_PLACEHOLDER,8,35,270,28,NOT 
                     WS_VISIBLE,WS_EX_STATICEDGE
     LTEXT           "&Title:",IDC_ST_TITLE,8,70,17,8
-    EDITTEXT        IDC_ED_TITLE,66,67,211,14,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_ED_TITLE,66,67,212,14,ES_AUTOHSCROLL | WS_DISABLED
     LTEXT           "&Path / command:",IDC_ST_PATH,8,87,55,8
     EDITTEXT        IDC_ED_COMMAND,66,84,188,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "...",IDC_BTN_BROWSE,256,84,21,14,WS_DISABLED
+    PUSHBUTTON      "...",IDC_BTN_BROWSE,257,84,21,14,WS_DISABLED
     LTEXT           "T&arget path (optional):",IDC_ST_TARGETPATH,8,99,44,16
     EDITTEXT        IDC_ED_TARGETPATH,66,101,188,14,ES_AUTOHSCROLL | 
                     WS_DISABLED
-    PUSHBUTTON      "...",IDC_BTN_TARGETBROWSE,256,101,21,14,WS_DISABLED
-    DEFPUSHBUTTON   "OK",IDOK,119,124,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,173,124,50,14
-    PUSHBUTTON      "Re&vert",IDC_BTN_REVERT,227,124,50,14,WS_DISABLED
+    PUSHBUTTON      "...",IDC_BTN_TARGETBROWSE,257,101,21,14,WS_DISABLED
+    LTEXT           "&Icon path:",IDC_ST_ICONPATH,8,120,42,8
+    EDITTEXT        IDC_ED_ICONPATH,66,118,188,14,ES_AUTOHSCROLL | 
+                    WS_DISABLED
+    PUSHBUTTON      "...",IDC_BTN_ICONBROWSE,257,118,21,14,WS_DISABLED
+    DEFPUSHBUTTON   "OK",IDOK,119,140,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,173,140,50,14
+    PUSHBUTTON      "Re&vert",IDC_BTN_REVERT,228,140,50,14,WS_DISABLED
 END
 
 IDD_IMPORT DIALOGEX 0, 0, 332, 108
@@ -465,9 +469,9 @@ BEGIN
     IDD_FAVORITES, DIALOG
     BEGIN
         LEFTMARGIN, 8
-        RIGHTMARGIN, 277
+        RIGHTMARGIN, 278
         TOPMARGIN, 8
-        BOTTOMMARGIN, 138
+        BOTTOMMARGIN, 154
     END
 
     IDD_IMPORT, DIALOG

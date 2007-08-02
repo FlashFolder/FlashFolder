@@ -37,7 +37,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="fflib.lib"
+				AdditionalDependencies="fflib.lib shlwapi.lib"
 				OutputFile="..\exe\FlashFolder.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -107,7 +107,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="fflib.lib"
+				AdditionalDependencies="fflib.lib shlwapi.lib"
 				OutputFile="..\exe\FlashFolder.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -178,7 +178,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="fflib.lib"
+				AdditionalDependencies="fflib.lib shlwapi.lib"
 				OutputFile="..\exe\FlashFolder.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -248,7 +248,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="fflib.lib"
+				AdditionalDependencies="fflib.lib shlwapi.lib"
 				OutputFile="..\exe\FlashFolder.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -317,7 +317,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="fflib.lib"
+				AdditionalDependencies="fflib.lib shlwapi.lib"
 				OutputFile="..\exe\FlashFolder.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"

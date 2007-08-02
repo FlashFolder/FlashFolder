@@ -38,6 +38,7 @@ private:
 	afx_msg void OnEnChangeEdTitle();
 	afx_msg void OnEnChangeEdCommand();
 	afx_msg void OnEnChangeEdTargetPath();
+	afx_msg void OnEnChangeEdIconPath();
 	afx_msg void OnBnClickedBtnAdd();
 	afx_msg void OnBnClickedBtnAddDivider();
 	afx_msg void OnBnClickedBtnAddSubmenu();
@@ -46,7 +47,8 @@ private:
 	afx_msg void OnBnClickedBtnBrowse();
 	afx_msg void OnBnClickedBtnTargetbrowse();
 	afx_msg void OnBnClickedBtnRevert();
-	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
+	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point );
+	afx_msg void OnBnClickedBtnIconbrowse();
 	DECLARE_MESSAGE_MAP()
 
 	void LoadFavorites();
@@ -64,8 +66,14 @@ private:
 	CEditEx m_edTitle;
 	CEditEx m_edPath;
 	CEditEx m_edTargetPath;
+	CEditEx m_edIconPath;
 
 	HTREEITEM m_hSelItem;
+
+	stdext::hash_map< HTREEITEM, CString > m_iconPathes;
+	CString GetItemIconPath(  HTREEITEM hItem ) const;
+
+	stdext::hash_map< CString, int > m_iconIDs;
 
 	bool m_isOwned;
 };
