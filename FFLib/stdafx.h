@@ -8,6 +8,8 @@
 #define _WIN32_WINDOWS 0x0501 
 #define _WIN32_IE 0x0600
 
+#pragma warning(disable:4995) // "deprecated" warnings caused by strsafe.h
+
 //--- windows headers
 #include <windows.h>
 #include <commdlg.h>

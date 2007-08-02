@@ -725,11 +725,50 @@ LRESULT CALLBACK ToolWindowEditPathProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
     return CallWindowProc(g_wndProcToolWindowEditPath, hwnd, uMsg, wParam, lParam);
 }
 
+//-----------------------------------------------------------------------------------------------
+
+void ExecuteToolbarCommand( UINT cmd )
+{
+	switch( cmd & 0xFFFF )
+	{
+		case ID_FF_LASTDIR:
+			GotoLastDir();
+			break;
+		case ID_FF_SHOWALL:
+			g_spFileDlgHook->SetFilter( _T("*.*") );
+			break;
+		case ID_FF_FOCUSPATH:
+		{
+			::SetForegroundWindow( g_hToolWnd );
+			HWND hEdit = ::GetDlgItem( g_hToolWnd, ID_FF_PATH );
+			::SetFocus( hEdit );
+			::SendMessage( hEdit, EM_SETSEL, 0, -1 );
+			break;
+		}
+		case ID_FF_GLOBALHIST:
+			DisplayMenu_GlobalHist();
+			break;
+		case ID_FF_OPENDIRS:
+			DisplayMenu_OpenDirs();
+			break;
+		case ID_FF_FAVORITES:
+			FavMenu_DisplayForFileDialog();
+			break;
+		case ID_FF_CONFIG:
+			DisplayMenu_Config();
+			break;
+		default:
+			DebugOut( _T("[fflib] ERROR: invalid command") );
+	}	
+}
+
 //-----------------------------------------------------------------------------------------
 // Window proc of the FlashFolder toolbar window
 
 INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static bool s_inMenu = false;
+
     switch( uMsg )
     {
 		case WM_COMMAND:
@@ -738,17 +777,8 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			WORD wID = LOWORD(wParam);         // item, control, or accelerator identifier 
 			HWND hwndCtl = (HWND) lParam;      // handle of control 
  
-			if (wNotifyCode == BN_CLICKED)
-				switch (wID)
-				{
-					case ID_FF_LASTDIR:
-						GotoLastDir();
-						break;
-					case ID_FF_SHOWALL:
-						g_spFileDlgHook->SetFilter( _T("*.*") );
-						SetForegroundWindow(g_hFileDialog);
-						break;
-				}
+			if( wNotifyCode == BN_CLICKED )
+				ExecuteToolbarCommand( wID );
 		}
 		break;
 
@@ -760,21 +790,8 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				// drop-down button pressed
 
 				NMTOOLBAR* pnmt = reinterpret_cast<NMTOOLBAR*>( pnm );
-				switch( pnmt->iItem )
-				{
-					case ID_FF_GLOBALHIST: 
-						DisplayMenu_GlobalHist();
-						break;
-                    case ID_FF_OPENDIRS:
-                        DisplayMenu_OpenDirs();
-                        break;
-					case ID_FF_FAVORITES:
-						FavMenu_DisplayForFileDialog();
-						break;
-					case ID_FF_CONFIG:
-						DisplayMenu_Config();
-						break;
-				}
+				ExecuteToolbarCommand( pnmt->iItem );
+
 				::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, TBDDRET_DEFAULT );
 				return TRUE;
 			}
@@ -818,42 +835,38 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			HWND hTb = ::GetDlgItem( g_hToolWnd, ID_FF_TOOLBAR );
 			
-			// cancel currently open menu, if any
-			::SendMessage( g_hToolWnd, WM_CANCELMODE, 0, 0 );
+			UINT cmd = 0;
+			const UINT IS_MENU = 0x10000;
 
 			if( tstring( _T("ff_LastFolder") ) + ffGuid == atomName )
-			{
-				GotoLastDir();
-			}
-			else if( tstring( _T("ff_MenuFolderHistory") ) + ffGuid == atomName )
-			{
-				::SendMessage( hTb, TB_PRESSBUTTON, ID_FF_GLOBALHIST, TRUE );
-				DisplayMenu_GlobalHist();
-				::SendMessage( hTb, TB_PRESSBUTTON, ID_FF_GLOBALHIST, FALSE );
-			}
-			else if( tstring( _T("ff_MenuOpenFolders") ) + ffGuid == atomName )
-			{
-				::SendMessage( hTb, TB_PRESSBUTTON, ID_FF_OPENDIRS, TRUE );
-				DisplayMenu_OpenDirs();
-					::SendMessage( hTb, TB_PRESSBUTTON, ID_FF_OPENDIRS, FALSE );
-			}
-			else if( tstring( _T("ff_MenuFavorites") ) + ffGuid == atomName )
-			{
-				::SendMessage( hTb, TB_PRESSBUTTON, ID_FF_FAVORITES, TRUE );
-				FavMenu_DisplayForFileDialog();
-				::SendMessage( hTb, TB_PRESSBUTTON, ID_FF_FAVORITES, FALSE );
-			}
+				cmd = ID_FF_LASTDIR;
 			else if( tstring( _T("ff_ViewAllFiles") ) + ffGuid == atomName )
-			{
-				g_spFileDlgHook->SetFilter( _T("*.*") );
-			}
+				cmd = ID_FF_SHOWALL;
 			else if( tstring( _T("ff_FocusPathEdit") ) + ffGuid == atomName )
+				cmd = ID_FF_FOCUSPATH;
+			else if( tstring( _T("ff_MenuFolderHistory") ) + ffGuid == atomName )
+				cmd = ID_FF_GLOBALHIST | IS_MENU;
+			else if( tstring( _T("ff_MenuOpenFolders") ) + ffGuid == atomName )
+				cmd = ID_FF_OPENDIRS   | IS_MENU;
+			else if( tstring( _T("ff_MenuFavorites") ) + ffGuid == atomName )
+				cmd = ID_FF_FAVORITES  | IS_MENU;
+
+			if( s_inMenu )
 			{
-				::SetForegroundWindow( g_hToolWnd );
-				HWND hEdit = ::GetDlgItem( g_hToolWnd, ID_FF_PATH );
-				::SetFocus( hEdit );
-				::SendMessage( hEdit, EM_SETSEL, 0, -1 );
+				// cancel currently open menu
+				::SendMessage( g_hToolWnd, WM_CANCELMODE, 0, 0 );
+				return FALSE;
 			}
+
+			if( cmd & IS_MENU )
+				::SendMessage( hTb, TB_PRESSBUTTON, cmd & 0xFFFF, TRUE );
+
+			s_inMenu = true;
+			ExecuteToolbarCommand( cmd & 0xFFFF );
+			s_inMenu = false;
+
+			if( cmd & IS_MENU )
+				::SendMessage( hTb, TB_PRESSBUTTON, cmd & 0xFFFF, FALSE );
 		}
 		break;
 
@@ -1239,6 +1252,43 @@ bool IsCurrentProgramEnabledForDialog( FileDlgType fileDlgType )
 	return true;
 }
 
+//----------------------------------------------------------------------------------------------------
+// Message-only temporary window for delayed creation of favmenu.
+
+LPCTSTR TCFAVMENU_TEMP_WNDCLASS = _T("{D3772EFE-1491-4992-987E-CCE970231A99}");
+
+LRESULT CALLBACK TempWindowForTcFavmenu_Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+{
+	if( uMsg == WM_APP )
+	{
+		DebugOut( _T("TempWindowForTcFavmenu_Proc\n") );
+
+		POINT pt; ::GetCursorPos( &pt );
+		HWND hTC = (HWND) ::GetProp( hwnd, _T("HWND_TC") );
+		HWND hClick = (HWND) ::GetProp( hwnd, _T("HWND_CLICK") );
+
+		FavMenu_DisplayForTotalCmd( hTC, pt.x, pt.y, hClick );
+
+		::RemoveProp( hwnd, _T("HWND_TC") );
+		::RemoveProp( hwnd, _T("HWND_CLICK") );
+		::DestroyWindow( hwnd );
+		if( ! ::UnregisterClass( TCFAVMENU_TEMP_WNDCLASS, g_hInstDll ) )
+			DebugOut( _T("Failed to unregister class\n") );
+		return 0;
+	}
+	return ::DefWindowProc( hwnd, uMsg, wParam, lParam );	
+}
+
+HWND CreateTempWindowForTcFavmenu()
+{
+	WNDCLASS wc = { 0 };
+	wc.lpszClassName = TCFAVMENU_TEMP_WNDCLASS;
+	wc.hInstance = g_hInstDll;
+	wc.lpfnWndProc = TempWindowForTcFavmenu_Proc;
+	::RegisterClass( &wc );
+	return ::CreateWindow( TCFAVMENU_TEMP_WNDCLASS, _T(""), 0, 0, 0, 0, 0, NULL, NULL, g_hInstDll, NULL );
+}
+
 //-----------------------------------------------------------------------------------------
 // This function gets called in the context of the hooked process.
 
@@ -1259,17 +1309,26 @@ LRESULT CALLBACK Hook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
 			::GetClassName( hwnd, className, 255 );
 			if( _tcscmp( className, _T("#32768") ) == 0 )
 			{
-				HWND hwndClicked = g_hwndTcFavmenuClick;
-				// avoid infinite recursion
-				g_hwndTcFavmenuClick = NULL;
-
 				if( HWND hTC = FindTopTcWnd( true ) )
 				{
-					POINT pt; ::GetCursorPos( &pt );
-					FavMenu_DisplayForTotalCmd( hTC, pt.x, pt.y, hwndClicked );
+					DebugOut( _T("TC favmenu\n") );
 
-					// Suppress original TC favmenu
-					::PostMessage( hTC, WM_CANCELMODE, 0, 0 ); 
+					// Suppress original TC favmenu (just removing WS_VISIBLE style / ShowWindow() 
+					// would not work)
+					::SetWindowRgn( hwnd, ::CreateRectRgn( 0, 0, 0, 0 ), FALSE );
+					::PostMessage( hTC, WM_CANCELMODE, 0, 0 );
+
+					// Displaying the menu directly doesn't work well - mouse clicks can still get trapped
+					// by TC's menu. So delay menu creation until TC has processed WM_CANCELMODE.
+					if( HWND hwndTemp = CreateTempWindowForTcFavmenu() )
+					{
+						DebugOut( _T("Temp. window created\n") );
+						::SetProp( hwndTemp, _T("HWND_TC"), (HANDLE) hTC );
+						::SetProp( hwndTemp, _T("HWND_CLICK"), (HANDLE) g_hwndTcFavmenuClick );
+						::PostMessage( hwndTemp, WM_APP, 0, 0 );
+					}
+
+					g_hwndTcFavmenuClick = NULL;
 				}
 			}
 		}
@@ -1369,7 +1428,7 @@ LRESULT CALLBACK Hook_Mouse( int nCode, WPARAM wParam, LPARAM lParam )
 				g_hwndTcFavmenuClick = NULL;
 
 				if( IsTcPathControl( pmh->hwnd ) &&
-                    ! IsShiftKeyPressed() )
+                    ! IsCtrlKeyPressed() )
 				{
 					if( g_profileDefaults.IsEmpty() )
 					{

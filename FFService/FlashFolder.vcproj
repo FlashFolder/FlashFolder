@@ -456,6 +456,9 @@
 						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="..\commonUtils\Utils.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header-Dateien"
@@ -468,6 +471,9 @@
 			</File>
 			<File
 				RelativePath="StdAfx.h">
+			</File>
+			<File
+				RelativePath="..\commonUtils\Utils.h">
 			</File>
 		</Filter>
 		<Filter

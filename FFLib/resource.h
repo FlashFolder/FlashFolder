@@ -13,6 +13,7 @@
 #define ID_FF_OPENDIRS                  1007
 #define ID_FF_LASTDIR                   1009
 #define ID_FF_CONFIG                    1010
+#define ID_FF_FOCUSPATH                 1011
 #define ID_FF_PATH                      2001
 #define ID_FF_TOOLBAR                   3000
 

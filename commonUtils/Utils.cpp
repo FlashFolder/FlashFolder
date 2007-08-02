@@ -125,3 +125,29 @@ void AddTextInput( std::vector<INPUT>* pInput, LPCTSTR pText )
 		pInput->push_back( inp );
 	}
 }
+
+//-----------------------------------------------------------------------------------------------
+
+void EnableDlgItem( HWND hDlg, UINT idCtrl, BOOL bEnable )
+{
+	HWND hCtrl = ::GetDlgItem( hDlg, idCtrl );
+	if( ! hCtrl )
+		return;
+	HWND hFocus = ::GetFocus();
+	::EnableWindow( hCtrl, bEnable );
+	if( ! bEnable && hFocus == hCtrl )
+		::SendMessage( hDlg, WM_NEXTDLGCTL, 0, 0 );			
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void DebugOut( LPCTSTR pFormat, ... )
+{
+	const size_t bufsize = 1024;
+	TCHAR buf[ bufsize ];
+	va_list args;
+	va_start( args, pFormat );
+	_vsntprintf( buf, bufsize - 1, pFormat, args );
+	va_end( args );
+	::OutputDebugString( buf );
+}

@@ -39,15 +39,6 @@ HANDLE g_hEventTerminate = NULL;
 
 //---------------------------------------------------------------------------
 
-void DebugOut( LPCTSTR str, DWORD status = 0 ) 
-{ 
-   TCHAR buf[1024]; 
-   _sntprintf( buf, sizeof(buf), _T("[%s] %s (%d)\n"), INTERNAL_APPNAME, str, status ); 
-   ::OutputDebugString( buf ); 
-}
-
-//---------------------------------------------------------------------------
-
 void SetMyServiceStatus( DWORD status, DWORD err = 0 )
 {
 	if( status != 0xFFFFFFFF )
@@ -60,7 +51,7 @@ void SetMyServiceStatus( DWORD status, DWORD err = 0 )
 	if( ! ::SetServiceStatus( g_myServiceStatusHandle, &g_myServiceStatus ) )
 	{ 
 		DWORD err = ::GetLastError(); 
-		DebugOut( _T("SetServiceStatus() error"), err ); 
+		DebugOut( _T("[FF] SetServiceStatus() error (%d)\n"), err ); 
 	} 
 }
 
@@ -71,7 +62,7 @@ DWORD MyServiceUninitialization( bool isShutDown )
 	if( ! UninstallHook() )
 	{
 		DWORD err = ::GetLastError();
-		DebugOut( _T("UninstallHook() failed."), err );
+		DebugOut( _T("[FF] UninstallHook() failed (%d)\n"), err );
 		if( ! isShutDown )
 			return err;
 	}
@@ -90,7 +81,7 @@ VOID WINAPI MyServiceCtrlHandler( DWORD opcode )
 	{ 
 		case SERVICE_CONTROL_STOP: 
 		{
-			DebugOut( _T("SERVICE_CONTROL_STOP received"), 0 );
+			DebugOut( _T("[FF] SERVICE_CONTROL_STOP received\n") );
 
 			SetMyServiceStatus( SERVICE_STOP_PENDING );
 
@@ -112,7 +103,7 @@ VOID WINAPI MyServiceCtrlHandler( DWORD opcode )
 
 		case SERVICE_CONTROL_INTERROGATE: 
 		{
-			DebugOut( _T("SERVICE_CONTROL_INTERROGATE received"), 0 );
+			DebugOut( _T("[FF] SERVICE_CONTROL_INTERROGATE received\n") );
 
 			// Send current status to service manager. 
 			SetMyServiceStatus( 0xFFFFFFFF );
@@ -120,7 +111,7 @@ VOID WINAPI MyServiceCtrlHandler( DWORD opcode )
 		}
 
 		default: 
-			DebugOut( _T("Unrecognized opcode received"), opcode ); 
+			DebugOut( _T("[FF] Unrecognized opcode received (%d)\n"), opcode ); 
 	} 
 }
 
@@ -131,7 +122,7 @@ DWORD MyServiceInitialization( DWORD argc, LPTSTR *argv )
 	if( ! InstallHook() )
 	{
 		DWORD err = ::GetLastError();
-		DebugOut( _T("InstallHook() failed."), err );
+		DebugOut( _T("[FF] InstallHook() failed (%d)\n"), err );
 		return err;
 	}	
 	return NO_ERROR; 
@@ -141,7 +132,7 @@ DWORD MyServiceInitialization( DWORD argc, LPTSTR *argv )
 
 void WINAPI MyServiceStart( DWORD argc, LPTSTR *argv ) 
 { 
-    DebugOut( _T("MyServiceStart()"), 0 ); 
+    DebugOut( _T("[FF] MyServiceStart()\n") ); 
 
     DWORD status = 0; 
  
@@ -158,7 +149,7 @@ void WINAPI MyServiceStart( DWORD argc, LPTSTR *argv )
  
     if( g_myServiceStatusHandle == (SERVICE_STATUS_HANDLE)0 ) 
     { 
-		DebugOut( _T("RegisterServiceCtrlHandler() failed"), ::GetLastError() ); 
+		DebugOut( _T("[FF] RegisterServiceCtrlHandler() failed (%d)\n"), ::GetLastError() ); 
         return; 
     } 
  
@@ -176,7 +167,7 @@ void WINAPI MyServiceStart( DWORD argc, LPTSTR *argv )
     // Initialization complete - report running status. 
 	SetMyServiceStatus( SERVICE_RUNNING, status );
 
-	DebugOut( _T("Service running, waiting for termination event") );
+	DebugOut( _T("[FF] Service running, waiting for termination event\n") );
 
 	// SetWindowsHookEx() seems to attach to the caller thread. So keep this thread running.
 	::WaitForSingleObject( g_hEventTerminate, INFINITE );
@@ -190,7 +181,7 @@ void WINAPI MyServiceStart( DWORD argc, LPTSTR *argv )
 
 int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )         
 { 
-	DebugOut( _T("Process started") );
+	DebugOut( _T("[FF] Process started\n") );
 
 	SERVICE_TABLE_ENTRY dispatchTable[] = 
 	{ 
@@ -202,15 +193,15 @@ int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	if( ! ::StartServiceCtrlDispatcher( dispatchTable ) ) 
 	{ 
 		DWORD err = ::GetLastError();
-		DebugOut( _T("StartServiceCtrlDispatcher() error"), err );
+		DebugOut( _T("[FF] StartServiceCtrlDispatcher() error (%d)\n"), err );
 
 		if( err == ERROR_SERVICE_ALREADY_RUNNING )	
-			DebugOut( _T("(Service already running)"), 0 );
+			DebugOut( _T("[FF] (Service already running)\n") );
 		else
 			res = 1;
 	} 
 
-	DebugOut( _T("Process terminates") );
+	DebugOut( _T("[FF] Process terminates\n") );
 
 	return res;
 } 
