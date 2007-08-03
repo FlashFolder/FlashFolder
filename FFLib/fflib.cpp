@@ -98,6 +98,7 @@ int g_globalHistoryMaxEntries;
 
 void RegisterMyHotkeys();
 void UnregisterMyHotkeys();
+LPCTSTR GetCommandName( int cmd );
 
 
 //-----------------------------------------------------------------------------------------
@@ -729,7 +730,7 @@ LRESULT CALLBACK ToolWindowEditPathProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
 void ExecuteToolbarCommand( UINT cmd )
 {
-	switch( cmd & 0xFFFF )
+	switch( cmd )
 	{
 		case ID_FF_LASTDIR:
 			GotoLastDir();
@@ -801,20 +802,33 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			
 				NMTTDISPINFO* pTTT = reinterpret_cast<NMTTDISPINFO*>( pnm );
 
-				pTTT->hinst = g_hInstDll;
+				pTTT->hinst = NULL;
+
+				const int TOOLTIP_BUFSIZE = MAX_PATH + 64;
+				static TCHAR s_tooltipBuf[ TOOLTIP_BUFSIZE + 1 ];
+				s_tooltipBuf[ 0 ] = 0;
+				pTTT->lpszText = s_tooltipBuf;
 			
 				if( pTTT->hdr.idFrom == ID_FF_LASTDIR )
 				{
-					// use last entry of global history as tooltip
-					HistoryLst history;
-					if( history.LoadFromProfile( g_profile, _T("GlobalFolderHistory") ) )
-						StringCchCopyN( pTTT->szText, sizeof(pTTT->szText) / sizeof(TCHAR),
-							history.GetList().front().c_str(), history.GetList().front().size() );
+					// use most recent entry of global history as tooltip
+					tstring sLastDir = g_profile.GetString( _T("GlobalFolderHistory"), _T("0") );
+					if( sLastDir.empty() )
+						::LoadString( g_hInstDll, pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
+					else
+						StringCbCopy( s_tooltipBuf, sizeof(s_tooltipBuf), sLastDir.c_str() );
 				}
 				else
 				{
-					pTTT->lpszText = MAKEINTRESOURCE(pTTT->hdr.idFrom);
-						//return ID of appropriate string resource (= ID of control)
+					::LoadString( g_hInstDll, pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
+				}
+
+				// append hotkey name
+				if( int hotkey = g_profile.GetInt( _T("Hotkeys"), GetCommandName( pTTT->hdr.idFrom ) ) )
+				{
+					StringCchCat( s_tooltipBuf, TOOLTIP_BUFSIZE, _T("\nShortcut: ") ); 					
+					TCHAR hkName[ 256 ]; GetHotkeyName( hkName, 255, hotkey );
+					StringCchCat( s_tooltipBuf, TOOLTIP_BUFSIZE, hkName ); 					
 				}
 			}
 		}
@@ -1118,6 +1132,25 @@ void RegisterMyHotkeys()
 		else
 			::GlobalDeleteAtom( atom );
 	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+LPCTSTR GetCommandName( int cmd )
+{
+	switch( cmd )
+	{
+		case ID_FF_LASTDIR:     return _T("ff_LastFolder");
+		case ID_FF_SHOWALL:     return _T("ff_ViewAllFiles");
+		case ID_FF_FOCUSPATH:   return _T("ff_FocusPathEdit");
+		case ID_FF_GLOBALHIST:  return _T("ff_MenuFolderHistory");
+		case ID_FF_OPENDIRS:    return _T("ff_MenuOpenFolders");
+		case ID_FF_FAVORITES:   return _T("ff_MenuFavorites");
+		case ID_FF_CONFIG:      return _T("ff_MenuConfig");
+		default:
+			DebugOut( _T("[fflib] ERROR: invalid command for GetCommandName()") );
+	}
+	return _T("");
 }
 
 //-----------------------------------------------------------------------------------------------

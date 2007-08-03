@@ -129,6 +129,7 @@ END
 
 STRINGTABLE 
 BEGIN
+    ID_FF_LASTDIR           "Go to last folder"
     ID_FF_CONFIG            "Edit FlashFolder configuration"
 END
 

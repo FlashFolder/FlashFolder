@@ -19,6 +19,7 @@
 
 #include <stdafx.h>
 #include <shlwapi.h>
+#include <commctrl.h>
 
 #include <assert.h>
 
@@ -148,6 +149,55 @@ void AddTextInput( std::vector<INPUT>* pInput, LPCTSTR pText )
 		inp.ki.dwFlags |= KEYEVENTF_KEYUP; 
 		pInput->push_back( inp );
 	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+int GetKeyName( LPTSTR pName, int cchNameLen, UINT vk, BOOL fExtended )
+{
+	pName[ 0 ] = 0;
+	
+	LONG lScan = ::MapVirtualKey(vk, 0) << 16;
+
+	// if it's an extended key, add the extended flag
+	if (fExtended)
+		lScan |= 0x01000000L;
+
+	return ::GetKeyNameText( lScan, pName, cchNameLen + 1 );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void GetHotkeyName( LPTSTR pName, int cchNameLen, DWORD hotkey )
+{
+	DWORD vk  = hotkey & 0xFF;
+	DWORD mod = hotkey >> 8;
+
+	pName[ 0 ] = 0;
+	TCHAR keyName[ 256 ] = _T("");
+
+	if( mod & HOTKEYF_CONTROL )
+	{
+		GetKeyName( pName, cchNameLen, VK_CONTROL, FALSE );
+	}
+	if( mod & HOTKEYF_SHIFT )
+	{
+		if( pName[ 0 ] != 0 )
+			StringCchCat( pName, cchNameLen, _T(" + ") );
+		GetKeyName( keyName, 255, VK_SHIFT, FALSE );
+		StringCchCat( pName, cchNameLen, keyName );
+	}
+	if( mod & HOTKEYF_ALT )
+	{
+		if( pName[ 0 ] != 0 )
+			StringCchCat( pName, cchNameLen, _T(" + ") );
+		GetKeyName( keyName, 255, VK_MENU, FALSE );
+		StringCchCat( pName, cchNameLen, keyName );
+	}
+	if( pName[ 0 ] != 0 )
+		StringCchCat( pName, cchNameLen, _T(" + ") );
+	GetKeyName( keyName, 255, vk, mod & HOTKEYF_EXT );
+	StringCchCat( pName, cchNameLen, keyName );
 }
 
 //-----------------------------------------------------------------------------------------------

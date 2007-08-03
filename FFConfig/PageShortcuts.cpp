@@ -26,10 +26,6 @@ using namespace std;
 
 //-----------------------------------------------------------------------------------------------
 
-CString GetHotkeyName( DWORD hotkey );
-
-//-----------------------------------------------------------------------------------------------
-
 enum ShortcutColumns
 {
 	COL_TITLE,
@@ -147,7 +143,9 @@ void CPageShortcuts::ReadProfile( const Profile& profile )
 	for( int i = 0; i <= nItem; ++i )
 	{
 		DWORD hotkey = m_lstShortcuts.GetItemData( i );
-		m_lstShortcuts.SetItemText( i, COL_SHORTCUTKEY, GetHotkeyName( hotkey ) );
+		TCHAR hkName[ 256 ];
+		GetHotkeyName( hkName, 255, hotkey );
+		m_lstShortcuts.SetItemText( i, COL_SHORTCUTKEY, hkName );
 	}
 
 	m_selItem = -1;
@@ -251,7 +249,10 @@ void CPageShortcuts::OnShortcutChange()
 	}
 
 	m_lstShortcuts.SetItemData( m_selItem, hotkey );
-	m_lstShortcuts.SetItemText( m_selItem, COL_SHORTCUTKEY, GetHotkeyName( hotkey ) );
+
+	TCHAR hkName[ 256 ];
+	GetHotkeyName( hkName, 255, hotkey );
+	m_lstShortcuts.SetItemText( m_selItem, COL_SHORTCUTKEY, hkName );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -266,35 +267,5 @@ void CPageShortcuts::OnBnClickedBtnClear()
 	}
 }
 
-//-----------------------------------------------------------------------------------------------
 
-CString GetHotkeyName( DWORD hotkey )
-{
-	WORD vk  = hotkey & 0xFF;
-	WORD mod = hotkey >> 8;
-	
-	CString s;
-	
-	if( mod & HOTKEYF_CONTROL )
-	{
-		s = CHotKeyCtrl::GetKeyName( VK_CONTROL, FALSE );
-	}
-	if( mod & HOTKEYF_SHIFT )
-	{
-		if( ! s.IsEmpty() )
-			s += _T(" + ");
-		s += CHotKeyCtrl::GetKeyName( VK_SHIFT, FALSE );
-	}
-	if( mod & HOTKEYF_ALT )
-	{
-		if( ! s.IsEmpty() )
-			s += _T(" + ");
-		s += CHotKeyCtrl::GetKeyName( VK_MENU, FALSE );
-	}
-	if( ! s.IsEmpty() )
-		s += _T(" + ");
-	s += CHotKeyCtrl::GetKeyName( vk, mod & HOTKEYF_EXT );
-
-	return s;
-}
 
