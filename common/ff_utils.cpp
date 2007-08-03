@@ -240,7 +240,13 @@ bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter )
 		{
             ::GetWindowText( hEditFileName, oldEditTxt, (sizeof(oldEditTxt) - 1) * sizeof(TCHAR) );
             ::SetWindowText( hEditFileName, filter );
+			
+			::SetFocus( hEditFileName );
+
             ::SendMessage( hwndFileDlg, WM_COMMAND, MAKEWPARAM(IDOK, BN_CLICKED), (LPARAM) hBtnOk );
+
+			// restoring focus doesn't work
+			
 			//only restore old text if it was not a filter
 			if( ( _tcschr( oldEditTxt, _T('*') ) == NULL ) &&
 				( _tcschr( oldEditTxt, _T('?') ) == NULL) )
