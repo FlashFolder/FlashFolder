@@ -982,6 +982,7 @@ void CTreeListCtrl_tree::OnMouseMove( UINT nFlags, CPoint pt )
 	m_pParent->GetClientRect( rcParent );
 	m_pParent->MapWindowPoints( this, rcParent );  
 
+	// determine mouse-over column, if it contains clipped text
 	int nCol = -1;
 	CRect rcCol;
 	UINT htFlags = 0;
@@ -993,7 +994,7 @@ void CTreeListCtrl_tree::OnMouseMove( UINT nFlags, CPoint pt )
 		{
 			m_pParent->m_headerCtrl.GetItemRect( i, &rcCol );
 
-			int subWidth = m_pParent->GetItemTextWidth( hItem, i );
+			int subWidth = m_pParent->GetSubItemWidth( hItem, i );
 
 			rcCol.right = min( rcCol.right, rcCol.left + subWidth );
 
@@ -1014,17 +1015,11 @@ void CTreeListCtrl_tree::OnMouseMove( UINT nFlags, CPoint pt )
 		m_toolInfo.lpszText = const_cast<LPTSTR>( s.GetString() );
 		m_tooltip.SendMessage( TTM_UPDATETIPTEXT, 0, reinterpret_cast<LPARAM>( &m_toolInfo ) );
 
-		CRect rcSubItem; 
-		if( nCol == 0 )
-			GetItemRect( hItem, rcSubItem, TRUE );
-		else
-		{
-			GetItemRect( hItem, rcSubItem, FALSE );
-			rcSubItem.left = rcCol.left;
-		}
-		ClientToScreen( rcSubItem );
-		
-		m_tooltip.SendMessage( TTM_TRACKPOSITION, 0, MAKELONG( rcSubItem.left, rcSubItem.top ) );
+		CRect rcTT;
+		m_pParent->GetSubItemRect( NULL, &rcTT, NULL, hItem, nCol );
+		ClientToScreen( rcTT );		
+		m_tooltip.SendMessage( TTM_ADJUSTRECT, TRUE, reinterpret_cast<LPARAM>( &rcTT ) );
+		m_tooltip.SendMessage( TTM_TRACKPOSITION, 0, MAKELONG( rcTT.left, rcTT.top ) );
 		
 		if( ! m_tooltip.IsWindowVisible() )
 			m_tooltip.SendMessage( 
@@ -1532,7 +1527,7 @@ BOOL CTreeListCtrl::SetColumnWidth( int nCol, int width )
 //-----------------------------------------------------------------------------------------------
 /// get unclipped width of subitem text
 
-int CTreeListCtrl::GetItemTextWidth( HTREEITEM hItem, int nCol )
+int CTreeListCtrl::GetSubItemWidth( HTREEITEM hItem, int nCol )
 {
 	CRect subItemMargins = TREE_SUBITEM_MARGINS;
 	MapDialogRect( subItemMargins );
@@ -1544,13 +1539,13 @@ int CTreeListCtrl::GetItemTextWidth( HTREEITEM hItem, int nCol )
 		pFont = CFont::FromHandle( (HFONT) ::GetStockObject( DEFAULT_GUI_FONT ) );
 	AutoSelectObj trSelFont( dc, *pFont );
 
-	return GetItemTextWidth( hItem, nCol, dc, subItemMargins );
+	return GetSubItemWidth( hItem, nCol, dc, subItemMargins );
 }
 
 //-----------------------------------------------------------------------------------------------
 /// get unclipped width of subitem text (optimized for batch calculation of multiple items)
 
-int CTreeListCtrl::GetItemTextWidth( HTREEITEM hItem, int nCol, CDC& dc, const CRect& subItemMargins )
+int CTreeListCtrl::GetSubItemWidth( HTREEITEM hItem, int nCol, CDC& dc, const CRect& subItemMargins )
 {
 	CString text = GetItemText( hItem, nCol );
 	CRect rc = CRect( 0, 0, 1, 1 );
@@ -1565,6 +1560,64 @@ int CTreeListCtrl::GetItemTextWidth( HTREEITEM hItem, int nCol, CDC& dc, const C
 	}
 
 	return rc.right;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CTreeListCtrl::GetSubItemRect( RECT* pSubItemRect, RECT* pTextRect, RECT* pUnclippedTextRect, 
+                                    HTREEITEM hItem, int nCol )
+{
+	CRect rcSubItem;
+	m_tree.GetItemRect( hItem, rcSubItem, FALSE );
+	CRect rcCol;
+	m_headerCtrl.GetItemRect( nCol, rcCol );
+	rcSubItem.left = rcCol.left;
+	rcSubItem.right = rcCol.right;
+
+	if( pSubItemRect )
+		*pSubItemRect = rcSubItem;
+
+	if( ! pTextRect && ! pUnclippedTextRect )
+		return;
+
+	CWindowDC dc( &m_tree );
+
+	CFont* pFont = m_tree.GetFont();
+	if( ! pFont )
+		pFont = CFont::FromHandle( (HFONT) ::GetStockObject( DEFAULT_GUI_FONT ) );
+	AutoSelectObj trSelFont( dc, *pFont );
+
+	CString text = GetItemText( hItem, nCol );
+	CRect rcUnclippedText = CRect( 0, 0, 1, 1 );
+	dc.DrawText( text, rcUnclippedText, DT_CALCRECT | DT_SINGLELINE | DT_HIDEPREFIX ); 
+
+	CRect rcText;
+	m_tree.GetItemRect( hItem, rcText, TRUE );
+	rcText.OffsetRect( 0, ( rcSubItem.Height() - rcUnclippedText.Height() ) / 2 );
+
+	CRect rcMargins = TREE_SUBITEM_MARGINS;
+	MapDialogRect( rcMargins );
+
+	if( nCol == 0 )
+	{
+		CRect rc = TREE_FIRSTCOLUMN_TEXT_MARGINS;
+		MapDialogRect( rc );
+		rcText.left += rc.right;
+		rcText.right = rcSubItem.right - rcMargins.right;
+	}
+	else
+	{
+		rcText.left = rcSubItem.left + rcMargins.right;
+		rcText.right = rcSubItem.right - rcMargins.right;
+	}
+
+	if( pTextRect )
+		*pTextRect = rcText;
+	if( pUnclippedTextRect )
+	{
+		rcUnclippedText.OffsetRect( rcText.left, rcText.top );
+		*pUnclippedTextRect = rcUnclippedText;
+	}
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -1622,7 +1675,7 @@ void CTreeListCtrl::SetColumnAutoWidth( int nCol, AutoWidthType type, int minWid
 	for( HTREEITEM hItem = m_tree.GetFirstVisibleItem(); hItem;
 		hItem = m_tree.GetNextVisibleItem( hItem ) )
 	{
-		int width = GetItemTextWidth( hItem, nCol, trdc, subItemMargins );
+		int width = GetSubItemWidth( hItem, nCol, trdc, subItemMargins );
 		if( width > maxItemWidth )
 			maxItemWidth = width;
 	}

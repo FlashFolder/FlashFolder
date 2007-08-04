@@ -288,7 +288,10 @@ public:
 		return ( fmt.flags & CTreeListCtrl::FMT_DIVIDER ) != 0;	
 	}
 
-	int GetItemTextWidth( HTREEITEM hItem, int nCol );
+	int GetSubItemWidth( HTREEITEM hItem, int nCol );
+	void GetSubItemRect( RECT* pSubItemRect, RECT* pTextRect, RECT* pUnclippedTextRect, 
+	                     HTREEITEM hItem, int nCol );
+
 
 	//--- imagelist methods
 
@@ -321,7 +324,7 @@ protected:
 	void OnContextMenu(CWnd* pWnd, CPoint pt );
 	DECLARE_MESSAGE_MAP()
 
-	int GetItemTextWidth( HTREEITEM hItem, int nCol, CDC& dc, const CRect& subItemMargins );
+	int GetSubItemWidth( HTREEITEM hItem, int nCol, CDC& dc, const CRect& subItemMargins );
 
 private:
 	void AdjustSizeAndPosition( bool bScroll );
