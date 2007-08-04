@@ -80,6 +80,7 @@ void CFolderFavoritesDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_ED_TITLE, m_edTitle);
 	DDX_Control(pDX, IDC_ED_COMMAND, m_edPath);
 	DDX_Control(pDX, IDC_ED_TARGETPATH, m_edTargetPath);
+	DDX_Control(pDX, IDC_ED_ICONPATH, m_edIconPath);
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -116,6 +117,12 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 		ModifyStyle( WS_MINIMIZEBOX, 0, SWP_FRAMECHANGED );
 		GetSystemMenu( FALSE )->EnableMenuItem( SC_MINIMIZE, MF_BYCOMMAND | MF_GRAYED );
 	}
+	
+	//--- Enable autocomplete
+
+	::SHAutoComplete( m_edPath, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
+	::SHAutoComplete( m_edTargetPath, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
+	::SHAutoComplete( m_edIconPath, SHACF_FILESYSTEM | SHACF_AUTOSUGGEST_FORCE_ON );
 
 	//--- Create and populate tree control
 	
@@ -234,7 +241,6 @@ void CFolderFavoritesDlg::LoadFavorites_worker(
 			hItem = m_tree.InsertItem( fav.title.substr( 1 ).c_str(), 0, 0, hParent, hInsertAfter );
 			m_tree.SetItemIsFolder( hItem );
 
-
 			++iItem;
 
 			LoadFavorites_worker( hItem, TVI_FIRST, favs, iItem, false );			
@@ -259,7 +265,8 @@ void CFolderFavoritesDlg::LoadFavorites_worker(
 			++iItem;
 		}
 
-		m_tree.GetTree().SetItemData( hItem, 0 );
+		if( ! fav.iconPath.empty() )
+			m_iconPathes[ hItem ] = fav.iconPath.c_str();
 
 		// select inserted root items
 		if( bSelectInsertedItems )
@@ -313,6 +320,10 @@ void CFolderFavoritesDlg::SaveFavorites_worker( FavoritesList& favs, HTREEITEM h
 				continue;
 
 		FavoritesItem fav;
+
+		stdext::hash_map< HTREEITEM, CString >::const_iterator it = m_iconPathes.find( hItem );
+		if( it != m_iconPathes.end() )
+			fav.iconPath = it->second;
 
 		if( m_tree.GetTree().ItemHasChildren( hItem ) )
 		{

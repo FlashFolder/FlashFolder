@@ -10,7 +10,8 @@
 
 #define WINVER 0x0501		
 #define _WIN32_WINNT 0x0501	
-#define _WIN32_WINDOWS 0x0501 
+#define _WIN32_WINDOWS 0x0501
+#define _WIN32_IE 0x0600
 
 
 // turns off MFC's hiding of some common and often safely ignored warning messages
