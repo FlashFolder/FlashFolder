@@ -238,6 +238,11 @@ bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter )
         HWND hBtnOk = ::GetDlgItem( hwndFileDlg, IDOK );
 		if( hBtnOk )
 		{
+			// Make sure the listcontrol is not focused, otherwise it would react on BN_CLICKED.
+			HWND hOldFocus = ::GetFocus();
+			if( hOldFocus != hEditFileName )
+				::SendMessage( hwndFileDlg, WM_NEXTDLGCTL, (WPARAM) hEditFileName, TRUE ); 
+
             ::GetWindowText( hEditFileName, oldEditTxt, (sizeof(oldEditTxt) - 1) * sizeof(TCHAR) );
             ::SetWindowText( hEditFileName, filter );
             ::SendMessage( hwndFileDlg, WM_COMMAND, MAKEWPARAM(IDOK, BN_CLICKED), (LPARAM) hBtnOk );
@@ -245,6 +250,11 @@ bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter )
 			if( ( _tcschr( oldEditTxt, _T('*') ) == NULL ) &&
 				( _tcschr( oldEditTxt, _T('?') ) == NULL) )
                 ::SetWindowText( hEditFileName, oldEditTxt );
+
+			// restore focus
+			if( hOldFocus && hOldFocus != hEditFileName )
+				::PostMessage( hwndFileDlg, WM_NEXTDLGCTL, (WPARAM) hOldFocus, TRUE ); 
+
 			return true;
 		}
 	}
