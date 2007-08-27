@@ -596,8 +596,7 @@ void ExecuteToolbarCommand( UINT cmd )
 		{
 			::SetForegroundWindow( g_hToolWnd );
 			HWND hEdit = ::GetDlgItem( g_hToolWnd, ID_FF_PATH );
-			::SetFocus( hEdit );
-			::SendMessage( hEdit, EM_SETSEL, 0, -1 );
+			::SendMessage( g_hToolWnd, WM_NEXTDLGCTL, (WPARAM) hEdit, TRUE ); 
 			break;
 		}
 		case ID_FF_GLOBALHIST:

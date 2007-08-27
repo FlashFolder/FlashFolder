@@ -64,7 +64,7 @@ BOOL CExcludesDlg::OnInitDialog()
 		
 	m_edList.SetWindowText( s );
 
-	m_edList.SetFocus();
+	SendMessage( WM_NEXTDLGCTL, (WPARAM) m_edList.GetSafeHwnd(), TRUE ); 
 	m_edList.SetSel( m_edList.GetWindowTextLength(), m_edList.GetWindowTextLength() );
 
 	return FALSE;

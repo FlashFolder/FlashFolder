@@ -69,7 +69,8 @@ BOOL CPageGeneric::OnInitDialog()
 	else
 		ReadProfile( g_profile );
 
-	GetDlgItem( IDC_ED_MAX_DIRHISTORY )->SetFocus();
+	SendMessage( WM_NEXTDLGCTL, (WPARAM) GetDlgItem( IDC_ED_MAX_DIRHISTORY )->GetSafeHwnd(), TRUE ); 
+
 	return FALSE;
 }
 

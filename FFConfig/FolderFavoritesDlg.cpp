@@ -317,7 +317,7 @@ void CFolderFavoritesDlg::OnBnClickedBtnAdd()
 	ItemData* pData = new ItemData;
 	m_listFavs.SetItemData( nItem, reinterpret_cast<DWORD_PTR>( pData ) );
 	SelectItem( nItem );
-	GetDlgItem( IDC_ED_PATH )->SetFocus();
+	SendMessage( WM_NEXTDLGCTL, (WPARAM) GetDlgItem( IDC_ED_PATH )->GetSafeHwnd(), TRUE ); 
 }
 
 //-----------------------------------------------------------------------------------------------
