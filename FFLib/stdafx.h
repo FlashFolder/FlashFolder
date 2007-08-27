@@ -16,6 +16,7 @@
 #include <dlgs.h>
 #include <shlwapi.h>
 #include <shellapi.h>
+#include <uxtheme.h>
 
 //--- crt headers
 #include <tchar.h>
@@ -42,6 +43,7 @@ using namespace std;
 #include "../commonUtils/NtKernelUtils.h"
 #include "../commonUtils/TotalCmdUtils.h"
 #include "../commonUtils/Registry.h"
+#include "../commonUtils/GdiUtils.h"
 #include "../common/Favorites.h"
 #include "../common/ff_utils.h"
 #include "../common/HistoryLst.h"

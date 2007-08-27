@@ -23,6 +23,7 @@
 #include <vector>
 
 void GetAppDir( HINSTANCE hInstApp, LPTSTR szDir );
+void GetAppFilename( HINSTANCE hInstApp, LPTSTR pName );
 
 inline bool DirectoryExists( LPCTSTR szName )
 {
@@ -41,15 +42,37 @@ bool IsRelativePath( LPCTSTR path );
 
 void GetTempFilePath( LPTSTR pResult, LPCTSTR pPrefix );
 
+int ComparePath( LPCTSTR path1, LPCTSTR path2 );
+
+
 bool IsIniSectionNotEmpty( LPCTSTR filename, LPCTSTR sectionName );
 
 void AddTextInput( std::vector<INPUT>* pInput, LPCTSTR pText );
 
-inline void ScreenToClientRect( HWND hwnd, RECT* prc )
+/// Get runtime OS version, high-byte = major version, low-byte = minor version.
+/// e.g. 0x0500 = Win2k, 0x0501 = WinXP, 0x0600 = Vista
+inline WORD GetOsVersion()
 {
-	POINT pt1 = { prc->left, prc->top };
-	::ScreenToClient( hwnd, &pt1 );
-	POINT pt2 = { prc->right, prc->bottom };
-	::ScreenToClient( hwnd, &pt2 );
-	prc->left = pt1.x; prc->top = pt1.y; prc->right = pt2.x; prc->bottom = pt2.y;
+	OSVERSIONINFO ovi = { sizeof(ovi) };
+	::GetVersionEx( &ovi );
+	return static_cast<WORD>( ovi.dwMajorVersion << 8 | ovi.dwMinorVersion );
 }
+
+inline bool IsShiftKeyPressed() 
+	{ return (GetKeyState(VK_SHIFT) & (1 << (sizeof(SHORT)*8-1))) != 0; }
+inline bool IsCtrlKeyPressed()  
+	{ return (GetKeyState(VK_CONTROL) & (1 << (sizeof(SHORT)*8-1))) != 0; }
+inline bool IsAltKeyPressed()  
+	{ return (GetKeyState(VK_MENU) & (1 << (sizeof(SHORT)*8-1))) != 0; }
+
+int GetKeyName( LPTSTR pName, int cchNameLen, UINT vk, BOOL fExtended );
+void GetHotkeyName( LPTSTR pName, int cchNameLen, DWORD hotkey );
+
+/// Set enabled state of dialog control but switch focus if it is on a disabled item.\n
+/// Otherwise, if using EnableWindow() alone, focus can be lost and cannot be 
+/// activated again by using keyboard.
+void EnableDlgItem( HWND hDlg, UINT idCtrl, BOOL bEnable = TRUE );
+
+/// Send a formatted message to the debugger (or external tool). 
+/// Message size can be max. 1024 TCHARs.
+void DebugOut( LPCTSTR pFormat, ... );

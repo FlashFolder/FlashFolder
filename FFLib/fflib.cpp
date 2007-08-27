@@ -70,6 +70,8 @@ TCHAR g_favIniFilePath[MAX_PATH+1];		// Path to INI-File with favorite folders
 RegistryProfile g_profile;   
 MemoryProfile g_profileDefaults;
 
+WORD g_osVersion = 0;
+
 //--- options read from profile
 int g_globalHistoryMaxEntries;
 
@@ -95,6 +97,8 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 			g_hInstDll = hModule;
 			//optimize DLL loading
 			::DisableThreadLibraryCalls( hModule );
+
+			g_osVersion = GetOsVersion();
 		}
 		break;
 
@@ -685,6 +689,10 @@ BOOL CALLBACK ToolWndSetFont(HWND hwnd, LPARAM lParam)
 
 void CreateToolWindow( bool isFileDialog )
 {
+	bool isThemed = false;
+	if( g_osVersion >= 0x0501 )
+		isThemed = ::IsThemeActive() != 0;	
+
 	//--- create the external tool window ---
 
 	g_hToolWnd = ::CreateDialog( g_hInstDll, MAKEINTRESOURCE( IDD_TOOLWND ), g_hFileDialog, ToolDlgProc );
@@ -730,9 +738,7 @@ void CreateToolWindow( bool isFileDialog )
 	// Check whether the 32 bpp version of the toolbar bitmap is supported. 
 	// For this, OS must be >= WinXP and display mode >= 16 bpp.
 	bool isToolbar32bpp = false;
-	OSVERSIONINFO ovi = { sizeof(ovi) };
-	::GetVersionEx( &ovi );
-	if( ( ovi.dwMajorVersion << 8 | ovi.dwMinorVersion ) >= 0x0501 )
+	if( g_osVersion >= 0x0501 )
 	{
 		HDC hScreenIC = ::CreateIC( _T("DISPLAY"), NULL, NULL, NULL );
 		isToolbar32bpp = ::GetDeviceCaps( hScreenIC, BITSPIXEL ) >= 16;
@@ -768,11 +774,17 @@ void CreateToolWindow( bool isFileDialog )
 	RECT rcDiv = { 0, 0, 3, 1 };  ::MapDialogRect( g_hToolWnd, &rcDiv ); 
 	RECT rcDivR = { 0, 0, 2, 1 }; ::MapDialogRect( g_hToolWnd, &rcDivR ); 
 	int xEdit = tbSize.cx + rcDiv.right;
-	HWND hEdit = ::CreateWindowEx( WS_EX_STATICEDGE, _T("Edit"), NULL, WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL, 
+
+	// use themed border if possible
+	DWORD edStyleEx = isThemed ? WS_EX_CLIENTEDGE : WS_EX_STATICEDGE;
+
+	HWND hEdit = ::CreateWindowEx( edStyleEx, _T("Edit"), NULL, 
+		WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL, 
 		xEdit, rcDiv.bottom, 
 		rcClient.right - rcClient.left - xEdit - rcDivR.right, 
 		rcClient.bottom - rcClient.top - rcDiv.bottom * 2, 
 		g_hToolWnd, (HMENU) ID_FF_PATH, g_hInstDll, NULL);
+	
 	// enable auto-complete for the edit control
 	::SHAutoComplete( hEdit, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
 	//sub-class the edit control to handle key-stroke messages

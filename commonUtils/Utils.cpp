@@ -18,6 +18,10 @@
  */
 
 #include <stdafx.h>
+#include <shlwapi.h>
+#include <commctrl.h>
+
+#include <assert.h>
 
 #include "utils.h"
 
@@ -39,6 +43,17 @@ void GetAppDir( HINSTANCE hInstApp, LPTSTR szDir)
     ::GetModuleFileName( hInstApp, szDir, MAX_PATH - 1 );
 	LPTSTR p = _tcsrchr( szDir, _T('\\') );
 	if( p ) p[1] = 0;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void GetAppFilename( HINSTANCE hInstApp, LPTSTR pName )
+{
+	*pName = 0;
+	TCHAR exePath[ MAX_PATH + 1 ] = _T("");
+	::GetModuleFileName( NULL, exePath, MAX_PATH );
+	if( LPTSTR p = _tcsrchr( exePath, _T('\\') ) )
+		StringCchCopy( pName, MAX_PATH, p + 1 );
 }
 
 //-----------------------------------------------------------------------------------------
@@ -64,6 +79,27 @@ bool IsRelativePath( LPCTSTR path )
 	if( _istalpha( path[0] ) && path[1] == _T(':') )
 		return false;
 	return true;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+int ComparePath( LPCTSTR path1, LPCTSTR path2 )
+{
+	TCHAR temp1[ MAX_PATH + 1 ];
+	TCHAR temp2[ MAX_PATH + 1 ];
+	if( ! ::PathCanonicalize( temp1, path1 ) )
+	{
+		assert( false );
+		return 1;
+	}
+	::PathRemoveBackslash( temp1 );
+	if( ! ::PathCanonicalize( temp2, path2 ) )
+	{
+		assert( false );
+		return 1;
+	}
+	::PathRemoveBackslash( temp2 );
+	return _tcsicmp( temp1, temp2 );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -113,4 +149,79 @@ void AddTextInput( std::vector<INPUT>* pInput, LPCTSTR pText )
 		inp.ki.dwFlags |= KEYEVENTF_KEYUP; 
 		pInput->push_back( inp );
 	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+int GetKeyName( LPTSTR pName, int cchNameLen, UINT vk, BOOL fExtended )
+{
+	pName[ 0 ] = 0;
+	
+	LONG lScan = ::MapVirtualKey(vk, 0) << 16;
+
+	// if it's an extended key, add the extended flag
+	if (fExtended)
+		lScan |= 0x01000000L;
+
+	return ::GetKeyNameText( lScan, pName, cchNameLen + 1 );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void GetHotkeyName( LPTSTR pName, int cchNameLen, DWORD hotkey )
+{
+	DWORD vk  = hotkey & 0xFF;
+	DWORD mod = hotkey >> 8;
+
+	pName[ 0 ] = 0;
+	TCHAR keyName[ 256 ] = _T("");
+
+	if( mod & HOTKEYF_CONTROL )
+	{
+		GetKeyName( pName, cchNameLen, VK_CONTROL, FALSE );
+	}
+	if( mod & HOTKEYF_SHIFT )
+	{
+		if( pName[ 0 ] != 0 )
+			StringCchCat( pName, cchNameLen, _T(" + ") );
+		GetKeyName( keyName, 255, VK_SHIFT, FALSE );
+		StringCchCat( pName, cchNameLen, keyName );
+	}
+	if( mod & HOTKEYF_ALT )
+	{
+		if( pName[ 0 ] != 0 )
+			StringCchCat( pName, cchNameLen, _T(" + ") );
+		GetKeyName( keyName, 255, VK_MENU, FALSE );
+		StringCchCat( pName, cchNameLen, keyName );
+	}
+	if( pName[ 0 ] != 0 )
+		StringCchCat( pName, cchNameLen, _T(" + ") );
+	GetKeyName( keyName, 255, vk, mod & HOTKEYF_EXT );
+	StringCchCat( pName, cchNameLen, keyName );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void EnableDlgItem( HWND hDlg, UINT idCtrl, BOOL bEnable )
+{
+	HWND hCtrl = ::GetDlgItem( hDlg, idCtrl );
+	if( ! hCtrl )
+		return;
+	HWND hFocus = ::GetFocus();
+	::EnableWindow( hCtrl, bEnable );
+	if( ! bEnable && hFocus == hCtrl )
+		::SendMessage( hDlg, WM_NEXTDLGCTL, 0, 0 );			
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void DebugOut( LPCTSTR pFormat, ... )
+{
+	const size_t bufsize = 1024;
+	TCHAR buf[ bufsize ];
+	va_list args;
+	va_start( args, pFormat );
+	_vsntprintf( buf, bufsize - 1, pFormat, args );
+	va_end( args );
+	::OutputDebugString( buf );
 }
