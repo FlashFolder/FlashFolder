@@ -20,7 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -81,7 +81,7 @@
 			CharacterSet="1">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				MinimalRebuild="FALSE"
 				RuntimeLibrary="0"
@@ -143,7 +143,7 @@
 			CharacterSet="1">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				MinimalRebuild="FALSE"
 				RuntimeLibrary="0"
@@ -206,7 +206,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -268,7 +268,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -362,6 +362,9 @@
 				RelativePath=".\PageMsoFileDlg.cpp">
 			</File>
 			<File
+				RelativePath=".\PageShortcuts.cpp">
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp">
 				<FileConfiguration
 					Name="Unicode Debug|Win32">
@@ -434,6 +437,9 @@
 			</File>
 			<File
 				RelativePath=".\PageMsoFileDlg.h">
+			</File>
+			<File
+				RelativePath=".\PageShortcuts.cpp">
 			</File>
 			<File
 				RelativePath=".\Resource.h">
@@ -510,6 +516,9 @@
 				RelativePath="..\commonUtils\FolderDlg.h">
 			</File>
 			<File
+				RelativePath="..\commonUtils\GdiUtils.h">
+			</File>
+			<File
 				RelativePath="..\commonUtils\GroupCheck.h">
 			</File>
 			<File
@@ -558,6 +567,9 @@
 				RelativePath="..\commonUtils\tstring.h">
 			</File>
 			<File
+				RelativePath="..\commonUtils\UnicodeUtils.h">
+			</File>
+			<File
 				RelativePath="..\commonUtils\Utils.h">
 			</File>
 			<File
@@ -581,6 +593,9 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\FolderDlg.cpp">
+			</File>
+			<File
+				RelativePath="..\commonUtils\GdiUtils.cpp">
 			</File>
 			<File
 				RelativePath="..\commonUtils\GroupCheck.cpp">

@@ -40,8 +40,10 @@ CFFConfigDlg::CFFConfigDlg(CWnd* pParent /*=NULL*/)
 	AddPage( &m_pageGeneric );
 	AddPage( &m_pageCommonFileDlg );
 	AddPage( &m_pageCommonDirDlg );
-	AddPage( &m_pageCommonOpenWithDlg );
+	if( GetOsVersion() <= 0x0500 )
+		AddPage( &m_pageCommonOpenWithDlg );
 	AddPage( &m_pageMsoFileDlg );
+	AddPage( &m_pageShortcuts );
 
 	// See http://support.microsoft.com/default.aspx?scid=kb%3Ben-us%3BQ158552 for why 
 	// the first-chance access-violation exception can savely be ignored. 

@@ -22,6 +22,7 @@
 #define IDD_PAGE_COMMON_DIRDLG          150
 #define IDD_PAGE_COMMON_FILEDLG         151
 #define IDD_UPDATECHECK                 154
+#define IDD_PAGE_SHORTCUTS              163
 #define IDC_RD_INDIVIDUAL_PROFILES      1000
 #define IDC_RD_SHARED_PROFILE           1001
 #define IDC_ED_MAX_DIRHISTORY           1002
@@ -75,14 +76,19 @@
 #define IDC_ED_TEXT                     1070
 #define IDC_RICHEDIT21                  1071
 #define IDC_BTN_DOWNLOAD                1072
+#define IDC_ED_COMMAND                  1078
+#define IDC_HOTKEY                      1084
+#define IDC_LST_SHORTCUTS               1085
+#define IDC_BUTTON1                     1086
+#define IDC_BTN_CLEAR                   1086
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        156
-#define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1073
+#define _APS_NEXT_RESOURCE_VALUE        166
+#define _APS_NEXT_COMMAND_VALUE         32778
+#define _APS_NEXT_CONTROL_VALUE         1089
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif
