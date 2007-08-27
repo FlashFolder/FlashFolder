@@ -236,7 +236,7 @@ LRESULT CALLBACK CmnFolderDlgHook::HookWindowProc(
 		case WM_ACTIVATE:
 			g_pHook->m_isWindowActive = LOWORD(wParam) != 0;
 							FileDlgHookCallbacks::OnFolderChange();
-
+			FileDlgHookCallbacks::OnActivate( wParam, lParam );
 			break;
 
         case WM_WINDOWPOSCHANGED:

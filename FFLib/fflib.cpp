@@ -51,6 +51,10 @@ HHOOK g_hHook = NULL;						// handle of the hook
 #pragma data_seg()
 #pragma comment( linker, "/SECTION:.shared,RWS" )
 
+//-----------------------------------------------------------------------------------------
+// constants
+//-----------------------------------------------------------------------------------------
+LPCTSTR FF_GUID = _T("{163F258C-65E0-483d-8B7A-5ABD9E3D4487}");
 
 //-----------------------------------------------------------------------------------------
 // global variables that are "local" to each instance of the DLL  
@@ -72,8 +76,28 @@ MemoryProfile g_profileDefaults;
 
 WORD g_osVersion = 0;
 
+TCHAR g_currentExePath[ MAX_PATH + 1 ] = _T("");
+LPCTSTR g_currentExeName = _T("");
+TCHAR g_currentExeDir[ MAX_PATH + 1 ] = _T("");
+
+HWND g_hwndTcFavmenuClick = NULL;
+
+vector<ATOM> g_hotkeyAtoms;              // unique identifiers of assigned hotkeys
+
+bool g_isFileDlgActive = false;
+bool g_isToolWndActive = false;
+
 //--- options read from profile
 int g_globalHistoryMaxEntries;
+
+
+//-----------------------------------------------------------------------------------------
+// Prototypes
+//-----------------------------------------------------------------------------------------
+
+void RegisterMyHotkeys();
+void UnregisterMyHotkeys();
+LPCTSTR GetCommandName( int cmd );
 
 
 //-----------------------------------------------------------------------------------------
@@ -85,12 +109,17 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
     {
 		case DLL_PROCESS_ATTACH:
 		{
-			TCHAR exePath[ MAX_PATH + 1 ] = _T("");
-			::GetModuleFileName( NULL, exePath, MAX_PATH );
+			::GetModuleFileName( NULL, g_currentExePath, MAX_PATH );
+			if( LPTSTR p = _tcsrchr( g_currentExePath, _T('\\') ) )
+			{
+				g_currentExeName = p + 1;
+				StringCbCopy( g_currentExeDir, sizeof(g_currentExeDir), g_currentExePath );
+				g_currentExeDir[ p - g_currentExePath ] = 0;
+			}
 
 			TCHAR s[512];
 			StringCbPrintf( s, sizeof(s), _T("[fflib] DLL_PROCESS_ATTACH (pid %08Xh, \"%s\")\n"), 
-				::GetCurrentProcessId(), exePath );
+				::GetCurrentProcessId(), g_currentExePath );
 			::OutputDebugString( s ); 
 
 			//save the HInstance of the DLL
@@ -111,6 +140,24 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 		break;
     }
     return TRUE;
+}
+
+//-----------------------------------------------------------------------------------------------
+// Make sure the DLL gets not unloaded as long as the window is subclassed.
+// This can occur if the FlashFolder service stops while a file dialog is open.
+// Intentionally there is no balancing FreeLibrary() call since I couldn't find
+// a good place to call it. 
+
+void MakeSureDllKeepsLoaded()
+{
+	static bool s_isLoaded = false;
+	if( s_isLoaded )
+		return;
+	s_isLoaded = true;
+
+	TCHAR dllPath[ MAX_PATH + 1 ];
+	::GetModuleFileName( (HMODULE) g_hInstDll, dllPath, MAX_PATH ); 
+	::LoadLibrary( dllPath );
 }
 
 //-----------------------------------------------------------------------------------------
@@ -206,6 +253,7 @@ int DisplayFolderMenu( HMENU hMenu, int buttonID )
 	int id = TrackPopupMenu(hMenu, 
 		TPM_LEFTALIGN | TPM_TOPALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD | TPM_NONOTIFY, 
 		rc.left, rc.bottom, 0, g_hToolWnd, NULL);
+
 	if( id > 0 )
 	{
         // get directory path from menu item text
@@ -268,7 +316,7 @@ void DisplayMenu_OpenDirs()
 
     //--- get current Total Commander folders and add them to the menu
 
-	CTotalCmdUtils tcmdUtils( CTotalCmdUtils::FindTopTCmdWnd() );
+	CTotalCmdUtils tcmdUtils( FindTopTcWnd() );
     if( tcmdUtils.GetTCmdWnd() )
     {
         TCHAR leftDir[MAX_PATH+1] = _T("");
@@ -304,13 +352,6 @@ void DisplayMenu_OpenDirs()
         handleBuf.Resize( handleBuf.GetSize() * 2 );
     if( res != STATUS_SUCCESS )
         return;
-
-    //--- get application EXE dir - will be ignored by the handle-enumeration and added
-    //    later on top of the menu
-    TCHAR exeDir[MAX_PATH+1];
-    ::GetModuleFileName( NULL, exeDir, MAX_PATH );
-    LPTSTR pExeDirBs = _tcsrchr( exeDir, _T('\\') );
-    if( pExeDirBs ) *pExeDirBs = 0;
 
     //--- for each file handle of the current process: get the dir path and add it to the set
     
@@ -356,14 +397,14 @@ void DisplayMenu_OpenDirs()
         }
 
         // add the directory path - the set eleminates duplicates
-        if( _tcsicmp( filepath, exeDir ) != 0 )
+        if( _tcsicmp( filepath, g_currentExeDir ) != 0 )
             dirset.insert( filepath );
     } //for       
 
     vector<tstring> dirlist( dirset.size() + 1 );
 
     //--- add application dir to the folder list
-    dirlist[0] = exeDir;
+    dirlist[0] = g_currentExeDir;
 
     //--- copy the in-use-folders to the list
     vector<tstring>::iterator it = dirlist.begin();  it++;
@@ -536,10 +577,50 @@ LRESULT CALLBACK ToolWindowEditPathProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
     return CallWindowProc(g_wndProcToolWindowEditPath, hwnd, uMsg, wParam, lParam);
 }
 
+//-----------------------------------------------------------------------------------------------
+
+void ExecuteToolbarCommand( UINT cmd )
+{
+	switch( cmd )
+	{
+		case ID_FF_LASTDIR:
+			GotoLastDir();
+			break;
+		case ID_FF_SHOWALL:
+			g_spFileDlgHook->SetFilter( _T("*.*") );
+			break;
+		case ID_FF_FOCUSPATH:
+		{
+			::SetForegroundWindow( g_hToolWnd );
+			HWND hEdit = ::GetDlgItem( g_hToolWnd, ID_FF_PATH );
+			::SetFocus( hEdit );
+			::SendMessage( hEdit, EM_SETSEL, 0, -1 );
+			break;
+		}
+		case ID_FF_GLOBALHIST:
+			DisplayMenu_GlobalHist();
+			break;
+		case ID_FF_OPENDIRS:
+			DisplayMenu_OpenDirs();
+			break;
+		case ID_FF_FAVORITES:
+			DisplayMenu_Favorites();
+			break;
+		case ID_FF_CONFIG:
+			DisplayMenu_Config();
+			break;
+		default:
+			DebugOut( _T("[fflib] ERROR: invalid command") );
+	}	
+}
+
 //-----------------------------------------------------------------------------------------
+// Window proc of the FlashFolder toolbar window
 
 INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static bool s_inMenu = false;
+
     switch( uMsg )
     {
 		case WM_COMMAND:
@@ -548,17 +629,8 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			WORD wID = LOWORD(wParam);         // item, control, or accelerator identifier 
 			HWND hwndCtl = (HWND) lParam;      // handle of control 
  
-			if (wNotifyCode == BN_CLICKED)
-				switch (wID)
-				{
-					case ID_FF_LASTDIR:
-						GotoLastDir();
-						break;
-					case ID_FF_SHOWALL:
-						g_spFileDlgHook->SetFilter( _T("*.*") );
-						SetForegroundWindow(g_hFileDialog);
-						break;
-				}
+			if( wNotifyCode == BN_CLICKED )
+				ExecuteToolbarCommand( wID );
 		}
 		break;
 
@@ -570,21 +642,8 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				// drop-down button pressed
 
 				NMTOOLBAR* pnmt = reinterpret_cast<NMTOOLBAR*>( pnm );
-				switch( pnmt->iItem )
-				{
-					case ID_FF_GLOBALHIST: 
-						DisplayMenu_GlobalHist();
-						break;
-                    case ID_FF_OPENDIRS:
-                        DisplayMenu_OpenDirs();
-                        break;
-					case ID_FF_FAVORITES:
-						DisplayMenu_Favorites();
-						break;
-					case ID_FF_CONFIG:
-						DisplayMenu_Config();
-						break;
-				}
+				ExecuteToolbarCommand( pnmt->iItem );
+
 				::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, TBDDRET_DEFAULT );
 				return TRUE;
 			}
@@ -594,22 +653,97 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			
 				NMTTDISPINFO* pTTT = reinterpret_cast<NMTTDISPINFO*>( pnm );
 
-				pTTT->hinst = g_hInstDll;
+				pTTT->hinst = NULL;
+
+				const int TOOLTIP_BUFSIZE = MAX_PATH + 64;
+				static TCHAR s_tooltipBuf[ TOOLTIP_BUFSIZE + 1 ];
+				s_tooltipBuf[ 0 ] = 0;
+				pTTT->lpszText = s_tooltipBuf;
 			
 				if( pTTT->hdr.idFrom == ID_FF_LASTDIR )
 				{
-					// use last entry of global history as tooltip
-					HistoryLst history;
-					if( history.LoadFromProfile( g_profile, _T("GlobalFolderHistory") ) )
-						StringCchCopyN( pTTT->szText, sizeof(pTTT->szText) / sizeof(TCHAR),
-							history.GetList().front().c_str(), history.GetList().front().size() );
+					// use most recent entry of global history as tooltip
+					tstring sLastDir = g_profile.GetString( _T("GlobalFolderHistory"), _T("0") );
+					if( sLastDir.empty() )
+						::LoadString( g_hInstDll, pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
+					else
+						StringCbCopy( s_tooltipBuf, sizeof(s_tooltipBuf), sLastDir.c_str() );
 				}
 				else
 				{
-					pTTT->lpszText = MAKEINTRESOURCE(pTTT->hdr.idFrom);
-						//return ID of appropriate string resource (= ID of control)
+					::LoadString( g_hInstDll, pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
+				}
+
+				// append hotkey name
+				if( int hotkey = g_profile.GetInt( _T("Hotkeys"), GetCommandName( pTTT->hdr.idFrom ) ) )
+				{
+					StringCchCat( s_tooltipBuf, TOOLTIP_BUFSIZE, _T("\nShortcut: ") ); 					
+					TCHAR hkName[ 256 ]; GetHotkeyName( hkName, 255, hotkey );
+					StringCchCat( s_tooltipBuf, TOOLTIP_BUFSIZE, hkName ); 					
 				}
 			}
+		}
+		break;
+
+		case WM_HOTKEY:
+		{
+			// hotkeys make only sense if the hooked dialog is the foreground window
+			HWND hwndFg = ::GetForegroundWindow();
+			if( hwndFg != g_hToolWnd && hwndFg != g_hFileDialog )
+				break;
+
+			ATOM hotkeyAtom = static_cast<ATOM>( wParam );
+			TCHAR atomName[ 256 ] = _T("");
+			::GlobalGetAtomName( hotkeyAtom, atomName, 255 );
+
+			tstring ffGuid = tstring( _T(".") ) + tstring( FF_GUID );
+
+			HWND hTb = ::GetDlgItem( g_hToolWnd, ID_FF_TOOLBAR );
+			
+			UINT cmd = 0;
+			const UINT IS_MENU = 0x10000;
+
+			if( tstring( _T("ff_LastFolder") ) + ffGuid == atomName )
+				cmd = ID_FF_LASTDIR;
+			else if( tstring( _T("ff_ViewAllFiles") ) + ffGuid == atomName )
+				cmd = ID_FF_SHOWALL;
+			else if( tstring( _T("ff_FocusPathEdit") ) + ffGuid == atomName )
+				cmd = ID_FF_FOCUSPATH;
+			else if( tstring( _T("ff_MenuFolderHistory") ) + ffGuid == atomName )
+				cmd = ID_FF_GLOBALHIST | IS_MENU;
+			else if( tstring( _T("ff_MenuOpenFolders") ) + ffGuid == atomName )
+				cmd = ID_FF_OPENDIRS   | IS_MENU;
+			else if( tstring( _T("ff_MenuFavorites") ) + ffGuid == atomName )
+				cmd = ID_FF_FAVORITES  | IS_MENU;
+
+			if( s_inMenu )
+			{
+				// cancel currently open menu
+				::SendMessage( g_hToolWnd, WM_CANCELMODE, 0, 0 );
+				return FALSE;
+			}
+
+			if( cmd & IS_MENU )
+				::SendMessage( hTb, TB_PRESSBUTTON, cmd & 0xFFFF, TRUE );
+
+			s_inMenu = true;
+			ExecuteToolbarCommand( cmd & 0xFFFF );
+			s_inMenu = false;
+
+			if( cmd & IS_MENU )
+				::SendMessage( hTb, TB_PRESSBUTTON, cmd & 0xFFFF, FALSE );
+		}
+		break;
+
+		case WM_ACTIVATE:
+		{
+			// since we are using global hotkeys, disable them if both toolbar and filedialog are not active
+
+			g_isToolWndActive = LOWORD( wParam ) != WA_INACTIVE;
+			if( g_isToolWndActive || g_isFileDlgActive )
+				RegisterMyHotkeys();
+			else
+				UnregisterMyHotkeys();
 		}
 		break;
 
@@ -806,6 +940,82 @@ void CreateToolWindow( bool isFileDialog )
 	}
 }
 
+//-----------------------------------------------------------------------------------------------
+
+void RegisterMyHotkeys()
+{
+	if( ! g_hotkeyAtoms.empty() )
+		return;
+
+	const int cmdCount = 6;
+	LPCTSTR cmdList[ cmdCount ] = {
+		_T("ff_LastFolder"),
+		_T("ff_MenuFolderHistory"),
+		_T("ff_MenuOpenFolders"),
+		_T("ff_MenuFavorites"),
+		_T("ff_ViewAllFiles"),
+		_T("ff_FocusPathEdit") };
+
+	tstring ffGuid = tstring( _T(".") ) + tstring( FF_GUID );
+
+	for( int i = 0; i < cmdCount; ++i )
+	{
+		int hotkey = g_profile.GetInt( _T("Hotkeys"), cmdList[ i ] );  
+		if( hotkey == 0 )
+			continue;
+
+		// use GlobalAddAtom() to avoid conflicts with hotkey IDs of other programs / DLLs
+		tstring atomName = tstring( cmdList[ i ] ) + ffGuid;
+		ATOM atom = ::GlobalAddAtom( atomName.c_str() );
+
+		UINT vk = hotkey & 0xFF;
+		UINT mod = hotkey >> 8;
+		UINT rmod = 0;
+		if( mod & HOTKEYF_CONTROL )
+			rmod |= MOD_CONTROL;
+		if( mod & HOTKEYF_ALT )
+			rmod |= MOD_ALT;
+		if( mod & HOTKEYF_SHIFT )
+			rmod |= MOD_SHIFT;
+
+		if( ::RegisterHotKey( g_hToolWnd, atom, rmod, vk ) )
+			g_hotkeyAtoms.push_back( atom );
+		else
+			::GlobalDeleteAtom( atom );
+	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+LPCTSTR GetCommandName( int cmd )
+{
+	switch( cmd )
+	{
+		case ID_FF_LASTDIR:     return _T("ff_LastFolder");
+		case ID_FF_SHOWALL:     return _T("ff_ViewAllFiles");
+		case ID_FF_FOCUSPATH:   return _T("ff_FocusPathEdit");
+		case ID_FF_GLOBALHIST:  return _T("ff_MenuFolderHistory");
+		case ID_FF_OPENDIRS:    return _T("ff_MenuOpenFolders");
+		case ID_FF_FAVORITES:   return _T("ff_MenuFavorites");
+		case ID_FF_CONFIG:      return _T("ff_MenuConfig");
+		default:
+			DebugOut( _T("[fflib] ERROR: invalid command for GetCommandName()") );
+	}
+	return _T("");
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void UnregisterMyHotkeys()
+{
+	for( size_t i = 0; i < g_hotkeyAtoms.size(); ++i )
+	{
+		::UnregisterHotKey( g_hToolWnd, g_hotkeyAtoms[ i ] );
+		::GlobalDeleteAtom( g_hotkeyAtoms[ i ] );		
+	}
+	g_hotkeyAtoms.clear();
+}
+
 //-----------------------------------------------------------------------------------------
 
 // callbacks that will be called by the file dialog hook
@@ -841,18 +1051,36 @@ void OnShow( bool bShow )
 	::ShowWindow( g_hToolWnd, bShow ? SW_SHOW : SW_HIDE );
 }
 
+void OnActivate( WPARAM wParam, LPARAM lParam )
+{
+	// since we are using global hotkeys, disable them if both toolbar and filedialog are not active
+
+	g_isFileDlgActive = LOWORD( wParam ) != WA_INACTIVE;
+	if( g_isToolWndActive || g_isFileDlgActive )
+		RegisterMyHotkeys();
+	else
+		UnregisterMyHotkeys();
+}
+
 void OnDestroy( bool isOkBtnPressed )
 {
 	//--- add folder to history if file dialog was closed with OK
+
 	if( isOkBtnPressed )
 		AddCurrentFolderToHistory();			
 
-	//--- destroy tool window + class ---
+	//--- unregister hotkeys 
+
+	UnregisterMyHotkeys();
+
+	//--- destroy tool window + class
+
 	::DestroyWindow( g_hToolWnd );
 	g_hToolWnd = NULL;
 	g_hFileDialog = NULL;
 
 	//--- destroy additional resources
+
 	if( g_hToolbarImages )
 	{
 		::ImageList_Destroy( g_hToolbarImages );
@@ -892,26 +1120,18 @@ bool IsCurrentProgramEnabledForDialog( FileDlgType fileDlgType )
 	if( g_profile.GetInt( pProfileGroup, _T("EnableHook") ) == 0 )
 		return false;
 
-    // Get EXE filename of current program.
-	TCHAR procPath[ MAX_PATH + 1 ] = _T("");
-	::GetModuleFileName( NULL, procPath, MAX_PATH );
-    if( TCHAR* pProcExe = _tcsrchr( procPath, _T('\\') ) )
+	// Check if EXE filename is in the excludes list for given dialog type.
+	tstring excludesGroup = pProfileGroup;
+	excludesGroup += _T(".Excludes");
+	for( int i = 0;; ++i )
 	{
-		++pProcExe;
-
-		// Check if EXE filename is in the excludes list for given dialog type.
-		tstring excludesGroup = pProfileGroup;
-		excludesGroup += _T(".Excludes");
-		for( int i = 0;; ++i )
-		{
-			TCHAR key[10];
-			StringCbPrintf( key, sizeof(key), _T("%d"), i );
-			tstring path = g_profile.GetString( excludesGroup.c_str(), key );
-			if( path.empty() )
-				break;
-			if( _tcsicmp( pProcExe, path.c_str() ) == 0 )
-				return false;
-		}
+		TCHAR key[10];
+		StringCbPrintf( key, sizeof(key), _T("%d"), i );
+		tstring path = g_profile.GetString( excludesGroup.c_str(), key );
+		if( path.empty() )
+			break;
+		if( _tcsicmp( g_currentExeName, path.c_str() ) == 0 )
+			return false;
 	}
 	return true;
 }
@@ -949,6 +1169,7 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 			g_hFileDialog = hwnd;
 
 			CreateToolWindow( isFileDialog );
+			RegisterMyHotkeys();
 
 			// create an instance of a file dialog hook class depending on the
 			// type of file dialog
@@ -982,15 +1203,9 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 
-			// Make sure the DLL gets not unloaded as long as the window is subclassed.
-			// This can occur if the FlashFolder service stops while a file dialog is open.
-			// Intentionally there is no balancing FreeLibrary() call since I couldn't find
-			// a good place to call it. 
-			TCHAR dllPath[ MAX_PATH + 1 ];
-			::GetModuleFileName( (HMODULE) g_hInstDll, dllPath, MAX_PATH ); 
-			::LoadLibrary( dllPath );  
+			MakeSureDllKeepsLoaded();
 
-			return 0;                
+			return 0;
 		}
 	}
 
