@@ -52,7 +52,7 @@ END
 // RT_MANIFEST
 //
 
-ISOLATIONAWARE_MANIFEST_RESOURCE_ID        RT_MANIFEST             "res\\xp_manifest.xml"
+2                       RT_MANIFEST             "res\\xp_manifest.xml"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -61,6 +61,7 @@ ISOLATIONAWARE_MANIFEST_RESOURCE_ID        RT_MANIFEST             "res\\xp_mani
 
 IDD_TOOLWND DIALOGEX 0, 0, 186, 14
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CLIPCHILDREN
+CLASS "FlashFolder_3832795"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
 END
@@ -122,7 +123,7 @@ IDI_FOLDER              ICON                    "res\\folder.ico"
 STRINGTABLE 
 BEGIN
     ID_FF_GLOBALHIST        "Global folder history"
-    ID_FF_FAVORITES         "Favorite folders (shared with Total Commander)"
+    ID_FF_FAVORITES         "Favorite folders"
     ID_FF_SHOWALL           "View all files (*.*)"
     ID_FF_OPENDIRS          "Folders of currently open files"
 END
@@ -146,3 +147,4 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+

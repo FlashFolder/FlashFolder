@@ -56,6 +56,9 @@ HHOOK g_hHook = NULL;						// handle of the hook
 //-----------------------------------------------------------------------------------------
 LPCTSTR FF_GUID = _T("{163F258C-65E0-483d-8B7A-5ABD9E3D4487}");
 
+// Note: the dialog window class in the .rc-file must be the same 
+LPCTSTR FF_WNDCLASSNAME = _T("FlashFolder_3832795"); 
+
 //-----------------------------------------------------------------------------------------
 // global variables that are "local" to each instance of the DLL  
 //-----------------------------------------------------------------------------------------
@@ -845,6 +848,15 @@ void CreateToolWindow( bool isFileDialog )
 
 	//--- create the external tool window ---
 
+	// Register unique class name so FF can be identified by other tools.
+	WNDCLASS wc = { 0 };
+	wc.lpszClassName = FF_WNDCLASSNAME;
+	wc.hInstance = g_hInstDll;
+	wc.hCursor = ::LoadCursor( NULL, IDC_ARROW );
+	wc.lpfnWndProc = DefDlgProc;
+	wc.cbWndExtra = DLGWINDOWEXTRA;
+	::RegisterClass( &wc );
+
 	g_hToolWnd = ::CreateDialog( g_hInstDll, MAKEINTRESOURCE( IDD_TOOLWND ), g_hFileDialog, ToolDlgProc );
 	if( g_hToolWnd == NULL )
 		return;
@@ -1094,6 +1106,8 @@ void OnDestroy( bool isOkBtnPressed )
 	::DestroyWindow( g_hToolWnd );
 	g_hToolWnd = NULL;
 	g_hFileDialog = NULL;
+
+	::UnregisterClass( FF_WNDCLASSNAME, g_hInstDll );
 
 	//--- destroy additional resources
 
