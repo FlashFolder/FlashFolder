@@ -317,7 +317,7 @@ void DisplayMenu_OpenDirs()
 {
 	HMENU hMenu = ::CreatePopupMenu();
 
-    //--- get current Total Commander folders and add them to the menu
+    //--- get current Total Commander folders (if any) and add them to the menu
 
 	CTotalCmdUtils tcmdUtils( FindTopTcWnd() );
     if( tcmdUtils.GetTCmdWnd() )
@@ -341,6 +341,20 @@ void DisplayMenu_OpenDirs()
 			::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
         }
     }
+
+	//--- get current Windows Explorer folders (if any) and add them to the menu
+
+	std::vector<tstring> explorerPathes;
+	if( GetAllExplorerPathes( &explorerPathes ) > 0 )
+	{
+		for( int i = 0; i != explorerPathes.size(); ++i )
+		{
+			TCHAR s[ MAX_PATH + 20 ] = _T("[Explorer] ");
+			StringCbCat( s, sizeof(s), explorerPathes[ i ].c_str() );
+			::AppendMenu( hMenu, MF_STRING, 2100 + i, s );
+		}
+		::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
+	}
 
     //--- allocate buffers for return data of NT kernel APIs
 

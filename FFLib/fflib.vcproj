@@ -587,6 +587,9 @@
 			Name="commonUtils_h"
 			Filter="*.h;*.hpp;*.hxx">
 			<File
+				RelativePath="..\commonUtils\ExplorerUtils.h">
+			</File>
+			<File
 				RelativePath="..\commonUtils\NTKernelApi.h">
 			</File>
 			<File
@@ -614,6 +617,9 @@
 		<Filter
 			Name="commonUtils_cpp"
 			Filter="">
+			<File
+				RelativePath="..\commonUtils\ExplorerUtils.cpp">
+			</File>
 			<File
 				RelativePath="..\commonUtils\NTKernelApi.cpp">
 			</File>

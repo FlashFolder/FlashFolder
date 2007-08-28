@@ -42,6 +42,7 @@ using namespace std;
 #include "../commonUtils/NtKernelApi.h"
 #include "../commonUtils/NtKernelUtils.h"
 #include "../commonUtils/TotalCmdUtils.h"
+#include "../commonUtils/ExplorerUtils.h"
 #include "../commonUtils/Registry.h"
 #include "../commonUtils/GdiUtils.h"
 #include "../common/Favorites.h"
