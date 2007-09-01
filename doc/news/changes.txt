@@ -1,6 +1,40 @@
 Changelog for project FlashFolder
 =================================
 
+v1.8.141 beta
+
+FIX: Upgrade installs could crash Windows Explorer (issue #1763646)
+
+ADD: assignable hotkeys (use options dialog to assign hotkeys)
+ADD: show the folders of the currently open Explorer
+windows in the menu "folders of currently open files"
+ADD: use unique window class name
+
+CHG: use themed look for path edit control under XP
+
+DEL: removed "experimental" warning for MSO file dialog
+
+---------------
+
+v1.7.103 beta
+
+FIX: 32 bpp toolbar icons were not used for 16/24 bpp display mode and for programs 
+that do not have visual styles enabled under WinXP (issue #1757007)
+
+---------------
+
+v1.7.81 beta
+
+FIX: toolbar icons not shown for 24-bit graphic mode (issue #1756616)
+
+---------------
+
+v1.7.78 beta
+
+FIX: toolbar icons not shown for 16-bit graphic mode (issue #1741112)
+
+---------------
+
 v1.7.76 beta
 
 CHG: redesigned toolbar icons that use truecolor (including alpha channel for WinXP)
