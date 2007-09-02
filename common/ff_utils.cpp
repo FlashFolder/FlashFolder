@@ -41,20 +41,36 @@ FileDlgType GetFileDlgType( HWND dlg )
     ::GetClassName(dlg, className, sizeof(className) / sizeof(TCHAR) - 1 );
 	if( _tcscmp( className, _T("#32770") ) != 0 )
 	{
-		// detect the MS Office file dialog
+		// Detect variants of the MS Office file dialog.
+		// In different versions of this dialog the ID / classname of the filename edit control
+		// changes.
+
 		if( _tcsncmp( className, _T("bosa_sdm_"), 9 ) == 0 )
 		{
-			// verify it's the file dialog: check if there is the file name richedit ctrl
-			if( (hEditFileName = GetDlgItem( dlg, MSO2002_FILEDLG_ED_FILENAME )) == NULL )
-				if( (hEditFileName = GetDlgItem( dlg, MSO2000_FILEDLG_ED_FILENAME )) == NULL )
-					return FDT_NONE;
-			className[0] = 0;
-			::GetClassName( hEditFileName, className, sizeof(className) / sizeof(TCHAR) - 1 );
-			if( _tcsncmp( className, _T("RichEdit20"), 10 ) != 0 )
-				return FDT_NONE;
-			return FDT_MSOFFICE;
+			if( hEditFileName = GetDlgItem( dlg, VS2005_FILEDLG_ED_FILENAME ) )
+			{
+				className[0] = 0;
+				::GetClassName( hEditFileName, className, sizeof(className) / sizeof(TCHAR) - 1 );
+				if( _tcscmp( className, _T("Edit") ) == 0 )
+					return FileDlgType( FDT_MSOFFICE, FDT_VS2005 );
+			}
+
+			FileDlgType res( FDT_MSOFFICE );
+
+			if( hEditFileName = GetDlgItem( dlg, MSO2002_FILEDLG_ED_FILENAME ) )
+				res.subType = FDT_MSO2002;
+			else if( hEditFileName = GetDlgItem( dlg, MSO2000_FILEDLG_ED_FILENAME ) )
+				res.subType = FDT_MSO2000;
+			
+			if( hEditFileName )
+			{
+				className[0] = 0;
+				::GetClassName( hEditFileName, className, sizeof(className) / sizeof(TCHAR) - 1 );
+				if( _tcsncmp( className, _T("RichEdit20"), 10 ) == 0 )
+					return res;
+			}
 		}
-		return FDT_NONE;
+		return FileDlgType( FDT_NONE );
 	}
 
 	// detect the common "Open With" dialog
@@ -74,7 +90,7 @@ FileDlgType GetFileDlgType( HWND dlg )
 						className[0] = 0;
 						::GetClassName( hWnd, className, sizeof(className) / sizeof(TCHAR) - 1 );
 						if( _tcscmp( className, _T("SysListView32") ) == 0 )
-							return FDT_COMMON_OPENWITH;							
+							return FileDlgType( FDT_COMMON_OPENWITH );							
 					}
 			}
 	}         
@@ -85,47 +101,47 @@ FileDlgType GetFileDlgType( HWND dlg )
 		className[0] = 0;
 		::GetClassName( hWnd, className, sizeof(className) / sizeof(TCHAR) - 1 );
 		if( _tcscmp( className, _T("SHBrowseForFolder ShellNameSpace Control") ) == 0 )
-			return FDT_COMMON_FOLDER;
+			return FileDlgType( FDT_COMMON_FOLDER );
 	}
 
 	// to detect the common file dlg I check various control IDs and class names
 	// that exist only in the common file dlg
 
 	if( (hShellView = GetDlgItem(dlg, FILEDLG_LB_SHELLVIEW)) == NULL )
-		return FDT_NONE;
+		return FileDlgType( FDT_NONE );
 	className[0] = 0;
     ::GetClassName(hShellView, className, sizeof(className) / sizeof(TCHAR) - 1 );
 	if( _tcscmp( className, _T("ListBox") ) != 0)
-		return FDT_NONE;
+		return FileDlgType( FDT_NONE );
 
 	if( (hStat1 = GetDlgItem(dlg, FILEDLG_ST_SEARCH)) == NULL )
-		return FDT_NONE;	
+		return FileDlgType( FDT_NONE );	
 	className[0] = 0;
     ::GetClassName( hStat1, className, sizeof(className) / sizeof(TCHAR) - 1 );
 	if( _tcscmp( className, _T("Static") ) != 0)
-		return FDT_NONE;
+		return FileDlgType( FDT_NONE );
 
 	if ((hCombFolder = GetDlgItem(dlg, FILEDLG_CB_FOLDER)) == NULL)
-		return FDT_NONE;
+		return FileDlgType( FDT_NONE );
 	className[0] = 0;
     ::GetClassName( hCombFolder, className, sizeof(className) / sizeof(TCHAR) - 1 );
 	if( _tcscmp( className, _T("ComboBox") ) != 0)
-		return FDT_NONE;
+		return FileDlgType( FDT_NONE );
 
 	if ((hEditFileName = GetDlgItem(dlg, FILEDLG_ED_FILENAME)) == NULL)
-		return FDT_NONE;
+		return FileDlgType( FDT_NONE );
 	className[0] = 0;
     ::GetClassName( hEditFileName, className, sizeof(className) / sizeof(TCHAR) - 1 );
 	if( _tcscmp( className, _T("Edit") ) != 0)
-		return FDT_NONE;
+		return FileDlgType( FDT_NONE );
 
 	// filter out old-style (Win 3.1) open/save dialogs
 	//   we detect them by checking for the "drive listbox" that doesn't
 	//   exists in new style dialogs
 	if( (hDriveListBox = GetDlgItem(dlg, FILEDLG_CB_OLD_DRIVES)) != NULL )
-		return FDT_NONE;
+		return FileDlgType( FDT_NONE );
 
-	return FDT_COMMON;
+	return FileDlgType( FDT_COMMON );
 }
 
 //-----------------------------------------------------------------------------------------

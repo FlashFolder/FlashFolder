@@ -94,101 +94,111 @@ bool MsoFileDlgHook::EnterFilenameEditText( LPCTSTR pText )
 
 	TCHAR oldEditTxt[1024] = _T(""); 
 
-	HWND hEditFileName = ::GetDlgItem( m_hwndFileDlg, MSO2002_FILEDLG_ED_FILENAME );
-	if( ! hEditFileName )
-		hEditFileName = ::GetDlgItem( m_hwndFileDlg, MSO2000_FILEDLG_ED_FILENAME );
+	HWND hEditFileName = NULL;
 
-	if( hEditFileName )
+	switch( m_subType )
 	{
-		// save current state
-		::GetWindowText( hEditFileName, oldEditTxt, (sizeof(oldEditTxt) - 1) / sizeof(TCHAR) );
-		POINT oldCursorPos;
-		::GetCursorPos( &oldCursorPos );
-
-		// clear the edit control for new keyboard input
-		::SetWindowText( hEditFileName, _T("") );
-
-		//--- prepare the mouse / keyboard input stream ---
-
-		// simulate mouse click in the filename edit control to set the focus to it
-
-		RECT rcEdit;
-		::GetWindowRect( hEditFileName, &rcEdit );
-		int mx = rcEdit.left + ( rcEdit.right - rcEdit.left ) / 2;
-		int my = rcEdit.top + ( rcEdit.bottom - rcEdit.top ) / 2;
-
-		vector<INPUT> vinp;
-		INPUT inp;
-
-		memset( &inp, 0, sizeof(inp) );
-		inp.type = INPUT_MOUSE;
-		inp.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
-		inp.mi.dx = mx * 65535 / ::GetSystemMetrics( SM_CXSCREEN );
-		inp.mi.dy = my * 65535 / ::GetSystemMetrics( SM_CYSCREEN );
-		vinp.push_back( inp );
-
-		memset( &inp, 0, sizeof(inp) );
-		inp.type = INPUT_MOUSE;
-		inp.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-		vinp.push_back( inp );
-		inp.mi.dwFlags = MOUSEEVENTF_LEFTUP;
-		vinp.push_back( inp );
-
-		// simulate Ctrl+A keystrokes in the filename edit control to select all text
-		memset( &inp, 0, sizeof(inp) );
-		inp.type = INPUT_KEYBOARD;
-		inp.ki.wVk = VK_CONTROL;
-		vinp.push_back( inp );
-		inp.ki.wVk = 'A';
-		vinp.push_back( inp );
-		inp.ki.dwFlags = KEYEVENTF_KEYUP; 
-		vinp.push_back( inp );
-		inp.ki.wVk = VK_CONTROL;
-		vinp.push_back( inp );
-
-		// simulate keystrokes in the filename edit control to put the given text
-		// into it
-		AddTextInput( &vinp, pText );
-
-		// simulate return key
-		memset( &inp, 0, sizeof(inp) );
-		inp.type = INPUT_KEYBOARD;
-		inp.ki.wVk = VK_RETURN;
-		vinp.push_back( inp );
-		inp.ki.dwFlags = KEYEVENTF_KEYUP; 
-		vinp.push_back( inp );
-
-		// simulate Ctrl+A keystrokes in the filename edit control to select all text
-		memset( &inp, 0, sizeof(inp) );
-		inp.type = INPUT_KEYBOARD;
-		inp.ki.wVk = VK_CONTROL;
-		vinp.push_back( inp );
-		inp.ki.wVk = 'A';
-		vinp.push_back( inp );
-		inp.ki.dwFlags = KEYEVENTF_KEYUP; 
-		vinp.push_back( inp );
-		inp.ki.wVk = VK_CONTROL;
-		vinp.push_back( inp );
-
-		// simulate keystrokes in the filename edit control to put the original
-		// text into it
-		AddTextInput( &vinp, oldEditTxt );
-
-		// simulate mouse move to restore old cursor pos
-		memset( &inp, 0, sizeof(inp) );
-		inp.type = INPUT_MOUSE;
-		inp.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
-		inp.mi.dx = oldCursorPos.x * 65535 / ::GetSystemMetrics( SM_CXSCREEN );
-		inp.mi.dy = oldCursorPos.y * 65535 / ::GetSystemMetrics( SM_CYSCREEN );
-		vinp.push_back( inp );
-
-		//--- send the prepared input stream ---
-
-		::SendInput( vinp.size(), &vinp[0], sizeof(INPUT) );
-
-		return true;
+		case FDT_MSO2000:
+			hEditFileName = ::GetDlgItem( m_hwndFileDlg, MSO2000_FILEDLG_ED_FILENAME );
+			break;
+		case FDT_MSO2002:
+			hEditFileName = ::GetDlgItem( m_hwndFileDlg, MSO2002_FILEDLG_ED_FILENAME );
+			break;
+		case FDT_MSO96:
+			hEditFileName = ::GetDlgItem( m_hwndFileDlg, MSO96_FILEDLG_ED_FILENAME );
+			break;
 	}
-	return false;
+
+	if( ! hEditFileName )
+		return false;
+
+	// save current state
+	::GetWindowText( hEditFileName, oldEditTxt, (sizeof(oldEditTxt) - 1) / sizeof(TCHAR) );
+	POINT oldCursorPos;
+	::GetCursorPos( &oldCursorPos );
+
+	// clear the edit control for new keyboard input
+	::SetWindowText( hEditFileName, _T("") );
+
+	//--- prepare the mouse / keyboard input stream ---
+
+	// simulate mouse click in the filename edit control to set the focus to it
+
+	RECT rcEdit;
+	::GetWindowRect( hEditFileName, &rcEdit );
+	int mx = rcEdit.left + ( rcEdit.right - rcEdit.left ) / 2;
+	int my = rcEdit.top + ( rcEdit.bottom - rcEdit.top ) / 2;
+
+	vector<INPUT> vinp;
+	INPUT inp;
+
+	memset( &inp, 0, sizeof(inp) );
+	inp.type = INPUT_MOUSE;
+	inp.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
+	inp.mi.dx = mx * 65535 / ::GetSystemMetrics( SM_CXSCREEN );
+	inp.mi.dy = my * 65535 / ::GetSystemMetrics( SM_CYSCREEN );
+	vinp.push_back( inp );
+
+	memset( &inp, 0, sizeof(inp) );
+	inp.type = INPUT_MOUSE;
+	inp.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+	vinp.push_back( inp );
+	inp.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+	vinp.push_back( inp );
+
+	// simulate Ctrl+A keystrokes in the filename edit control to select all text
+	memset( &inp, 0, sizeof(inp) );
+	inp.type = INPUT_KEYBOARD;
+	inp.ki.wVk = VK_CONTROL;
+	vinp.push_back( inp );
+	inp.ki.wVk = 'A';
+	vinp.push_back( inp );
+	inp.ki.dwFlags = KEYEVENTF_KEYUP; 
+	vinp.push_back( inp );
+	inp.ki.wVk = VK_CONTROL;
+	vinp.push_back( inp );
+
+	// simulate keystrokes in the filename edit control to put the given text
+	// into it
+	AddTextInput( &vinp, pText );
+
+	// simulate return key
+	memset( &inp, 0, sizeof(inp) );
+	inp.type = INPUT_KEYBOARD;
+	inp.ki.wVk = VK_RETURN;
+	vinp.push_back( inp );
+	inp.ki.dwFlags = KEYEVENTF_KEYUP; 
+	vinp.push_back( inp );
+
+	// simulate Ctrl+A keystrokes in the filename edit control to select all text
+	memset( &inp, 0, sizeof(inp) );
+	inp.type = INPUT_KEYBOARD;
+	inp.ki.wVk = VK_CONTROL;
+	vinp.push_back( inp );
+	inp.ki.wVk = 'A';
+	vinp.push_back( inp );
+	inp.ki.dwFlags = KEYEVENTF_KEYUP; 
+	vinp.push_back( inp );
+	inp.ki.wVk = VK_CONTROL;
+	vinp.push_back( inp );
+
+	// simulate keystrokes in the filename edit control to put the original
+	// text into it
+	AddTextInput( &vinp, oldEditTxt );
+
+	// simulate mouse move to restore old cursor pos
+	memset( &inp, 0, sizeof(inp) );
+	inp.type = INPUT_MOUSE;
+	inp.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
+	inp.mi.dx = oldCursorPos.x * 65535 / ::GetSystemMetrics( SM_CXSCREEN );
+	inp.mi.dy = oldCursorPos.y * 65535 / ::GetSystemMetrics( SM_CYSCREEN );
+	vinp.push_back( inp );
+
+	//--- send the prepared input stream ---
+
+	::SendInput( vinp.size(), &vinp[0], sizeof(INPUT) );
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------------------

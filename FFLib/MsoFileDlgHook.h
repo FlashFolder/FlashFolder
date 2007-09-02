@@ -33,7 +33,8 @@
 class MsoFileDlgHook : public FileDlgHook_base
 {
 public:
-	MsoFileDlgHook() :
+	MsoFileDlgHook( FileDlgSubType subType ) :
+		m_subType( subType ),
 		m_hwndFileDlg( 0 ), m_fileDialogCanceled( false ),
         m_initDone( false ), m_isWindowActive( false ), 
 		m_hKeyboardHook( NULL ) 
@@ -52,6 +53,8 @@ private:
 
 	void ResizeFileDialog();
 	bool EnterFilenameEditText( LPCTSTR text );
+
+	FileDlgSubType m_subType;
 
 	HWND m_hwndFileDlg, m_hwndTool;
 	WNDPROC m_oldWndProc;

@@ -19,8 +19,21 @@
 
 //-----------------------------------------------------------------------------------------------
 
-enum FileDlgType { FDT_NONE, FDT_COMMON, FDT_MSOFFICE, FDT_COMMON_OPENWITH, FDT_COMMON_FOLDER };
+enum FileDlgMainType { FDT_NONE, FDT_COMMON, FDT_MSOFFICE, FDT_COMMON_OPENWITH, FDT_COMMON_FOLDER };
+enum FileDlgSubType { FDT_SUB_NONE, FDT_MSO2000, FDT_MSO2002, FDT_VS2005 };
+
+struct FileDlgType
+{
+	FileDlgMainType mainType;
+	FileDlgSubType subType;
+
+	explicit FileDlgType( FileDlgMainType mt = FDT_NONE, FileDlgSubType st = FDT_SUB_NONE ) : 
+		mainType( mt ), subType( st ) {}
+};
+
 FileDlgType GetFileDlgType( HWND dlg );
+
+//-----------------------------------------------------------------------------------------------
 
 bool FileDlgBrowseToFolder( HWND hwndFileDlg, LPCTSTR path );
 bool FileDlgGetCurrentFolder( HWND hwndFileDlg, LPTSTR folderPath );
@@ -43,4 +56,5 @@ const unsigned FILEDLG_CB_OLD_DRIVES = 1121;      // Win 3.1 style dialogs only
 // some control ID's of the MS Office file dialog
 const unsigned MSO2000_FILEDLG_ED_FILENAME = 48;
 const unsigned MSO2002_FILEDLG_ED_FILENAME = 54;
+const unsigned VS2005_FILEDLG_ED_FILENAME = 51;   ///< e.g. Visual Studio 2005
 

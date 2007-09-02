@@ -1132,7 +1132,7 @@ bool IsCurrentProgramEnabledForDialog( FileDlgType fileDlgType )
 {
 	// Check if FlashFolder is globally disabled for given kind of dialog.
 	TCHAR* pProfileGroup = _T("");
-	switch( fileDlgType )
+	switch( fileDlgType.mainType )
 	{
 		case FDT_COMMON:
 			pProfileGroup = _T("CommonFileDlg");
@@ -1180,7 +1180,7 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 		HWND hwnd = reinterpret_cast<HWND>( wParam );
 
 		FileDlgType fileDlgType = GetFileDlgType( hwnd );
-		if( fileDlgType != FDT_NONE )
+		if( fileDlgType.mainType != FDT_NONE )
 		{
 			if( g_profileDefaults.IsEmpty() )
 			{
@@ -1194,7 +1194,7 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 			//--- initialise hook for this dialog
 
-			bool isFileDialog = ( fileDlgType == FDT_COMMON || fileDlgType == FDT_MSOFFICE );
+			bool isFileDialog = ( fileDlgType.mainType == FDT_COMMON || fileDlgType.mainType == FDT_MSOFFICE );
 
 			g_hFileDialog = hwnd;
 
@@ -1203,7 +1203,7 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 			// create an instance of a file dialog hook class depending on the
 			// type of file dialog
-			switch( fileDlgType )
+			switch( fileDlgType.mainType )
 			{
 				case FDT_COMMON:
 				{
@@ -1213,7 +1213,7 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam)
 				break;
 				case FDT_MSOFFICE:
 				{
-					g_spFileDlgHook.reset( new MsoFileDlgHook );
+					g_spFileDlgHook.reset( new MsoFileDlgHook( fileDlgType.subType ) );
 					g_spFileDlgHook->Init( hwnd, g_hToolWnd );
 				}
 				break;
