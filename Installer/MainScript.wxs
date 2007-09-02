@@ -61,9 +61,13 @@
 		<!-- always install program for all users -->
 		<Property Id="ALLUSERS">1</Property>		
 			
-		<!-- Launch condition (system requirements) -->
+		<!-- Launch conditions (system requirements) -->
+		
 		<Condition Message="$(loc.CptUI_Win2k_and_above)"><![CDATA[VersionNT >= 500]]></Condition>		
-			
+		
+		<Condition Message="You need administrator privileges to install this program.">
+			<![CDATA[Privileged]]>
+		</Condition>			
     
 		<!-- product components ................................................................. -->
 
