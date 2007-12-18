@@ -104,8 +104,8 @@ bool MsoFileDlgHook::EnterFilenameEditText( LPCTSTR pText )
 		case FDT_MSO2002:
 			hEditFileName = ::GetDlgItem( m_hwndFileDlg, MSO2002_FILEDLG_ED_FILENAME );
 			break;
-		case FDT_MSO96:
-			hEditFileName = ::GetDlgItem( m_hwndFileDlg, MSO96_FILEDLG_ED_FILENAME );
+		case FDT_VS2005:
+			hEditFileName = ::GetDlgItem( m_hwndFileDlg, VS2005_FILEDLG_ED_FILENAME );
 			break;
 	}
 

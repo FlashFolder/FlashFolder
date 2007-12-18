@@ -134,9 +134,9 @@
 		<Property Id="CptUI_Version">$(var.Version)</Property>
 		<Property Id="CptUI_VersionDisplay">$(var.VersionDisplay)</Property>
 		
-		<Binary Id="CptUI_BmpBanner" SourceFile="Bitmaps\banner.jpg" />
-		<Binary Id="CptUI_BmpDialog" SourceFile="Bitmaps\dialog.jpg" />		
-		<Icon Id="CptUI_ProductIcon" SourceFile="..\FFService\res\FlashFolder.ico" />
+		<Binary Id="CptUI_BmpBanner" src="Bitmaps\banner.jpg" />
+		<Binary Id="CptUI_BmpDialog" src="Bitmaps\dialog.jpg" />		
+		<Icon Id="CptUI_ProductIcon" src="..\FFService\res\FlashFolder.ico" />
 
 	</Product>
 </Wix>
