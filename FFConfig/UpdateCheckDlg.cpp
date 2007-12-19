@@ -24,6 +24,7 @@
 #endif
 
 #pragma warning(disable:4244) // numeric conversion
+#pragma warning(disable:4311) // pointer conversion
 
 using namespace std;
 

@@ -1,324 +1,491 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8.00"
 	Name="FFConfig"
 	ProjectGUID="{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}"
-	Keyword="MFCProj">
+	RootNamespace="FFConfig"
+	Keyword="MFCProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Unicode Debug|Win32"
 			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
 			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
-			CharacterSet="1">
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				Description="Setting version resource build number to Subversion revision number"
+				CommandLine="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="false"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
-				MinimalRebuild="TRUE"
+				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				TreatWChar_tAsBuiltInType="TRUE"
-				UsePrecompiledHeader="3"
+				TreatWChar_tAsBuiltInType="true"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="4"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="uxtheme.dll;urlmon.dll;wininet.dll"
-				GenerateDebugInformation="TRUE"
+				DelayLoadDLLs="uxtheme.dll;urlmon.dll"
+				GenerateDebugInformation="true"
 				SubSystem="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+			/>
 			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="FALSE"/>
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				AdditionalManifestFiles="res\manifest.xml"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Deleting .res-file so version resource is updated always."
-				CommandLine="del &quot;$(IntDir)\$(InputName).res&quot;"/>
-			<Tool
-				Name="VCPreBuildEventTool"
-				Description="Setting version resource build number to Subversion revision number"
-				CommandLine="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				CommandLine="del &quot;$(IntDir)\$(InputName).res&quot;"
+			/>
 		</Configuration>
 		<Configuration
 			Name="Unicode Release|Win32"
 			OutputDirectory="Release"
 			IntermediateDirectory="Release"
 			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
-			CharacterSet="1">
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				Description="Setting version resource build number to Subversion revision number"
+				CommandLine="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="false"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
-				MinimalRebuild="FALSE"
+				MinimalRebuild="false"
 				RuntimeLibrary="0"
-				TreatWChar_tAsBuiltInType="TRUE"
-				UsePrecompiledHeader="3"
+				TreatWChar_tAsBuiltInType="true"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="3"/>
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="uxtheme.dll;urlmon.dll;wininet.dll"
-				GenerateDebugInformation="TRUE"
+				DelayLoadDLLs="uxtheme.dll;urlmon.dll"
+				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				OptimizeForWindows98="1"
+				LinkTimeCodeGeneration="1"
+				TargetMachine="1"
+			/>
 			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="FALSE"/>
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				AdditionalManifestFiles="res\manifest.xml"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Deleting .res-file so version resource is updated always."
-				CommandLine="del &quot;$(IntDir)\$(InputName).res&quot;"/>
-			<Tool
-				Name="VCPreBuildEventTool"
-				Description="Setting version resource build number to Subversion revision number"
-				CommandLine="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				CommandLine="del &quot;$(IntDir)\$(InputName).res&quot;"
+			/>
 		</Configuration>
 		<Configuration
 			Name="ANSI Release|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
-			CharacterSet="1">
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				Description="Setting version resource build number to Subversion revision number"
+				CommandLine="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="false"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
-				MinimalRebuild="FALSE"
+				MinimalRebuild="false"
 				RuntimeLibrary="0"
-				TreatWChar_tAsBuiltInType="TRUE"
-				UsePrecompiledHeader="3"
+				TreatWChar_tAsBuiltInType="true"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="3"/>
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="uxtheme.dll;urlmon.dll;wininet.dll"
-				GenerateDebugInformation="TRUE"
+				DelayLoadDLLs="uxtheme.dll;urlmon.dll"
+				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+			/>
 			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="FALSE"/>
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				AdditionalManifestFiles="res\manifest.xml"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Deleting .res-file so version resource is updated always."
-				CommandLine="del &quot;$(IntDir)\$(InputName).res&quot;"/>
-			<Tool
-				Name="VCPreBuildEventTool"
-				Description="Setting version resource build number to Subversion revision number"
-				CommandLine="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				CommandLine="del &quot;$(IntDir)\$(InputName).res&quot;"
+			/>
 		</Configuration>
 		<Configuration
 			Name="ANSI Debug|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
-			CharacterSet="1">
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				Description="Setting version resource build number to Subversion revision number"
+				CommandLine="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="false"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
-				MinimalRebuild="TRUE"
+				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				TreatWChar_tAsBuiltInType="TRUE"
-				UsePrecompiledHeader="3"
+				TreatWChar_tAsBuiltInType="true"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="4"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="uxtheme.dll;urlmon.dll;wininet.dll"
-				GenerateDebugInformation="TRUE"
+				DelayLoadDLLs="uxtheme.dll;urlmon.dll"
+				GenerateDebugInformation="true"
 				SubSystem="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+			/>
 			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="FALSE"/>
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				AdditionalManifestFiles="res\manifest.xml"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Deleting .res-file so version resource is updated always."
-				CommandLine="del &quot;$(IntDir)\$(InputName).res&quot;"/>
-			<Tool
-				Name="VCPreBuildEventTool"
-				Description="Setting version resource build number to Subversion revision number"
-				CommandLine="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				CommandLine="del &quot;$(IntDir)\$(InputName).res&quot;"
+			/>
 		</Configuration>
 		<Configuration
 			Name="Unicode Debug Symbols|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
-			CharacterSet="1">
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				Description="Setting version resource build number to Subversion revision number"
+				CommandLine="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="false"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
-				MinimalRebuild="TRUE"
+				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				TreatWChar_tAsBuiltInType="TRUE"
-				UsePrecompiledHeader="3"
+				TreatWChar_tAsBuiltInType="true"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="4"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="uxtheme.dll;urlmon.dll;wininet.dll"
-				GenerateDebugInformation="TRUE"
+				DelayLoadDLLs="uxtheme.dll;urlmon.dll"
+				GenerateDebugInformation="true"
 				SubSystem="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+			/>
 			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="FALSE"/>
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				AdditionalManifestFiles="res\manifest.xml"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Deleting .res-file so version resource is updated always."
-				CommandLine="del &quot;$(IntDir)\$(InputName).res&quot;"/>
-			<Tool
-				Name="VCPreBuildEventTool"
-				Description="Setting version resource build number to Subversion revision number"
-				CommandLine="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				CommandLine="del &quot;$(IntDir)\$(InputName).res&quot;"
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -327,446 +494,590 @@
 		<Filter
 			Name="Quelldateien"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\AboutDlg.cpp">
+				RelativePath=".\AboutDlg.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AutoPropertyPage.cpp">
+				RelativePath=".\AutoPropertyPage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ExcludesDlg.cpp">
+				RelativePath=".\ExcludesDlg.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\FFConfig.cpp">
+				RelativePath=".\FFConfig.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\FFConfigDlg.cpp">
+				RelativePath=".\FFConfigDlg.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\FolderFavoritesDlg.cpp">
+				RelativePath=".\FolderFavoritesDlg.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PageCommonDirDlg.cpp">
+				RelativePath=".\PageCommonDirDlg.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PageCommonFileDlg.cpp">
+				RelativePath=".\PageCommonFileDlg.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PageCommonOpenWithDlg.cpp">
+				RelativePath=".\PageCommonOpenWithDlg.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PageGeneric.cpp">
+				RelativePath=".\PageGeneric.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PageMsoFileDlg.cpp">
+				RelativePath=".\PageMsoFileDlg.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PageShortcuts.cpp">
+				RelativePath=".\PageShortcuts.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\stdafx.cpp">
+				RelativePath=".\stdafx.cpp"
+				>
 				<FileConfiguration
-					Name="Unicode Debug|Win32">
+					Name="Unicode Debug|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Release|Win32">
+					Name="Unicode Release|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ANSI Release|Win32">
+					Name="ANSI Release|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ANSI Debug|Win32">
+					Name="ANSI Debug|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug Symbols|Win32">
+					Name="Unicode Debug Symbols|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+					/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\UpdateCheckDlg.cpp">
+				RelativePath=".\UpdateCheckDlg.cpp"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
 			<File
-				RelativePath=".\AboutDlg.h">
+				RelativePath=".\AboutDlg.h"
+				>
 			</File>
 			<File
-				RelativePath=".\AutoPropertyPage.h">
+				RelativePath=".\AutoPropertyPage.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ExcludesDlg.h">
+				RelativePath=".\ExcludesDlg.h"
+				>
 			</File>
 			<File
-				RelativePath=".\FFConfig.h">
+				RelativePath=".\FFConfig.h"
+				>
 			</File>
 			<File
-				RelativePath=".\FFConfigDlg.h">
+				RelativePath=".\FFConfigDlg.h"
+				>
 			</File>
 			<File
-				RelativePath=".\FolderFavoritesDlg.h">
+				RelativePath=".\FolderFavoritesDlg.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PageCommonDirDlg.h">
+				RelativePath=".\PageCommonDirDlg.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PageCommonFileDlg.h">
+				RelativePath=".\PageCommonFileDlg.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PageCommonOpenWithDlg.h">
+				RelativePath=".\PageCommonOpenWithDlg.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PageGeneric.h">
+				RelativePath=".\PageGeneric.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PageMsoFileDlg.h">
+				RelativePath=".\PageMsoFileDlg.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PageShortcuts.cpp">
+				RelativePath=".\PageShortcuts.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Resource.h">
+				RelativePath=".\Resource.h"
+				>
 			</File>
 			<File
-				RelativePath=".\stdafx.h">
+				RelativePath=".\stdafx.h"
+				>
 			</File>
 			<File
-				RelativePath=".\UpdateCheckDlg.h">
+				RelativePath=".\UpdateCheckDlg.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Ressourcendateien"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
 			<File
-				RelativePath=".\res\FFConfig.ico">
+				RelativePath=".\res\FFConfig.ico"
+				>
 			</File>
 			<File
-				RelativePath=".\FFConfig.rc">
+				RelativePath=".\FFConfig.rc"
+				>
 			</File>
 			<File
-				RelativePath=".\res\FFConfig.rc2">
+				RelativePath=".\res\FFConfig.rc2"
+				>
 			</File>
 			<File
-				RelativePath=".\res\manifest.xml">
+				RelativePath=".\res\manifest.xml"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="common_h"
-			Filter="*.h;*.hpp;*.hxx">
+			Filter="*.h;*.hpp;*.hxx"
+			>
 			<File
-				RelativePath="..\common\Favorites.h">
+				RelativePath="..\common\Favorites.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\ff_utils.h">
+				RelativePath="..\common\ff_utils.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\HistoryLst.h">
+				RelativePath="..\common\HistoryLst.h"
+				>
 			</File>
 			<File
-				RelativePath="..\common\ProfileDefaults.h">
+				RelativePath="..\common\ProfileDefaults.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="common_cpp"
-			Filter="*.cpp">
+			Filter="*.cpp"
+			>
 			<File
-				RelativePath="..\common\Favorites.cpp">
+				RelativePath="..\common\Favorites.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\common\ff_utils.cpp">
+				RelativePath="..\common\ff_utils.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\common\HistoryLst.cpp">
+				RelativePath="..\common\HistoryLst.cpp"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="commonUtils_h"
-			Filter="*.h;*.hpp;*.hxx">
+			Filter="*.h;*.hpp;*.hxx"
+			>
 			<File
-				RelativePath="..\commonUtils\DlgExpander.h">
+				RelativePath="..\commonUtils\DlgExpander.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\DownloadThread.h">
+				RelativePath="..\commonUtils\DownloadThread.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\DragListCtrl.h">
+				RelativePath="..\commonUtils\DragListCtrl.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\EditEx.h">
+				RelativePath="..\commonUtils\EditEx.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\FolderDlg.h">
+				RelativePath="..\commonUtils\FolderDlg.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\GdiUtils.h">
+				RelativePath="..\commonUtils\GdiUtils.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\GroupCheck.h">
+				RelativePath="..\commonUtils\GroupCheck.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\HighColorTab.hpp">
+				RelativePath="..\commonUtils\HighColorTab.hpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\HyperLink.h">
+				RelativePath="..\commonUtils\HyperLink.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\MfcThread.h">
+				RelativePath="..\commonUtils\MfcThread.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\NTKernelApi.h">
+				RelativePath="..\commonUtils\NTKernelApi.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\NtKernelUtils.h">
+				RelativePath="..\commonUtils\NtKernelUtils.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\Profile.h">
+				RelativePath="..\commonUtils\Profile.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\TreePropSheet\PropPageFrame.h">
+				RelativePath="..\commonUtils\TreePropSheet\PropPageFrame.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\TreePropSheet\PropPageFrameDefault.h">
+				RelativePath="..\commonUtils\TreePropSheet\PropPageFrameDefault.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\Registry.h">
+				RelativePath="..\commonUtils\Registry.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\ResizableDlg.h">
+				RelativePath="..\commonUtils\ResizableDlg.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\StringUtils.h">
+				RelativePath="..\commonUtils\StringUtils.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\TinyXml\tinyxml.h">
+				RelativePath="..\commonUtils\TinyXml\tinyxml.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\TotalCmdUtils.h">
+				RelativePath="..\commonUtils\TotalCmdUtils.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.h">
+				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\tstring.h">
+				RelativePath="..\commonUtils\tstring.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\UnicodeUtils.h">
+				RelativePath="..\commonUtils\UnicodeUtils.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\Utils.h">
+				RelativePath="..\commonUtils\Utils.h"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\VersionInfo.h">
+				RelativePath="..\commonUtils\VersionInfo.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="commonUtils_cpp"
-			Filter="*.cpp">
+			Filter="*.cpp"
+			>
 			<File
-				RelativePath="..\commonUtils\DlgExpander.cpp">
+				RelativePath="..\commonUtils\DlgExpander.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\DownloadThread.cpp">
+				RelativePath="..\commonUtils\DownloadThread.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\DragListCtrl.cpp">
+				RelativePath="..\commonUtils\DragListCtrl.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\EditEx.cpp">
+				RelativePath="..\commonUtils\EditEx.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\FolderDlg.cpp">
+				RelativePath="..\commonUtils\FolderDlg.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\GdiUtils.cpp">
+				RelativePath="..\commonUtils\GdiUtils.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\GroupCheck.cpp">
+				RelativePath="..\commonUtils\GroupCheck.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\HyperLink.cpp">
+				RelativePath="..\commonUtils\HyperLink.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\Profile.cpp">
+				RelativePath="..\commonUtils\Profile.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\TreePropSheet\PropPageFrame.cpp">
+				RelativePath="..\commonUtils\TreePropSheet\PropPageFrame.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\TreePropSheet\PropPageFrameDefault.cpp">
+				RelativePath="..\commonUtils\TreePropSheet\PropPageFrameDefault.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\Registry.cpp">
+				RelativePath="..\commonUtils\Registry.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\ResizableDlg.cpp">
+				RelativePath="..\commonUtils\ResizableDlg.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\TinyXml\tinystr.cpp">
+				RelativePath="..\commonUtils\TinyXml\tinystr.cpp"
+				>
 				<FileConfiguration
-					Name="Unicode Debug|Win32">
+					Name="Unicode Debug|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
+						UsePrecompiledHeader="0"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Release|Win32">
+					Name="Unicode Release|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
+						UsePrecompiledHeader="0"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ANSI Release|Win32">
+					Name="ANSI Release|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
+						UsePrecompiledHeader="0"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ANSI Debug|Win32">
+					Name="ANSI Debug|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
+						UsePrecompiledHeader="0"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug Symbols|Win32">
+					Name="Unicode Debug Symbols|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TinyXml\tinyxml.cpp">
-				<FileConfiguration
-					Name="Unicode Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Unicode Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ANSI Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ANSI Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Unicode Debug Symbols|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
+						UsePrecompiledHeader="0"
+					/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\commonUtils\TinyXml\tinyxmlerror.cpp">
+				RelativePath="..\commonUtils\TinyXml\tinyxml.cpp"
+				>
 				<FileConfiguration
-					Name="Unicode Debug|Win32">
+					Name="Unicode Debug|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
+						UsePrecompiledHeader="0"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Release|Win32">
+					Name="Unicode Release|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
+						UsePrecompiledHeader="0"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ANSI Release|Win32">
+					Name="ANSI Release|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
+						UsePrecompiledHeader="0"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ANSI Debug|Win32">
+					Name="ANSI Debug|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
+						UsePrecompiledHeader="0"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug Symbols|Win32">
+					Name="Unicode Debug Symbols|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TinyXml\tinyxmlparser.cpp">
-				<FileConfiguration
-					Name="Unicode Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Unicode Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ANSI Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ANSI Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Unicode Debug Symbols|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
+						UsePrecompiledHeader="0"
+					/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\commonUtils\TotalCmdUtils.cpp">
+				RelativePath="..\commonUtils\TinyXml\tinyxmlerror.cpp"
+				>
+				<FileConfiguration
+					Name="Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ANSI Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ANSI Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode Debug Symbols|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.cpp">
+				RelativePath="..\commonUtils\TinyXml\tinyxmlparser.cpp"
+				>
+				<FileConfiguration
+					Name="Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ANSI Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ANSI Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode Debug Symbols|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\commonUtils\Utils.cpp">
+				RelativePath="..\commonUtils\TotalCmdUtils.cpp"
+				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\VersionInfo.cpp">
+				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\Utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\VersionInfo.cpp"
+				>
 			</File>
 		</Filter>
 	</Files>
 	<Globals>
 		<Global
 			Name="RESOURCE_FILE"
-			Value="FFConfig.rc"/>
+			Value="FFConfig.rc"
+		/>
 	</Globals>
 </VisualStudioProject>

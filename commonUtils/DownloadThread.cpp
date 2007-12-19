@@ -209,9 +209,6 @@ UINT CDownloadThread::ThreadFunc()
 
 	::SendMessage( m_params.notifyHwnd, m_params.notifyMsg, ON_STARTED, 0 );
 
-	// attempt a connection to override IE's offline mode (if activated)
-	::InternetAttemptConnect( 0 );
-
 	DownloadCallback callback( this );
 	cleanup.err = ::URLDownloadToFile( NULL, m_params.url, m_params.destFilePath, 0, &callback );
 

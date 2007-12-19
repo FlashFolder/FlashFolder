@@ -174,7 +174,7 @@ bool FileDlgBrowseToFolder( HWND hwndFileDlg, LPCTSTR path )
 			if (SHGetDesktopFolder(&pDesktopFolder) == NOERROR)
 			{                
 #ifdef _UNICODE
-                wcsncpy( wpath, path, MAX_PATH );
+                StringCbCopy( wpath, sizeof(wpath), path );
 #else
                 ::MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, path, -1, wpath, MAX_PATH);
                 LPWSTR p_wpath = wpath;

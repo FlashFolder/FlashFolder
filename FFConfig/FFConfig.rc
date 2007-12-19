@@ -32,25 +32,20 @@ CAPTION "Keyboard Shortcuts"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "&Select function:",IDC_STATIC,7,7,51,8
-    CONTROL         "",IDC_LST_SHORTCUTS,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
-                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,18,218,111
+    CONTROL         "",IDC_LST_SHORTCUTS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,18,218,111
     LTEXT           "&Press shortcut key:",IDC_STATIC,7,138,71,8
-    CONTROL         "",IDC_HOTKEY,"msctls_hotkey32",WS_DISABLED | WS_BORDER | 
-                    WS_TABSTOP,75,135,114,14
+    CONTROL         "",IDC_HOTKEY,"msctls_hotkey32",WS_DISABLED | WS_BORDER | WS_TABSTOP,75,135,114,14
     PUSHBUTTON      "&Clear",IDC_BTN_CLEAR,191,135,34,14,WS_DISABLED
 END
 
 IDD_UPDATECHECK DIALOGEX 0, 0, 260, 94
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Checking for new FlashFolder version"
 CLASS "FFUpdateCheck.xmgn4ngertu4mnsf"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "",IDC_ST_STATUS,7,13,246,18
-    CONTROL         "",IDC_ST_EXPAND,"Static",SS_BLACKFRAME | NOT WS_VISIBLE,
-                    0,35,260,31
+    CONTROL         "",IDC_ST_EXPAND,"Static",SS_BLACKFRAME | NOT WS_VISIBLE,0,35,260,31
     LTEXT           "Your version:",IDC_STATIC,7,38,44,8
     LTEXT           "1.0.0.0",IDC_ST_INSTVER,81,38,66,8
     LTEXT           "Most recent version:",IDC_STATIC,7,53,67,8
@@ -60,49 +55,39 @@ BEGIN
 END
 
 IDD_ABOUT DIALOGEX 0, 0, 212, 135
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | 
-    WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "About FlashFolder"
 CLASS "FFAbout.xmgn4ngertu4mnsf"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CTEXT           "FlashFolder Service Version",IDC_ST_FFSERVICE,7,7,198,8
-    CTEXT           "FlashFolder Hook Library Version",IDC_ST_FFLIB,7,17,198,
-                    8
+    CTEXT           "FlashFolder Hook Library Version",IDC_ST_FFLIB,7,17,198,8
     CTEXT           "FlashFolder Config Version",IDC_ST_FFCONFIG,7,28,198,8
     CTEXT           "Copyright © 2007 zett42",IDC_STATIC,7,43,198,8
     CTEXT           "Homepage",IDC_ST_HOMEPAGE,7,60,198,8
-    CTEXT           "Project page at SourceForge.net",IDC_ST_PROJECTPAGE,7,
-                    71,198,8
+    CTEXT           "Project page at SourceForge.net",IDC_ST_PROJECTPAGE,7,71,198,8
     CTEXT           "Submit bug report",IDC_ST_BUGREPORT,7,86,198,8
     CTEXT           "Submit feature request",IDC_ST_FEATUREREQ,6,97,199,8
     DEFPUSHBUTTON   "OK",IDOK,80,114,50,14
 END
 
 IDD_PAGE_COMMON_OPENWITHDLG DIALOGEX 0, 0, 256, 110
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN | 
-    WS_CAPTION
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN | WS_CAPTION
 CAPTION "Dialogs::Common ""Open With""|Common ""Open With"" Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "&Enable FlashFolder for this dialog (Windows 2000 only)",
-                    IDC_CHK_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,
-                    11,191,10
+    CONTROL         "&Enable FlashFolder for this dialog (Windows 2000 only)",IDC_CHK_ENABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,191,10
     PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,202,9,47,12
     LTEXT           "WARNING: EXPERIMENTAL FEATURE!",IDC_STATIC,7,23,122,8
     LTEXT           "Min. width:",IDC_STATIC,7,45,50,8
     EDITTEXT        IDC_ED_MINWIDTH,60,42,44,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_SP_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | 
-                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,105,42,11,
-                    14
+    CONTROL         "",IDC_SP_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,105,42,11,14
     LTEXT           "Min. height:",IDC_STATIC,7,61,50,8
     EDITTEXT        IDC_ED_MINHEIGHT,60,58,44,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_SP_MINHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | 
-                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,105,58,11,
-                    14
+    CONTROL         "",IDC_SP_MINHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,105,58,11,14
     LTEXT           "&Position:",IDC_STATIC,7,80,53,8
-    COMBOBOX        IDC_CB_POSITION,60,78,106,101,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CB_POSITION,60,78,106,101,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_PAGE_GENERIC DIALOGEX 0, 0, 199, 157
@@ -113,21 +98,15 @@ BEGIN
     PUSHBUTTON      "&Reset all options to default",IDC_BTN_RESET,7,7,112,14
     GROUPBOX        "Multi-User",IDC_STATIC,7,33,185,43,0,WS_EX_TRANSPARENT
     LTEXT           "Statisch",IDC_ST_MULTIUSER,14,44,151,8
-    LTEXT           "To change this option, you need to reinstall FlashFolder.",
-                    IDC_STATIC,13,55,171,17,WS_DISABLED
-    LTEXT           "&Max. number of folder history entries:",IDC_STATIC,7,
-                    91,185,11
+    LTEXT           "To change this option, you need to reinstall FlashFolder.",IDC_STATIC,13,55,171,17,WS_DISABLED
+    LTEXT           "&Max. number of folder history entries:",IDC_STATIC,7,91,185,11
     EDITTEXT        IDC_ED_MAX_DIRHISTORY,7,101,34,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_SP_MAX_DIRHISTORY,"msctls_updown32",
-                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
-                    UDS_ARROWKEYS,41,101,11,14
+    CONTROL         "",IDC_SP_MAX_DIRHISTORY,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,41,101,11,14
 END
 
 IDD_PAGE_MSO_FILEDLG DIALOGEX 0, 0, 195, 110
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN | 
-    WS_CAPTION
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN | WS_CAPTION
 CAPTION "Dialogs::MS Office ""Open/Save""|MS Office 2003 ""Open/Save"" Dialog"
-
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "&Enable FlashFolder for this dialog",IDC_CHK_ENABLE,
@@ -135,24 +114,18 @@ BEGIN
     PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,133,9,47,12
     LTEXT           "Min. width:",IDC_STATIC,7,45,50,8
     EDITTEXT        IDC_ED_MINWIDTH,60,42,44,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_SP_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | 
-                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,104,42,11,
-                    14
+    CONTROL         "",IDC_SP_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,104,42,11,14
     LTEXT           "Min. height:",IDC_STATIC,7,61,50,8
     EDITTEXT        IDC_ED_MINHEIGHT,60,58,44,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_SP_MINHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | 
-                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,104,58,11,
-                    14
+    CONTROL         "",IDC_SP_MINHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,104,58,11,14
     LTEXT           "&Position:",IDC_STATIC,7,80,53,8
-    COMBOBOX        IDC_CB_POSITION,60,78,106,111,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CB_POSITION,60,78,106,111,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_PAGE_COMMON_DIRDLG DIALOGEX 0, 0, 196, 103
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION 
 "Dialogs::Common ""Browse For Folder""|Common ""Browse For Folder""  Dialog"
-
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "&Enable FlashFolder for this dialog",IDC_CHK_ENABLE,
@@ -160,22 +133,16 @@ BEGIN
     PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,133,9,47,12
     LTEXT           "Min. width:",IDC_STATIC,7,45,50,8
     EDITTEXT        IDC_ED_MINWIDTH,60,42,44,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_SP_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | 
-                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,103,42,11,
-                    14
+    CONTROL         "",IDC_SP_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,103,42,11,14
     LTEXT           "Min. height:",IDC_STATIC,7,61,50,8
     EDITTEXT        IDC_ED_MINHEIGHT,60,58,44,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_SP_MINHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | 
-                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,103,58,11,
-                    14
+    CONTROL         "",IDC_SP_MINHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,103,58,11,14
     LTEXT           "&Position:",IDC_STATIC,7,80,28,8
-    COMBOBOX        IDC_CB_POSITION,60,78,106,104,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CB_POSITION,60,78,106,104,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_PAGE_COMMON_FILEDLG DIALOGEX 0, 0, 197, 177
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CLIPCHILDREN | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialogs::Common ""Open/Save""|Common ""Open/Save"" Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
@@ -184,75 +151,53 @@ BEGIN
     PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,133,9,47,12
     LTEXT           "Min. width:",IDC_STATIC,7,45,50,8
     EDITTEXT        IDC_ED_MINWIDTH,60,42,44,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_SP_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | 
-                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,104,42,11,
-                    14
+    CONTROL         "",IDC_SP_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,104,42,11,14
     LTEXT           "Min. height:",IDC_STATIC,7,61,50,8
     EDITTEXT        IDC_ED_MINHEIGHT,60,58,44,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_SP_MINHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | 
-                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,104,58,11,
-                    14
+    CONTROL         "",IDC_SP_MINHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,104,58,11,14
     LTEXT           "&Position:",IDC_STATIC,7,80,38,8
-    COMBOBOX        IDC_CB_POSITION,60,78,106,101,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Max. height of &folder combobox:",IDC_STATIC,8,102,106,
-                    8
+    COMBOBOX        IDC_CB_POSITION,60,78,106,101,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Max. height of &folder combobox:",IDC_STATIC,8,102,106,8
     EDITTEXT        IDC_ED_FOLDERCOMBO_MAXHEIGHT,127,99,45,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_SP_FOLDERCOMBO_MAXHEIGHT,"msctls_updown32",
-                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
-                    UDS_ARROWKEYS,172,99,11,14
-    LTEXT           "Max. height of file&types combobox:",IDC_STATIC,8,118,
-                    114,8
-    EDITTEXT        IDC_ED_FILETYPECOMBO_MAXHEIGHT,127,115,45,14,
-                    ES_AUTOHSCROLL
-    CONTROL         "",IDC_SP_FILETYPECOMBO_MAXHEIGHT,"msctls_updown32",
-                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
-                    UDS_ARROWKEYS,172,115,11,14
-    CONTROL         "&Resize non-resizable dialogs",
-                    IDC_CHK_RESIZENONRESIZABLE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,7,139,105,10
-    PUSHBUTTON      "E&xcludes...",IDC_BTN_NONRESIZABLE_EXCLUDES,113,138,47,
-                    12
+    CONTROL         "",IDC_SP_FOLDERCOMBO_MAXHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,172,99,11,14
+    LTEXT           "Max. height of file&types combobox:",IDC_STATIC,8,118,114,8
+    EDITTEXT        IDC_ED_FILETYPECOMBO_MAXHEIGHT,127,115,45,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_FILETYPECOMBO_MAXHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,172,115,11,14
+    CONTROL         "&Resize non-resizable dialogs",IDC_CHK_RESIZENONRESIZABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,139,105,10
+    PUSHBUTTON      "E&xcludes...",IDC_BTN_NONRESIZABLE_EXCLUDES,113,138,47,12
 END
 
 IDD_EXCLUDE DIALOGEX 0, 0, 285, 198
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | 
-    WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Edit Exclusion List"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "",IDC_ST_DESCR,7,7,271,25
-    EDITTEXT        IDC_ED_EXCLUDES,7,37,271,123,ES_MULTILINE | 
-                    ES_WANTRETURN | WS_VSCROLL
+    EDITTEXT        IDC_ED_EXCLUDES,7,37,271,123,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
     PUSHBUTTON      "&Add program...",IDC_BTN_ADD,7,160,66,14
     DEFPUSHBUTTON   "OK",IDOK,89,177,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,146,177,50,14
 END
 
 IDD_FAVORITES DIALOGEX 0, 0, 255, 152
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | 
-    WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "FlashFolder Favorites"
 CLASS "FFFavorites.xmgn4ngertu4mnsf"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     PUSHBUTTON      "&Insert",IDC_BTN_ADD,7,8,40,14
     PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,49,8,40,14
-    LTEXT           "Drag an item by mouse to change its position.",
-                    IDC_STATIC,100,11,147,8
-    CONTROL         "",IDC_LST_FAVS,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
-                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,24,240,34
+    LTEXT           "Drag an item by mouse to change its position.",IDC_STATIC,100,11,147,8
+    CONTROL         "",IDC_LST_FAVS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,24,240,34
     LTEXT           "&Path:",IDC_ST_PATH,8,67,18,8
     EDITTEXT        IDC_ED_PATH,60,64,163,14,ES_AUTOHSCROLL | WS_DISABLED
     PUSHBUTTON      "...",IDC_BTN_BROWSE,226,64,21,14,WS_DISABLED
     LTEXT           "Title (optional):",IDC_ST_TITLE,8,83,50,8
     EDITTEXT        IDC_ED_TITLE,60,80,187,14,ES_AUTOHSCROLL | WS_DISABLED
-    CONTROL         "&Use FlashFolder favorites",IDC_RD_OWN_FAVORITES,"Button",
-                    BS_AUTORADIOBUTTON,8,101,97,10
-    CONTROL         "Use directory menu from Total Commander®",
-                    IDC_RD_TC_FAVORITES,"Button",BS_AUTORADIOBUTTON,8,114,
-                    159,10
+    CONTROL         "&Use FlashFolder favorites",IDC_RD_OWN_FAVORITES,"Button",BS_AUTORADIOBUTTON,8,101,97,10
+    CONTROL         "Use directory menu from Total Commander®",IDC_RD_TC_FAVORITES,
+                    "Button",BS_AUTORADIOBUTTON,8,114,159,10
     DEFPUSHBUTTON   "OK",IDOK,45,130,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,102,130,50,14
     PUSHBUTTON      "Re&vert",IDC_BTN_REVERT,159,130,50,14
@@ -382,13 +327,6 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\FFConfig.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// RT_MANIFEST
-//
-
-1                       RT_MANIFEST             "res\\manifest.xml"
 
 /////////////////////////////////////////////////////////////////////////////
 //

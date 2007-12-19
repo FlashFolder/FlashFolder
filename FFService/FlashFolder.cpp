@@ -42,7 +42,7 @@ HANDLE g_hEventTerminate = NULL;
 void DebugOut( LPCTSTR str, DWORD status = 0 ) 
 { 
    TCHAR buf[1024]; 
-   _sntprintf( buf, sizeof(buf), _T("[%s] %s (%d)\n"), INTERNAL_APPNAME, str, status ); 
+   StringCbPrintf( buf, sizeof(buf), _T("[%s] %s (%d)\n"), INTERNAL_APPNAME, str, status ); 
    ::OutputDebugString( buf ); 
 }
 

@@ -23,11 +23,12 @@
 class CResizeGrip : public CScrollBar
 {
 protected:
-	afx_msg UINT OnNcHitTest( CPoint pt ) { return HTBOTTOMRIGHT; }
+	afx_msg LRESULT OnNcHitTest( CPoint pt ) { return HTBOTTOMRIGHT; }
 	DECLARE_MESSAGE_MAP()
 };
 
 //-----------------------------------------------------------------------------------------------
+
 
 class CResizableDlg : public CDialog
 {

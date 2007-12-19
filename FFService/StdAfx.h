@@ -9,3 +9,4 @@
 // CRT headers
 #include <stdio.h>
 #include <tchar.h>
+#include <strsafe.h>
