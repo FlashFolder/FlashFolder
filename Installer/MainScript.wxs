@@ -74,17 +74,10 @@
 		<Directory Id="TARGETDIR" Name="SourceDir">
 			<Directory Id="ProgramFilesFolder">
 				<Directory Id="INSTALLDIR" Name="ffdir" LongName="$(loc.CptUI_ProductName)" >
-				
-					<Component Id="MainComponent" Guid="0CD48D8D-E72F-49A7-9738-B8775A9C36FD">
-												
-						<!-- Install program files -->
-						<File DiskId="1" Id="ffexe" Name="ffexe" LongName="FlashFolder.exe" Vital="yes" KeyPath="yes"
-							src="..\exe\FlashFolder.exe" />
-						<File DiskId="1" Id="ffdll" Name="fflib" LongName="fflib6439.dll" Vital="yes" 
-							src="..\exe\fflib6439.dll" />
-						<File DiskId="1" Id="ffcfgexe" Name="ffcfgexe" LongName="FFConfig.exe" Vital="yes" 
-							src="..\exe\FFConfig.exe" />
-							
+
+					<Component Id="FFService" Guid="E5EF7F5C-026E-4772-BBC0-075A94198FDA">
+						<File Id="ffexe" Name="ffexe" LongName="FlashFolder.exe" Vital="yes" KeyPath="yes"
+							src="..\exe\FlashFolder.exe" DiskId="1" />
 						<!-- Install program as an interactive, autorun service -->
 						<ServiceInstall Id="ffservice_inst" 
 							Name="[CptUI_ProductReg]" 
@@ -94,14 +87,23 @@
 							Interactive="yes"
 							Start="auto"
 							Type="ownProcess"
-							Vital="yes" />		
+							Vital="yes" />
 						<ServiceControl Id="ffservice_ctrl"
 							Name="[CptUI_ProductReg]"
 							Start="install"
 							Remove="uninstall" 
-							Wait="yes" />								
-							
-					</Component>	
+							Wait="yes" />
+					</Component>
+
+					<Component Id="FFLib" Guid="ABB79737-52B0-4EA1-AC4C-DD7BE0BC3F16">
+						<File Id="ffdll" Name="fflib" LongName="fflib6439.dll" Vital="yes" KeyPath="yes" 
+							src="..\exe\fflib6439.dll" DiskId="1" />
+					</Component>
+
+					<Component Id="FFConfig" Guid="3E8D86C3-3CA3-41D5-B6E3-D09D01B50CFD">
+						<File Id="ffcfgexe" Name="ffcfgexe" LongName="FFConfig.exe" Vital="yes" KeyPath="yes"  
+							src="..\exe\FFConfig.exe" DiskId="1" />
+					</Component>
 									
 				</Directory>
 			</Directory>
@@ -113,7 +115,9 @@
 			
 			<!-- Include creation of standard regkeys under HKLM\Software -->
 			<ComponentRef Id="CptUI_StandardReg" />
-			<ComponentRef Id="MainComponent" />
+			<ComponentRef Id="FFService" />
+			<ComponentRef Id="FFLib" />
+			<ComponentRef Id="FFConfig" />
 		</Feature>
 		
 
