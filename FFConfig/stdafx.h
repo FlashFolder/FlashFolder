@@ -75,11 +75,15 @@
 #include <EditEx.h>
 #include <HyperLink.h>
 #include <DlgExpander.h>
-#include <DragListCtrl.h>
+#include <TreeListCtrl/EditableTreeListCtrl.h>
+#include <BalloonHelp.h>
 #include <TreePropSheet/TreePropSheet.h>
 #include <TreePropSheet/PropPageFrame.h>
 #include <TreePropSheet/PropPageFrameDefault.h>
+#include <PopupDlg.h>
+#include <CacheImageList.h>
 
 // project-specific
 #include "../common/ff_utils.h"
 #include "../common/Favorites.h"
+#include "../common/ProfileDefaults.h"

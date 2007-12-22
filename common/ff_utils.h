@@ -33,8 +33,6 @@ struct FileDlgType
 
 FileDlgType GetFileDlgType( HWND dlg );
 
-//-----------------------------------------------------------------------------------------------
-
 bool FileDlgBrowseToFolder( HWND hwndFileDlg, LPCTSTR path );
 bool FileDlgGetCurrentFolder( HWND hwndFileDlg, LPTSTR folderPath );
 bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter );

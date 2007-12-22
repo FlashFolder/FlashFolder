@@ -14,21 +14,41 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  */
 
 #pragma once
 
-struct FavoritesItem
+class CImportDlg : public CDialog
 {
-	tstring command;      ///< file path or TC command (required)
-	tstring title;        ///< menu item title
-	tstring targetpath;   ///< target path for TC
-	tstring iconPath;     ///< path to icon + "," + iconId 
+	DECLARE_DYNAMIC(CImportDlg)
+
+public:
+	CImportDlg(CWnd* pParent = NULL);   // Standardkonstruktor
+
+	enum { IDD = IDD_IMPORT };
+
+	CString GetTcIniPath() const { return m_enteredPath; }
+	bool GetReplaceExisting() const { return m_replaceExisting; }
+
+private:
+	// overrides CDialog
+	void DoDataExchange(CDataExchange* pDX);    // DDX/DDV-Unterstützung
+	// overrides CDialog
+	BOOL OnInitDialog();
+	// overrides CDialog
+	void OnOK();
+
+	afx_msg void OnBnClickedCheckInstalled();
+	afx_msg void OnBnClickedBtnBrowse();
+	afx_msg void OnEnChangeEdit1();
+	DECLARE_MESSAGE_MAP()
+
+	CString m_installedIniPath, m_enteredPath;
+	bool m_replaceExisting;
 };
 
-typedef std::vector<FavoritesItem> FavoritesList;
+//----------------------------------------------------------------------------------------------------
 
-void GetDirFavorites( FavoritesList* pList );
-void SetDirFavorites( const FavoritesList& list );
+void GetTcFavorites( FavoritesList* pFavs, CString tcIniPath );
 
-int GetFavItemByPath( const FavoritesList& favs, LPCTSTR pPath );

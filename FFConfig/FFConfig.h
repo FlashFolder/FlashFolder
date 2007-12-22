@@ -33,6 +33,7 @@ public:
 
 private:
 	virtual BOOL InitInstance();
+	virtual int ExitInstance();
 
 	DECLARE_MESSAGE_MAP()
 };

@@ -19,6 +19,7 @@
 
 #include "stdafx.h"
 #include "PropPageFrame.h"
+#include "..\gdiUtils.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -148,7 +149,10 @@ CRect CPropPageFrame::CalcMsgArea()
 
 void CPropPageFrame::DrawMsg(CDC *pDc, CRect rect, LPCTSTR /*lpszMsg*/, DWORD /*dwFormat*/) 
 {
-	CFont	*pPrevFont = (CFont*) (pDc->SelectStockObject(DEFAULT_GUI_FONT));
+	CFont font;
+	CreateSysMessageFont( &font, GetWnd()->GetSafeHwnd() );
+
+	CFont *pPrevFont = pDc->SelectObject( &font );
 	int		nPrevBkMode = pDc->SetBkMode(TRANSPARENT);
 
 	pDc->DrawText(GetMsgText(), rect, GetMsgFormat());

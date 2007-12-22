@@ -32,28 +32,48 @@ private:
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	virtual void OnCancel();
-	afx_msg void OnBnClickedBtnBrowse();
-	afx_msg void OnLstFavs_ItemChanged(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnBnClickedRdOwnFavorites();
-	afx_msg void OnBnClickedRdTcFavorites();
-	afx_msg void OnLstFavs_DeleteItem(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTree_SelChanged(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTree_InsertItem(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTree_DeleteItem(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnEnChangeEdTitle();
-	afx_msg void OnEnChangeEdPath();
+	afx_msg void OnEnChangeEdCommand();
+	afx_msg void OnEnChangeEdTargetPath();
+	afx_msg void OnEnChangeEdIconPath();
 	afx_msg void OnBnClickedBtnAdd();
+	afx_msg void OnBnClickedBtnAddDivider();
+	afx_msg void OnBnClickedBtnAddSubmenu();
 	afx_msg void OnBnClickedBtnRemove();
-	afx_msg void OnLstFavs_KeyDown(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedBtnImport();
+	afx_msg void OnBnClickedBtnBrowse();
+	afx_msg void OnBnClickedBtnTargetbrowse();
 	afx_msg void OnBnClickedBtnRevert();
-	afx_msg void OnListFavs_DblClick(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point );
 	DECLARE_MESSAGE_MAP()
 
-	void UpdateFavList( DirFavoritesSrc source = DFS_DEFAULT );
-	void SelectItem( int sel );
+	void LoadFavorites();
+	void LoadFavorites_worker( HTREEITEM hParent, HTREEITEM hInsertAfter, 
+		const FavoritesList& favs, size_t& iItem, bool bSelectInsertedItems = false );
+	void SaveFavorites();
+	void SaveFavorites_worker( FavoritesList& favs, HTREEITEM hParent );
+
 	void UpdateSelItemEditControls();
 	void SaveDialogSize();
 
-	CDragListCtrl m_listFavs;
+	CEditableTreeListCtrl m_tree;
+
+	CCacheImageList m_treeIcons;
+
 	CEditEx m_edTitle;
 	CEditEx m_edPath;
+	CEditEx m_edTargetPath;
+	CEditEx m_edIconPath;
 
-	int m_sel;
+	HTREEITEM m_hSelItem;
+
+	stdext::hash_map< HTREEITEM, CString > m_iconPathes;
+	CString GetItemIconPath(  HTREEITEM hItem ) const;
+
+	stdext::hash_map< CString, int > m_iconIDs;
+
+	bool m_isOwned;
 };

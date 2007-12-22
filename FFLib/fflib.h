@@ -20,3 +20,10 @@
 
 extern RegistryProfile g_profile;
 
+int FavMenu_Display( HWND hWndParent, int x, int y, const FavoritesList& favs );
+void FavMenu_StartEditor( HWND hWndParent );
+void FavMenu_AddDir( FavoritesList& favs, LPCTSTR pPath );
+
+void FavMenu_DisplayForTotalCmd( HWND hWndParent, int x, int y, HWND hwndClicked = NULL );
+
+void MakeSureDllKeepsLoaded();

@@ -158,12 +158,14 @@ BOOL CPageShortcuts::OnApply()
 	int count = m_lstShortcuts.GetItemCount();
 	for( int i = 0; i < count; ++i )
 	{
-		CString title = m_lstShortcuts.GetItemText( i, COL_TITLE );
-		std::map<CString,CString>::iterator itCmd = m_mapTitleToCmd.find( title );
-		ASSERT( itCmd != m_mapTitleToCmd.end() );
-
 		DWORD hotkey = m_lstShortcuts.GetItemData( i );
-		g_profile.SetInt( PROFILE_GROUP, itCmd->second, hotkey );
+		if( hotkey != 0 )
+		{
+			CString title = m_lstShortcuts.GetItemText( i, COL_TITLE );
+			std::map<CString,CString>::iterator itCmd = m_mapTitleToCmd.find( title );
+			ASSERT( itCmd != m_mapTitleToCmd.end() );
+			g_profile.SetInt( PROFILE_GROUP, itCmd->second, hotkey );
+		}
 	}
 
 	return base::OnApply();

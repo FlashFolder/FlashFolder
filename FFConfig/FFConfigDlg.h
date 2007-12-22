@@ -23,6 +23,7 @@
 #include "PageCommonDirDlg.h"
 #include "PageCommonOpenWithDlg.h"
 #include "PageMsoFileDlg.h"
+#include "PageTotalCmd.h"
 #include "PageShortcuts.h"
 
 //-----------------------------------------------------------------------------------------------
@@ -49,5 +50,6 @@ private:
 	CPageCommonDirDlg m_pageCommonDirDlg;
 	CPageCommonOpenWithDlg m_pageCommonOpenWithDlg;
 	CPageMsoFileDlg m_pageMsoFileDlg;
+	CPageTotalcmd m_pageTotalcmd;
 	CPageShortcuts m_pageShortcuts;
 };

@@ -116,7 +116,7 @@
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
 			CharacterSet="1"
-			WholeProgramOptimization="1"
+			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -139,10 +139,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="2"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				WholeProgramOptimization="true"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="false"
 				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				MinimalRebuild="false"
@@ -177,7 +176,6 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
-				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -521,6 +519,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ImportDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PageCommonDirDlg.cpp"
 				>
 			</File>
@@ -542,6 +544,10 @@
 			</File>
 			<File
 				RelativePath=".\PageShortcuts.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PageTotalcmd.cpp"
 				>
 			</File>
 			<File
@@ -665,6 +671,10 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath=".\res\dragging.cur"
+				>
+			</File>
+			<File
 				RelativePath=".\res\FFConfig.ico"
 				>
 			</File>
@@ -678,6 +688,14 @@
 			</File>
 			<File
 				RelativePath=".\res\manifest.xml"
+				>
+			</File>
+			<File
+				RelativePath=".\res\menuitem.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\submenu.ico"
 				>
 			</File>
 		</Filter>
@@ -718,11 +736,23 @@
 				RelativePath="..\common\HistoryLst.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\common\ProfileDefaults.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="commonUtils_h"
 			Filter="*.h;*.hpp;*.hxx"
 			>
+			<File
+				RelativePath="..\commonUtils\BalloonHelp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\CacheImageList.h"
+				>
+			</File>
 			<File
 				RelativePath="..\commonUtils\DlgExpander.h"
 				>
@@ -733,6 +763,10 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\DragListCtrl.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreeListCtrl\EditableTreeListCtrl.h"
 				>
 			</File>
 			<File
@@ -761,6 +795,10 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\MfcThread.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreeListCtrl\MultiSelTree.h"
 				>
 			</File>
 			<File
@@ -804,6 +842,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\TreeListCtrl\TreeListCtrl.h"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.h"
 				>
 			</File>
@@ -829,6 +871,14 @@
 			Filter="*.cpp"
 			>
 			<File
+				RelativePath="..\commonUtils\BalloonHelp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\CacheImageList.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\DlgExpander.cpp"
 				>
 			</File>
@@ -838,6 +888,10 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\DragListCtrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreeListCtrl\EditableTreeListCtrl.cpp"
 				>
 			</File>
 			<File
@@ -858,6 +912,10 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\HyperLink.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreeListCtrl\MultiSelTree.cpp"
 				>
 			</File>
 			<File
@@ -1058,6 +1116,10 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\TotalCmdUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreeListCtrl\TreeListCtrl.cpp"
 				>
 			</File>
 			<File

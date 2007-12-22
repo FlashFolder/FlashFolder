@@ -19,25 +19,57 @@
 #include "stdafx.h"
 #include "FFConfig.h"
 #include "FolderFavoritesDlg.h"
+#include "ImportDlg.h"
+
+#pragma warning(disable:4244) // numeric conversion
 
 //-----------------------------------------------------------------------------------------------
 
 enum FavCols
 {
 	COL_TITLE,
-	COL_PATH
+	COL_COMMAND,
+	COL_TARGETPATH
 };
 
-struct ItemData
+//-----------------------------------------------------------------------------------------------
+
+struct TempFocus
 {
-	CString targetPath;
+	TempFocus( HWND hWnd )
+	{
+		hWndFocus = ::SetFocus( hWnd );		
+	}
+	~TempFocus()
+	{
+		if( hWndFocus ) 
+			::SetFocus( hWndFocus );
+	}
+	HWND hWndFocus;
 };
+
+//-----------------------------------------------------------------------------------------------
+
+CString GetDefaultTitle( const CString& cmd )
+{
+	CString title;
+	tstring token, args;
+	SplitTcCommand( cmd, &token, &args );
+	if( CString( token.c_str() ).CompareNoCase( _T("cd") ) == 0 )
+		title = args.c_str();
+	else
+		title = cmd;
+	if( title.IsEmpty() )
+		title = _T("-untitled-");
+	return title;
+}
 
 //-----------------------------------------------------------------------------------------------
 
 CFolderFavoritesDlg::CFolderFavoritesDlg(CWnd* pParent /*=NULL*/)
 	: CResizableDlg(CFolderFavoritesDlg::IDD, pParent),
-	m_sel( -1 )
+	m_hSelItem( NULL ),
+	m_isOwned( pParent ? true : false )
 {}
 
 //-----------------------------------------------------------------------------------------------
@@ -45,27 +77,30 @@ CFolderFavoritesDlg::CFolderFavoritesDlg(CWnd* pParent /*=NULL*/)
 void CFolderFavoritesDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CResizableDlg::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LST_FAVS, m_listFavs);
 	DDX_Control(pDX, IDC_ED_TITLE, m_edTitle);
-	DDX_Control(pDX, IDC_ED_PATH, m_edPath);
+	DDX_Control(pDX, IDC_ED_COMMAND, m_edPath);
+	DDX_Control(pDX, IDC_ED_TARGETPATH, m_edTargetPath);
 }
 
 //-----------------------------------------------------------------------------------------------
 
 BEGIN_MESSAGE_MAP(CFolderFavoritesDlg, CResizableDlg)
 	ON_WM_GETMINMAXINFO()
-	ON_BN_CLICKED(IDC_BTN_BROWSE, OnBnClickedBtnBrowse)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LST_FAVS, OnLstFavs_ItemChanged)
-	ON_BN_CLICKED(IDC_RD_OWN_FAVORITES, OnBnClickedRdOwnFavorites)
-	ON_BN_CLICKED(IDC_RD_TC_FAVORITES, OnBnClickedRdTcFavorites)
-	ON_NOTIFY(LVN_DELETEITEM, IDC_LST_FAVS, OnLstFavs_DeleteItem)
-	ON_EN_CHANGE(IDC_ED_TITLE, OnEnChangeEdTitle)
-	ON_EN_CHANGE(IDC_ED_PATH, OnEnChangeEdPath)
-	ON_BN_CLICKED(IDC_BTN_ADD, OnBnClickedBtnAdd)
-	ON_BN_CLICKED(IDC_BTN_REMOVE, OnBnClickedBtnRemove)
-	ON_NOTIFY(LVN_KEYDOWN, IDC_LST_FAVS, OnLstFavs_KeyDown)
+	ON_BN_CLICKED( IDC_BTN_BROWSE, OnBnClickedBtnBrowse )
+	ON_NOTIFY( TVN_SELCHANGED, IDC_LST_FAVS, OnTree_SelChanged )
+	ON_NOTIFY( CEditableTreeListCtrl::TVN_INSERTITEM, IDC_LST_FAVS, OnTree_InsertItem )
+	ON_NOTIFY( TVN_DELETEITEM, IDC_LST_FAVS, OnTree_DeleteItem )
+	ON_EN_CHANGE( IDC_ED_TITLE, OnEnChangeEdTitle )
+	ON_EN_CHANGE( IDC_ED_COMMAND, OnEnChangeEdCommand )
+	ON_EN_CHANGE( IDC_ED_TARGETPATH, OnEnChangeEdTargetPath )
+	ON_BN_CLICKED( IDC_BTN_ADD, OnBnClickedBtnAdd )
+	ON_BN_CLICKED( IDC_BTN_ADD_DIVIDER, OnBnClickedBtnAddDivider )
+	ON_BN_CLICKED( IDC_BTN_ADD_SUBMENU, OnBnClickedBtnAddSubmenu )
+	ON_BN_CLICKED( IDC_BTN_REMOVE, OnBnClickedBtnRemove )
+	ON_BN_CLICKED( IDC_BTN_IMPORT, OnBnClickedBtnImport )
+	ON_BN_CLICKED(IDC_BTN_TARGETBROWSE, OnBnClickedBtnTargetbrowse)
 	ON_BN_CLICKED(IDC_BTN_REVERT, OnBnClickedBtnRevert)
-	ON_NOTIFY(NM_DBLCLK, IDC_LST_FAVS, OnListFavs_DblClick)
+	ON_WM_CONTEXTMENU()
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
@@ -74,113 +109,265 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 {
 	CResizableDlg::OnInitDialog();
 
-	tstring tcIniPath;
-	bool isTcInstalled = GetTotalCmdLocation( NULL, &tcIniPath );
-	bool useTcFavs = false;
-	if( isTcInstalled )
-	{
-		useTcFavs = g_profile.GetInt( _T("main"), _T("UseTcFavorites") ) != 0;
-	}
-	else
-	{
-		GetDlgItem( IDC_RD_TC_FAVORITES )->EnableWindow( FALSE ); 	
-		GetDlgItem( IDC_RD_OWN_FAVORITES )->EnableWindow( FALSE ); 	
-	}
-	CheckDlgButton( useTcFavs ? IDC_RD_TC_FAVORITES : IDC_RD_OWN_FAVORITES, 1 );
+	CString exeName;
+	GetAppFilename( AfxGetInstanceHandle(), exeName.GetBuffer( MAX_PATH ) );
+	exeName.ReleaseBuffer();
 
-	m_listFavs.SetExtendedStyle( LVS_EX_INFOTIP | LVS_EX_FULLROWSELECT );
-	CRect rcCol;
-	rcCol = CRect( 0, 0, 130, 1 ); MapDialogRect( rcCol );
-	m_listFavs.InsertColumn( 0, _T("Title"), LVCFMT_LEFT, rcCol.Width() );
-	rcCol = CRect( 0, 0, 200, 1 ); MapDialogRect( rcCol );
-	m_listFavs.InsertColumn( 1, _T("Path"), LVCFMT_LEFT, rcCol.Width() );
+	if( m_isOwned )
+	{
+		ModifyStyle( WS_MINIMIZEBOX, 0, SWP_FRAMECHANGED );
+		GetSystemMenu( FALSE )->EnableMenuItem( SC_MINIMIZE, MF_BYCOMMAND | MF_GRAYED );
+	}
+	
+	//--- Enable autocomplete
 
-	UpdateFavList();
+	::SHAutoComplete( m_edPath, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
+	::SHAutoComplete( m_edTargetPath, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
+	::SHAutoComplete( m_edIconPath, SHACF_FILESYSTEM | SHACF_AUTOSUGGEST_FORCE_ON );
+
+	//--- Create and populate tree control
+	
+	CRect rcTree; GetDlgItem( IDC_ST_TREE_PLACEHOLDER )->GetWindowRect( rcTree );
+	ScreenToClient( rcTree );
+	m_tree.Create( this, rcTree, IDC_LST_FAVS );
+	m_tree.SetWindowPos( GetDlgItem( IDC_ST_FAVMENU ), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+	m_tree.SetFont( GetFont() );
+	m_tree.GetHeaderCtrl().ModifyStyle( HDS_BUTTONS, 0 );
+
+	int iconCX = 16, iconCY = 16;
+
+	CRect rcItem( 0, 0, 1, 12 ); MapDialogRect( rcItem );
+	m_tree.GetTree().SetItemHeight( max( rcItem.bottom, iconCY ) );
+
+	m_tree.SetDragCursor( AfxGetInstanceHandle(), MAKEINTRESOURCE( IDC_DRAGCURSOR ) );
+
+	m_treeIcons.Create( iconCX, iconCY, ILC_COLOR32 | ILC_MASK, 1, 1 );
+	m_treeIcons.GetCacheIcon( AfxGetInstanceHandle(), IDI_SUBMENU, exeName );
+	m_treeIcons.GetCacheIcon( AfxGetInstanceHandle(), IDI_MENUITEM, exeName );
+	m_tree.GetTree().SetImageList( &m_treeIcons, TVSIL_NORMAL );
+
+	int colWidth;
+	colWidth = MapProfileX( *this, g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_title") ) );
+	m_tree.InsertColumn( 0, _T("Title"), LVCFMT_LEFT, colWidth );
+
+	colWidth = MapProfileX( *this, g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_command") ) );
+	m_tree.InsertColumn( 1, _T("Command"), LVCFMT_LEFT, colWidth );
+
+	colWidth = MapProfileX( *this, g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_targetPath") ) );
+	m_tree.InsertColumn( 2, _T("Target path"), LVCFMT_LEFT, colWidth );
+
+	LoadFavorites();
+
+	//--- Dialog resizing stuff	
 
 	Anchor( IDC_LST_FAVS, ANCHOR_ALL );
 	Anchor( IDC_ST_TITLE, ANCHOR_BOTTOMLEFT );
 	Anchor( IDC_ST_PATH, ANCHOR_BOTTOMLEFT );
+	Anchor( IDC_ST_TARGETPATH, ANCHOR_BOTTOMLEFT );
+	Anchor( IDC_ST_ICONPATH, ANCHOR_BOTTOMLEFT );
 	Anchor( IDC_ED_TITLE, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
-	Anchor( IDC_ED_PATH, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
+	Anchor( IDC_ED_COMMAND, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
+	Anchor( IDC_ED_TARGETPATH, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
+	Anchor( IDC_ED_ICONPATH, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
 	Anchor( IDC_BTN_BROWSE, ANCHOR_BOTTOMRIGHT );
-	Anchor( IDC_RD_OWN_FAVORITES, ANCHOR_BOTTOMLEFT );
-	Anchor( IDC_RD_TC_FAVORITES, ANCHOR_BOTTOMLEFT );
-	Anchor( IDOK, ANCHOR_BOTTOM );
-	Anchor( IDCANCEL, ANCHOR_BOTTOM );
-	Anchor( IDC_BTN_REVERT, ANCHOR_BOTTOM );
+	Anchor( IDC_BTN_TARGETBROWSE, ANCHOR_BOTTOMRIGHT );
+	Anchor( IDC_BTN_ICONBROWSE, ANCHOR_BOTTOMRIGHT );
+	Anchor( IDC_BTN_CHOOSEICON, ANCHOR_BOTTOMRIGHT );
+	Anchor( IDOK, ANCHOR_BOTTOMRIGHT );
+	Anchor( IDCANCEL, ANCHOR_BOTTOMRIGHT );
+	Anchor( IDC_BTN_REVERT, ANCHOR_BOTTOMRIGHT );
 
 	// Set size from dialog template as minimum size
 	SetMinSize();
 
-	// get dialog size from registry
-	int width = g_profile.GetInt( _T("main"), _T("FavoritesDlgWidth") );
-	int height = g_profile.GetInt( _T("main"), _T("FavoritesDlgHeight") );
+	// get dialog size from profile
+	int width = MapProfileX( *this, g_profile.GetInt( _T("main"), _T("FavoritesDlgWidth") ) );
+	int height = MapProfileY( *this, g_profile.GetInt( _T("main"), _T("FavoritesDlgHeight") ) );
+
 	SetWindowPos( NULL, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE );
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
 //-----------------------------------------------------------------------------------------------
+/// Load favorites menu from profile
 
-void CFolderFavoritesDlg::UpdateFavList( DirFavoritesSrc source )
+void CFolderFavoritesDlg::LoadFavorites()
 {
-	m_listFavs.SetRedraw( FALSE );
-	m_listFavs.DeleteAllItems();
+	AutoRedraw( m_tree.GetSafeHwnd() );
+
+	m_tree.DeleteAllItems();
 
 	FavoritesList favs;
-	GetDirFavorites( &favs, source );
-	for( int i = 0; i != favs.size(); ++i )
-	{
-		FavoritesList::value_type& fav = favs[ i ];
-		int nItem = m_listFavs.InsertItem( m_listFavs.GetItemCount(), _T("") );
-		CString title = fav.title.c_str();
-		if( title.IsEmpty() ) 
-			title = _T("-untitled-");
-		m_listFavs.SetItemText( nItem, COL_TITLE, title );
-		m_listFavs.SetItemText( nItem, COL_PATH, fav.path.c_str() );
-		
-		ItemData* pData = new ItemData;
-		pData->targetPath = fav.targetpath.c_str();
-		m_listFavs.SetItemData( nItem, reinterpret_cast<DWORD_PTR>( pData ) );
-	}
-	m_listFavs.SetRedraw( TRUE );
+	GetDirFavorites( &favs );
+
+	size_t iItem = 0;
+
+	LoadFavorites_worker( TVI_ROOT, TVI_LAST, favs, iItem );
+
+	EnableDlgItem( *this, IDC_BTN_REVERT, FALSE );
+
+	// select first item (if any)
+	m_tree.GetTree().SelectAll( FALSE );
+	if( HTREEITEM hItem = m_tree.GetTree().GetChildItem( TVI_ROOT ) )
+		m_tree.GetTree().SetItemState( hItem, TVIS_SELECTED | TVIS_FOCUSED, TVIS_SELECTED | TVIS_FOCUSED );
 }
 
 //-----------------------------------------------------------------------------------------------
 
-void CFolderFavoritesDlg::OnLstFavs_DeleteItem(NMHDR *pNMHDR, LRESULT *pResult)
+void CFolderFavoritesDlg::LoadFavorites_worker( 
+	HTREEITEM hParent, HTREEITEM hInsertAfter, const FavoritesList& favs, size_t& iItem, 
+	bool bSelectInsertedItems )
 {
-	*pResult = 0;
-	LPNMLISTVIEW pnm = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-	ItemData* pData = reinterpret_cast<ItemData*>( m_listFavs.GetItemData( pnm->iItem ) );
-	delete pData;
+	while( iItem < favs.size() )
+	{
+		const FavoritesList::value_type& fav = favs[ iItem ];
+
+		HTREEITEM hItem = NULL;
+		
+		if( fav.title == _T("--") )
+		{
+			// end of submenu
+
+			++iItem;
+			return;
+		}
+		else if( fav.title.size() > 1 && fav.title.substr( 0, 1 ) == _T("-") )
+		{
+			// insert submenu recursively
+
+			hItem = m_tree.InsertItem( fav.title.substr( 1 ).c_str(), 0, 0, hParent, hInsertAfter );
+			m_tree.SetItemIsFolder( hItem );
+
+			++iItem;
+
+			LoadFavorites_worker( hItem, TVI_FIRST, favs, iItem, false );			
+		}
+		else if( fav.title == _T("-") )
+		{
+			// insert divider
+			
+			hItem = m_tree.InsertItem( _T(""), -1, -1, hParent, hInsertAfter );
+			m_tree.SetItemDivider( hItem );
+
+			++iItem;
+		}
+		else
+		{
+			// insert normal item
+
+			hItem = m_tree.InsertItem( fav.title.c_str(), 1, 1, hParent, hInsertAfter );
+			m_tree.SetItemText( hItem, COL_COMMAND, fav.command.c_str() );
+			m_tree.SetItemText( hItem, COL_TARGETPATH, fav.targetpath.c_str() );
+
+			++iItem;
+		}
+
+		// select inserted root items
+		if( bSelectInsertedItems )
+			m_tree.GetTree().SetItemState( hItem, TVIS_SELECTED, TVIS_SELECTED );
+
+		hInsertAfter = hItem;
+	}
 }
 
 //-----------------------------------------------------------------------------------------------
 
 void CFolderFavoritesDlg::OnOK()
 {
-	g_profile.SetInt( _T("main"), _T("UseTcFavorites"), IsDlgButtonChecked( IDC_RD_TC_FAVORITES ) );
-
-	FavoritesList favList;
-	for( int i = 0; i != m_listFavs.GetItemCount(); ++i )
-	{
-		ItemData* pData = reinterpret_cast<ItemData*>( m_listFavs.GetItemData( i ) );
-		
-		FavoritesList::value_type fav;
-		fav.path = m_listFavs.GetItemText( i, COL_PATH ).GetString();
-		fav.title = m_listFavs.GetItemText( i, COL_TITLE ).GetString();
-		if( fav.title == _T("-untitled-") || fav.title.empty() )
-			fav.title = fav.path;
-		fav.targetpath = pData->targetPath;		
-		if( ! ( fav.title.empty() && fav.path.empty() ) )
-			favList.push_back( fav );
-	}
-	SetDirFavorites( favList );
+	SaveFavorites();
 
 	SaveDialogSize();
-	
+
 	CResizableDlg::OnOK();
+}
+
+//-----------------------------------------------------------------------------------------------
+/// Save favorites menu into profile
+
+void CFolderFavoritesDlg::SaveFavorites()
+{
+	FavoritesList favs;
+	SaveFavorites_worker( favs, TVI_ROOT );
+	SetDirFavorites( favs );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CFolderFavoritesDlg::SaveFavorites_worker( FavoritesList& favs, HTREEITEM hParent )
+{
+	for( HTREEITEM hItem = m_tree.GetTree().GetChildItem( hParent ); hItem; 
+	     hItem = m_tree.GetTree().GetNextItem( hItem, TVGN_NEXT ) )
+	{
+		if( m_tree.IsItemDummy( hItem ) )
+			continue;
+
+		CString title = m_tree.GetItemText( hItem, COL_TITLE ).GetString();
+		// remove special tokens
+		if( title == _T("-") || title == _T("--") )
+			title = _T(" ") + title;
+
+		CString command = m_tree.GetItemText( hItem, COL_COMMAND ).GetString();
+
+		// remove incomplete items
+		if( ! m_tree.IsItemDivider( hItem ) )
+			if( ( title.IsEmpty() || title == _T("-untitled-") ) && command.IsEmpty() )
+				continue;
+
+		FavoritesItem fav;
+
+		stdext::hash_map< HTREEITEM, CString >::const_iterator it = m_iconPathes.find( hItem );
+		if( it != m_iconPathes.end() )
+			fav.iconPath = it->second;
+
+		if( m_tree.GetTree().ItemHasChildren( hItem ) )
+		{
+			// add submenu
+
+			fav.title = _T("-") + title;
+			favs.push_back( fav );
+
+			if( m_tree.HasRealChildren( hItem ) )
+				SaveFavorites_worker( favs, hItem );
+
+			// end of submenu
+			FavoritesItem fav;
+			fav.title = _T("--");
+			favs.push_back( fav );
+		}
+		else
+		{
+			if( m_tree.IsItemDivider( hItem ) )
+			{
+				// add divider
+
+				fav.title = _T("-");
+				favs.push_back( fav );
+			}
+			else
+			{
+				// add normal item
+
+				if( title.IsEmpty() )
+					title = GetDefaultTitle( command );
+				fav.title = title.GetString();
+				if( IsFilePath( command ) )
+					command = _T("cd ") + command;
+				fav.command = command.GetString();
+				
+				fav.targetpath = m_tree.GetItemText( hItem, COL_TARGETPATH ).GetString();
+				favs.push_back( fav );		
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+CString CFolderFavoritesDlg::GetItemIconPath( HTREEITEM hItem ) const
+{
+	stdext::hash_map<HTREEITEM, CString>::const_iterator it = m_iconPathes.find( hItem );
+	return it != m_iconPathes.end() ? it->second : _T(""); 
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -198,166 +385,439 @@ void CFolderFavoritesDlg::SaveDialogSize()
 	CRect rc; GetWindowRect( rc );
 	g_profile.SetInt( _T("main"), _T("FavoritesDlgWidth"), rc.Width() );
 	g_profile.SetInt( _T("main"), _T("FavoritesDlgHeight"), rc.Height() );
+
+	int colWidth;
+	colWidth = m_tree.GetHeaderCtrl().GetItemWidth( COL_TITLE );
+	g_profile.SetInt( _T("Favorites.Options"), _T("ColWidth_title"), colWidth );
+
+	colWidth = m_tree.GetHeaderCtrl().GetItemWidth( COL_COMMAND );
+	g_profile.SetInt( _T("Favorites.Options"), _T("ColWidth_command"), colWidth );
+
+	colWidth = m_tree.GetHeaderCtrl().GetItemWidth( COL_TARGETPATH );
+	g_profile.SetInt( _T("Favorites.Options"), _T("ColWidth_targetPath"), colWidth );
 }
 
 //-----------------------------------------------------------------------------------------------
 
 void CFolderFavoritesDlg::OnBnClickedBtnBrowse()
 {
-	CString path; GetDlgItemText( IDC_ED_PATH, path );
+	CString path;
+	CString cmd; GetDlgItemText( IDC_ED_COMMAND, cmd );
+	if( IsFilePath( cmd ) )
+	{
+		path = cmd;
+	}
+	else
+	{
+		tstring token, args;
+		SplitTcCommand( cmd, &token, &args );
+		if( CString( token.c_str() ).CompareNoCase( _T("cd") ) == 0 )
+			path = args.c_str();
+	}
+
 	CFolderDlg dlg( _T("Select a directory:"), path, this );
 	if( dlg.DoModal() == IDOK )
 	{
-		SetDlgItemText( IDC_ED_PATH, dlg.GetFolderPath() );
+		SetDlgItemText( IDC_ED_COMMAND,	CString( _T("cd ") ) + dlg.GetFolderPath() );
 	}
 }
 
 //-----------------------------------------------------------------------------------------------
 
-void CFolderFavoritesDlg::SelectItem( int sel )
+void CFolderFavoritesDlg::OnBnClickedBtnTargetbrowse()
 {
-	m_listFavs.SetItemState( m_sel, 0, LVIS_SELECTED );
-	m_listFavs.SetItemState( sel, LVIS_SELECTED, LVIS_SELECTED );
-	m_listFavs.SetSelectionMark( sel );
-	m_sel = sel;
-	UpdateSelItemEditControls();
+	CString path; GetDlgItemText( IDC_ED_TARGETPATH, path );
+	CFolderDlg dlg( _T("Select a directory:"), path, this );
+	if( dlg.DoModal() == IDOK )
+	{
+		SetDlgItemText( IDC_ED_TARGETPATH, dlg.GetFolderPath() );
+	}
 }
 
 //-----------------------------------------------------------------------------------------------
 
 void CFolderFavoritesDlg::UpdateSelItemEditControls()
 {
-	if( m_sel == -1 )
+	if( ! m_hSelItem )
+	{
+		// clear edit controls without updating tree
+		HTREEITEM oldSel = m_hSelItem; m_hSelItem = NULL;
+		SetDlgItemText( IDC_ED_TITLE, _T("") );
+		SetDlgItemText( IDC_ED_COMMAND, _T("") );
+		SetDlgItemText( IDC_ED_TARGETPATH, _T("") );
+		m_edTitle.SetHintText( _T("") );
+		m_hSelItem = oldSel;
 		return;
-	CString title = m_listFavs.GetItemText( m_sel, COL_TITLE );
-	CString path = m_listFavs.GetItemText( m_sel, COL_PATH );
+	}
 
-	// set edit controls, but disable "reverse update" of list control
-	int curSel = m_sel;
-	m_sel = -1;
+	CString title, command, targetPath, iconPath;
+	if( ! m_tree.IsItemDummy( m_hSelItem ) )
+	{
+		title = m_tree.GetItemText( m_hSelItem, COL_TITLE );
+		command = m_tree.GetItemText( m_hSelItem, COL_COMMAND );
+		targetPath = m_tree.GetItemText( m_hSelItem, COL_TARGETPATH );
+	}
+
+	// disable "reverse update" of list control
+	HTREEITEM curSel = m_hSelItem;
+	m_hSelItem = NULL;
+
+	CString defTitle = GetDefaultTitle( command );
+
+	if( title == _T("-untitled-") || ComparePath( title, defTitle ) == 0 )
+	{
+		m_edTitle.SetHintText( title );
+		title = _T("");
+	}
 	SetDlgItemText( IDC_ED_TITLE, title );
-	SetDlgItemText( IDC_ED_PATH, path );
-	m_sel = curSel;
+
+	SetDlgItemText( IDC_ED_COMMAND, command );
+	SetDlgItemText( IDC_ED_TARGETPATH, targetPath );
+	
+	m_hSelItem = curSel;
+}
+
+//-----------------------------------------------------------------------------------------------
+// Update states/content of controls upon selection change in tree
+
+void CFolderFavoritesDlg::OnTree_SelChanged( NMHDR *pNMHDR, LRESULT *pResult )
+{
+	*pResult = 0;
+	LPNMTREEVIEW pnm = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
+
+	HTREEITEM hFocus = m_tree.GetTree().GetFocusedItem();
+	if( hFocus != m_hSelItem )
+	{
+		m_hSelItem = hFocus;
+
+		UpdateSelItemEditControls();
+
+		BOOL bBtnRemove = FALSE;
+		BOOL bEdTitle = FALSE;
+		BOOL bCommandAndTarget = FALSE;
+
+		if( ! m_tree.IsItemDummy( m_hSelItem ) )
+		{
+			bBtnRemove = TRUE;
+
+			if( ! m_tree.IsItemDivider( m_hSelItem ) )
+			{
+				bEdTitle = TRUE;
+
+				if( ! m_tree.GetTree().ItemHasChildren( m_hSelItem ) )
+				{
+					bCommandAndTarget = TRUE;
+				}
+			}
+		}
+		
+		EnableDlgItem( *this, IDC_BTN_REMOVE, bBtnRemove );
+		EnableDlgItem( *this, IDC_ED_TITLE, bEdTitle );
+		EnableDlgItem( *this, IDC_ED_COMMAND, bCommandAndTarget );
+		EnableDlgItem( *this, IDC_BTN_BROWSE, bCommandAndTarget );
+		EnableDlgItem( *this, IDC_ED_TARGETPATH, bCommandAndTarget );
+		EnableDlgItem( *this, IDC_BTN_TARGETBROWSE, bCommandAndTarget );
+	}
 }
 
 //-----------------------------------------------------------------------------------------------
 
-void CFolderFavoritesDlg::OnLstFavs_ItemChanged(NMHDR *pNMHDR, LRESULT *pResult)
+void CFolderFavoritesDlg::OnTree_InsertItem( NMHDR *pNMHDR, LRESULT *pResult )
 {
 	*pResult = 0;
-	LPNMLISTVIEW pnm = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+	EnableDlgItem( *this, IDC_BTN_REVERT );
+}
 
-	if( pnm->uNewState & LVIS_SELECTED )
-	{
-		GetDlgItem( IDC_ED_PATH )->EnableWindow( TRUE );
-		GetDlgItem( IDC_ED_TITLE )->EnableWindow( TRUE );
-		GetDlgItem( IDC_BTN_BROWSE )->EnableWindow( TRUE );
-		GetDlgItem( IDC_BTN_REMOVE )->EnableWindow( TRUE );
-		m_sel = pnm->iItem;
-		UpdateSelItemEditControls();
-	}
-	else if( pnm->uOldState & LVIS_SELECTED )
-	{
-		int oldSel = m_sel; m_sel = -1;
-		SetDlgItemText( IDC_ED_PATH, _T("") );
-		SetDlgItemText( IDC_ED_TITLE, _T("") );
-		m_sel = oldSel;
-		GetDlgItem( IDC_ED_PATH )->EnableWindow( FALSE );
-		GetDlgItem( IDC_ED_TITLE )->EnableWindow( FALSE );
-		GetDlgItem( IDC_BTN_BROWSE )->EnableWindow( FALSE );
-		GetDlgItem( IDC_BTN_REMOVE )->EnableWindow( FALSE );
-	}
+//-----------------------------------------------------------------------------------------------
+
+void CFolderFavoritesDlg::OnTree_DeleteItem( NMHDR *pNMHDR, LRESULT *pResult )
+{
+	*pResult = 0;
+	EnableDlgItem( *this, IDC_BTN_REVERT );
+
+	// delete additional data associated with item
+	NMTREEVIEW* pnm = reinterpret_cast<NMTREEVIEW*>( pNMHDR );
+	m_iconPathes.erase( pnm->itemOld.hItem );
 }
 
 //-----------------------------------------------------------------------------------------------
 
 void CFolderFavoritesDlg::OnEnChangeEdTitle()
 {
+	CString title;
+	GetDlgItemText( IDC_ED_TITLE, title );
+
+	// set default title
+	CString cmd;
+	GetDlgItemText( IDC_ED_COMMAND, cmd );
+	cmd.Trim();
+	CString defTitle = GetDefaultTitle( cmd );
+	m_edTitle.SetHintText( defTitle );
+
 	// update current list item
-	if( m_sel != -1 )
+	if( m_hSelItem )
 	{
-		CString title;
-		GetDlgItemText( IDC_ED_TITLE, title );
-		m_listFavs.SetItemText( m_sel, COL_TITLE, title );
+		if( title.IsEmpty() )
+			title = defTitle;
+
+		m_tree.SetItemText( m_hSelItem, COL_TITLE, title );
+
+		EnableDlgItem( *this, IDC_BTN_REVERT );
 	}
 }
 
-void CFolderFavoritesDlg::OnEnChangeEdPath()
+void CFolderFavoritesDlg::OnEnChangeEdCommand()
+{
+	CString cmd;
+	GetDlgItemText( IDC_ED_COMMAND, cmd );
+	cmd.Trim();
+
+	// set default title
+	CString title = GetDefaultTitle( cmd );
+	m_edTitle.SetHintText( title );
+
+	// update current list item
+	if( m_hSelItem )
+	{
+		if( GetDlgItem( IDC_ED_TITLE )->GetWindowTextLength() == 0 )
+			m_tree.SetItemText( m_hSelItem, COL_TITLE, title );
+
+		m_tree.SetItemText( m_hSelItem, COL_COMMAND, cmd );
+
+		EnableDlgItem( *this, IDC_BTN_REVERT );
+	}
+}
+
+void CFolderFavoritesDlg::OnEnChangeEdTargetPath()
 {
 	// update current list item
-	if( m_sel != -1 )
+	if( m_hSelItem )
 	{
 		CString path;
-		GetDlgItemText( IDC_ED_PATH, path );
-		m_listFavs.SetItemText( m_sel, COL_PATH, path );
+		GetDlgItemText( IDC_ED_TARGETPATH, path );
+		path.Trim();
+		m_tree.SetItemText( m_hSelItem, COL_TARGETPATH, path );
+
+		EnableDlgItem( *this, IDC_BTN_REVERT );
 	}
-}
-
-//-----------------------------------------------------------------------------------------------
-
-void CFolderFavoritesDlg::OnBnClickedRdOwnFavorites()
-{
-	UpdateFavList( DFS_FLASHFOLDER );
-}
-
-//-----------------------------------------------------------------------------------------------
-
-void CFolderFavoritesDlg::OnBnClickedRdTcFavorites()
-{
-	UpdateFavList( DFS_TOTALCMD );
 }
 
 //-----------------------------------------------------------------------------------------------
 
 void CFolderFavoritesDlg::OnBnClickedBtnAdd()
 {
-	if( m_sel == -1 )
-		m_sel = m_listFavs.GetItemCount();
-	int nItem = m_listFavs.InsertItem( m_sel, _T("-untitled-") );
-	ItemData* pData = new ItemData;
-	m_listFavs.SetItemData( nItem, reinterpret_cast<DWORD_PTR>( pData ) );
-	SelectItem( nItem );
-	SendMessage( WM_NEXTDLGCTL, (WPARAM) GetDlgItem( IDC_ED_PATH )->GetSafeHwnd(), TRUE ); 
+	// without setting focus, subsequent inserts will not work 
+	TempFocus tempFocus( m_tree );
+
+	HTREEITEM hInsert = m_tree.GetTree().GetFocusedItem();
+	HTREEITEM hParent = TVI_ROOT;
+	if( hInsert )
+		hParent = m_tree.GetTree().GetParentItem( hInsert );
+	else
+		hInsert = TVI_LAST;
+
+	HTREEITEM hItem = m_tree.InsertItem( _T("-untitled-"), 1, 1, hParent, hInsert );
+
+	m_tree.GetTree().SelectAll( FALSE );
+	m_tree.GetTree().SetItemState( hItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
+	m_tree.GetTree().EnsureVisible( hItem );
+
+	EnableDlgItem( *this, IDC_BTN_REVERT );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CFolderFavoritesDlg::OnBnClickedBtnAddDivider()
+{
+	// without setting focus, subsequent inserts will not work 
+	TempFocus tempFocus( m_tree );
+
+	HTREEITEM hInsert = m_tree.GetTree().GetFocusedItem();
+	HTREEITEM hParent = TVI_ROOT;
+	if( hInsert )
+		hParent = m_tree.GetTree().GetParentItem( hInsert );
+	else
+		hInsert = TVI_LAST;
+
+	HTREEITEM hItem = m_tree.InsertItem( _T(""), -1, -1, hParent, hInsert );
+	m_tree.SetItemDivider( hItem );
+
+	m_tree.GetTree().SelectAll( FALSE );
+	m_tree.GetTree().SetItemState( hItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
+	m_tree.GetTree().EnsureVisible( hItem );
+
+	EnableDlgItem( *this, IDC_BTN_REVERT );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CFolderFavoritesDlg::OnBnClickedBtnAddSubmenu()
+{
+	// without setting focus, subsequent inserts will not work 
+	TempFocus tempFocus( m_tree );
+
+	HTREEITEM hInsert = m_tree.GetTree().GetFocusedItem();
+	HTREEITEM hParent = TVI_ROOT;
+	if( hInsert )
+		hParent = m_tree.GetTree().GetParentItem( hInsert );
+	else
+		hInsert = TVI_LAST;
+
+	HTREEITEM hItem = m_tree.InsertItem( _T("Submenu"), 0, 0, hParent, hInsert );
+	m_tree.SetItemIsFolder( hItem );
+
+	m_tree.GetTree().Expand( hItem, TVE_EXPAND );
+	m_tree.GetTree().SelectAll( FALSE );
+	m_tree.GetTree().SetItemState( hItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
+	m_tree.GetTree().EnsureVisible( hItem );
+
+	EnableDlgItem( *this, IDC_BTN_REVERT );
 }
 
 //-----------------------------------------------------------------------------------------------
 
 void CFolderFavoritesDlg::OnBnClickedBtnRemove()
 {
-	if( m_sel == -1 )
-		return;
-	m_listFavs.DeleteItem( m_sel );
-	if( m_sel == m_listFavs.GetItemCount() )
-		m_sel--;
-	SelectItem( m_sel );
-}
-
-//-----------------------------------------------------------------------------------------------
-
-void CFolderFavoritesDlg::OnLstFavs_KeyDown(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	*pResult = 0;
-	LPNMLVKEYDOWN pnm = reinterpret_cast<LPNMLVKEYDOWN>(pNMHDR);
-	if( pnm->wVKey == VK_INSERT )
-		OnBnClickedBtnAdd();
-	else if( pnm->wVKey == VK_DELETE )
-		OnBnClickedBtnRemove();
+	m_tree.Delete();
 }
 
 //-----------------------------------------------------------------------------------------------
 
 void CFolderFavoritesDlg::OnBnClickedBtnRevert()
 {
-	UpdateFavList( IsDlgButtonChecked( IDC_RD_TC_FAVORITES ) ? DFS_TOTALCMD : DFS_FLASHFOLDER );
+	LoadFavorites();
 }
 
 //-----------------------------------------------------------------------------------------------
 
-void CFolderFavoritesDlg::OnListFavs_DblClick(NMHDR *pNMHDR, LRESULT *pResult)
+void CFolderFavoritesDlg::OnContextMenu(CWnd* pWnd, CPoint pt )
 {
-	*pResult = 0;
-	if( m_listFavs.GetSelectionMark() == -1 )
+	if( pWnd != &m_tree.GetTree() )
+	{
+		CDialog::OnContextMenu( pWnd, pt );
+		return;
+	}
+
+	CPoint menuPos;
+
+	if( pt.x != -1 || pt.y != -1 )
+	{
+		// Context menu has been invoked by mouse, position it at cursor pos.
+
+		menuPos = pt;		
+	}
+	else
+	{
+		// Context menu handler has not been invoked by mouse, e.g. by Shift+F10.
+		// Set context menu position to focused item, if any.
+
+		if( HTREEITEM hFocused = m_tree.GetTree().GetFocusedItem() )
+		{
+			CRect rc; 
+			m_tree.GetTree().GetItemRect( hFocused, rc, TRUE );
+			menuPos = CPoint( rc.left + MapDialogX( *this, 24 ), rc.bottom );
+		}
+		else
+		{
+			menuPos = MapDialogPoint( *this, CPoint( 8, 16 ) );			
+		}
+
+		// Clip menu pos to tree rectangle (since focused item could be scolled out of view).
+		CRect rcClient;
+		m_tree.GetClientRect( rcClient );
+		m_tree.MapWindowPoints( &m_tree.GetTree(), rcClient );
+		menuPos.x = min( max( rcClient.left, menuPos.x ), rcClient.right - MapDialogX( *this, 40 ) );
+		menuPos.y = min( max( rcClient.top, menuPos.y ), rcClient.bottom - MapDialogY( *this, 20 ) );	
+
+		m_tree.GetTree().ClientToScreen( &menuPos );
+	}
+
+	CMenu menu;
+	menu.LoadMenu( IDR_FAVORITES_CONTEXTMENU );
+
+	if( m_tree.GetTree().GetSelectedCount() == 0 )
+	{
+		menu.EnableMenuItem( ID_FAVCONTEXT_CUT, MF_BYCOMMAND | MF_GRAYED );
+		menu.EnableMenuItem( ID_FAVCONTEXT_COPY, MF_BYCOMMAND | MF_GRAYED );
+		menu.EnableMenuItem( ID_FAVCONTEXT_REMOVE, MF_BYCOMMAND | MF_GRAYED );
+	}
+	if( ! m_tree.CanPaste() )
+		menu.EnableMenuItem( ID_FAVCONTEXT_PASTE, MF_BYCOMMAND | MF_GRAYED );
+
+    UINT cmd = (UINT) menu.GetSubMenu( 0 )->TrackPopupMenu( TPM_RETURNCMD | TPM_LEFTALIGN, menuPos.x, menuPos.y, this );
+	if( cmd == 0 )
 		return;
 
-	OnBnClickedBtnBrowse();
+	switch( cmd )
+	{
+		case ID_FAVCONTEXT_NEWITEM:
+			OnBnClickedBtnAdd();
+			break;
+		case ID_FAVCONTEXT_NEWDIVIDER:
+			OnBnClickedBtnAddDivider();
+			break;
+		case ID_FAVCONTEXT_NEWSUBMENU:
+			OnBnClickedBtnAddSubmenu();
+			break;
+		case ID_FAVCONTEXT_CUT:
+			m_tree.Cut();
+			break;
+		case ID_FAVCONTEXT_COPY:
+			m_tree.Copy();
+			break;
+		case ID_FAVCONTEXT_PASTE:
+			m_tree.Paste();
+			break;
+		case ID_FAVCONTEXT_REMOVE:
+			m_tree.Delete();
+			break;
+		default: ASSERT( false );
+	}
 }
+
+//-----------------------------------------------------------------------------------------------
+/// Import menu from Total Commander
+
+void CFolderFavoritesDlg::OnBnClickedBtnImport()
+{
+	CImportDlg dlg( this );
+	if( dlg.DoModal() == IDOK )
+	{
+		FavoritesList favs;
+		GetTcFavorites( &favs, dlg.GetTcIniPath() );
+
+		AutoRedraw( m_tree.GetSafeHwnd() );
+
+		HTREEITEM hInsertAfter = TVI_LAST;
+		HTREEITEM hParent = TVI_ROOT;
+
+		if( dlg.GetReplaceExisting() )
+		{
+			m_tree.DeleteAllItems();
+			hInsertAfter = TVI_LAST;
+			hParent = TVI_ROOT;
+		}
+		else if( m_hSelItem )
+		{
+			m_tree.GetTree().SelectAll( false );
+			hInsertAfter = m_hSelItem;
+			hParent = m_tree.GetTree().GetParentItem( m_hSelItem );
+			if( ! hParent )
+				hParent = TVI_ROOT;
+		}
+
+		size_t iItem = 0;
+		LoadFavorites_worker( hParent, hInsertAfter, favs, iItem, true );
+
+		if( dlg.GetReplaceExisting() )
+		{
+			// select first item (if any)
+			m_tree.GetTree().SelectAll( FALSE );
+			if( HTREEITEM hItem = m_tree.GetTree().GetChildItem( TVI_ROOT ) )
+				m_tree.GetTree().SetItemState( hItem, TVIS_SELECTED | TVIS_FOCUSED, TVIS_SELECTED | TVIS_FOCUSED );
+		}
+		
+		EnableDlgItem( *this, IDC_BTN_REVERT );
+	}
+}
+

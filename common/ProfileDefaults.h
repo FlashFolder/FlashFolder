@@ -17,67 +17,29 @@
  */
 #pragma once
 
-//-----------------------------------------------------------------------------------------------
-
-inline int MapDlgX( int templateUnitX, int baseUnitX )
-	{ return int( __int64( templateUnitX ) * baseUnitX / 4 ); }
-inline int MapDlgY( int templateUnitY, int baseUnitY )
-	{ return int( __int64( templateUnitY ) * baseUnitY / 8 ); }
-
 //-----------------------------------------------------------------------------------------
 /**
  * Get default program settings.
 **/
-void GetProfileDefaults( Profile* pProfile )
+void GetProfileDefaults( Profile* pProfile );
+
+//-----------------------------------------------------------------------------------------------
+
+// If the absolute value of any dialog metrics read from the profile is greater than this constant,
+// it means the value is stored in dialog units rather than pixels. In this case MapDialogRect() 
+// must be used to calculate the pixel values.
+const int DIALOG_UNITS_FLAG = 0x40000000;
+
+inline int MapProfileX( HWND hDlg, int x )
 {
-	LONG baseUnits = ::GetDialogBaseUnits();
-	int baseUnitX = baseUnits & 0xFFFF;
-	int baseUnitY = baseUnits >> 16;
+	if( x > DIALOG_UNITS_FLAG )
+		return MapDialogX( hDlg, x - DIALOG_UNITS_FLAG );
+	return x;
+}
 
-	pProfile->Clear();
-
-	//--- general
-
-	pProfile->SetInt( _T("main"), _T("MaxGlobalHistoryEntries"), 15 );
-
-	tstring tcIniPath;
-	bool isTcInstalled = GetTotalCmdLocation( NULL, &tcIniPath );
-	pProfile->SetInt( _T("main"), _T("UseTcFavorites"), isTcInstalled ? 1 : 0 );
-
-	pProfile->SetInt( _T("main"), _T("FavoritesDlgWidth"), MapDlgX( baseUnitX, 360 ) );
-	pProfile->SetInt( _T("main"), _T("FavoritesDlgHeight"), MapDlgY( baseUnitY, 270 ) );
-
-	//--- common file dialog
-
-	pProfile->SetInt( _T("CommonFileDlg"), _T("EnableHook"), 1 );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("MinWidth"), MapDlgX( baseUnitX, 325 ) );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("MinHeight"), MapDlgY( baseUnitY, 250 ) );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("Center"), 1 );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("FolderComboHeight"), MapDlgY( baseUnitY, 325 ) );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("FiletypesComboHeight"), MapDlgY( baseUnitY, 200 ) );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("ResizeNonResizableDialogs"), 1 );
-	pProfile->SetString( _T("CommonFileDlg.NonResizableExcludes"), _T("0"), _T("i_view32.exe") );
-	pProfile->SetString( _T("CommonFileDlg.Excludes"), _T("0"), _T("iTunes.exe") );
-
-	//--- common folder dialog
-
-	pProfile->SetInt( _T("CommonFolderDlg"), _T("EnableHook"), 1 );
-	pProfile->SetInt( _T("CommonFolderDlg"), _T("MinWidth"), MapDlgX( baseUnitX, 200 ) );
-	pProfile->SetInt( _T("CommonFolderDlg"), _T("MinHeight"), MapDlgY( baseUnitY, 250 ) );
-	pProfile->SetInt( _T("CommonFolderDlg"), _T("Center"), 1 );
-	pProfile->SetString( _T("CommonFolderDlg.Excludes"), _T("0"), _T("iTunes.exe") );
-
-	//--- MSO file dialog
-
-	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("EnableHook"), 0 );
-	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("MinWidth"), MapDlgX( baseUnitX, 325 ) );
-	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("MinHeight"), MapDlgY( baseUnitY, 250 ) );
-	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("Center"), 1 );
-
-	//--- common "Open With" dialog
-
-	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("EnableHook"), 0 );
-	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinWidth"), MapDlgX( baseUnitX, 200 ) );
-	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinHeight"), MapDlgY( baseUnitY, 250 ) );
-	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("Center"), 1 );
+inline int MapProfileY( HWND hDlg, int y )
+{
+	if( y > DIALOG_UNITS_FLAG )
+		return MapDialogY( hDlg, y - DIALOG_UNITS_FLAG );
+	return y;
 }

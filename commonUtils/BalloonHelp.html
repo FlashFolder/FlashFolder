@@ -1,0 +1,502 @@
+<!----------------------------- Article Starts ----------------------------->
+Release #3:
+<ul class="download">
+	<li>
+		<a href='BalloonHelp/BalloonHelpR3_src.zip'>Download source files - 26 Kb</a>
+	<li>
+		<a href='BalloonHelp/BalloonHelpR3_demo.zip'>Download demo project and .exe - 70 
+			Kb</a>
+</ul>
+Previous release:
+<ul class="download">
+	<li>
+		<a href='BalloonHelp/BalloonHelpR2_src.zip'>Download source files - 16 Kb</a>
+	<li>
+		<a href='BalloonHelp/BalloonHelpR2_demo.zip'>Download demo project and .exe - 60 
+			Kb</a>
+</ul>
+Ports:
+<ul class="download">
+	<li>
+		<a href='BalloonHelp/WTL_BalloonHelp_Demo.zip'>Download Maximilian Hänel's WTL 
+			port (source + demo) - 58Kb</a></li>
+	<li>
+		<a href='BalloonHelp/BH-ATL.zip'>Download Fil Mackay's ATL port (source + demo) - 
+			40Kb</a></li>
+</ul>
+<h3>Update Notes</h3>
+<p>The primary reason for this release is a bug I found with the open location 
+	feature: it would access deallocated memory! In addition, I've worked in a few 
+	other changes to make writing custom <code>LaunchBalloon()</code> methods 
+	easier, fixed a bug in the demo, and added two new options:</p>
+<p><code>unDELAY_CLOSE</code> works in tandem with a timeout value to delay the 
+	action caused by the other <code>unCLOSE_*</code> options. This allows you to 
+	keep a balloon active indefinately (until the user gets back from coffee break, 
+	etc. and has time to take a look at it). For long timeout values, I'd advise 
+	also using <code>unSHOW_CLOSE_BUTTON</code> so the user can still get rid of it 
+	quickly if need be.</p>
+<p><code>unDISABLE_XP_SHADOW</code> is exactly what it sounds like: if set, that 
+	cool dropshadow XP uses for tooltips and menus isn't shown. Note that the user 
+	can also disable dropshadows globally, in which case this option has no effect.
+</p>
+<p>I want to add some new demos, there are more things that can be done with this 
+	than what I'm currently demonstrating, but I felt these bug fixes needed to be 
+	released, and I'm probably too lazy to get the demos done as soon as i'd like 
+	anyway. So, I'll do another update when they are finished. In the meantime, 
+	Rama Krishna either has already, or will soon be releasing his <b>.NET Version</b>, 
+	so there'll be plenty of Balloon Goodness around. :)</p>
+<P align="center">
+	<img src="BalloonHelp/Balloons.jpg" width="498" height="512" alt="Balloons"><br>
+	<i>CBalloonHelp test app, running under Windows XP.</i></P>
+<P>
+	<a href="#Intro">Introduction</a><br>
+	<a href="#Using">Using CBalloonHelp</a><br>
+	<a href="#API">API</a><br>
+	&nbsp;&nbsp;&nbsp;<a href="#API Important">Important stuff</a><br>
+	&nbsp;&nbsp;&nbsp;<a href="#API SetAnchorPoint">SetAnchorPoint()</a><br>
+	&nbsp;&nbsp;&nbsp;<a href="#API SetBackgroundColor">SetBackgroundColor()</a><br>
+	&nbsp;&nbsp;&nbsp;<a href="#API SetForegroundColor">SetForegroundColor()</a><br>
+	&nbsp;&nbsp;&nbsp;<a href="#API SetTitle">SetTitle()</a><br>
+	&nbsp;&nbsp;&nbsp;<a href="#API SetContent">SetContent()</a><br>
+	&nbsp;&nbsp;&nbsp;<a href="#API SetTitleFont">SetTitleFont()</a><br>
+	&nbsp;&nbsp;&nbsp;<a href="#API SetContentFont">SetContentFont()</a><br>
+	&nbsp;&nbsp;&nbsp;<a href="#API SetURL">SetURL()</a><br>
+	&nbsp;&nbsp;&nbsp;<a href="#API SetIcon">SetIcon()</a><br>
+	&nbsp;&nbsp;&nbsp;<a href="#API LaunchBalloon">LaunchBalloon()</a><br>
+	<a href="#Features">Features</a><br>
+	<a href="#Compatibility">Compatibility</a><br>
+	<a href="#Internals">Internals</a><br>
+	<a href="#Updates">Updates</a><br>
+	<a href="#Links">Related Articles</a><br>
+	<a href="#TODO">TODO</a><br>
+	<a href="#Thanks">Thanks</a><br>
+</P>
+<h2><a name="Intro">Introduction</a></h2>
+<h3>I hate message boxes.</h3>
+<P>Or really,&nbsp;I hate <code>MessageBox()</code>s. Something about having a 
+	form of output <I>sooo</I> convenient, a single function call, no need for 
+	resources to be added, for interfaces to be designed, for any planning or 
+	preparation <I>at all</I> – not even a window handle is needed (!) – seems 
+	almost to <I>force</I> programmers to use it whenever there is any doubt about 
+	what the user should know. Is there a chance a user will perform an action in 
+	error? Better get confirmation... Just pop up a <code>MessageBox()</code>! 
+	&nbsp;I can't delete a file in the windows explorer without having to click 
+	through at least one <code>MessageBox()</code>. Am I sure? But, the file is 
+	executable... Am i <I>really</I> sure? But, it might affect registered 
+	programs... Am&nbsp;I <I>really, <B>really</B></I> sure? ...&nbsp;If a check 
+	box was provided to let you hide the message in the future... But that would 
+	require extra effort, and there's this <B>ready to use, almost good enough</B> function 
+	that will suffice...</P>
+<P>But worse yet are programs that feel the need to inform you, after performing 
+	an action that you <I>explicitly requested</I>, that the action has indeed been 
+	performed, using – you guessed it – <code>MessageBox()</code>. Nothing wrong 
+	with a little feedback, especially if the action had effects not necessarily 
+	intuitive to first-time users, but to do it in a way that requires you to stop 
+	what you're doing, (and what is sometimes worse, what the <I>program</I> is 
+	doing) just to acknowledge it... That is not funny.
+</P>
+<h3>OK...</h3>
+<P>Enough hypocritical griping however. Solutions do exist – creating message 
+	boxes with check boxes or “yes to all” / “no to all” buttons is not difficult. 
+	For the purpose of feedback, displaying a short message in a status bar will 
+	often suffice, or possibly adding a log pane. But both of these options really 
+	only work for the main window of an application, and have other drawbacks in 
+	terms of visibility and screen real-estate as well.</P>
+<P>With Windows 2000, Microsoft began a practice of using balloons (of the comic 
+	strip dialog variety) for displaying messages from system tray icons. This 
+	seems to work quite well; when I dial into the Internet, once the connection is 
+	made, a small icon appears in the tray, along with a balloon giving details on 
+	my connection speed. A <code>MessageBox()</code> here would be inexcusable, but 
+	a balloon is small, unobtrusive, and does not require any action on my part. 
+	After a few seconds, it quietly fades away. Windows XP provides this feature 
+	for many more tray icons, from system updates to the activation reminder, 
+	adding another feature to them in the form of a close button that will dismiss 
+	the balloon instantly, in case I'm annoyed by it and don't want to wait for it 
+	to time out. (Windows XP also uses similar balloons in other situations, but 
+	that fits more in line with the general XP aping of MacOS...)</P>
+<P>Note that balloons as described above are not ToolTips. ToolTips, also in use 
+	by tray icons by the way, serve well in their current form: small unobtrusive 
+	pieces of text that show up when you hover the mouse over a control, and 
+	disappear immediately upon moving the mouse away. Anyone who has used 
+	BalloonHelp on the MacOS (Ref: <A HREF="http://developer.apple.com/techpubs/mac/HIGuidelines/HIGuidelines-240.html">
+		http://developer.apple.com/techpubs/mac/HIGuidelines/HIGuidelines-240.html</A>) 
+	should know the advantages Microsoft's ToolTips have when used for this 
+	purpose.
+</P>
+<P>With Internet Explorer 5 and later, Microsoft make the Balloon ToolTip style 
+	available for general use (via the <code>TTS_BALLOON</code> style). But it is 
+	not very simple to use, and of course not useable at all on systems without 
+	IE5.
+</P>
+<h3>So get to the point already...</h3>
+<P>The point of all this of course is that I've written an easy to use balloon 
+	control. I stress easy to use: in order to convince myself and others to go 
+	this way, I wanted it to be as easy to pop up a help balloon as popping up a <code>
+		MessageBox()</code>.</P>
+<h2><a name="Using">Using CBalloonHelp</a></h2>
+<P>Add BalloonHelp.cpp and BalloonHelp.h in your project.</P>
+<h2><a name="API">API</a></h2>
+<h3><a name="API Important">The important stuff</a></h3>
+<P>The easiest way to create a balloon is to use the LaunchBalloon() static 
+	function:</P>
+<pre>void CBalloonHelp::LaunchBalloon(const CString&amp; strTitle, 
+                                 const CString&amp; strContent, 
+      const CPoint&amp; ptAnchor, 
+      LPCTSTR szIcon /*= IDI_EXCLAMATION*/
+      unsigned int unOptions /*= unSHOW_CLOSE_BUTTON*/,
+      CWnd* pParentWnd /*= NULL*/,
+      const CString strURL /*= &quot;&quot;*/,
+      unsigned int unTimeout /*= 10000*/)</pre>
+<P>
+	This will allocate a new <code>CBalloonHelp</code> object, create the window, 
+	and show it. When the window closes, the <code>CBalloonHelp</code> object will 
+	be deleted automatically. Parameters are as follows:</P>
+<PRE>strTitle    |  Title of balloon
+strContent  |  Content of balloon
+ptAnchor    |  point tail of balloon  will  be &quot;anchor&quot;ed to.
+               This is  in client coordinates if pParentWnd is given, 
+               otherwise it is in screen coordinates.
+szIcon      |  One of:
+     IDI_APPLICATION
+     IDI_INFORMATION IDI_ASTERISK (same)
+     IDI_ERROR IDI_HAND (same)
+     IDI_EXCLAMATION IDI_WARNING (same)
+     IDI_QUESTION
+     IDI_WINLOGO
+unOptions   |  One or more of:
+     unCLOSE_ON_LBUTTON_DOWN |  closes window on WM_LBUTTON_DOWN
+     unCLOSE_ON_MBUTTON_DOWN |  closes window on WM_MBUTTON_DOWN
+     unCLOSE_ON_RBUTTON_DOWN |  closes window on WM_RBUTTON_DOWN
+     unCLOSE_ON_LBUTTON_UP   |  closes window on WM_LBUTTON_UP
+     unCLOSE_ON_MBUTTON_UP   |  closes window on WM_MBUTTON_UP
+     unCLOSE_ON_RBUTTON_UP   |  closes window on WM_RBUTTON_UP
+     unCLOSE_ON_MOUSE_MOVE   |  closes window when user moves mouse 
+                             |    past threshhold
+     unCLOSE_ON_KEYPRESS     |  closes window on the next keypress message sent
+                                  to this thread.
+     unCLOSE_ON_ANYTHING     |  all of the above.
+     unDELAY_CLOSE           |  when a user action triggers the close, 
+                             |   begins timer.  closes when timer expires.
+     unSHOW_CLOSE_BUTTON     |  shows close button in upper right
+     unSHOW_INNER_SHADOW     |  draw inner shadow in balloon
+     unSHOW_TOPMOST          |  place balloon above all other windows
+     unDISABLE_XP_SHADOW     |  disable Windows XP's drop-shadow effect 
+                             |   (overrides system and user settings)
+     unDISABLE_FADE          |  disable the fade-in/fade-out effects 
+                             |   (overrides system and user settings)
+     unDISABLE_FADEIN        |  disable the fade-in effect
+     unDISABLE_FADEOUT       |  disable the fade-out effect
+pParentWnd  |  Parent window/anchor window.  If NULL, balloon will be anchored
+               in screen coordinates, and owned by the application's main window.
+strURL      |  If not empty, when the balloon is clicked ShellExecute() 
+            |    will be called, with strURL passed in.
+unTimeout   |  If not 0, balloon will automatically close after unTimeout 
+            |    milliseconds.</PRE>
+<h3><a name="API Use">Use:</a></h3>
+<pre>CBalloonHelp::LaunchBalloon(&quot;BoogaBooga&quot;, 
+     &quot;What the hell is \&quot;Booga Booga\&quot; supposed to mean, anyway?&quot;, 
+     CPoint(0,0));
+
+CBalloonHelp::LaunchBalloon(&quot;You are holding down the right mouse button!&quot;, 
+     &quot;Blah&quot;, Cpoint(0,0), IDI_WARNING, 
+      CballoonHelp::unCLOSE_ON_RBUTTON_UP|CBalloonHelp::unSHOW_INNER_SHADOW, 
+                                          this, &quot;&quot;, 0);</pre>
+<P>
+	The first line above will show a balloon with the title “BoogaBooga” and 
+	associated message anchored to the top left corner of the screen (point is in 
+	screen coordinates). Ideally, you'd anchor it to something more meaningful, 
+	such as the center of a control, or a status bar icon. The default options will 
+	cause this balloon to disappear after 10 seconds, and to show the standard 
+	information icon at top left, and a close button at top right.</P>
+<P>The second line above will show a balloon, this time anchored to the top left 
+	corner of the window represented by <code>this</code>, this time with the 
+	standard warning icon. The CBalloonHelp::unCLOSE_ON_RBUTTON_UP option will 
+	cause it to be destroyed when the right mouse button is released – if a mouse 
+	button is being held down, then mouse input is captured, so the balloon will 
+	close whenever the right mouse button is released. If no mouse button is held 
+	down, the user will have to release the right mouse button somewhere in a 
+	window owned by the same thread in order for it to close. The 
+	CballoonHelp::unSHOW_INNER_SHADOW option will cause the balloon to be drawn 
+	with an inner hilight and shadow... Not all that interesting, but if you're not 
+	running on Windows XP, it's the only shadow you can get.</P>
+<P>It is also possible to create a balloon using the Create() function, in which 
+	case you can opt not to have the object automatically deleted when the window 
+	closes (the LaunchBalloon() function always adds the option 
+	CBalloonHelp::unDELETE_THIS_ON_CLOSE to force this, but it may not be desirable 
+	if, for instance, you allocate a CBalloonHelp object from the stack). This 
+	function gives much greater potential for customization as well (see below for 
+	more info).</P>
+<h3>Complete API</h3>
+<pre><a name="API Create"></a>BOOL CBalloonHelp::Create(const CString&amp; strTitle, 
+               const CString&amp; strContent, 
+               const CPoint&amp; ptAnchor, unsigned int unOptions,
+               CWnd* pParentWnd /*=NULL*/,
+               const CString strURL /*= &quot;&quot;*/,
+               unsigned int unTimeout /*= 0*/,
+               HICON hIcon /*= NULL*/);
+      </pre>
+<p>This will create and display a balloon window. Title and content override any 
+	set for the object prior to this call. <code>ptAnchor</code> indicates anchor 
+	location in screen coordinates. <code>unOptions</code> should be a combination 
+	of one or more of the following:
+</p>
+<pre>CBalloonHelp::unCLOSE_ON_LBUTTON_DOWN //  closes window on WM_LBUTTON_DOWN
+CBalloonHelp::unCLOSE_ON_MBUTTON_DOWN //  closes window on WM_MBUTTON_DOWN
+CBalloonHelp::unCLOSE_ON_RBUTTON_DOWN //  closes window on WM_RBUTTON_DOWN
+CBalloonHelp::unCLOSE_ON_LBUTTON_UP   //  closes window on WM_LBUTTON_UP
+CBalloonHelp::unCLOSE_ON_MBUTTON_UP   //  closes window on WM_MBUTTON_UP
+CBalloonHelp::unCLOSE_ON_RBUTTON_UP   //  closes window on WM_RBUTTON_UP
+CBalloonHelp::unCLOSE_ON_RBUTTON_UP   //  closes window on WM_RBUTTON_UP
+CBalloonHelp::unCLOSE_ON_MOUSE_MOVE   //  closes window when user moves mouse past 
+                                      //  threshhold
+CBalloonHelp::unCLOSE_ON_KEYPRESS     //  closes window on the next keypress message sent
+                                      //  to this thread.
+CBalloonHelp::unCLOSE_ON_ANYTHING;    //  all of the above
+CBalloonHelp::unDELAY_CLOSE;          //  when a user action triggers the close, 
+                                      //  begins timer.  closes when timer expires.
+CBalloonHelp::unDELETE_THIS_ON_CLOSE  //  deletes object when window is closed.  Used by 
+                                      //  LaunchBalloon(), use with care
+CBalloonHelp::unSHOW_CLOSE_BUTTON     //  shows close button in upper right
+CBalloonHelp::unSHOW_INNER_SHADOW     //  draw inner shadow in balloon
+CBalloonHelp::unSHOW_TOPMOST          //  place balloon above all other windows
+CBalloonHelp::unDISABLE_XP_SHADOW;    //  disable Windows XP's drop-shadow effect 
+                                      //  (overrides system and user settings)
+CBalloonHelp::unDISABLE_FADE          //  disable the fade-in/fade-out effects 
+                                      //  (overrides system and user settings)
+CBalloonHelp::unDISABLE_FADEIN        //  disable the fade-in effect
+CBalloonHelp::unDISABLE_FADEOUT       //  disable the fade-out effect
+      </pre>
+<p>
+	If <code>pParentWnd</code> is <code>NULL</code>, the balloon will be anchored 
+	in screen coordinates, and owned by the application's main window (<code>AfxGetMainWnd())</code>. 
+	If there is no main window, and <code>pParentWnd</code> is <code>NULL</code>, 
+	creation will fail. <code>strURL</code> if not empty will be passed to <code>ShellExecute()</code>
+	when the balloon is clicked. If not 0, <code>unTimeout</code> specifies the 
+	time in milliseconds until the balloon closes automatically. And <code>hIcon</code>
+	if not NULL specifies the icon shown in the upper left corner of the balloon; 
+	it is copied on creation, so the icon can safely be destroyed after <code>Create()</code>
+	returns.
+</p>
+<pre><a name="API SetAnchorPoint"></a>      void CBalloonHelp::SetAnchorPoint(CPoint ptAnchor, CWnd* pWndAnchor = NULL);      </pre>
+<p>Sets the point to which the balloon is anchored (the point the balloon's tail 
+	attaches to). Calling this before the balloon is created has no effect, since 
+	the anchor is a required parameter of <code>Create()</code>. If <code>pWndAnchor</code>
+	is <code>NULL</code>, <code>ptAnchor</code> is assumed to be in screen 
+	coordinates, otherwise it is assumed to be relative to the client area of <code>pWndAnchor</code>
+</p>
+<pre><a name="API SetBackgroundColor"></a>      void CBalloonHelp::SetBackgroundColor(COLORREF crBackground);</pre>
+<p>Sets the background color of the balloon. Can be called before or after the 
+	balloon is created.
+</p>
+<pre><a name="API SetForegroundColor"></a>      void CBalloonHelp::SetForegroundColor(COLORREF crForeground);</pre>
+<p>Sets the foreground (borders &amp; text) color of the balloon. Can be called 
+	before or after the balloon is created.
+</p>
+<pre><a name="API SetTitle"></a>      void CBalloonHelp::SetTitle(const CString&amp; strTitle);</pre>
+<p>Sets the title of the balloon. Can be called before or after the balloon is 
+	created.
+</p>
+<pre><a name="API SetContent"></a>      void CBalloonHelp::SetContent(const CString&amp; strContent);</pre>
+<p>Sets the content of the balloon. Can be called before or after the balloon is 
+	created.
+</p>
+<pre><a name="API SetTitleFont"></a>      void CBalloonHelp::SetTitleFont(CFont* pFont);</pre>
+<p>Sets the font used to draw the title of the balloon. Can be called before or 
+	after the balloon is created. The font and the CFont object are stored and 
+	eventually deleted by the balloon; do not use either after calling this 
+	function.
+</p>
+<pre><a name="API SetContentFont"></a>      void CBalloonHelp::SetContentFont(CFont* pFont);    </pre>
+<p>Sets the font used to draw the contents of the balloon. Can be called before or 
+	after the balloon is created. If this is called before creation, and the title 
+	font is not explicitly set (via <code>SetTitleFont()</code>) then a bold 
+	version of this font is used for the title (even if this font is already bold). 
+	The font and the CFont object are stored and eventually deleted by the balloon; 
+	do not use either after calling this function.
+</p>
+<pre><a name="API SetURL"></a>      void CBalloonHelp::SetURL(const CString&amp; strURL);    </pre>
+<p>Sets the URL or file to be opened by the balloon when clicked. Set to "" to 
+	disable. Can be called before or after the balloon is created.
+</p>
+<pre><a name="API SetIcon"></a>      void CBalloonHelp::SetIcon(HICON hIcon);    </pre>
+<p>Sets the icon shown at the top left of the balloon. Pass in NULL to show no 
+	icon. Icon will not be scaled. Can be called before or after the balloon is 
+	created.
+</p>
+<pre>      void CBalloonHelp::SetIcon(HBITMAP hBitmap, COLORREF crMask);
+      </pre>
+<p>Sets the icon shown at the top left of the balloon. <code>crMask</code> indicates 
+	transparent color. Pass in NULL for <code>hBitmap</code> to show no icon. Icon 
+	will not be scaled. Can be called before or after the balloon is created.
+</p>
+<pre>      void CBalloonHelp::SetIcon(HBITMAP hBitmap, HBITMAP hMask);</pre>
+<p>Sets the icon shown at the top left of the balloon. <code>hMask</code> indicates 
+	the transparent areas. Both parameters must be valid. Icon will not be scaled. 
+	Can be called before or after the balloon is created.
+</p>
+<pre>      void CBalloonHelp::SetIcon(CImageList* pImageList, int nIconIndex);</pre>
+<p>Sets the icon shown at the top left of the balloon. <code>nIconIndex</code> indicates 
+	image to use. Both parameters must be valid. Icon will not be scaled. Can be 
+	called before or after the balloon is created.
+</p>
+<pre><a name="API LaunchBalloon"></a>void CBalloonHelp::LaunchBalloon(const CString&amp; strTitle, 
+               const CString&amp; strContent,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const CPoint&amp; ptAnchor,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LPCTSTR szIcon /*= IDI_EXCLAMATION*/,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned int unOptions /*= unSHOW_CLOSE_BUTTON*/,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CWnd* pParentWnd /*= NULL*/,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const CString strURL /*= &quot;&quot;*/,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned int unTimeout /*= 10000*/)</pre>
+<p>Creates and shows a balloon. This is a static function, so calling this on an 
+	instance of CBalloonHelp is not too useful. If you need more control, create a 
+	derived class, or use <code>Create()</code> and associated property functions. 
+	See <a href="#API Use">Use</a> for more information.
+</p>
+<h2><a name="Features">Features</a></h2>
+<UL>
+	<LI>
+	Easy to use interface.
+	<LI>
+	Adjusts position depending on anchor position; window will always be completely 
+	visible, assuming content size is less than screen size.
+	<LI>
+	Uses translucency effects if available.
+	<LI>
+		Uses drop-shadow effect if available.</LI>
+</UL>
+<h2><a name="Compatibility">Compatibility</a></h2>
+<P>Tested on Windows XP, 2000, 98, and 95</P>
+<P>Compiles with VC++ 6.0 / MFC 6 and VC++.NET / MFC 7</P>
+<h2><a name="Internals">Internals</a></h2>
+<P><code>CBalloonHelp</code> is an MFC class, derived from <code>CWnd</code>. The 
+	first time a balloon is created, a window class named “BalloonHelpClass” is 
+	registered. First, a window class with the <code>CS_DROPSHADOW</code> style is 
+	registered; if registration fails, the style is removed, and registration is 
+	attempted again. This allows use of the style on Windows XP, while avoiding 
+	problems on previous versions of Windows.
+</P>
+<P>The window is created hidden, and then the size of the content and title are 
+	calculated. Margins and space for the tail are added to this, and the window is 
+	sized and positioned relative to the anchor point. Finally, the window region 
+	is set and the window is shown.</P>
+<P>Tip: when doing shaped windows, put the shaped bits in the non-client area; 
+	it's a <I>lot</I> easier to deal with if you don't have to account for that 
+	stuff when dealing with drawing the client area.</P>
+<P><code>AnimateWindow()</code> is used for the fade-in/fade-out effects if 
+	available and requested.</P>
+<p>Messsage hooks are used to determine when closing mouse actions occur.</p>
+<p>Andrew Nosenko's CAuxThunk implementation (renamed to _ThunkImpl) is used for 
+	implementing message hooks.</p>
+<h2><a name="Updates">Updates</a></h2>
+<p>8/2/02
+	<ul>
+		<li>
+			Fixed bug in demo where div by zero balloon would be shown at wrong position.</li>
+		<li>
+			Fixed bug where deallocated memory was accessed when using the strURL parameter 
+			to open a file or location when the balloon was clicked.</li>
+		<li>
+			Added option: <code>CBalloonHelp::unDELAY_CLOSE</code>.</li>
+		<li>
+			Added option: <code>CBalloonHelp::unDISABLE_XP_SHADOW</code>.</li>
+	</ul>
+</p>
+<p>5/30/02
+	<ul>
+		<li>
+		Posted Maximilian Hänel's WTL port.
+		<li>
+		Release #2 (arbitrary number, but needed something)
+		<li>
+		Added support for multiple monitors
+		<li>
+		Added support for closing on WM_*BUTTON_DOWN messages.
+		<li>
+		Added support for anchoring to windows (move with parent).
+		<li>
+			Reworked message hook code, taken mostly from Max's WTL port.</li>
+	</ul>
+<p>1/23/02
+	<ul>
+		<li>
+			Posted Fil Mackay's ATL port</li>
+	</ul>
+<p>12/31/01
+	<ul>
+		<li>
+		Changed utilization of transparency (again), hopefully this will workaround 
+		problems with Win2k
+		<li>
+		Altered border calculation code slightly
+		<li>
+			Fixed bug where no title would cause balloon to be full screen sized.</li>
+	</ul>
+<p>12/21/01
+	<ul>
+		<li>
+		Expanded API to allow greater customization
+		<li>
+		Added example of balloon created manually that moves with parent window
+		<li>
+		Implemented keyboard hooks to allow close-on-keypress
+		<li>
+		Separate flags to disable fade-in/fade-out
+		<li>
+			Smooth scaling of small icons used for <code>LauchBalloon()</code>
+		(on Win2k/XP only)
+		<li>
+			Misc. code cleanup.</li>
+	</ul>
+<p>12/12/01
+	<ul>
+		<li>
+		Fixed bug with mouse not being released until fade-out had completed.
+		<li>
+		Added option for disabling fade effects; this is forced if the user has 
+		disabled them via the control panel.
+		<li>
+			Added option for making balloons topmost windows.</li>
+	</ul>
+	<h2><a name="Links">Related Articles</a></h2>
+	<ul>
+		<LI>
+			<A href="http://www.codeproject.com/useritems/xinfotip.asp">CXInfoTip - 
+				Information Tooltip <i>Mark Bozeman</i></A>
+		<LI>
+			<A href="http://www.codeproject.com/useritems/message_balloons.asp">Message 
+				Balloons <i>Prateek Kaul</i></A>
+		<li>
+			<a href="http://www.codeproject.com/library/classlib.asp">ClassLib, A C++ class 
+				library <i>Jan van den Baard</i></a>
+		<LI>
+			<A href="http://www.codeproject.com/shell/systemtray.asp">Adding Icons to the 
+				System Tray <i>Chris Maunder</i></A>
+		(this one is on a different topic, but uses the Windows shell's tooltip 
+		functionality available in Windows 2000 and later)
+		<LI>
+			<A href="http://www.codeproject.com/gdi/rgncreator.asp">The RGN Generator <i>Richard 
+					de Oude</i></A>
+		(information on using regions to create shaped windows)
+		<LI>
+			<A href="http://www.codeproject.com/gdi/holes.asp">Creating holes in a window <i>Amir 
+					Salzbe</i></A> (same as above, but a bit simpler.)<BR>
+		</LI>
+	</ul>
+	<h2><a name="TODO">TODO</a></h2>
+<P>Clean up code a bit... most of it is pretty straight forward, but documentation 
+	could be better.</P>
+<P>Move to straight Win32, not MFC derived class.</P>
+<p>Add better code walkthrough to this article.</p>
+<h2><a name="Thanks">Thanks...</a></h2>
+<p>...Jan van den Baard for showing me the right way to use AnimateWindow(), and 
+	for demonstrating how <code>WM_NCHITTEST</code> can be used to provide hot 
+	tracking. Check out his <a href="http://www.codeproject.com/library/classlib.asp">ClassLib</a>
+	library on CP!</p>
+<p>...Maximilian Hänel for his WTL port, and for demonstrating therein a nicer way 
+	to handle message hooks.</p>
+<p>...To all the people who've provided feedback, positive and negative. It all 
+	helps.</p>
+<p>...To Mustafa Demirhan, for his suggestion and information on using keyboard 
+	hooks.</p>
+<p>...To The Code Project, for providing a useable forum for all of us.</p>
+<!----------------------------- Article Ends ----------------------------->

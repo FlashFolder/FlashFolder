@@ -51,7 +51,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE;_USRDLL;_MT;FFLIB_EXPORTS;ISOLATION_AWARE_ENABLED"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
@@ -131,7 +131,7 @@
 			UseOfATL="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="1"
-			WholeProgramOptimization="1"
+			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -161,7 +161,7 @@
 				Optimization="1"
 				InlineFunctionExpansion="1"
 				FavorSizeOrSpeed="2"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE;_USRDLL;_MT;FFLIB_EXPORTS;ISOLATION_AWARE_ENABLED"
 				StringPooling="true"
 				ExceptionHandling="1"
@@ -199,7 +199,6 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
-				LinkTimeCodeGeneration="1"
 				BaseAddress="0x60000000"
 				ImportLibrary="./bin/fflib.lib"
 				TargetMachine="1"
@@ -270,7 +269,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="1"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE;_USRDLL;_MT;FFLIB_EXPORTS;ISOLATION_AWARE_ENABLED"
 				StringPooling="true"
 				ExceptionHandling="1"
@@ -377,7 +376,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE;_USRDLL;_MT;FFLIB_EXPORTS;ISOLATION_AWARE_ENABLED"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
@@ -484,7 +483,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\commonUtils"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE;_USRDLL;_MT;FFLIB_EXPORTS;ISOLATION_AWARE_ENABLED"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
@@ -799,6 +798,10 @@
 			</File>
 			<File
 				RelativePath="..\common\HistoryLst.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\ProfileDefaults.cpp"
 				>
 			</File>
 		</Filter>

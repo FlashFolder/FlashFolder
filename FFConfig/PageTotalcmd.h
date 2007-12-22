@@ -1,5 +1,5 @@
-/* This file is part of FlashFolder. 
- * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+/* This file is part of FlashFolder.
+ * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net )
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,21 +14,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  */
-
 #pragma once
 
-struct FavoritesItem
+#include "AutoPropertyPage.h"
+
+//-----------------------------------------------------------------------------------------------
+
+class CPageTotalcmd : public CAutoPropertyPage
 {
-	tstring command;      ///< file path or TC command (required)
-	tstring title;        ///< menu item title
-	tstring targetpath;   ///< target path for TC
-	tstring iconPath;     ///< path to icon + "," + iconId 
+public:
+	typedef CAutoPropertyPage base;
+
+	enum { IDD = IDD_PAGE_TOTALCMD };
+
+	CPageTotalcmd();
+
+	virtual void ReadProfile( const Profile& profile );
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    
+	virtual BOOL OnInitDialog();
+	virtual BOOL OnApply();
+
+	afx_msg void OnBnClickedChkEnable();
+	DECLARE_MESSAGE_MAP()
+
+private:
+	bool m_bReadDefaults;
 };
-
-typedef std::vector<FavoritesItem> FavoritesList;
-
-void GetDirFavorites( FavoritesList* pList );
-void SetDirFavorites( const FavoritesList& list );
-
-int GetFavItemByPath( const FavoritesList& favs, LPCTSTR pPath );

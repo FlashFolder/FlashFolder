@@ -64,14 +64,17 @@ CFFConfigApp::CFFConfigApp() :
 
 BOOL CFFConfigApp::InitInstance()
 {
+	CWinApp::InitInstance();
+
+	::CoInitialize( NULL );
+
 	// InitCommonControls() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
 	InitCommonControls();
 
-	CWinApp::InitInstance();
-
 	AfxInitRichEdit2();
+
 
 	HWND hwndParent = NULL;
 	if( __argc > 1 )
@@ -144,14 +147,14 @@ BOOL CFFConfigApp::InitInstance()
 	{
 		case DLG_CONFIG:
 		{
-			CFFConfigDlg dlg( CWnd::FromHandle( hwndParent ) );
+			CFFConfigDlg dlg( hwndParent ? CWnd::FromHandle( hwndParent ) : NULL );
 			m_pMainWnd = &dlg;
 			dlg.DoModal();
 			break;
 		}
 		case DLG_FAVS:
 		{
-			CFolderFavoritesDlg dlg( CWnd::FromHandle( hwndParent ) );
+			CFolderFavoritesDlg dlg( hwndParent ? CWnd::FromHandle( hwndParent ) : NULL );
 			m_pMainWnd = &dlg;
 			dlg.DoModal();
 			break;
@@ -167,7 +170,7 @@ BOOL CFFConfigApp::InitInstance()
 		}
 		case DLG_ABOUT:
 		{
-			CAboutDlg dlg( CWnd::FromHandle( hwndParent ) );
+			CAboutDlg dlg( hwndParent ? CWnd::FromHandle( hwndParent ) : NULL );
 			m_pMainWnd = &dlg;
 			dlg.DoModal();
 			break;
@@ -175,4 +178,13 @@ BOOL CFFConfigApp::InitInstance()
 	}
 
 	return FALSE;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+int CFFConfigApp::ExitInstance()
+{
+	::CoUninitialize();
+	
+	return CWinApp::ExitInstance();
 }

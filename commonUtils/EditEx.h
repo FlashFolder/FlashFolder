@@ -19,18 +19,51 @@
 #pragma once
 
 /**
- * \brief An edit control that can display a grayed hint text if it is empty.
+ * \brief An edit control that can display a differently styled hint text if it is empty and not focused.
 **/
 class CEditEx : public CEdit
 {
 	DECLARE_DYNAMIC(CEditEx)
 
 public:
-	void SetHelpText( const CString& text )
+	/// bit flags for SetHintFontStyle()
+	enum StyleFlags
 	{
-		m_helpText = text;
+		FF_ITALIC = 0x0001,
+		FF_BOLD   = 0x0002
+	};
+
+	CEditEx() : 
+		m_hintFontStyle( 0 ),
+		m_hintColor( 0xFF000000 | COLOR_GRAYTEXT ) {}
+
+	void SetHintText( const CString& text )
+	{
+		m_hintText = text;
 		Invalidate();
 	}
+	CString GetHintText() const { return m_hintText; }
+
+	void SetHintFontStyle( DWORD style )
+	{
+		if( style != m_hintFontStyle )
+		{
+			m_hintFontStyle = style;
+			Invalidate();
+		}
+	}
+	DWORD GetHintFontStyle() const { return m_hintFontStyle; }
+
+	void SetHintColor( COLORREF color )
+	{
+		if( color != m_hintColor )
+		{
+			m_hintColor = color;
+			Invalidate();
+		}
+		
+	}
+	COLORREF GetHintColor() const { return m_hintColor; }
 
 protected:
 	afx_msg void OnPaint();
@@ -39,8 +72,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	CString m_helpText;
-	CFont m_helpFont;
+	CString m_hintText;
+	DWORD m_hintFontStyle;
+	COLORREF m_hintColor;
 };
 
 

@@ -18,50 +18,39 @@
  */
 #include "stdafx.h"
 #include "FFConfig.h"
-#include "PageCommonDirDlg.h"
-#include "ExcludesDlg.h"
+#include "PageTotalcmd.h"
 
 using namespace std;
 
 //-----------------------------------------------------------------------------------------------
 
-const CString PROFILE_GROUP = _T("CommonFolderDlg");
+const CString PROFILE_GROUP = _T("TotalCmd");
 
 //-----------------------------------------------------------------------------------------------
 
-CPageCommonDirDlg::CPageCommonDirDlg()
-	: base(CPageCommonDirDlg::IDD),
+CPageTotalcmd::CPageTotalcmd()
+	: base(CPageTotalcmd::IDD),
 	m_bReadDefaults( false )
 {}
 
 //-----------------------------------------------------------------------------------------------
 
-void CPageCommonDirDlg::DoDataExchange(CDataExchange* pDX)
+void CPageTotalcmd::DoDataExchange(CDataExchange* pDX)
 {
 	base::DoDataExchange(pDX);
-	DDX_Control( pDX, IDC_CB_POSITION, m_cbPos );
 }
 
 //-----------------------------------------------------------------------------------------------
 
-BEGIN_MESSAGE_MAP(CPageCommonDirDlg, CPageCommonDirDlg::base)
-	ON_BN_CLICKED(IDC_BTN_EXCLUDES, OnBnClickedBtnExcludes)
+BEGIN_MESSAGE_MAP(CPageTotalcmd, CPageTotalcmd::base)
 	ON_BN_CLICKED(IDC_CHK_ENABLE, OnBnClickedChkEnable)
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
 
-BOOL CPageCommonDirDlg::OnInitDialog()
+BOOL CPageTotalcmd::OnInitDialog()
 {
 	base::OnInitDialog();
-
-	//--- init controls
-
-	int cxs = ::GetSystemMetrics( SM_CXSCREEN );
-	int cys = ::GetSystemMetrics( SM_CYSCREEN );
-
-	GetDlgItem( IDC_SP_MINWIDTH )->SendMessage( UDM_SETRANGE, NULL, MAKELONG( cxs, 0 ) );
-	GetDlgItem( IDC_SP_MINHEIGHT )->SendMessage( UDM_SETRANGE, NULL, MAKELONG( cys, 0 ) );
 
 	//--- get profile data
 
@@ -75,7 +64,7 @@ BOOL CPageCommonDirDlg::OnInitDialog()
 
 //-----------------------------------------------------------------------------------------------
 
-void CPageCommonDirDlg::ReadProfile( const Profile& profile )
+void CPageTotalcmd::ReadProfile( const Profile& profile )
 {
 	if( ! GetSafeHwnd() )
 	{
@@ -85,17 +74,6 @@ void CPageCommonDirDlg::ReadProfile( const Profile& profile )
 
 	CString s;
 	CheckDlgButton( IDC_CHK_ENABLE, profile.GetInt( PROFILE_GROUP, _T("EnableHook") ) );
-	s.Format( _T("%d"), MapProfileX( *this, profile.GetInt( PROFILE_GROUP, _T("MinWidth") ) ) );
-	SetDlgItemText( IDC_ED_MINWIDTH, s );
-	s.Format( _T("%d"), MapProfileY( *this, profile.GetInt( PROFILE_GROUP, _T("MinHeight") ) ) );
-	SetDlgItemText( IDC_ED_MINHEIGHT, s );
-	m_cbPos.SetCurSel( profile.GetInt( PROFILE_GROUP, _T("Center") ) );
-
-	vector<tstring> list;
-	m_excludes.clear();
-	profile.GetStringList( &list, PROFILE_GROUP + _T(".Excludes") );
-	for( int i = 0; i != list.size(); ++i )
-		m_excludes.push_back( list[ i ].c_str() );
 
 	// Set initial enabled state for child controls
 	OnBnClickedChkEnable();
@@ -103,27 +81,17 @@ void CPageCommonDirDlg::ReadProfile( const Profile& profile )
 
 //-----------------------------------------------------------------------------------------------
 
-BOOL CPageCommonDirDlg::OnApply()
+BOOL CPageTotalcmd::OnApply()
 {
 	CString s;
 	g_profile.SetInt( PROFILE_GROUP, _T("EnableHook"), IsDlgButtonChecked( IDC_CHK_ENABLE ) );
-	GetDlgItemText( IDC_ED_MINWIDTH, s );
-	g_profile.SetInt( PROFILE_GROUP, _T("MinWidth"), _ttoi( s ) );
-	GetDlgItemText( IDC_ED_MINHEIGHT, s );
-	g_profile.SetInt( PROFILE_GROUP, _T("MinHeight"), _ttoi( s ) );
-	g_profile.SetInt( PROFILE_GROUP, _T("Center"), m_cbPos.GetCurSel() );
-
-	vector<tstring> list;
-	for( int i = 0; i != m_excludes.size(); ++i )
-		list.push_back( m_excludes[ i ].GetString() );
-	g_profile.SetStringList( PROFILE_GROUP + _T(".Excludes"), list );
 
 	return base::OnApply();
 }
 
 //-----------------------------------------------------------------------------------------------
 
-void CPageCommonDirDlg::OnBnClickedChkEnable()
+void CPageTotalcmd::OnBnClickedChkEnable()
 {
 	bool isEnabled = IsDlgButtonChecked( IDC_CHK_ENABLE ) != 0;
 	for( CWnd* pChild = GetWindow( GW_CHILD ); pChild; pChild = pChild->GetNextWindow() )
@@ -131,15 +99,3 @@ void CPageCommonDirDlg::OnBnClickedChkEnable()
 			pChild->EnableWindow( isEnabled );
 }
 
-//-----------------------------------------------------------------------------------------------
-
-void CPageCommonDirDlg::OnBnClickedBtnExcludes()
-{
-	CExcludesDlg dlg( this );
-	CString s; 
-	s.LoadString( IDS_EXCLUDES );
-	dlg.SetDescr( s );
-	dlg.SetStrings( m_excludes );
-	if( dlg.DoModal() == IDOK )
-		dlg.GetStrings( &m_excludes );
-}

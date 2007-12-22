@@ -13,18 +13,67 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Englisch (USA) resources
+// Deutsch (Deutschland) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
 #ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 #pragma code_page(1252)
 #endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MENUITEM            ICON                    "res\\menuitem.ico"
+IDI_SUBMENU             ICON                    "res\\submenu.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_DRAGCURSOR          CURSOR                  "res\\dragging.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_FAVORITES_CONTEXTMENU MENU 
+BEGIN
+    POPUP "FavContext"
+    BEGIN
+        MENUITEM "&New item",                   ID_FAVCONTEXT_NEWITEM
+        MENUITEM "New &divider",                ID_FAVCONTEXT_NEWDIVIDER
+        MENUITEM "New &submenu",                ID_FAVCONTEXT_NEWSUBMENU
+        MENUITEM SEPARATOR
+        MENUITEM "&Cut\tCtrl+X",                ID_FAVCONTEXT_CUT
+        MENUITEM "C&opy\tCtrl+C",               ID_FAVCONTEXT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_FAVCONTEXT_PASTE
+        MENUITEM "D&elete\tDel",                ID_FAVCONTEXT_REMOVE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // Dialog
 //
+
+IDD_PAGE_TOTALCMD DIALOGEX 0, 0, 211, 103
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "Total Commander Integration"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "&Enable Total Commander® integration",IDC_CHK_ENABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,139,10
+    LTEXT           "If enabled, this allows you to use the FlashFolder favorites menu instead of Total Commander's own directory menu when you double-click the path field above the left or right directory panel.",IDC_STATIC,18,28,183,35
+    LTEXT           "You can still open the TC directory menu by using Ctrl+Doubleclick, by pressing the TC shortcut key or by clicking the TC directory menu button.",IDC_STATIC,18,65,183,31
+END
 
 IDD_PAGE_SHORTCUTS DIALOGEX 0, 0, 232, 156
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CAPTION
@@ -38,20 +87,75 @@ BEGIN
     PUSHBUTTON      "&Clear",IDC_BTN_CLEAR,191,135,34,14,WS_DISABLED
 END
 
-IDD_UPDATECHECK DIALOGEX 0, 0, 260, 94
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_PAGE_TOTALCMD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 204
+        VERTGUIDE, 18
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 96
+    END
+
+    IDD_PAGE_SHORTCUTS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 225
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 149
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Englisch (USA) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\FFConfig.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_UPDATECHECK DIALOGEX 0, 0, 231, 94
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Checking for new FlashFolder version"
 CLASS "FFUpdateCheck.xmgn4ngertu4mnsf"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "",IDC_ST_STATUS,7,13,246,18
-    CONTROL         "",IDC_ST_EXPAND,"Static",SS_BLACKFRAME | NOT WS_VISIBLE,0,35,260,31
+    LTEXT           "",IDC_ST_STATUS,7,13,217,18
+    CONTROL         "",IDC_ST_EXPAND,"Static",SS_BLACKFRAME | NOT WS_VISIBLE,0,35,231,31
     LTEXT           "Your version:",IDC_STATIC,7,38,44,8
     LTEXT           "1.0.0.0",IDC_ST_INSTVER,81,38,66,8
     LTEXT           "Most recent version:",IDC_STATIC,7,53,67,8
     LTEXT           "1.0.0.0",IDC_ST_ONLINEVER,81,53,66,8
-    PUSHBUTTON      "&Go to download site",IDC_BTN_DOWNLOAD,164,48,89,14
-    PUSHBUTTON      "Cancel",IDCANCEL,105,73,50,14
+    PUSHBUTTON      "&Go to download site",IDC_BTN_DOWNLOAD,146,48,78,14
+    PUSHBUTTON      "Cancel",IDCANCEL,174,73,50,14
 END
 
 IDD_ABOUT DIALOGEX 0, 0, 212, 135
@@ -71,14 +175,12 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,80,114,50,14
 END
 
-IDD_PAGE_COMMON_OPENWITHDLG DIALOGEX 0, 0, 256, 110
+IDD_PAGE_COMMON_OPENWITHDLG DIALOGEX 0, 0, 196, 110
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN | WS_CAPTION
 CAPTION "Dialogs::Common ""Open With""|Common ""Open With"" Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "&Enable FlashFolder for this dialog (Windows 2000 only)",IDC_CHK_ENABLE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,191,10
-    PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,202,9,47,12
+    PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,133,8,47,14
     LTEXT           "WARNING: EXPERIMENTAL FEATURE!",IDC_STATIC,7,23,122,8
     LTEXT           "Min. width:",IDC_STATIC,7,45,50,8
     EDITTEXT        IDC_ED_MINWIDTH,60,42,44,14,ES_AUTOHSCROLL
@@ -88,6 +190,8 @@ BEGIN
     CONTROL         "",IDC_SP_MINHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,105,58,11,14
     LTEXT           "&Position:",IDC_STATIC,7,80,53,8
     COMBOBOX        IDC_CB_POSITION,60,78,106,101,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "&Enable FlashFolder for this dialog",IDC_CHK_ENABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,121,10
 END
 
 IDD_PAGE_GENERIC DIALOGEX 0, 0, 199, 157
@@ -111,7 +215,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "&Enable FlashFolder for this dialog",IDC_CHK_ENABLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,121,10
-    PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,133,9,47,12
+    PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,133,8,47,14
     LTEXT           "Min. width:",IDC_STATIC,7,45,50,8
     EDITTEXT        IDC_ED_MINWIDTH,60,42,44,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_SP_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,104,42,11,14
@@ -130,7 +234,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "&Enable FlashFolder for this dialog",IDC_CHK_ENABLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,120,10
-    PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,133,9,47,12
+    PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,133,8,47,14
     LTEXT           "Min. width:",IDC_STATIC,7,45,50,8
     EDITTEXT        IDC_ED_MINWIDTH,60,42,44,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_SP_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,103,42,11,14
@@ -148,7 +252,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "&Enable FlashFolder for this dialog",IDC_CHK_ENABLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,121,10
-    PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,133,9,47,12
+    PUSHBUTTON      "E&xcludes...",IDC_BTN_EXCLUDES,133,8,47,14
     LTEXT           "Min. width:",IDC_STATIC,7,45,50,8
     EDITTEXT        IDC_ED_MINWIDTH,60,42,44,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_SP_MINWIDTH,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,104,42,11,14
@@ -165,42 +269,61 @@ BEGIN
     CONTROL         "",IDC_SP_FILETYPECOMBO_MAXHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,172,115,11,14
     CONTROL         "&Resize non-resizable dialogs",IDC_CHK_RESIZENONRESIZABLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,139,105,10
-    PUSHBUTTON      "E&xcludes...",IDC_BTN_NONRESIZABLE_EXCLUDES,113,138,47,12
+    PUSHBUTTON      "E&xcludes...",IDC_BTN_NONRESIZABLE_EXCLUDES,113,137,47,14
 END
 
-IDD_EXCLUDE DIALOGEX 0, 0, 285, 198
+IDD_EXCLUDE DIALOGEX 0, 0, 285, 188
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Edit Exclusion List"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "",IDC_ST_DESCR,7,7,271,25
     EDITTEXT        IDC_ED_EXCLUDES,7,37,271,123,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
-    PUSHBUTTON      "&Add program...",IDC_BTN_ADD,7,160,66,14
-    DEFPUSHBUTTON   "OK",IDOK,89,177,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,146,177,50,14
+    PUSHBUTTON      "&Add program...",IDC_BTN_ADD,7,167,66,14
+    DEFPUSHBUTTON   "OK",IDOK,174,167,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,228,167,50,14
 END
 
-IDD_FAVORITES DIALOGEX 0, 0, 255, 152
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "FlashFolder Favorites"
+IDD_FAVORITES DIALOGEX 0, 0, 286, 145
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Edit FlashFolder Favorites"
 CLASS "FFFavorites.xmgn4ngertu4mnsf"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "&Insert",IDC_BTN_ADD,7,8,40,14
-    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,49,8,40,14
-    LTEXT           "Drag an item by mouse to change its position.",IDC_STATIC,100,11,147,8
-    CONTROL         "",IDC_LST_FAVS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,24,240,34
-    LTEXT           "&Path:",IDC_ST_PATH,8,67,18,8
-    EDITTEXT        IDC_ED_PATH,60,64,163,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "...",IDC_BTN_BROWSE,226,64,21,14,WS_DISABLED
-    LTEXT           "Title (optional):",IDC_ST_TITLE,8,83,50,8
-    EDITTEXT        IDC_ED_TITLE,60,80,187,14,ES_AUTOHSCROLL | WS_DISABLED
-    CONTROL         "&Use FlashFolder favorites",IDC_RD_OWN_FAVORITES,"Button",BS_AUTORADIOBUTTON,8,101,97,10
-    CONTROL         "Use directory menu from Total Commander®",IDC_RD_TC_FAVORITES,
-                    "Button",BS_AUTORADIOBUTTON,8,114,159,10
-    DEFPUSHBUTTON   "OK",IDOK,45,130,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,102,130,50,14
-    PUSHBUTTON      "Re&vert",IDC_BTN_REVERT,159,130,50,14
+    PUSHBUTTON      "&New item",IDC_BTN_ADD,8,8,50,14
+    PUSHBUTTON      "New &divider",IDC_BTN_ADD_DIVIDER,59,8,50,14
+    PUSHBUTTON      "New &submenu",IDC_BTN_ADD_SUBMENU,110,8,57,14
+    PUSHBUTTON      "&Delete",IDC_BTN_REMOVE,172,8,50,14,WS_DISABLED
+    PUSHBUTTON      "I&mport...",IDC_BTN_IMPORT,227,8,49,14
+    LTEXT           "&Favorites menu:",IDC_ST_FAVMENU,8,25,53,8
+    LTEXT           "Statisch",IDC_ST_TREE_PLACEHOLDER,8,35,270,28,NOT WS_VISIBLE,WS_EX_STATICEDGE
+    LTEXT           "&Title:",IDC_ST_TITLE,8,70,17,8
+    EDITTEXT        IDC_ED_TITLE,66,67,212,14,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "&Path / command:",IDC_ST_PATH,8,87,55,8
+    EDITTEXT        IDC_ED_COMMAND,66,84,188,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "...",IDC_BTN_BROWSE,257,84,21,14,WS_DISABLED
+    LTEXT           "T&arget path (optional):",IDC_ST_TARGETPATH,8,99,44,16
+    EDITTEXT        IDC_ED_TARGETPATH,66,101,188,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "...",IDC_BTN_TARGETBROWSE,257,101,21,14,WS_DISABLED
+    DEFPUSHBUTTON   "OK",IDOK,119,123,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,173,123,50,14
+    PUSHBUTTON      "Re&vert",IDC_BTN_REVERT,228,123,50,14,WS_DISABLED
+END
+
+IDD_IMPORT DIALOGEX 0, 0, 332, 108
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Import Total Commander® directory menu"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "&Get from installed Total Commander",IDC_CHK_INSTALLED,
+                    "Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,8,11,130,10
+    LTEXT           "&Path of wincmd.ini:",IDC_STATIC,8,28,71,8
+    EDITTEXT        IDC_ED_PATH,8,39,295,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE,304,39,21,14
+    CONTROL         "I&nsert after selected menu item",IDC_RD_APPEND,"Button",BS_AUTORADIOBUTTON | WS_GROUP,8,60,117,11
+    DEFPUSHBUTTON   "OK",IDOK,221,86,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,275,86,50,14
+    CONTROL         "&Replace existing favorites",IDC_RD_REPLACE,"Button",BS_AUTORADIOBUTTON,8,74,99,10
 END
 
 
@@ -215,7 +338,7 @@ BEGIN
     IDD_UPDATECHECK, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 253
+        RIGHTMARGIN, 224
         TOPMARGIN, 7
         BOTTOMMARGIN, 87
     END
@@ -231,7 +354,7 @@ BEGIN
     IDD_PAGE_COMMON_OPENWITHDLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 249
+        RIGHTMARGIN, 189
         VERTGUIDE, 60
         TOPMARGIN, 7
         BOTTOMMARGIN, 103
@@ -272,12 +395,30 @@ BEGIN
         BOTTOMMARGIN, 170
     END
 
-    IDD_FAVORITES, DIALOG
+    IDD_EXCLUDE, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 247
+        RIGHTMARGIN, 278
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 181
+        HORZGUIDE, 160
+        HORZGUIDE, 167
+    END
+
+    IDD_FAVORITES, DIALOG
+    BEGIN
+        LEFTMARGIN, 8
+        RIGHTMARGIN, 278
         TOPMARGIN, 8
-        BOTTOMMARGIN, 144
+        BOTTOMMARGIN, 137
+    END
+
+    IDD_IMPORT, DIALOG
+    BEGIN
+        LEFTMARGIN, 8
+        RIGHTMARGIN, 325
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 100
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -318,15 +459,6 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\FFConfig.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -394,7 +526,7 @@ BEGIN
     IDS_EDIT_EXCLUDES       "Edit exclusion list"
     IDS_MU_INDIVIDUAL       "Use individual user profiles"
     IDS_MU_SHARED           "Use shared profile for all users"
-    IDS_EXCLUDES            "Enter filenames of programs which are not compatible with this feature (e.g. myprogram.exe).\n&Put each filename on a separate line:"
+    IDS_EXCLUDES            "Enter filenames of programs which are not compatible with this feature\n(e.g. myprogram.exe).\n&Put each filename on a separate line:"
 END
 
 #endif    // Englisch (USA) resources

@@ -23,152 +23,101 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------------------
+/// get favorites from profile
 
-void GetDirFavorites( FavoritesList* pList, DirFavoritesSrc source )
+void GetDirFavorites( FavoritesList* pList )
 {
-	tstring tcIniPath;
-	bool isTcInstalled = GetTotalCmdLocation( NULL, &tcIniPath );
-
-	RegistryProfile profile( _T("zett42\\FlashFolder") );
-	MemoryProfile defProfile;
-	defProfile.SetInt( _T("main"), _T("UseTcFavorites"), isTcInstalled ? 1 : 0 );
-	profile.SetDefaults( &defProfile );
-
-	if( source == DFS_DEFAULT )
-	{
-		source = DFS_FLASHFOLDER;
-		if( isTcInstalled )
-			if( profile.GetInt( _T("main"), _T("UseTcFavorites") ) != 0 )
-				source = DFS_TOTALCMD;
-	}
-
 	pList->clear();
 
-	if( source == DFS_TOTALCMD )
+	RegistryProfile profile( _T("zett42\\FlashFolder") );
+
+	TCHAR key[32];
+	for( int i = 0;; ++i )
 	{
-		//--- Get directory menu from TotalCommander profile.
-		// Get all available data for each menu item so that even if we don't need it,
-		// proper roundtripping can be done when the menu is later saved by
-		// SetDirFavorites().
+		FavoritesItem item;
 
-		tstring tcIniPath;
-		if( ! GetTotalCmdLocation( NULL, &tcIniPath ) )
-			return;
-		
-		tstring dbg = tstring( _T("[fflib] Found wincmd.ini at ") ) + tcIniPath + 
-			tstring( _T("\n") );
-		::OutputDebugString( dbg.c_str() );
+		StringCbPrintf( key, sizeof(key), _T("%d_title"), i );			
+		item.title = profile.GetString( _T("Favorites"), key );
 
-		for( int i = 1;; ++i )
-		{
-			TCHAR key[ 32 ];
-			TCHAR cmd[ MAX_PATH + 1 + 3 ] = _T("");
-			TCHAR title[ 256 ] = _T("");
-			TCHAR targetPath[ MAX_PATH + 1 ] = _T("");
+		StringCbPrintf( key, sizeof(key), _T("%d"), i );
+		item.command = profile.GetString( _T("Favorites"), key );
 
-			StringCbPrintf( key, sizeof(key), _T("menu%d"), i );
-			if( ::GetPrivateProfileString( _T("DirMenu"), key, _T(""), title, 
-					sizeof(title) / sizeof(TCHAR) - 1, tcIniPath.c_str() ) == 0 )
-				break;
+		if( item.title.empty() && item.command.empty() )
+			break;
 
-			FavoritesItem item;
-			item.title = title;
+		if( item.title.empty() )
+			item.title = item.command;
 
-			StringCbPrintf( key, sizeof(key), _T("cmd%d"), i );
-			if( ::GetPrivateProfileString( _T("DirMenu"), key, _T(""), cmd, 
-					sizeof(cmd) / sizeof(TCHAR) - 1, tcIniPath.c_str() ) > 0 )
-			{
-				if( _tcsnicmp( cmd, _T("cd "), 3 ) == 0 )
-					// menu item is directory, extract the path
-					item.path = &cmd[3];
-				else
-					// menu item is Total Commander command, keep as is
-					item.path = cmd;
-			}
+		StringCbPrintf( key, sizeof(key), _T("%d_targetPath"), i );			
+		item.targetpath = profile.GetString( _T("Favorites"), key );
 
-			StringCbPrintf( key, sizeof(key), _T("path%d"), i );
-			if( ::GetPrivateProfileString( _T("DirMenu"), key, _T(""), targetPath, 
-					sizeof(targetPath) / sizeof(TCHAR) - 1, tcIniPath.c_str() ) > 0 )
-				item.targetpath = targetPath;		
+		StringCbPrintf( key, sizeof(key), _T("%d_iconPath"), i );			
+		item.iconPath = profile.GetString( _T("Favorites"), key );
 
-			pList->push_back( item );
-		}
-	}
-	else 
-	{
-		//--- get favorites from FlashFolder profile
-
-		TCHAR key[32];
-		for( int i = 0;; ++i )
-		{
-			FavoritesItem item;
-			StringCbPrintf( key, sizeof(key), _T("%d"), i );
-			item.path = profile.GetString( _T("Favorites"), key );
-			if( item.path.empty() )
-				break;
-
-			StringCbPrintf( key, sizeof(key), _T("%d_title"), i );			
-			item.title = profile.GetString( _T("Favorites"), key );
-			pList->push_back( item );
-		}
+		pList->push_back( item );
 	}
 }
 
 //-----------------------------------------------------------------------------------------
+/// write favorites to profile
 
-void SetDirFavorites( const FavoritesList& list, DirFavoritesSrc source )
+void SetDirFavorites( const FavoritesList& list )
 {
 	RegistryProfile profile( _T("zett42\\FlashFolder") );
 
-	if( source == DFS_DEFAULT )
-		if( profile.GetInt( _T("main"), _T("UseTcFavorites") ) != 0 )
-			source = DFS_TOTALCMD;
-		else
-			source = DFS_FLASHFOLDER;
+	profile.DeleteSection( _T("Favorites") );
+	TCHAR key[32];
+	int nItem = 0;
 
-	if( source == DFS_TOTALCMD )
+	for( int i = 0; i != list.size(); ++i )
 	{
-		//--- write favorites to Total Commander profile
+		if( list[ i ].title.empty() )
+			continue;
 
-		tstring tcIniPath;
-		if( ! GetTotalCmdLocation( NULL, &tcIniPath ) )
-			return;
+		StringCbPrintf( key, sizeof(key), _T("%d_title"), nItem );			
+		profile.SetString( _T("Favorites"), key, list[i].title.c_str() );
 
-		// remove current items from file
-		::WritePrivateProfileString( _T("DirMenu"), NULL, NULL, tcIniPath.c_str() ); 
-
-		TCHAR key[ 32 ];
-		for( int i = 0; i != list.size(); ++i )
+		if( ! list[ i ].command.empty() )
 		{
-			StringCbPrintf( key, sizeof(key), _T("menu%d"), i + 1 );
-			::WritePrivateProfileString( _T("DirMenu"), key, list[i].title.c_str(), tcIniPath.c_str() );
-
-			tstring s;
-			if( IsFilePath( list[ i ].path.c_str() ) )
-				s = tstring( _T("cd ") ) + list[ i ].path;
-			else
-				s = list[ i ].path;
-			StringCbPrintf( key, sizeof(key), _T("cmd%d"), i + 1 );
-			if( ! s.empty() )
-				::WritePrivateProfileString( _T("DirMenu"), key, s.c_str(), tcIniPath.c_str() );
-
-			StringCbPrintf( key, sizeof(key), _T("path%d"), i + 1 );
-			if( ! list[i].targetpath.empty() )
-				::WritePrivateProfileString( _T("DirMenu"), key, list[i].targetpath.c_str(), tcIniPath.c_str() );
+			StringCbPrintf( key, sizeof(key), _T("%d"), nItem );
+			profile.SetString( _T("Favorites"), key, list[i].command.c_str() );
 		}
+
+		if( ! list[ i ].targetpath.empty() )
+		{
+			StringCbPrintf( key, sizeof(key), _T("%d_targetPath"), nItem );
+			profile.SetString( _T("Favorites"), key, list[i].targetpath.c_str() );
+		}
+
+		if( ! list[ i ].iconPath.empty() )
+		{
+			StringCbPrintf( key, sizeof(key), _T("%d_iconPath"), nItem );
+			profile.SetString( _T("Favorites"), key, list[i].iconPath.c_str() );
+		}
+
+		++nItem;
 	}
-	else
+}
+
+//-----------------------------------------------------------------------------------------------
+
+int GetFavItemByPath( const FavoritesList& favs, LPCTSTR pPath )
+{
+	for( size_t i = 0; i < favs.size(); ++i )
 	{
-		//--- write favorites to FlashFolder profile
+		const FavoritesItem& fav = favs[ i ];
 
-		profile.DeleteSection( _T("Favorites") );
-		TCHAR key[32];
-		for( int i = 0; i != list.size(); ++i )
-		{
-			StringCbPrintf( key, sizeof(key), _T("%d"), i );
-			profile.SetString( _T("Favorites"), key, list[i].path.c_str() );
-			StringCbPrintf( key, sizeof(key), _T("%d_title"), i );			
-			profile.SetString( _T("Favorites"), key, list[i].title.c_str() );
-		}
+		tstring itemPath;
+		tstring token, args;
+		SplitTcCommand( fav.command.c_str(), &token, &args );
+
+		if( _tcsicmp( token.c_str(), _T("cd") ) == 0 )
+			itemPath = args;
+		else if( IsFilePath( fav.command.c_str() ) )
+			itemPath = fav.command;
+
+		if( _tcsicmp( itemPath.c_str(), pPath ) == 0 )
+			return i;
 	}
+	return -1;
 }

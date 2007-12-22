@@ -83,6 +83,8 @@ public:
 	void AnchorUpdateAll();
 	void AnchorRemoveAll()                         { m_controls.clear(); }
 
+	CResizeGrip& GetSizeGrip()                     { return m_sizeGrip; }
+
 protected:
 	void Construct()
 		{ m_ptMin = CPoint( 0, 0 ); }
