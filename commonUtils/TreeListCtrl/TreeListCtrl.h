@@ -74,7 +74,7 @@ class CTreeListCtrl_tooltip : public CWnd
 {
 protected:
 	DECLARE_MESSAGE_MAP()
-	afx_msg UINT OnNcHitTest( CPoint pt ) { return HTTRANSPARENT; }
+	afx_msg LRESULT OnNcHitTest( CPoint pt ) { return HTTRANSPARENT; }
 };
 
 //--------------------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ protected:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
-	afx_msg UINT OnNcHitTest(CPoint point);
+	afx_msg LRESULT OnNcHitTest(CPoint point);
 	afx_msg void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS FAR* lpncsp);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnKeyDown( UINT ch, UINT repCnt, UINT flags );

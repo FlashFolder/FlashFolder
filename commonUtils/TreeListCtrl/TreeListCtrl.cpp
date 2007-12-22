@@ -895,7 +895,7 @@ void CTreeListCtrl_tree::OnLButtonDblClk(UINT nFlags, CPoint point)
 
 //---------------------------------------------------------------------------------
 
-UINT CTreeListCtrl_tree::OnNcHitTest(CPoint point) 
+LRESULT CTreeListCtrl_tree::OnNcHitTest(CPoint point) 
 {
 	//OnNcHitTest is handled 'cause sometimes the header ctrl would not
 	//  receive clicks since it lays OVER the tree ctrl
@@ -1242,8 +1242,8 @@ BOOL CTreeListCtrl::Create( CWnd* pParentWnd, const RECT& rect, UINT nID, DWORD 
 	memset( &m_templ, 0, sizeof(m_templ) );
 	m_templ.dlg.style = ( dwStyle & ~WS_VISIBLE ) | WS_CHILD | WS_CLIPCHILDREN | DS_CONTROL | DS_SETFONT;
 	m_templ.dlg.dwExtendedStyle = dwExStyle;
-	wcscpy( m_templ.classArray, L"TreeListCtrl_zett42" );
-	wcscpy( m_templ.fontFace, L"MS Shell Dlg" );
+	StringCbCopyW( m_templ.classArray, sizeof(m_templ.classArray), L"TreeListCtrl_zett42" );
+	StringCbCopyW( m_templ.fontFace, sizeof(m_templ.fontFace), L"MS Shell Dlg" );
 	m_templ.fontSize = 8;
 
 	if( CreateIndirect( &m_templ, pParentWnd ) )
