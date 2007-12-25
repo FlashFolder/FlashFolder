@@ -58,63 +58,6 @@ BEGIN
     END
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_PAGE_TOTALCMD DIALOGEX 0, 0, 211, 103
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
-CAPTION "Total Commander Integration"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    CONTROL         "&Enable Total Commander® integration",IDC_CHK_ENABLE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,139,10
-    LTEXT           "If enabled, this allows you to use the FlashFolder favorites menu instead of Total Commander's own directory menu when you double-click the path field above the left or right directory panel.",IDC_STATIC,18,28,183,35
-    LTEXT           "You can still open the TC directory menu by using Ctrl+Doubleclick, by pressing the TC shortcut key or by clicking the TC directory menu button.",IDC_STATIC,18,65,183,31
-END
-
-IDD_PAGE_SHORTCUTS DIALOGEX 0, 0, 232, 156
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CAPTION
-CAPTION "Keyboard Shortcuts"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "&Select function:",IDC_STATIC,7,7,51,8
-    CONTROL         "",IDC_LST_SHORTCUTS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,18,218,111
-    LTEXT           "&Press shortcut key:",IDC_STATIC,7,138,71,8
-    CONTROL         "",IDC_HOTKEY,"msctls_hotkey32",WS_DISABLED | WS_BORDER | WS_TABSTOP,75,135,114,14
-    PUSHBUTTON      "&Clear",IDC_BTN_CLEAR,191,135,34,14,WS_DISABLED
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
-BEGIN
-    IDD_PAGE_TOTALCMD, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 204
-        VERTGUIDE, 18
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 96
-    END
-
-    IDD_PAGE_SHORTCUTS, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 225
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 149
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
 #endif    // Deutsch (Deutschland) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -142,6 +85,30 @@ IDR_MAINFRAME           ICON                    "res\\FFConfig.ico"
 // Dialog
 //
 
+IDD_PAGE_TOTALCMD DIALOGEX 0, 0, 230, 171
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "Total Commander Integration"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "&Enable Total Commander® integration",IDC_CHK_ENABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,139,10
+    LTEXT           "If this option is enabled, the FlashFolder favorites menu replaces Total Commander's own directory menu when you double-click the path field above the left or right directory panel.",IDC_STATIC,18,28,205,35
+    LTEXT           "You can still open the TC directory menu by using Ctrl+Doubleclick, by pressing the appropriate TC shortcut key or by clicking the TC directory menu button.",IDC_STATIC,18,65,205,30
+    LTEXT           "Total Commander® is a registered trademark of Christian Ghisler, C. Ghisler & Co., Switzerland.",IDC_STATIC,7,147,216,17,SS_NOPREFIX
+END
+
+IDD_PAGE_SHORTCUTS DIALOGEX 0, 0, 232, 156
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CAPTION
+CAPTION "Keyboard Shortcuts"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Select function:",IDC_STATIC,7,7,51,8
+    CONTROL         "",IDC_LST_SHORTCUTS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,18,218,111
+    LTEXT           "&Press shortcut key:",IDC_STATIC,7,138,71,8
+    CONTROL         "",IDC_HOTKEY,"msctls_hotkey32",WS_DISABLED | WS_BORDER | WS_TABSTOP,75,135,114,14
+    PUSHBUTTON      "&Clear",IDC_BTN_CLEAR,191,135,34,14,WS_DISABLED
+END
+
 IDD_UPDATECHECK DIALOGEX 0, 0, 231, 94
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Checking for new FlashFolder version"
@@ -158,21 +125,21 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,174,73,50,14
 END
 
-IDD_ABOUT DIALOGEX 0, 0, 212, 135
+IDD_ABOUT DIALOGEX 0, 0, 194, 129
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "About FlashFolder"
 CLASS "FFAbout.xmgn4ngertu4mnsf"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CTEXT           "FlashFolder Service Version",IDC_ST_FFSERVICE,7,7,198,8
-    CTEXT           "FlashFolder Hook Library Version",IDC_ST_FFLIB,7,17,198,8
-    CTEXT           "FlashFolder Config Version",IDC_ST_FFCONFIG,7,28,198,8
-    CTEXT           "Copyright © 2007 zett42",IDC_STATIC,7,43,198,8
-    CTEXT           "Homepage",IDC_ST_HOMEPAGE,7,60,198,8
-    CTEXT           "Project page at SourceForge.net",IDC_ST_PROJECTPAGE,7,71,198,8
-    CTEXT           "Submit bug report",IDC_ST_BUGREPORT,7,86,198,8
-    CTEXT           "Submit feature request",IDC_ST_FEATUREREQ,6,97,199,8
-    DEFPUSHBUTTON   "OK",IDOK,80,114,50,14
+    LTEXT           "FlashFolder Service Version",IDC_ST_FFSERVICE,7,7,180,8
+    LTEXT           "FlashFolder Hook Library Version",IDC_ST_FFLIB,7,17,180,8
+    LTEXT           "FlashFolder Config Version",IDC_ST_FFCONFIG,7,28,180,8
+    LTEXT           "Copyright © 2007 zett42",IDC_STATIC,7,43,180,8
+    LTEXT           "Homepage",IDC_ST_HOMEPAGE,7,59,180,8
+    LTEXT           "Project page at SourceForge.net",IDC_ST_PROJECTPAGE,7,70,180,8
+    LTEXT           "Submit bug report",IDC_ST_BUGREPORT,7,82,180,8
+    LTEXT           "Submit feature request",IDC_ST_FEATUREREQ,7,93,180,8
+    DEFPUSHBUTTON   "OK",IDOK,137,108,50,14
 END
 
 IDD_PAGE_COMMON_OPENWITHDLG DIALOGEX 0, 0, 196, 110
@@ -291,7 +258,7 @@ CLASS "FFFavorites.xmgn4ngertu4mnsf"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     PUSHBUTTON      "&New item",IDC_BTN_ADD,8,8,50,14
-    PUSHBUTTON      "New &divider",IDC_BTN_ADD_DIVIDER,59,8,50,14
+    PUSHBUTTON      "New di&vider",IDC_BTN_ADD_DIVIDER,59,8,50,14
     PUSHBUTTON      "New &submenu",IDC_BTN_ADD_SUBMENU,110,8,57,14
     PUSHBUTTON      "&Delete",IDC_BTN_REMOVE,172,8,50,14,WS_DISABLED
     PUSHBUTTON      "I&mport...",IDC_BTN_IMPORT,227,8,49,14
@@ -326,6 +293,20 @@ BEGIN
     CONTROL         "&Replace existing favorites",IDC_RD_REPLACE,"Button",BS_AUTORADIOBUTTON,8,74,99,10
 END
 
+IDD_ADD_FAVORITE DIALOGEX 0, 0, 289, 93
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Add FlashFolder Favorites Item"
+CLASS "FFAddFavorite.xmgn4ngertu4mnsf"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Enter new menu item title or choose one from below:",IDC_STATIC,7,7,170,8
+    COMBOBOX        IDC_CB_TITLE,7,18,275,46,CBS_SIMPLE | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "&Save target directory",IDC_CHK_SAVE_TARGETDIR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,63,85,10
+    DEFPUSHBUTTON   "OK",IDOK,177,72,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,232,72,50,14
+    PUSHBUTTON      "Edit &menu",IDC_EDIT_MENU,122,72,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -335,6 +316,23 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO 
 BEGIN
+    IDD_PAGE_TOTALCMD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 223
+        VERTGUIDE, 18
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 164
+    END
+
+    IDD_PAGE_SHORTCUTS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 225
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 149
+    END
+
     IDD_UPDATECHECK, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -346,9 +344,9 @@ BEGIN
     IDD_ABOUT, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 205
+        RIGHTMARGIN, 187
         TOPMARGIN, 7
-        BOTTOMMARGIN, 128
+        BOTTOMMARGIN, 122
     END
 
     IDD_PAGE_COMMON_OPENWITHDLG, DIALOG
@@ -419,6 +417,14 @@ BEGIN
         RIGHTMARGIN, 325
         TOPMARGIN, 7
         BOTTOMMARGIN, 100
+    END
+
+    IDD_ADD_FAVORITE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 282
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 86
     END
 END
 #endif    // APSTUDIO_INVOKED

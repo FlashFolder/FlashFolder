@@ -101,7 +101,7 @@ void SetDirFavorites( const FavoritesList& list )
 
 //-----------------------------------------------------------------------------------------------
 
-int GetFavItemByPath( const FavoritesList& favs, LPCTSTR pPath )
+int GetFavItemByPath( const FavoritesList& favs, LPCTSTR pPath, LPCTSTR pTargetPath )
 {
 	for( size_t i = 0; i < favs.size(); ++i )
 	{
@@ -117,7 +117,12 @@ int GetFavItemByPath( const FavoritesList& favs, LPCTSTR pPath )
 			itemPath = fav.command;
 
 		if( _tcsicmp( itemPath.c_str(), pPath ) == 0 )
-			return i;
+		{
+			if( ! pTargetPath )  
+				return i;
+			if( _tcsicmp( fav.targetpath.c_str(), pTargetPath ) == 0 )
+				return i;
+		}		
 	}
 	return -1;
 }

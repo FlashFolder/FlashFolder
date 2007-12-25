@@ -499,6 +499,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\AddFavoriteDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\AutoPropertyPage.cpp"
 				>
 			</File>
@@ -606,6 +610,10 @@
 			>
 			<File
 				RelativePath=".\AboutDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AddFavoriteDlg.h"
 				>
 			</File>
 			<File
@@ -794,6 +802,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\messagebox.h"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\MfcThread.h"
 				>
 			</File>
@@ -911,7 +923,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\HTMLFormatter.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\HyperLink.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\MessageBox.cpp"
 				>
 			</File>
 			<File

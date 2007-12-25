@@ -82,6 +82,7 @@
 #include <TreePropSheet/PropPageFrameDefault.h>
 #include <PopupDlg.h>
 #include <CacheImageList.h>
+#include <MessageBox.h>
 
 // project-specific
 #include "../common/ff_utils.h"

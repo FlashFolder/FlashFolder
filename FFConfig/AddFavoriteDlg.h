@@ -14,21 +14,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  */
-
 #pragma once
 
-struct FavoritesItem
+class CAddFavoriteDlg : public CDialog
 {
-	tstring command;      ///< file path or TC command (required)
-	tstring title;        ///< menu item title
-	tstring targetpath;   ///< target path for TC
-	tstring iconPath;     ///< path to icon + "," + iconId 
+	DECLARE_DYNAMIC(CAddFavoriteDlg)
+
+public:
+	CAddFavoriteDlg( CWnd* pParent, const CString& path, const CString& targetPath = _T("") );
+
+	enum { IDD = IDD_ADD_FAVORITE };
+
+private:
+	virtual void DoDataExchange(CDataExchange* pDX);    
+	virtual BOOL OnInitDialog();
+	DECLARE_MESSAGE_MAP()
+	
+	bool Save();
+	
+private:
+	CString m_path, m_targetPath;
+	CComboBox m_cbTitle;
+public:
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedEditMenu();
 };
-
-typedef std::vector<FavoritesItem> FavoritesList;
-
-void GetDirFavorites( FavoritesList* pList );
-void SetDirFavorites( const FavoritesList& list );
-
-int GetFavItemByPath( const FavoritesList& favs, LPCTSTR pPath, LPCTSTR pTargetPath = NULL );

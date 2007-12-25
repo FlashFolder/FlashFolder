@@ -44,6 +44,10 @@ void GetTempFilePath( LPTSTR pResult, LPCTSTR pPrefix );
 
 int ComparePath( LPCTSTR path1, LPCTSTR path2 );
 
+/// Extract the given number of components, separated by backslash, from a file path.
+LPCTSTR ExtractSubPath( LPCTSTR pPath, unsigned depth = 1 );
+
+bool HasTrailingBackslash( LPCTSTR pPath );
 
 bool IsIniSectionNotEmpty( LPCTSTR filename, LPCTSTR sectionName );
 

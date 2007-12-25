@@ -526,17 +526,26 @@ void FavMenu_StartEditor( HWND hWndParent )
 
 //-----------------------------------------------------------------------------------------------
 
-void FavMenu_AddDir( FavoritesList& favs, LPCTSTR pPath )
+void FavMenu_AddDir( HWND hWndParent, FavoritesList& favs, LPCTSTR pPath, LPCTSTR pTargetPath = _T("") )
 {
-	// add item only if current folder doesn't already exists in the list
-	if( GetFavItemByPath( favs, pPath ) == -1 )
-	{
-		FavoritesItem item;
-		item.title = pPath;
-		item.command = tstring( _T("cd ") ) + pPath;
-		favs.push_back( item );
-		SetDirFavorites( favs );
+	TCHAR path[ MAX_PATH + 1 ] = _T("");
+	GetAppDir( g_hInstDll, path );
+	StringCbCat( path, sizeof(path), _T("FFConfig.exe") );
+
+	TCHAR params[ 1024 ] = _T("");
+	StringCbPrintf( params, sizeof(params),	_T("%d --addfav \"%s"), hWndParent, pPath );
+	if( HasTrailingBackslash( pPath ) )
+		StringCbCat( params, sizeof(params), _T("\\") );
+	StringCbCat( params, sizeof(params), _T("\"") );
+	if( pTargetPath[ 0 ] != 0 )
+	{	
+		StringCbCat( params, sizeof(params), _T(" \"") );
+		StringCbCat( params, sizeof(params), pTargetPath );
+		if( HasTrailingBackslash( pTargetPath ) )
+			StringCbCat( params, sizeof(params), _T("\\") );
+		StringCbCat( params, sizeof(params), _T("\"") );
 	}
+	::ShellExecute( hWndParent, _T("open"), path, params, NULL, SW_SHOW );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -561,7 +570,7 @@ void FavMenu_DisplayForFileDialog()
 	{
 		TCHAR path[ MAX_PATH + 1 ];
 		if( g_spFileDlgHook->GetFolder( path ) )
-			FavMenu_AddDir( favs, path );
+			FavMenu_AddDir( NULL, favs, path );
 	}
 	else if( id == 1001 )
 	{
@@ -612,6 +621,9 @@ void FavMenu_DisplayForTotalCmd( HWND hWndParent, int x, int y, HWND hwndClicked
 
 	if( id == 1000 )
 	{
+		CTotalCmdUtils tcUtils( FindTopTcWnd( true ) );
+
+		// determine TC current directory
 		TCHAR path[ MAX_PATH + 1 ] = _T("");
 		if( hwndClicked )
 		{
@@ -621,11 +633,22 @@ void FavMenu_DisplayForTotalCmd( HWND hWndParent, int x, int y, HWND hwndClicked
 		else
 		{
 			// Favmenu was not invoked by mouse - take path from TC commandline label.
-			CTotalCmdUtils tc( FindTopTcWnd( true ) );
-			tc.GetActiveDir( path, MAX_PATH );
+			tcUtils.GetActiveDir( path, MAX_PATH );
 		}
 		if( path[ 0 ] != 0 )
-			FavMenu_AddDir( favs, path );
+		{
+			// determine TC target directory
+			LPCTSTR pTargetPath = _T("");
+			TCHAR leftPath[ MAX_PATH + 1 ] = _T("");
+			TCHAR rightPath[ MAX_PATH + 1 ] = _T("");	
+			tcUtils.GetDirs( leftPath, MAX_PATH, rightPath, MAX_PATH );
+			if( _tcscmp( path, leftPath ) == 0 )
+				pTargetPath = rightPath;
+			else if( _tcscmp( path, rightPath ) == 0 )
+				pTargetPath = leftPath;
+				
+			FavMenu_AddDir( NULL, favs, path, pTargetPath );
+		}
 	}
 	else if( id == 1001 )
 	{

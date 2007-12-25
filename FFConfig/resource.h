@@ -5,6 +5,7 @@
 #define IDC_BTN_REVERT                  3
 #define IDC_EXPAND                      3
 #define IDOK2                           4
+#define IDC_EDIT_MENU                   4
 #define IDD_FFCONFIG_DIALOG             102
 #define IDD_FFCONFIG                    102
 #define IDR_MAINFRAME                   128
@@ -30,6 +31,7 @@
 #define IDR_FAVORITES_CONTEXTMENU       160
 #define IDD_PAGE_TOTALCMD               162
 #define IDD_PAGE_SHORTCUTS              163
+#define IDD_ADD_FAVORITE                166
 #define IDC_RD_INDIVIDUAL_PROFILES      1000
 #define IDC_RD_SHARED_PROFILE           1001
 #define IDC_ED_MAX_DIRHISTORY           1002
@@ -104,6 +106,9 @@
 #define IDC_BTN_CLEAR                   1086
 #define IDC_BTN_CHOOSEICON              1086
 #define IDC_LIST1                       1088
+#define IDC_CHK_SAVE_TARGETDIR          1090
+#define IDC_COMBO1                      1092
+#define IDC_CB_TITLE                    1092
 #define ID_FAVCONTEXT_NEWITEM           32771
 #define ID_FAVCONTEXT_NEWDIVIDER        32772
 #define ID_FAVCONTEXT_NEWSUBMENU        32773
@@ -116,9 +121,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        166
+#define _APS_NEXT_RESOURCE_VALUE        168
 #define _APS_NEXT_COMMAND_VALUE         32778
-#define _APS_NEXT_CONTROL_VALUE         1089
+#define _APS_NEXT_CONTROL_VALUE         1093
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif

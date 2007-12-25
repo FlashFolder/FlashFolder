@@ -104,6 +104,38 @@ int ComparePath( LPCTSTR path1, LPCTSTR path2 )
 
 //-----------------------------------------------------------------------------------------------
 
+LPCTSTR ExtractSubPath( LPCTSTR pPath, unsigned depth )
+{
+	if( depth == 0 )
+		return _T("");
+	int len = _tcslen( pPath );
+	if( len <= 2 )
+		return pPath;
+
+	// skip last char to avoid trailing backslash
+	LPCTSTR p = _tcsninc( pPath, len - 2 );
+
+	for(; p > pPath; p = _tcsdec( pPath, p ) )
+		if( _tcsncmp( p, _T("\\"), 1 ) == 0 && p - pPath >= 1 )
+			if( --depth == 0 )
+				break; 		
+	if( p > pPath )
+		return p + 1;
+	return pPath;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+bool HasTrailingBackslash( LPCTSTR pPath )
+{
+	if( pPath[ 0 ] == 0 )
+		return false;
+	LPCTSTR pLast = _tcsninc( pPath, _tcslen( pPath ) - 1 );
+	return _tcscmp( pLast, _T("\"") ) == 0;
+}
+
+//-----------------------------------------------------------------------------------------------
+
 void GetTempFilePath( LPTSTR pResult, LPCTSTR pPrefix )
 {
 	pResult[ 0 ] = 0;

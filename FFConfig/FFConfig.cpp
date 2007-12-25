@@ -22,6 +22,7 @@
 #include "FolderFavoritesDlg.h"
 #include "UpdateCheckDlg.h"
 #include "AboutDlg.h"
+#include "AddFavoriteDlg.h"
 #include "../common/ProfileDefaults.h"
 
 #ifdef _DEBUG
@@ -79,12 +80,26 @@ BOOL CFFConfigApp::InitInstance()
 	HWND hwndParent = NULL;
 	if( __argc > 1 )
 		hwndParent = reinterpret_cast<HWND>( _ttoi64( __targv[ 1 ] ) );
+	CWnd* pParent = hwndParent ? CWnd::FromHandle( hwndParent ) : NULL;		
 
-	enum 
+	enum DialogType 
 	{ 
-		DLG_CONFIG, DLG_FAVS, DLG_UPDATECHECK, DLG_ABOUT 
+		DLG_CONFIG, DLG_FAVS, DLG_UPDATECHECK, DLG_ABOUT, DLG_ADD_FAVORITE, DLG_COUNT_ 
 	} 
 	dlgType = DLG_CONFIG;
+
+    //Unique names to identify the mutex and the main window of the program.
+	// --> make sure that dialogs in .RC-file have the same CLASS name!
+	const TCHAR* appIDs[ DLG_COUNT_ ] = 
+	{
+		_T("FFConfig.xmgn4ngertu4mnsf"),
+		_T("FFFavorites.xmgn4ngertu4mnsf"),
+		_T("FFUpdateCheck.xmgn4ngertu4mnsf"),
+		_T("FFAbout.xmgn4ngertu4mnsf"),
+		_T("FFAddFavorite.xmgn4ngertu4mnsf")
+	};	
+	
+	CString addFavPath, addFavTargetPath;
 	
 	if( __argc > 2 )
 		if( _tcscmp( __targv[ 2 ], _T("--fav") ) == 0 )
@@ -93,30 +108,20 @@ BOOL CFFConfigApp::InitInstance()
 			dlgType = DLG_UPDATECHECK;
 		else if( _tcscmp( __targv[ 2 ], _T("--about") ) == 0 )
 			dlgType = DLG_ABOUT;
+		else if( _tcscmp( __targv[ 2 ], _T("--addfav") ) == 0 )
+		{
+			dlgType = DLG_ADD_FAVORITE;
+			if( __argc > 3 )
+				addFavPath = __targv[ 3 ];
+			if( __argc > 4 )
+				addFavTargetPath = __targv[ 4 ];
+		}
+
+	const TCHAR* pUniqueAppId = appIDs[ dlgType ];
+
 
 	//--- running application instance detection 
 	// Allow one instance for each dialog.
-	
-    //Unique name to identify the mutex and the main window of the program.
-
-	const TCHAR* pUniqueAppId = NULL;
-
-	switch( dlgType )
-	{
-		case DLG_CONFIG:
-			pUniqueAppId = _T("FFConfig.xmgn4ngertu4mnsf");
-			break;
-		case DLG_FAVS:
-			pUniqueAppId = _T("FFFavorites.xmgn4ngertu4mnsf");
-			break;
-		case DLG_UPDATECHECK:
-			pUniqueAppId = _T("FFUpdateCheck.xmgn4ngertu4mnsf");
-			break;
-		case DLG_ABOUT:
-			pUniqueAppId = _T("FFAbout.xmgn4ngertu4mnsf");
-			break;
-	}
-	// --> make sure that dialogs in .RC-file have correct CLASS name!
 
 	CHandle hMutex( ::CreateMutex( NULL, TRUE, pUniqueAppId ) );
 	if( ::GetLastError() == ERROR_ALREADY_EXISTS )
@@ -125,7 +130,6 @@ BOOL CFFConfigApp::InitInstance()
 		ActivateWindow( pUniqueAppId  );
 		return FALSE;
 	}	    
-
 
 	// Register the dialog class that is specified in the .rc-file
 	WNDCLASS wc = { 0 };
@@ -147,14 +151,14 @@ BOOL CFFConfigApp::InitInstance()
 	{
 		case DLG_CONFIG:
 		{
-			CFFConfigDlg dlg( hwndParent ? CWnd::FromHandle( hwndParent ) : NULL );
+			CFFConfigDlg dlg( pParent );
 			m_pMainWnd = &dlg;
 			dlg.DoModal();
 			break;
 		}
 		case DLG_FAVS:
 		{
-			CFolderFavoritesDlg dlg( hwndParent ? CWnd::FromHandle( hwndParent ) : NULL );
+			CFolderFavoritesDlg dlg( pParent );
 			m_pMainWnd = &dlg;
 			dlg.DoModal();
 			break;
@@ -170,11 +174,17 @@ BOOL CFFConfigApp::InitInstance()
 		}
 		case DLG_ABOUT:
 		{
-			CAboutDlg dlg( hwndParent ? CWnd::FromHandle( hwndParent ) : NULL );
+			CAboutDlg dlg( pParent );
 			m_pMainWnd = &dlg;
 			dlg.DoModal();
 			break;
 		}
+		case DLG_ADD_FAVORITE:
+		{
+			CAddFavoriteDlg dlg( pParent, addFavPath, addFavTargetPath );
+			m_pMainWnd = &dlg;
+			dlg.DoModal();			
+		}		
 	}
 
 	return FALSE;
