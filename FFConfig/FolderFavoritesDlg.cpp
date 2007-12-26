@@ -56,7 +56,7 @@ CString GetDefaultTitle( const CString& cmd )
 	tstring token, args;
 	SplitTcCommand( cmd, &token, &args );
 	if( CString( token.c_str() ).CompareNoCase( _T("cd") ) == 0 )
-		title = args.c_str();
+		title = ExtractSubPath( args.c_str() );
 	else
 		title = cmd;
 	if( title.IsEmpty() )
@@ -79,7 +79,7 @@ CFolderFavoritesDlg::CFolderFavoritesDlg(CWnd* pParent, int selectItemId )
 void CFolderFavoritesDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CResizableDlg::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_ED_TITLE, m_edTitle);
+	DDX_Control(pDX, IDC_CB_TITLE, m_cbTitle);
 	DDX_Control(pDX, IDC_ED_COMMAND, m_edPath);
 	DDX_Control(pDX, IDC_ED_TARGETPATH, m_edTargetPath);
 }
@@ -92,9 +92,9 @@ BEGIN_MESSAGE_MAP(CFolderFavoritesDlg, CResizableDlg)
 	ON_NOTIFY( TVN_SELCHANGED, IDC_LST_FAVS, OnTree_SelChanged )
 	ON_NOTIFY( CEditableTreeListCtrl::TVN_INSERTITEM, IDC_LST_FAVS, OnTree_InsertItem )
 	ON_NOTIFY( TVN_DELETEITEM, IDC_LST_FAVS, OnTree_DeleteItem )
-	ON_EN_CHANGE( IDC_ED_TITLE, OnEnChangeEdTitle )
 	ON_EN_CHANGE( IDC_ED_COMMAND, OnEnChangeEdCommand )
 	ON_EN_CHANGE( IDC_ED_TARGETPATH, OnEnChangeEdTargetPath )
+	ON_CBN_EDITCHANGE(IDC_CB_TITLE, &CFolderFavoritesDlg::OnCbnEditchangeCbTitle)
 	ON_BN_CLICKED( IDC_BTN_ADD, OnBnClickedBtnAdd )
 	ON_BN_CLICKED( IDC_BTN_ADD_DIVIDER, OnBnClickedBtnAddDivider )
 	ON_BN_CLICKED( IDC_BTN_ADD_SUBMENU, OnBnClickedBtnAddSubmenu )
@@ -103,6 +103,7 @@ BEGIN_MESSAGE_MAP(CFolderFavoritesDlg, CResizableDlg)
 	ON_BN_CLICKED(IDC_BTN_TARGETBROWSE, OnBnClickedBtnTargetbrowse)
 	ON_BN_CLICKED(IDC_BTN_REVERT, OnBnClickedBtnRevert)
 	ON_WM_CONTEXTMENU()
+	ON_CBN_SELENDOK(IDC_CB_TITLE, &CFolderFavoritesDlg::OnCbnSelendokCbTitle)
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
@@ -125,6 +126,9 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 
 	::SHAutoComplete( m_edPath, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
 	::SHAutoComplete( m_edTargetPath, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
+	
+	CWnd* pTitleEdit = m_cbTitle.GetWindow( GW_CHILD );
+	m_edTitle.SubclassWindow( *pTitleEdit );
 
 	//--- Create and populate tree control
 	
@@ -165,7 +169,7 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	Anchor( IDC_ST_TITLE, ANCHOR_BOTTOMLEFT );
 	Anchor( IDC_ST_PATH, ANCHOR_BOTTOMLEFT );
 	Anchor( IDC_ST_TARGETPATH, ANCHOR_BOTTOMLEFT );
-	Anchor( IDC_ED_TITLE, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
+	Anchor( IDC_CB_TITLE, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
 	Anchor( IDC_ED_COMMAND, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
 	Anchor( IDC_ED_TARGETPATH, ANCHOR_BOTTOMLEFT | ANCHOR_RIGHT );
 	Anchor( IDC_BTN_BROWSE, ANCHOR_BOTTOMRIGHT );
@@ -448,7 +452,7 @@ void CFolderFavoritesDlg::UpdateSelItemEditControls()
 	{
 		// clear edit controls without updating tree
 		HTREEITEM oldSel = m_hSelItem; m_hSelItem = NULL;
-		SetDlgItemText( IDC_ED_TITLE, _T("") );
+		SetDlgItemText( IDC_CB_TITLE, _T("") );
 		SetDlgItemText( IDC_ED_COMMAND, _T("") );
 		SetDlgItemText( IDC_ED_TARGETPATH, _T("") );
 		m_edTitle.SetHintText( _T("") );
@@ -475,7 +479,7 @@ void CFolderFavoritesDlg::UpdateSelItemEditControls()
 		m_edTitle.SetHintText( title );
 		title = _T("");
 	}
-	SetDlgItemText( IDC_ED_TITLE, title );
+	SetDlgItemText( IDC_CB_TITLE, title );
 
 	SetDlgItemText( IDC_ED_COMMAND, command );
 	SetDlgItemText( IDC_ED_TARGETPATH, targetPath );
@@ -518,7 +522,7 @@ void CFolderFavoritesDlg::OnTree_SelChanged( NMHDR *pNMHDR, LRESULT *pResult )
 		}
 		
 		EnableDlgItem( *this, IDC_BTN_REMOVE, bBtnRemove );
-		EnableDlgItem( *this, IDC_ED_TITLE, bEdTitle );
+		EnableDlgItem( *this, IDC_CB_TITLE, bEdTitle );
 		EnableDlgItem( *this, IDC_ED_COMMAND, bCommandAndTarget );
 		EnableDlgItem( *this, IDC_BTN_BROWSE, bCommandAndTarget );
 		EnableDlgItem( *this, IDC_ED_TARGETPATH, bCommandAndTarget );
@@ -548,10 +552,10 @@ void CFolderFavoritesDlg::OnTree_DeleteItem( NMHDR *pNMHDR, LRESULT *pResult )
 
 //-----------------------------------------------------------------------------------------------
 
-void CFolderFavoritesDlg::OnEnChangeEdTitle()
+void CFolderFavoritesDlg::OnCbnEditchangeCbTitle()
 {
 	CString title;
-	GetDlgItemText( IDC_ED_TITLE, title );
+	m_edTitle.GetWindowText( title );
 
 	// set default title
 	CString cmd;
@@ -572,6 +576,18 @@ void CFolderFavoritesDlg::OnEnChangeEdTitle()
 	}
 }
 
+void CFolderFavoritesDlg::OnCbnSelendokCbTitle()
+{
+	CString title; 
+	int sel = m_cbTitle.GetCurSel();
+	if( sel != CB_ERR )
+	{
+		m_cbTitle.GetLBText( sel, title );
+		m_edTitle.SetWindowText( title ); 
+		OnCbnEditchangeCbTitle();
+	}
+}
+
 void CFolderFavoritesDlg::OnEnChangeEdCommand()
 {
 	CString cmd;
@@ -581,11 +597,13 @@ void CFolderFavoritesDlg::OnEnChangeEdCommand()
 	// set default title
 	CString title = GetDefaultTitle( cmd );
 	m_edTitle.SetHintText( title );
+	
+	UpdateTitleSuggestions();
 
 	// update current list item
 	if( m_hSelItem )
 	{
-		if( GetDlgItem( IDC_ED_TITLE )->GetWindowTextLength() == 0 )
+		if( GetDlgItem( IDC_CB_TITLE )->GetWindowTextLength() == 0 )
 			m_tree.SetItemText( m_hSelItem, COL_TITLE, title );
 
 		m_tree.SetItemText( m_hSelItem, COL_COMMAND, cmd );
@@ -605,6 +623,35 @@ void CFolderFavoritesDlg::OnEnChangeEdTargetPath()
 		m_tree.SetItemText( m_hSelItem, COL_TARGETPATH, path );
 
 		EnableDlgItem( *this, IDC_BTN_REVERT );
+	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CFolderFavoritesDlg::UpdateTitleSuggestions()
+{
+	// Create title suggestions for dropdown-list of title combobox based on current command
+
+	CString title; m_cbTitle.GetWindowText( title );
+	m_cbTitle.ResetContent();
+	m_cbTitle.SetWindowText( title );
+	
+	CString cmd; GetDlgItemText( IDC_ED_COMMAND, cmd );
+	tstring token, args;
+	SplitTcCommand( cmd, &token, &args );
+	if( CString( token.c_str() ).CompareNoCase( _T("cd") ) == 0 )
+	{
+		CString sub1 = ExtractSubPath( args.c_str() );
+		m_cbTitle.AddString( sub1 );
+		CString sub2 = ExtractSubPath( args.c_str(), 2 );
+		if( sub2 != sub1 )
+			m_cbTitle.AddString( sub2 );
+		if( args.c_str() != sub2 )
+			m_cbTitle.AddString( args.c_str() );
+	}
+	else
+	{
+		m_cbTitle.AddString( cmd );
 	}
 }
 

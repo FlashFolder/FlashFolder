@@ -35,7 +35,6 @@ private:
 	afx_msg void OnTree_SelChanged(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTree_InsertItem(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTree_DeleteItem(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnEnChangeEdTitle();
 	afx_msg void OnEnChangeEdCommand();
 	afx_msg void OnEnChangeEdTargetPath();
 	afx_msg void OnEnChangeEdIconPath();
@@ -48,6 +47,8 @@ private:
 	afx_msg void OnBnClickedBtnTargetbrowse();
 	afx_msg void OnBnClickedBtnRevert();
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point );
+	afx_msg void OnCbnEditchangeCbTitle();	
+	afx_msg void OnCbnSelendokCbTitle();
 	DECLARE_MESSAGE_MAP()
 
 	void LoadFavorites();
@@ -58,12 +59,15 @@ private:
 
 	void UpdateSelItemEditControls();
 	void SaveDialogSize();
+	
+	void UpdateTitleSuggestions();
 
 	CEditableTreeListCtrl m_tree;
 
 	CCacheImageList m_treeIcons;
 
 	CEditEx m_edTitle;
+	CComboBox m_cbTitle;
 	CEditEx m_edPath;
 	CEditEx m_edTargetPath;
 
