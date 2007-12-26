@@ -146,27 +146,6 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
     return TRUE;
 }
 
-//-----------------------------------------------------------------------------------------------
-// Make sure the DLL gets not unloaded as long as the window is subclassed.
-// This can occur if the FlashFolder service stops while a file dialog is open.
-// Intentionally there is no balancing FreeLibrary() call since I couldn't find
-// a good place to call it. 
-
-void MakeSureDllKeepsLoaded()
-{
-	// TEST whether not loading DLL make upgrade installs more stable (issue #1763646)
-	return;
-
-	static bool s_isLoaded = false;
-	if( s_isLoaded )
-		return;
-	s_isLoaded = true;
-
-	TCHAR dllPath[ MAX_PATH + 1 ];
-	::GetModuleFileName( (HMODULE) g_hInstDll, dllPath, MAX_PATH ); 
-	::LoadLibrary( dllPath );
-}
-
 //-----------------------------------------------------------------------------------------
 
 void AdjustToolWindowPos()
@@ -1479,8 +1458,6 @@ LRESULT CALLBACK Hook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
 				break;
 			}
 
-			MakeSureDllKeepsLoaded();
-
 			return 0;
 		}
 	}
@@ -1522,9 +1499,6 @@ LRESULT CALLBACK Hook_Mouse( int nCode, WPARAM wParam, LPARAM lParam )
                     if( g_profile.GetInt( _T("TotalCmd"), _T("EnableHook") ) != 0 )
 					{
 						g_hwndTcFavmenuClick = pmh->hwnd;
-						
-						// Keep DLL loaded to keep g_hwndTcFavmenuClick in memory.
-						MakeSureDllKeepsLoaded();
 					}
 				}
 			}
