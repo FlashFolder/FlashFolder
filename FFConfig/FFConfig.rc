@@ -302,9 +302,9 @@ BEGIN
     LTEXT           "&Enter new menu item title or choose one from below:",IDC_STATIC,7,7,170,8
     COMBOBOX        IDC_CB_TITLE,7,18,275,46,CBS_SIMPLE | WS_VSCROLL | WS_TABSTOP
     CONTROL         "&Save target directory",IDC_CHK_SAVE_TARGETDIR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,63,85,10
-    DEFPUSHBUTTON   "OK",IDOK,177,72,50,14
+    DEFPUSHBUTTON   "OK",IDOK,107,72,50,14
+    PUSHBUTTON      "OK -> Edit &menu",IDC_EDIT_MENU,162,72,65,14
     PUSHBUTTON      "Cancel",IDCANCEL,232,72,50,14
-    PUSHBUTTON      "Edit &menu",IDC_EDIT_MENU,122,72,50,14
 END
 
 
