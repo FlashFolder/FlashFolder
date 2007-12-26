@@ -570,7 +570,7 @@ void FavMenu_DisplayForFileDialog()
 	{
 		TCHAR path[ MAX_PATH + 1 ];
 		if( g_spFileDlgHook->GetFolder( path ) )
-			FavMenu_AddDir( NULL, favs, path );
+			FavMenu_AddDir( g_hFileDialog, favs, path );
 	}
 	else if( id == 1001 )
 	{
