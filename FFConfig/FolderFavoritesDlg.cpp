@@ -66,10 +66,12 @@ CString GetDefaultTitle( const CString& cmd )
 
 //-----------------------------------------------------------------------------------------------
 
-CFolderFavoritesDlg::CFolderFavoritesDlg(CWnd* pParent /*=NULL*/)
+CFolderFavoritesDlg::CFolderFavoritesDlg(CWnd* pParent, int selectItemId )
 	: CResizableDlg(CFolderFavoritesDlg::IDD, pParent),
 	m_hSelItem( NULL ),
-	m_isOwned( pParent ? true : false )
+	m_isOwned( pParent ? true : false ),
+	m_selectItemId( selectItemId ),
+	m_selectTreeItem( NULL )
 {}
 
 //-----------------------------------------------------------------------------------------------
@@ -123,7 +125,6 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 
 	::SHAutoComplete( m_edPath, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
 	::SHAutoComplete( m_edTargetPath, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
-	::SHAutoComplete( m_edIconPath, SHACF_FILESYSTEM | SHACF_AUTOSUGGEST_FORCE_ON );
 
 	//--- Create and populate tree control
 	
@@ -181,6 +182,12 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	int height = MapProfileY( *this, g_profile.GetInt( _T("main"), _T("FavoritesDlgHeight") ) );
 
 	SetWindowPos( NULL, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE );
+
+	if( m_selectTreeItem )
+	{
+		m_tree.GetTree().EnsureVisible( m_selectTreeItem );
+		m_tree.GetTree().Select( m_selectTreeItem, TVGN_CARET );
+	}
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -255,6 +262,9 @@ void CFolderFavoritesDlg::LoadFavorites_worker(
 			hItem = m_tree.InsertItem( fav.title.c_str(), 1, 1, hParent, hInsertAfter );
 			m_tree.SetItemText( hItem, COL_COMMAND, fav.command.c_str() );
 			m_tree.SetItemText( hItem, COL_TARGETPATH, fav.targetpath.c_str() );
+			
+			if( iItem == m_selectItemId )
+				m_selectTreeItem = hItem;
 
 			++iItem;
 		}

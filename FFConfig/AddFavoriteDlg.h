@@ -24,12 +24,17 @@ class CAddFavoriteDlg : public CDialog
 
 public:
 	CAddFavoriteDlg( CWnd* pParent, const CString& path, const CString& targetPath = _T("") );
-
+	
+	int GetNewItemId() const { return m_newItemId; }
+	
 	enum { IDD = IDD_ADD_FAVORITE };
+	enum { ID_EDITMENU = 0x100 };
 
 private:
 	virtual void DoDataExchange(CDataExchange* pDX);    
 	virtual BOOL OnInitDialog();
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedEditMenu();
 	DECLARE_MESSAGE_MAP()
 	
 	bool Save();
@@ -37,7 +42,5 @@ private:
 private:
 	CString m_path, m_targetPath;
 	CComboBox m_cbTitle;
-public:
-	afx_msg void OnBnClickedOk();
-	afx_msg void OnBnClickedEditMenu();
+	int m_newItemId;
 };

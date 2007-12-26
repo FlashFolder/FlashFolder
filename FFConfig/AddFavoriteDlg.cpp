@@ -32,7 +32,8 @@ IMPLEMENT_DYNAMIC(CAddFavoriteDlg, CDialog)
 CAddFavoriteDlg::CAddFavoriteDlg( CWnd* pParent, const CString& path, const CString& targetPath )
 	: CDialog(CAddFavoriteDlg::IDD, pParent),
 	m_path( path ), 
-	m_targetPath( targetPath )
+	m_targetPath( targetPath ),
+	m_newItemId( -1 )
 {}
 
 //-----------------------------------------------------------------------------------------------
@@ -87,7 +88,7 @@ bool CAddFavoriteDlg::Save()
 	if( duplicateItemId != -1 )
 	{
 		int res = CMessageBoxEx::Show( *this,  
-			_T("There already exists a favorites item with this path.\n\n")
+			_T("There already exists a favorites item with the same folder path.\n\n")
 			_T("You can choose to either replace the existing item or continue to add the duplicate item."), 
 			_T("Duplicate Favorites Item"),
 			3, 3, IDI_WARNING,
@@ -111,7 +112,9 @@ bool CAddFavoriteDlg::Save()
 	if( IsDlgButtonChecked( IDC_CHK_SAVE_TARGETDIR ) == 1 )
 		item.targetpath = m_targetPath.GetString();
 	favs.push_back( item );
-
+	
+	m_newItemId = favs.size() - 1 ;
+	
 	SetDirFavorites( favs );
 
 	return true;	
@@ -130,10 +133,5 @@ void CAddFavoriteDlg::OnBnClickedOk()
 void CAddFavoriteDlg::OnBnClickedEditMenu()
 {
 	if( Save() )
-	{	
-		CFolderFavoritesDlg dlg( this );
-		dlg.DoModal();	
-		
-		EndDialog( IDOK );		
-	}
+		EndDialog( ID_EDITMENU );		
 }

@@ -100,10 +100,15 @@ BOOL CFFConfigApp::InitInstance()
 	};	
 	
 	CString addFavPath, addFavTargetPath;
-	
+	int favSelectItem = -1;
+		
 	if( __argc > 2 )
 		if( _tcscmp( __targv[ 2 ], _T("--fav") ) == 0 )
+		{
 			dlgType = DLG_FAVS;
+			if( __argc > 3 )
+				favSelectItem = _ttoi( __targv[ 3 ] );
+		}
 		else if( _tcscmp( __targv[ 2 ], _T("--updatecheck") ) == 0 )
 			dlgType = DLG_UPDATECHECK;
 		else if( _tcscmp( __targv[ 2 ], _T("--about") ) == 0 )
@@ -120,8 +125,8 @@ BOOL CFFConfigApp::InitInstance()
 	const TCHAR* pUniqueAppId = appIDs[ dlgType ];
 
 
-	//--- running application instance detection 
-	// Allow one instance for each dialog.
+	//--- Detect instance of already running process. 
+	// Allow one instance for each dialog class.
 
 	CHandle hMutex( ::CreateMutex( NULL, TRUE, pUniqueAppId ) );
 	if( ::GetLastError() == ERROR_ALREADY_EXISTS )
@@ -144,7 +149,7 @@ BOOL CFFConfigApp::InitInstance()
 	// intialize default profile settings
 	GetProfileDefaults( &g_profileDefaults );
 	g_profile.SetDefaults( &g_profileDefaults );
-
+	
 	// By specifying the handle of the parent window, dialogs of FFConfig behave like modal dialogs to
 	// the program where FlashFolder toolbar is currently attached to.
 	switch( dlgType )
@@ -158,7 +163,7 @@ BOOL CFFConfigApp::InitInstance()
 		}
 		case DLG_FAVS:
 		{
-			CFolderFavoritesDlg dlg( pParent );
+			CFolderFavoritesDlg dlg( pParent, favSelectItem );
 			m_pMainWnd = &dlg;
 			dlg.DoModal();
 			break;
@@ -183,7 +188,13 @@ BOOL CFFConfigApp::InitInstance()
 		{
 			CAddFavoriteDlg dlg( pParent, addFavPath, addFavTargetPath );
 			m_pMainWnd = &dlg;
-			dlg.DoModal();			
+			if( dlg.DoModal() == CAddFavoriteDlg::ID_EDITMENU )
+			{
+				TCHAR appPath[ MAX_PATH + 1 ]; ::GetModuleFileName( NULL, appPath, MAX_PATH );
+				CString params; params.Format( _T("0 --fav %d"), dlg.GetNewItemId() );
+				::ShellExecute( NULL, _T("open"), appPath, params, NULL, SW_SHOW );			
+			}	
+			break;
 		}		
 	}
 

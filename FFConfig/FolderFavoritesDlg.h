@@ -23,7 +23,7 @@
 class CFolderFavoritesDlg : public CResizableDlg
 {
 public:
-	CFolderFavoritesDlg(CWnd* pParent = NULL);   
+	CFolderFavoritesDlg(CWnd* pParent = NULL, int selectItemId = -1 );   
 
 	enum { IDD = IDD_FAVORITES };
 
@@ -66,7 +66,6 @@ private:
 	CEditEx m_edTitle;
 	CEditEx m_edPath;
 	CEditEx m_edTargetPath;
-	CEditEx m_edIconPath;
 
 	HTREEITEM m_hSelItem;
 
@@ -76,4 +75,7 @@ private:
 	stdext::hash_map< CString, int > m_iconIDs;
 
 	bool m_isOwned;
+	
+	int m_selectItemId;
+	HTREEITEM m_selectTreeItem;
 };
