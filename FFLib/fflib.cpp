@@ -327,6 +327,11 @@ void DisplayMenu_OpenDirs()
 		}
 		::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
 	}
+	
+	//--- get system directories to filter out system pathes
+	
+	TCHAR winDir[ MAX_PATH + 1 ];
+	::GetWindowsDirectory( winDir, MAX_PATH );
 
     //--- allocate buffers for return data of NT kernel APIs
 
@@ -378,12 +383,16 @@ void DisplayMenu_OpenDirs()
         if( ! MapNtFilePathToUserPath( filepath, MAX_PATH, nameBuf.Get()->ObjectName.Buffer ) )
             continue;
 
+		//--- filter out system pathes
+		if( ::PathIsSameRoot( winDir, filepath ) )
+			continue;
+
         //--- if its not a directory, extract dir ---
         if( ! bIsDir )
         {
             WCHAR* p = wcsrchr( filepath, _T('\\') );
             if( p ) *p = 0;
-        }
+        } 
 
         // add the directory path - the set eleminates duplicates
         if( _tcsicmp( filepath, g_currentExeDir ) != 0 )

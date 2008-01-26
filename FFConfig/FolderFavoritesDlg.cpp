@@ -623,20 +623,19 @@ void CFolderFavoritesDlg::UpdateTitleSuggestions()
 	CString cmd; GetDlgItemText( IDC_ED_COMMAND, cmd );
 	tstring token, args;
 	SplitTcCommand( cmd, &token, &args );
+	CString path;
 	if( CString( token.c_str() ).CompareNoCase( _T("cd") ) == 0 )
-	{
-		CString sub1 = ExtractSubPath( args.c_str() );
-		m_cbTitle.AddString( sub1 );
-		CString sub2 = ExtractSubPath( args.c_str(), 2 );
-		if( sub2 != sub1 )
-			m_cbTitle.AddString( sub2 );
-		if( args.c_str() != sub2 )
-			m_cbTitle.AddString( args.c_str() );
-	}
+		path = args.c_str();
 	else
-	{
-		m_cbTitle.AddString( cmd );
-	}
+		path = cmd;
+		
+	CString sub1 = ExtractSubPath( path );
+	m_cbTitle.AddString( sub1 );
+	CString sub2 = ExtractSubPath( path, 2 );
+	if( sub2 != sub1 )
+		m_cbTitle.AddString( sub2 );
+	if( path != sub2 )
+		m_cbTitle.AddString( path );
 }
 
 //-----------------------------------------------------------------------------------------------
