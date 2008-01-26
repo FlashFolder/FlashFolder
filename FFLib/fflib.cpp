@@ -35,7 +35,6 @@
 #include "MsoFileDlgHook.h"
 #include "CmnOpenWithDlgHook.h"
 #include "CmnFolderDlgHook.h"
-#include "TotalCmdHook.h"
 #include "../common/ProfileDefaults.h"
 
 using namespace NT;
@@ -48,7 +47,6 @@ using namespace std;
 #pragma data_seg( ".shared" )
 
 HHOOK g_hHook = NULL;            // handle of the "window activate" hook
-HHOOK g_hMouseHook = NULL;       // handle of the mouse hook
 
 #pragma data_seg()
 #pragma comment( linker, "/SECTION:.shared,RWS" )
@@ -61,7 +59,6 @@ HWND g_hFileDialog = NULL;				// handle of file open/save dialog
 
 auto_ptr<FileDlgHook_base> g_spFileDlgHook;       // ptr to the hook instance
 auto_ptr<FileDlgHook_base> g_spOpenWithDlgHook;   // ptr to the hook instance
-auto_ptr<TotalCmdHook> g_spTotalCmdHook;          // ptr to the hook instance
 
 HWND g_hToolWnd = NULL;					// handle of cool external tool window
 WNDPROC g_wndProcToolWindowEditPath;
@@ -77,8 +74,6 @@ WORD g_osVersion = 0;
 TCHAR g_currentExePath[ MAX_PATH + 1 ] = _T("");
 LPCTSTR g_currentExeName = _T("");
 TCHAR g_currentExeDir[ MAX_PATH + 1 ] = _T("");
-
-HWND g_hwndTcFavmenuClick = NULL;
 
 vector<ATOM> g_hotkeyAtoms;              // unique identifiers of assigned hotkeys
 
@@ -575,78 +570,6 @@ void FavMenu_DisplayForFileDialog()
 	}		
 
 	SetForegroundWindow( g_hFileDialog );
-}
-
-//-----------------------------------------------------------------------------------------------
-// Show the FlashFolder favorites menu inside Total Commander. To be invoked in the context of
-// the GUI thread of the TC process.
-
-void FavMenu_DisplayForTotalCmd( HWND hWndParent, int x, int y, HWND hwndClicked )
-{
-	//--- show favmenu
-
-	FavoritesList favs;
-	GetDirFavorites( &favs );
-
-	int id = FavMenu_Display( hWndParent, x, y, favs );
-
-	//--- execute selected command
-
-	if( id == 1000 )
-	{
-		CTotalCmdUtils tcUtils( FindTopTcWnd( true ) );
-
-		// determine TC current directory
-		TCHAR path[ MAX_PATH + 1 ] = _T("");
-		if( hwndClicked )
-		{
-			// Favmenu was invoked by mouse - take path from clicked TC path control.
-			GetPathFromTcControl( hwndClicked, path, MAX_PATH );
-		}
-		else
-		{
-			// Favmenu was not invoked by mouse - take path from TC commandline label.
-			tcUtils.GetActiveDir( path, MAX_PATH );
-		}
-		if( path[ 0 ] != 0 )
-		{
-			// determine TC target directory
-			LPCTSTR pTargetPath = _T("");
-			TCHAR leftPath[ MAX_PATH + 1 ] = _T("");
-			TCHAR rightPath[ MAX_PATH + 1 ] = _T("");	
-			tcUtils.GetDirs( leftPath, MAX_PATH, rightPath, MAX_PATH );
-			if( _tcscmp( path, leftPath ) == 0 )
-				pTargetPath = rightPath;
-			else if( _tcscmp( path, rightPath ) == 0 )
-				pTargetPath = leftPath;
-				
-			FavMenu_AddDir( NULL, favs, path, pTargetPath );
-		}
-	}
-	else if( id == 1001 )
-	{
-		FavMenu_StartEditor( NULL );
-	}
-	else if( id > 0 )
-	{
-		//--- execute favorites menu item
-
-		const FavoritesItem& fav = favs[ id - 1 ];
-
-		tstring path;
-		tstring token, args;
-		SplitTcCommand( fav.command.c_str(), &token, &args );
-
-		if( _tcsicmp( token.c_str(), _T("cd") ) == 0 )
-			path = args;
-		else if( IsFilePath( fav.command.c_str() ) )
-			path = fav.command;
-
-		if( ! path.empty() )
-			if( DirectoryExists( path.c_str() ) )
-				SetTcCurrentPathesW( FindTopTcWnd( true ), 
-					path.c_str(), fav.targetpath.c_str(), STC_SOURCE_AND_TARGET );
-	}	
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -1300,43 +1223,6 @@ bool IsCurrentProgramEnabledForDialog( FileDlgType fileDlgType )
 	return true;
 }
 
-//----------------------------------------------------------------------------------------------------
-// Message-only temporary window for delayed creation of favmenu.
-
-LPCTSTR TCFAVMENU_TEMP_WNDCLASS = _T("{D3772EFE-1491-4992-987E-CCE970231A99}");
-
-LRESULT CALLBACK TempWindowForTcFavmenu_Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
-{
-	if( uMsg == WM_APP )
-	{
-		DebugOut( _T("TempWindowForTcFavmenu_Proc\n") );
-
-		POINT pt; ::GetCursorPos( &pt );
-		HWND hTC = (HWND) ::GetProp( hwnd, _T("HWND_TC") );
-		HWND hClick = (HWND) ::GetProp( hwnd, _T("HWND_CLICK") );
-
-		FavMenu_DisplayForTotalCmd( hTC, pt.x, pt.y, hClick );
-
-		::RemoveProp( hwnd, _T("HWND_TC") );
-		::RemoveProp( hwnd, _T("HWND_CLICK") );
-		::DestroyWindow( hwnd );
-		if( ! ::UnregisterClass( TCFAVMENU_TEMP_WNDCLASS, g_hInstDll ) )
-			DebugOut( _T("Failed to unregister class\n") );
-		return 0;
-	}
-	return ::DefWindowProc( hwnd, uMsg, wParam, lParam );	
-}
-
-HWND CreateTempWindowForTcFavmenu()
-{
-	WNDCLASS wc = { 0 };
-	wc.lpszClassName = TCFAVMENU_TEMP_WNDCLASS;
-	wc.hInstance = g_hInstDll;
-	wc.lpfnWndProc = TempWindowForTcFavmenu_Proc;
-	::RegisterClass( &wc );
-	return ::CreateWindow( TCFAVMENU_TEMP_WNDCLASS, _T(""), 0, 0, 0, 0, 0, NULL, NULL, g_hInstDll, NULL );
-}
-
 //-----------------------------------------------------------------------------------------
 // This function gets called in the context of the hooked process.
 
@@ -1344,68 +1230,8 @@ LRESULT CALLBACK Hook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
 {
 	HWND hwnd = reinterpret_cast<HWND>( wParam );
 
-	if( nCode == HCBT_CREATEWND )
-	{
-		CBT_CREATEWND* pcb = reinterpret_cast<CBT_CREATEWND*>( lParam );
-
-		// If in the context of TC process and a left/right path control was doubleclicked
-		// before, replace TC favmenu with custom menu (also see Hook_Mouse()).
-		if( g_hwndTcFavmenuClick && 
-			_tcsicmp( g_currentExeName, _T("totalcmd.exe") ) == 0 )
-		{
-			TCHAR className[ 256 ] = _T("");
-			::GetClassName( hwnd, className, 255 );
-			if( _tcscmp( className, _T("#32768") ) == 0 )
-			{
-				if( HWND hTC = FindTopTcWnd( true ) )
-				{
-					DebugOut( _T("TC favmenu\n") );
-
-					// Suppress original TC favmenu (just removing WS_VISIBLE style / ShowWindow() 
-					// would not work)
-					::SetWindowRgn( hwnd, ::CreateRectRgn( 0, 0, 0, 0 ), FALSE );
-					::PostMessage( hTC, WM_CANCELMODE, 0, 0 );
-
-					// Displaying the menu directly doesn't work well - mouse clicks can still get trapped
-					// by TC's menu. So delay menu creation until TC has processed WM_CANCELMODE.
-					if( HWND hwndTemp = CreateTempWindowForTcFavmenu() )
-					{
-						DebugOut( _T("Temp. window created\n") );
-						::SetProp( hwndTemp, _T("HWND_TC"), (HANDLE) hTC );
-						::SetProp( hwndTemp, _T("HWND_CLICK"), (HANDLE) g_hwndTcFavmenuClick );
-						::PostMessage( hwndTemp, WM_APP, 0, 0 );
-					}
-
-					g_hwndTcFavmenuClick = NULL;
-				}
-			}
-		}
-
-		return CallNextHookEx( g_hHook, nCode, wParam, lParam );
-	}
-
 	if( nCode == HCBT_ACTIVATE )
 	{
-		// Check whether a TotalCmd main window needs to be hooked.
-		if( ! g_spTotalCmdHook.get() && _tcsicmp( g_currentExeName, _T("totalcmd.exe") ) == 0 )
-		{
-			TCHAR wndClass[ 64 ] = _T(""); 
-			::GetClassName( hwnd, wndClass, sizeof(wndClass) / sizeof(TCHAR) - 1 );
-			if( _tcscmp( wndClass, _T("TTOTAL_CMD") ) == 0 )
-			{
-				if( g_profileDefaults.IsEmpty() )
-				{
-					GetProfileDefaults( &g_profileDefaults );
-					g_profile.SetRoot( _T("zett42\\FlashFolder") );
-					g_profile.SetDefaults( &g_profileDefaults );
-				}
-                if( g_profile.GetInt( _T("TotalCmd"), _T("EnableHook") ) != 0 )
-					g_spTotalCmdHook.reset( new TotalCmdHook( hwnd ) );
-						
-				return CallNextHookEx( g_hHook, nCode, wParam, lParam );
-			}
-		}
-
 		// Check whether a file dialog must be hooked.
 		// For now, we can only handle one running file dialog per application, but
 		// this should be enough in nearly all cases.
@@ -1475,47 +1301,6 @@ LRESULT CALLBACK Hook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
    	return CallNextHookEx( g_hHook, nCode, wParam, lParam );
 }
 
-//-----------------------------------------------------------------------------------------------
-// This function gets called in the context of the hooked process.
-
-LRESULT CALLBACK Hook_Mouse( int nCode, WPARAM wParam, LPARAM lParam )
-{
-	if( nCode < 0 )
-		return ::CallNextHookEx( g_hMouseHook, nCode, wParam, lParam );
-
-	if( nCode == HC_ACTION )
-	{
-		MOUSEHOOKSTRUCT* pmh = reinterpret_cast<MOUSEHOOKSTRUCT*>( lParam );
-	
-		// Check if this is a doubleclick in the TC path control. Remember this for the next
-		// time a popup menu is created.
-
-		if( wParam == WM_LBUTTONDBLCLK )
-		{
-			if( _tcsicmp( g_currentExeName, _T("totalcmd.exe") ) == 0 )
-			{			
-				g_hwndTcFavmenuClick = NULL;
-
-				if( IsTcPathControl( pmh->hwnd ) &&
-                    ! IsCtrlKeyPressed() )
-				{
-					if( g_profileDefaults.IsEmpty() )
-					{
-						GetProfileDefaults( &g_profileDefaults );
-						g_profile.SetRoot( _T("zett42\\FlashFolder") );
-						g_profile.SetDefaults( &g_profileDefaults );
-					}
-                    if( g_profile.GetInt( _T("TotalCmd"), _T("EnableHook") ) != 0 )
-					{
-						g_hwndTcFavmenuClick = pmh->hwnd;
-					}
-				}
-			}
-		}
-	}
-
-	return ::CallNextHookEx( g_hMouseHook, nCode, wParam, lParam );
-}
 
 //=========================================================================================
 //  Installation / Deinstallation Functions (DLL-Export)
@@ -1537,11 +1322,10 @@ DLLFUNC bool InstallHook()
 
         // Install the hook
 		g_hHook = ::SetWindowsHookEx( WH_CBT, Hook_CBT, g_hInstDll, 0 );
-		g_hMouseHook = ::SetWindowsHookEx( WH_MOUSE, Hook_Mouse, g_hInstDll, 0 );
 
 		TCHAR s[256]; 
 		StringCbPrintf( s, sizeof(s), 
-			_T("[fflib] g_hHook = %08Xh, g_hMouseHook = %08Xh\n"), g_hHook, g_hMouseHook );
+			_T("[fflib] g_hHook = %08Xh\n"), g_hHook );
 		::OutputDebugString( s );
 
 		return g_hHook != NULL;
@@ -1564,14 +1348,5 @@ DLLFUNC bool UninstallHook()
 			g_hHook = NULL;
     }
 
-	if( g_hMouseHook != NULL )
-    {
-		TCHAR s[256]; StringCbPrintf( s, sizeof(s), _T("[fflib] removing WH_MOUSE hook %08Xh...\n"), g_hMouseHook );
-		::OutputDebugString( s );
-
-		if( ::UnhookWindowsHookEx( g_hMouseHook ) )
-			g_hMouseHook = NULL;
-    }
-
-	return ! g_hHook && ! g_hMouseHook;
+	return ! g_hHook;
 }

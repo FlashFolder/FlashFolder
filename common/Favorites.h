@@ -22,13 +22,19 @@ struct FavoritesItem
 {
 	tstring command;      ///< file path or TC command (required)
 	tstring title;        ///< menu item title
-	tstring targetpath;   ///< target path for TC
-	tstring iconPath;     ///< path to icon + "," + iconId 
+	tstring targetpath;   ///< unused, round-trip data from TC
 };
 
 typedef std::vector<FavoritesItem> FavoritesList;
 
-void GetDirFavorites( FavoritesList* pList );
-void SetDirFavorites( const FavoritesList& list );
+enum DirFavoritesSrc
+{
+	DFS_DEFAULT,
+	DFS_FLASHFOLDER,
+	DFS_TOTALCMD
+};
+
+void GetDirFavorites( FavoritesList* pList, DirFavoritesSrc source = DFS_DEFAULT );
+void SetDirFavorites( const FavoritesList& list, DirFavoritesSrc source = DFS_DEFAULT );
 
 int GetFavItemByPath( const FavoritesList& favs, LPCTSTR pPath, LPCTSTR pTargetPath = NULL );

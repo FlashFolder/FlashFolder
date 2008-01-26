@@ -90,11 +90,11 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "Total Commander Integration"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "&Enable Total Commander® integration",IDC_CHK_ENABLE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,139,10
-    LTEXT           "If this option is enabled, the FlashFolder favorites menu replaces Total Commander's own directory menu when you double-click the path field above the left or right directory panel.",IDC_STATIC,18,28,205,35
-    LTEXT           "You can still open the TC directory menu by using Ctrl+Doubleclick, by pressing the appropriate TC shortcut key or by clicking the TC directory menu button.",IDC_STATIC,18,65,205,30
+    CONTROL         "&Share Total Commander® directory menu",IDC_CHK_ENABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,216,17
+    LTEXT           "If this option is enabled, FlashFolder reads the the directory menu items from the .ini-file of an installed Total Commander.\nIf you change the menu from within FlashFolder, the items will be written back to the TC .ini-file.",IDC_STATIC,18,31,205,34
     LTEXT           "Total Commander® is a registered trademark of Christian Ghisler, C. Ghisler & Co., Switzerland.",IDC_STATIC,7,147,216,17,SS_NOPREFIX
+    LTEXT           "WARNING: Some users have reported issues for this function. See the bug tracker (available from the ""About"" dialog) for details. ",IDC_STATIC,18,69,205,27
 END
 
 IDD_PAGE_SHORTCUTS DIALOGEX 0, 0, 232, 156
@@ -261,7 +261,6 @@ BEGIN
     PUSHBUTTON      "New di&vider",IDC_BTN_ADD_DIVIDER,59,8,50,14
     PUSHBUTTON      "New &submenu",IDC_BTN_ADD_SUBMENU,110,8,57,14
     PUSHBUTTON      "&Delete",IDC_BTN_REMOVE,172,8,50,14,WS_DISABLED
-    PUSHBUTTON      "I&mport...",IDC_BTN_IMPORT,227,8,49,14
     LTEXT           "&Favorites menu:",IDC_ST_FAVMENU,8,25,53,8
     LTEXT           "Statisch",IDC_ST_TREE_PLACEHOLDER,8,35,270,28,NOT WS_VISIBLE,WS_EX_STATICEDGE
     LTEXT           "&Title:",IDC_ST_TITLE,8,70,17,8

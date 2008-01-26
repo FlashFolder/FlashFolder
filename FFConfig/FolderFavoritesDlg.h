@@ -73,11 +73,6 @@ private:
 
 	HTREEITEM m_hSelItem;
 
-	stdext::hash_map< HTREEITEM, CString > m_iconPathes;
-	CString GetItemIconPath(  HTREEITEM hItem ) const;
-
-	stdext::hash_map< CString, int > m_iconIDs;
-
 	bool m_isOwned;
 	
 	int m_selectItemId;

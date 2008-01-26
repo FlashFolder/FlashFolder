@@ -40,8 +40,10 @@ CFFConfigDlg::CFFConfigDlg(CWnd* pParent /*=NULL*/)
 	AddPage( &m_pageGeneric );
 	AddPage( &m_pageCommonFileDlg );
 	AddPage( &m_pageCommonDirDlg );
+	
 	if( GetOsVersion() <= 0x0500 )
 		AddPage( &m_pageCommonOpenWithDlg );
+		
 	AddPage( &m_pageMsoFileDlg );
 	AddPage( &m_pageTotalcmd );
 	AddPage( &m_pageShortcuts );

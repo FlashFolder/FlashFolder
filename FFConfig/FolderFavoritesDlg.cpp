@@ -326,10 +326,6 @@ void CFolderFavoritesDlg::SaveFavorites_worker( FavoritesList& favs, HTREEITEM h
 
 		FavoritesItem fav;
 
-		stdext::hash_map< HTREEITEM, CString >::const_iterator it = m_iconPathes.find( hItem );
-		if( it != m_iconPathes.end() )
-			fav.iconPath = it->second;
-
 		if( m_tree.GetTree().ItemHasChildren( hItem ) )
 		{
 			// add submenu
@@ -370,14 +366,6 @@ void CFolderFavoritesDlg::SaveFavorites_worker( FavoritesList& favs, HTREEITEM h
 			}
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------------------------
-
-CString CFolderFavoritesDlg::GetItemIconPath( HTREEITEM hItem ) const
-{
-	stdext::hash_map<HTREEITEM, CString>::const_iterator it = m_iconPathes.find( hItem );
-	return it != m_iconPathes.end() ? it->second : _T(""); 
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -544,10 +532,6 @@ void CFolderFavoritesDlg::OnTree_DeleteItem( NMHDR *pNMHDR, LRESULT *pResult )
 {
 	*pResult = 0;
 	EnableDlgItem( *this, IDC_BTN_REVERT );
-
-	// delete additional data associated with item
-	NMTREEVIEW* pnm = reinterpret_cast<NMTREEVIEW*>( pNMHDR );
-	m_iconPathes.erase( pnm->itemOld.hItem );
 }
 
 //-----------------------------------------------------------------------------------------------

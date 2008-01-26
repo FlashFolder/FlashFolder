@@ -65,14 +65,11 @@ void GetProfileDefaults( Profile* pProfile )
 	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinHeight"), 308 + DIALOG_UNITS_FLAG );
 	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("Center"), 1 );
 
-	//--- Total Commander integration
-
-	pProfile->SetInt( _T("TotalCmd"), _T("EnableHook"), 0 );
-
 	//--- favorites editor
 
 	pProfile->SetInt( _T("main"), _T("FavoritesDlgWidth"), 450 + DIALOG_UNITS_FLAG );
 	pProfile->SetInt( _T("main"), _T("FavoritesDlgHeight"), 330 + DIALOG_UNITS_FLAG );
+	pProfile->SetInt( _T("main"), _T("UseTcFavorites"), 0 );
 	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_title"), 130 + DIALOG_UNITS_FLAG );
 	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_command"), 140 + DIALOG_UNITS_FLAG );
 	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_targetPath"), 140 + DIALOG_UNITS_FLAG );

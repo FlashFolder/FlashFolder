@@ -24,7 +24,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------------------------
 
-const CString PROFILE_GROUP = _T("TotalCmd");
+const CString PROFILE_GROUP = _T("main");
 
 //-----------------------------------------------------------------------------------------------
 
@@ -58,6 +58,13 @@ BOOL CPageTotalcmd::OnInitDialog()
 		ReadProfile( g_profileDefaults );
 	else
 		ReadProfile( g_profile );
+		
+	tstring tcIniPath;
+	if( ! GetTotalCmdLocation( NULL, &tcIniPath ) )
+	{
+		for( CWnd* pChild = GetWindow( GW_CHILD ); pChild; pChild = pChild->GetNextWindow() )
+			pChild->EnableWindow( FALSE );
+	}
 
 	return TRUE;
 }
@@ -73,7 +80,7 @@ void CPageTotalcmd::ReadProfile( const Profile& profile )
 	}
 
 	CString s;
-	CheckDlgButton( IDC_CHK_ENABLE, profile.GetInt( PROFILE_GROUP, _T("EnableHook") ) );
+	CheckDlgButton( IDC_CHK_ENABLE, profile.GetInt( PROFILE_GROUP, _T("UseTcFavorites") ) );
 
 	// Set initial enabled state for child controls
 	OnBnClickedChkEnable();
@@ -84,7 +91,7 @@ void CPageTotalcmd::ReadProfile( const Profile& profile )
 BOOL CPageTotalcmd::OnApply()
 {
 	CString s;
-	g_profile.SetInt( PROFILE_GROUP, _T("EnableHook"), IsDlgButtonChecked( IDC_CHK_ENABLE ) );
+	g_profile.SetInt( PROFILE_GROUP, _T("UseTcFavorites"), IsDlgButtonChecked( IDC_CHK_ENABLE ) );
 
 	return base::OnApply();
 }
@@ -93,9 +100,5 @@ BOOL CPageTotalcmd::OnApply()
 
 void CPageTotalcmd::OnBnClickedChkEnable()
 {
-	bool isEnabled = IsDlgButtonChecked( IDC_CHK_ENABLE ) != 0;
-	for( CWnd* pChild = GetWindow( GW_CHILD ); pChild; pChild = pChild->GetNextWindow() )
-		if( pChild->GetDlgCtrlID() != IDC_CHK_ENABLE )
-			pChild->EnableWindow( isEnabled );
 }
 
