@@ -35,6 +35,7 @@
 #include "MsoFileDlgHook.h"
 #include "CmnOpenWithDlgHook.h"
 #include "CmnFolderDlgHook.h"
+#include "TotalCmdHook.h"
 #include "../common/ProfileDefaults.h"
 
 using namespace NT;
@@ -53,21 +54,14 @@ HHOOK g_hMouseHook = NULL;       // handle of the mouse hook
 #pragma comment( linker, "/SECTION:.shared,RWS" )
 
 //-----------------------------------------------------------------------------------------
-// constants
-//-----------------------------------------------------------------------------------------
-LPCTSTR FF_GUID = _T("{163F258C-65E0-483d-8B7A-5ABD9E3D4487}");
-
-// Note: the dialog window class in the .rc-file must be the same 
-LPCTSTR FF_WNDCLASSNAME = _T("FlashFolder_3832795"); 
-
-//-----------------------------------------------------------------------------------------
 // global variables that are "local" to each instance of the DLL  
 //-----------------------------------------------------------------------------------------
 HINSTANCE g_hInstDll = NULL;
 HWND g_hFileDialog = NULL;				// handle of file open/save dialog 
 
-auto_ptr<FileDlgHook_base> g_spFileDlgHook;   // ptr to the hook instance
+auto_ptr<FileDlgHook_base> g_spFileDlgHook;       // ptr to the hook instance
 auto_ptr<FileDlgHook_base> g_spOpenWithDlgHook;   // ptr to the hook instance
+auto_ptr<TotalCmdHook> g_spTotalCmdHook;          // ptr to the hook instance
 
 HWND g_hToolWnd = NULL;					// handle of cool external tool window
 WNDPROC g_wndProcToolWindowEditPath;
@@ -1144,17 +1138,9 @@ void RegisterMyHotkeys()
 		tstring atomName = tstring( cmdList[ i ] ) + ffGuid;
 		ATOM atom = ::GlobalAddAtom( atomName.c_str() );
 
-		UINT vk = hotkey & 0xFF;
-		UINT mod = hotkey >> 8;
-		UINT rmod = 0;
-		if( mod & HOTKEYF_CONTROL )
-			rmod |= MOD_CONTROL;
-		if( mod & HOTKEYF_ALT )
-			rmod |= MOD_ALT;
-		if( mod & HOTKEYF_SHIFT )
-			rmod |= MOD_SHIFT;
-
-		if( ::RegisterHotKey( g_hToolWnd, atom, rmod, vk ) )
+		UINT vk, mod;
+		SplitHotKey( &vk, &mod, hotkey );
+		if( ::RegisterHotKey( g_hToolWnd, atom, mod, vk ) )
 			g_hotkeyAtoms.push_back( atom );
 		else
 			::GlobalDeleteAtom( atom );
@@ -1398,69 +1384,92 @@ LRESULT CALLBACK Hook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
 		return CallNextHookEx( g_hHook, nCode, wParam, lParam );
 	}
 
-
-	// Check whether a file dialog is already hooked.
-	// For now, we can only handle one running file dialog per application, but
-	// this should be enough in nearly all cases.
-	if( nCode == HCBT_ACTIVATE && g_hFileDialog == NULL )
+	if( nCode == HCBT_ACTIVATE )
 	{
-		FileDlgType fileDlgType = GetFileDlgType( hwnd );
-		if( fileDlgType.mainType != FDT_NONE )
+		// Check whether a TotalCmd main window needs to be hooked.
+		if( ! g_spTotalCmdHook.get() && _tcsicmp( g_currentExeName, _T("totalcmd.exe") ) == 0 )
 		{
-			if( g_profileDefaults.IsEmpty() )
+			TCHAR wndClass[ 64 ] = _T(""); 
+			::GetClassName( hwnd, wndClass, sizeof(wndClass) / sizeof(TCHAR) - 1 );
+			if( _tcscmp( wndClass, _T("TTOTAL_CMD") ) == 0 )
 			{
-				GetProfileDefaults( &g_profileDefaults );
-				g_profile.SetRoot( _T("zett42\\FlashFolder") );
-				g_profile.SetDefaults( &g_profileDefaults );
-			}
-
-			if( ! IsCurrentProgramEnabledForDialog( fileDlgType ) )
+				if( g_profileDefaults.IsEmpty() )
+				{
+					GetProfileDefaults( &g_profileDefaults );
+					g_profile.SetRoot( _T("zett42\\FlashFolder") );
+					g_profile.SetDefaults( &g_profileDefaults );
+				}
+                if( g_profile.GetInt( _T("TotalCmd"), _T("EnableHook") ) != 0 )
+					g_spTotalCmdHook.reset( new TotalCmdHook( hwnd ) );
+						
 				return CallNextHookEx( g_hHook, nCode, wParam, lParam );
-
-			//--- initialise hook for this dialog
-
-			bool isFileDialog = ( fileDlgType.mainType == FDT_COMMON || fileDlgType.mainType == FDT_MSOFFICE );
-
-			g_hFileDialog = hwnd;
-
-			CreateToolWindow( isFileDialog );
-			RegisterMyHotkeys();
-
-			// create an instance of a file dialog hook class depending on the
-			// type of file dialog
-			switch( fileDlgType.mainType )
-			{
-				case FDT_COMMON:
-				{
-					g_spFileDlgHook.reset( new CmnFileDlgHook );
-					g_spFileDlgHook->Init( hwnd, g_hToolWnd );
-				}
-				break;
-				case FDT_MSOFFICE:
-				{
-					g_spFileDlgHook.reset( new MsoFileDlgHook( fileDlgType.subType ) );
-					g_spFileDlgHook->Init( hwnd, g_hToolWnd );
-				}
-				break;
-				case FDT_COMMON_OPENWITH:
-				{
-					// init the "Open With" dialog hook
-					g_spOpenWithDlgHook.reset( new CmnOpenWithDlgHook );
-					g_spOpenWithDlgHook->Init( hwnd, g_hToolWnd );
-				}
-				break;
-				case FDT_COMMON_FOLDER:
-				{
-					// init the "Open With" dialog hook
-					g_spFileDlgHook.reset( new CmnFolderDlgHook );
-					g_spFileDlgHook->Init( hwnd, g_hToolWnd );
-				}
-				break;
 			}
-
-			return 0;
 		}
-	}
+
+		// Check whether a file dialog must be hooked.
+		// For now, we can only handle one running file dialog per application, but
+		// this should be enough in nearly all cases.
+		if( g_hFileDialog == NULL )
+		{
+			FileDlgType fileDlgType = GetFileDlgType( hwnd );
+			if( fileDlgType.mainType != FDT_NONE )
+			{
+				if( g_profileDefaults.IsEmpty() )
+				{
+					GetProfileDefaults( &g_profileDefaults );
+					g_profile.SetRoot( _T("zett42\\FlashFolder") );
+					g_profile.SetDefaults( &g_profileDefaults );
+				}
+
+				if( ! IsCurrentProgramEnabledForDialog( fileDlgType ) )
+					return CallNextHookEx( g_hHook, nCode, wParam, lParam );
+
+				//--- initialise hook for this dialog
+
+				bool isFileDialog = ( fileDlgType.mainType == FDT_COMMON || fileDlgType.mainType == FDT_MSOFFICE );
+
+				g_hFileDialog = hwnd;
+
+				CreateToolWindow( isFileDialog );
+				RegisterMyHotkeys();
+
+				// create an instance of a file dialog hook class depending on the
+				// type of file dialog
+				switch( fileDlgType.mainType )
+				{
+					case FDT_COMMON:
+					{
+						g_spFileDlgHook.reset( new CmnFileDlgHook );
+						g_spFileDlgHook->Init( hwnd, g_hToolWnd );
+					}
+					break;
+					case FDT_MSOFFICE:
+					{
+						g_spFileDlgHook.reset( new MsoFileDlgHook( fileDlgType.subType ) );
+						g_spFileDlgHook->Init( hwnd, g_hToolWnd );
+					}
+					break;
+					case FDT_COMMON_OPENWITH:
+					{
+						// init the "Open With" dialog hook
+						g_spOpenWithDlgHook.reset( new CmnOpenWithDlgHook );
+						g_spOpenWithDlgHook->Init( hwnd, g_hToolWnd );
+					}
+					break;
+					case FDT_COMMON_FOLDER:
+					{
+						// init the "Open With" dialog hook
+						g_spFileDlgHook.reset( new CmnFolderDlgHook );
+						g_spFileDlgHook->Init( hwnd, g_hToolWnd );
+					}
+					break;
+				}
+
+				return 0;
+			}
+		} //if
+		
+	} //if
 
 	// be a good Windoze citizen
    	return CallNextHookEx( g_hHook, nCode, wParam, lParam );

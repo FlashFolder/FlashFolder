@@ -28,23 +28,18 @@ class CTotalCmdUtils
 {
 public:
     CTotalCmdUtils( HWND hwndTotalCmd = NULL ) { SetTCmdWnd( hwndTotalCmd ); }
-
-    void SetTCmdWnd( HWND hwndTotalCmd ) 
-    { 
-        m_hwnd = hwndTotalCmd; 
-        m_hwndLeft = m_hwndRight = m_hwndActive = NULL; 
-    }
-
+    void SetTCmdWnd( HWND hwndTotalCmd ); 
+    
     HWND GetTCmdWnd() const { return m_hwnd; }
+	HWND GetLeftPathWnd()    const { return m_hwndLeft; }
+	HWND GetRightPathWnd()   const { return m_hwndRight; }
+	HWND GetActivePathWnd()  const { return m_hwndActive; }
 
+	bool IsLeftDirActive() const; 
     bool GetDirs( LPTSTR pLeftDir = NULL, unsigned leftDirLen = 0, 
-                  LPTSTR pRightDir = NULL, unsigned rightDirLen = 0 );
-	bool GetActiveDir( LPTSTR pDir, unsigned len );
-
-	HWND GetLeftPathWnd() const { return m_hwndLeft; }
-	HWND GetRightPathWnd() const { return m_hwndRight; }
-	HWND GetActivePathWnd() const { return m_hwndActive; }
-
+                  LPTSTR pRightDir = NULL, unsigned rightDirLen = 0 ) const;
+	bool GetActiveDir( LPTSTR pDir, unsigned len ) const;
+	
 private:
     struct CFindSubWindowsData
     {
@@ -59,6 +54,7 @@ private:
    
 private:
     HWND m_hwnd, m_hwndLeft, m_hwndRight, m_hwndActive;
+    bool m_isLeftDirActive;
 };
 
 //-------------------------------------------------------------------------------------------------

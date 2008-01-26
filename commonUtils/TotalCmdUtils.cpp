@@ -68,20 +68,11 @@ bool IsTcPathControl( HWND hwnd )
 
 //-----------------------------------------------------------------------------------------------
 
-bool CTotalCmdUtils::GetDirs( LPTSTR pLeftDir, unsigned leftDirLen, 
-                              LPTSTR pRightDir, unsigned rightDirLen )
-{
-    pLeftDir[0] = pRightDir[0] = 0;
-    if( ! m_hwnd ) return false;
-
-    if( m_hwndLeft && m_hwndRight )
-    {
-		if( pLeftDir )
-			::GetWindowText( m_hwndLeft, pLeftDir, leftDirLen );
-		if( pRightDir )
-			::GetWindowText( m_hwndRight, pRightDir, rightDirLen );        
-        return true;
-    }
+void CTotalCmdUtils::SetTCmdWnd( HWND hwndTotalCmd ) 
+{ 
+    m_hwnd = hwndTotalCmd; 
+	m_hwndLeft = m_hwndRight = m_hwndActive = NULL; 
+    if( ! m_hwnd ) return;
 
 	// Find the child windows which contain the left / right path
     CFindSubWindowsData data;
@@ -89,7 +80,6 @@ bool CTotalCmdUtils::GetDirs( LPTSTR pLeftDir, unsigned leftDirLen,
     ::EnumChildWindows( m_hwnd, FindSubWindows_Proc, reinterpret_cast<LPARAM>( &data ) );
 
 	// Determine left and right windows
-	
 	if( m_hwndLeft && m_hwndRight )
 	{
 		RECT rc1, rc2;
@@ -97,22 +87,47 @@ bool CTotalCmdUtils::GetDirs( LPTSTR pLeftDir, unsigned leftDirLen,
 		::GetWindowRect( m_hwndRight, &rc2 );
 		if( rc1.left > rc2.left )
 			std::swap( m_hwndLeft, m_hwndRight );
+	}    
+}
+
+//-----------------------------------------------------------------------------------------------
+
+bool CTotalCmdUtils::IsLeftDirActive() const
+{
+	TCHAR leftDir[ MAX_PATH + 1 ];
+	TCHAR activeDir[ MAX_PATH + 1 ];
+	GetDirs( leftDir, MAX_PATH );
+	GetActiveDir( activeDir, MAX_PATH );
+	return ComparePath( leftDir, activeDir ) == 0;
+} 
+
+//-----------------------------------------------------------------------------------------------
+
+bool CTotalCmdUtils::GetDirs( LPTSTR pLeftDir, unsigned leftDirLen, 
+                              LPTSTR pRightDir, unsigned rightDirLen ) const
+{
+	if( pLeftDir )
+	{
+		pLeftDir[ 0 ] = NULL;
+		if( m_hwndLeft )
+			GetPathFromTcControl( m_hwndLeft, pLeftDir, leftDirLen );
 	}
-	if( m_hwndLeft )
-		GetPathFromTcControl( m_hwndLeft, pLeftDir, leftDirLen );
-	if( m_hwndRight )
-		GetPathFromTcControl( m_hwndRight, pRightDir, rightDirLen );
-    
+	if( pRightDir )
+	{
+		pRightDir[ 0 ] = NULL;
+		if( m_hwndRight )
+			GetPathFromTcControl( m_hwndRight, pRightDir, rightDirLen );
+	}    
     return m_hwndLeft || m_hwndRight;
 }
 
 //-----------------------------------------------------------------------------------------------
 
-bool CTotalCmdUtils::GetActiveDir( LPTSTR pDir, unsigned len )
+bool CTotalCmdUtils::GetActiveDir( LPTSTR pDir, unsigned len ) const
 {
 	pDir[ 0 ] = 0;
 	if( ! m_hwndActive )
-		GetDirs();
+		return false;
 
     TCHAR wndtext[ MAX_PATH + 1 ] = _T("");
     if( ::GetWindowText( m_hwndActive, wndtext, MAX_PATH ) > 0 )

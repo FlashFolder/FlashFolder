@@ -71,6 +71,7 @@ inline bool IsAltKeyPressed()
 
 int GetKeyName( LPTSTR pName, int cchNameLen, UINT vk, BOOL fExtended );
 void GetHotkeyName( LPTSTR pName, int cchNameLen, DWORD hotkey );
+void SplitHotKey( UINT* virtualkey, UINT* modifiers, DWORD hotkey ); 
 
 /// Set enabled state of dialog control but switch focus if it is on a disabled item.\n
 /// Otherwise, if using EnableWindow() alone, focus can be lost and cannot be 

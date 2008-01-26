@@ -67,7 +67,7 @@ void GetProfileDefaults( Profile* pProfile )
 
 	//--- Total Commander integration
 
-	pProfile->SetInt( _T("TotalCmd"), _T("EnableHook"), 1 );
+	pProfile->SetInt( _T("TotalCmd"), _T("EnableHook"), 0 );
 
 	//--- favorites editor
 

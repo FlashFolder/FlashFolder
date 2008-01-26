@@ -15,19 +15,25 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 #pragma once
 
-// GUID for various purposes
-const TCHAR FF_GUID[] = _T("{163F258C-65E0-483d-8B7A-5ABD9E3D4487}");
+//-----------------------------------------------------------------------------------------
+/// Hook for Total Commander window to receive hotkey messages for showing FlashFolder 
+/// favorites menu.
 
-// Window class of FlashFolder toolbar
-const TCHAR FF_WNDCLASSNAME[] = _T("FlashFolder_3832795"); 
+class TotalCmdHook
+{
+public:
+	TotalCmdHook( HWND hwndTC ); 
 
-extern RegistryProfile g_profile;
+private:
+	static LRESULT CALLBACK HookWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-int FavMenu_Display( HWND hWndParent, int x, int y, const FavoritesList& favs );
-void FavMenu_StartEditor( HWND hWndParent );
-void FavMenu_AddDir( HWND hWndParent, FavoritesList& favs, LPCTSTR pPath, LPCTSTR pTargetPath );
+	void RegisterMyHotkeys();
+	void UnregisterMyHotkeys();
+	void OnHotkey( HWND hwnd, WPARAM wp, LPARAM lp );
 
-void FavMenu_DisplayForTotalCmd( HWND hWndParent, int x, int y, HWND hwndClicked = NULL );
+	HWND m_hwndTC;
+	WNDPROC m_oldWndProc;
+	ATOM m_favmenuHotkeyAtom;
+};

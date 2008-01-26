@@ -234,6 +234,21 @@ void GetHotkeyName( LPTSTR pName, int cchNameLen, DWORD hotkey )
 
 //-----------------------------------------------------------------------------------------------
 
+void SplitHotKey( UINT* virtualkey, UINT* modifiers, DWORD hotkey ) 
+{
+	*virtualkey = hotkey & 0xFF;
+	UINT mod = hotkey >> 8;
+	*modifiers = 0;
+	if( mod & HOTKEYF_CONTROL )
+		*modifiers |= MOD_CONTROL;
+	if( mod & HOTKEYF_ALT )
+		*modifiers |= MOD_ALT;
+	if( mod & HOTKEYF_SHIFT )
+		*modifiers |= MOD_SHIFT;
+}
+
+//-----------------------------------------------------------------------------------------------
+
 void EnableDlgItem( HWND hDlg, UINT idCtrl, BOOL bEnable )
 {
 	HWND hCtrl = ::GetDlgItem( hDlg, idCtrl );
