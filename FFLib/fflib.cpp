@@ -330,8 +330,10 @@ void DisplayMenu_OpenDirs()
 	
 	//--- get system directories to filter out system pathes
 	
-	TCHAR winDir[ MAX_PATH + 1 ];
-	::GetWindowsDirectory( winDir, MAX_PATH );
+    // get Windows directory to filter out system dirs
+    TCHAR windowsDir[ MAX_PATH + 1 ] = { 0 };
+    ::GetWindowsDirectory( windowsDir, MAX_PATH );
+    int windowsDirLen = _tcslen( windowsDir );
 
     //--- allocate buffers for return data of NT kernel APIs
 
@@ -353,7 +355,7 @@ void DisplayMenu_OpenDirs()
     DWORD processId = ::GetCurrentProcessId();  
     BYTE objType_file = CNtObjTypeMap::GetTypeId( OT_File );
     SYSTEM_HANDLE *pHandleInfo = handleBuf.Get()->Handles;
-
+    
     for( size_t n = 0; n < handleBuf.Get()->NumberOfHandles; n++, pHandleInfo++ )
     {
         if( pHandleInfo->ProcessId != processId || pHandleInfo->ObjectType != objType_file )
@@ -383,16 +385,16 @@ void DisplayMenu_OpenDirs()
         if( ! MapNtFilePathToUserPath( filepath, MAX_PATH, nameBuf.Get()->ObjectName.Buffer ) )
             continue;
 
-		//--- filter out system pathes
-		if( ::PathIsSameRoot( winDir, filepath ) )
-			continue;
-
         //--- if its not a directory, extract dir ---
         if( ! bIsDir )
         {
             WCHAR* p = wcsrchr( filepath, _T('\\') );
             if( p ) *p = 0;
         } 
+        
+        // filter out system dirs
+		if( windowsDirLen > 0 && _tcsnicmp( filepath, windowsDir, windowsDirLen ) == 0 )
+			continue;        
 
         // add the directory path - the set eleminates duplicates
         if( _tcsicmp( filepath, g_currentExeDir ) != 0 )
