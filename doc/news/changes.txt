@@ -1,6 +1,21 @@
 Changelog for project FlashFolder
 =================================
 
+v1.9.167 beta
+
+ADD: Redesigned favorites menu editor that features keyboard interface, drag-n-drop, context menu,
+     multi-selection and creation of sub menus
+ADD: Submenus in favorites menu
+ADD: Custom item titles in favorites menu
+ADD: Support for VS2005 open/save dialog
+CHG: Filter out system directories from "currently open folders" menu
+CHG: If user selects a directory that doesn't exist anymore, try parent
+     directories until an existing directory is found
+CHG: Total Commander integration is now off by default. It can be switched on in the options dialog.
+FIX: Installer error "admin required" came way too late
+
+---------------
+
 v1.8.141 beta
 
 FIX: Upgrade installs could crash Windows Explorer (issue #1763646)
