@@ -44,8 +44,18 @@ void GetTempFilePath( LPTSTR pResult, LPCTSTR pPrefix );
 
 int ComparePath( LPCTSTR path1, LPCTSTR path2 );
 
+/// Remove trailing backslash from path.
+tstring RemoveBackslash( LPCTSTR pPath );
+
 /// Extract the given number of components, separated by backslash, from a file path.
 LPCTSTR ExtractSubPath( LPCTSTR pPath, unsigned depth = 1 );
+
+/// Extract the parent directory of a file path.
+tstring GetParentDir( LPCTSTR pPath );
+
+/// Return the given directory path if it exists, otherwise try the parent directories until an existing
+/// directory is found.
+tstring GetExistingDirOrParent( LPCTSTR pPath );
 
 bool HasTrailingBackslash( LPCTSTR pPath );
 

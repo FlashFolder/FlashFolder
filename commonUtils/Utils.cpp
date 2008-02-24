@@ -126,6 +126,42 @@ LPCTSTR ExtractSubPath( LPCTSTR pPath, unsigned depth )
 
 //-----------------------------------------------------------------------------------------------
 
+tstring RemoveBackslash( LPCTSTR pPath )
+{
+	int len = _tcslen( pPath );
+	if( len == 0 )
+		return _T("");
+	LPCTSTR pLast = ( len == 1 ? pPath : _tcsninc( pPath, len - 1 ) );
+	if( *pLast == '\\' )
+		return ( len == 1 ? _T("") : tstring( pPath, len - 1 ) );
+	return pPath; 
+}
+
+//-----------------------------------------------------------------------------------------------
+
+tstring GetParentDir( LPCTSTR pPath )
+{
+	if( ::PathIsRoot( pPath ) )
+		return _T("");
+	tstring dir = RemoveBackslash( pPath );
+	int iSlash = dir.rfind( '\\' );
+	if( iSlash == tstring::npos )
+		return _T("");
+	return dir.substr( 0, iSlash + 1 );
+}
+
+//-----------------------------------------------------------------------------------------------
+
+tstring GetExistingDirOrParent( LPCTSTR pPath )
+{
+	tstring dir = pPath;
+	while( ! dir.empty() && ! DirectoryExists( dir.c_str() ) )
+		dir = GetParentDir( dir.c_str() );
+	return dir;	
+}
+
+//-----------------------------------------------------------------------------------------------
+
 bool HasTrailingBackslash( LPCTSTR pPath )
 {
 	if( pPath[ 0 ] == 0 )

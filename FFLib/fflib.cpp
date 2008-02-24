@@ -246,10 +246,14 @@ int DisplayFolderMenu( HMENU hMenu, int buttonID )
 
 		if( IsFilePath( pPath ) )
         {
-		    SetDlgItemText( g_hToolWnd, ID_FF_PATH, pPath );
-		
-			SetForegroundWindow(g_hFileDialog);
-			g_spFileDlgHook->SetFolder( pPath );
+			tstring existingDir = GetExistingDirOrParent( pPath );
+			if( ! existingDir.empty() )
+			{ 
+				SetDlgItemText( g_hToolWnd, ID_FF_PATH, existingDir.c_str() );
+			
+				SetForegroundWindow( g_hFileDialog );
+				g_spFileDlgHook->SetFolder( existingDir.c_str() );
+			}
         }
 	}
 
