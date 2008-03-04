@@ -551,6 +551,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PageToolbar.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PageTotalcmd.cpp"
 				>
 			</File>
@@ -657,7 +661,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\PageShortcuts.cpp"
+				RelativePath=".\PageToolbar.h"
 				>
 			</File>
 			<File

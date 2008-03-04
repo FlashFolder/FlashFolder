@@ -47,6 +47,8 @@ CFFConfigDlg::CFFConfigDlg(CWnd* pParent /*=NULL*/)
 	AddPage( &m_pageMsoFileDlg );
 	AddPage( &m_pageTotalcmd );
 	AddPage( &m_pageShortcuts );
+	AddPage( &m_pageToolbar );
+	
 
 	// See http://support.microsoft.com/default.aspx?scid=kb%3Ben-us%3BQ158552 for why 
 	// the first-chance access-violation exception can savely be ignored. 

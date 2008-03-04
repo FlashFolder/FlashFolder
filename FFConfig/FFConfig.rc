@@ -306,6 +306,24 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,232,72,50,14
 END
 
+IDD_PAGE_TOOLBAR DIALOGEX 0, 0, 219, 119
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Toolbar|Toolbar Options"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Toolbar positioning",IDC_STATIC,7,7,205,105
+    LTEXT           "Remove the gap between the FlashFolder toolbar and the window border that occurs with some visual themes.\nYou need to close and reopen the current file dialog to see the changes in effect.",IDC_STATIC,15,19,190,35
+    LTEXT           "&Horizontal position offset:",IDC_STATIC,15,62,90,8
+    EDITTEXT        IDC_ED_OFFSET_X,115,59,44,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_OFFSET_X,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,159,59,11,14
+    LTEXT           "&Vertical positon offset:",IDC_STATIC,15,78,84,8
+    EDITTEXT        IDC_ED_OFFSET_Y,115,75,44,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_OFFSET_Y,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,159,75,11,14
+    LTEXT           "&Relative width adjustment:",IDC_STATIC,15,94,95,8
+    EDITTEXT        IDC_ED_OFFSET_W,115,91,44,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SP_OFFSET_W,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,159,91,11,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -424,6 +442,15 @@ BEGIN
         RIGHTMARGIN, 282
         TOPMARGIN, 7
         BOTTOMMARGIN, 86
+    END
+
+    IDD_PAGE_TOOLBAR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 212
+        VERTGUIDE, 15
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 112
     END
 END
 #endif    // APSTUDIO_INVOKED

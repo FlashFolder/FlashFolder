@@ -25,6 +25,7 @@
 #include "PageMsoFileDlg.h"
 #include "PageTotalCmd.h"
 #include "PageShortcuts.h"
+#include "PageToolbar.h"
 
 //-----------------------------------------------------------------------------------------------
 
@@ -52,4 +53,5 @@ private:
 	CPageMsoFileDlg m_pageMsoFileDlg;
 	CPageTotalcmd m_pageTotalcmd;
 	CPageShortcuts m_pageShortcuts;
+	CPageToolbar m_pageToolbar;
 };

@@ -77,6 +77,8 @@ TCHAR g_currentExeDir[ MAX_PATH + 1 ] = _T("");
 
 vector<ATOM> g_hotkeyAtoms;              // unique identifiers of assigned hotkeys
 
+RECT g_toolbarOffset = { 0 };            // Toolbar position / width offset to adjust for some XP themes.
+
 bool g_isFileDlgActive = false;
 bool g_isToolWndActive = false;
 
@@ -147,10 +149,10 @@ void AdjustToolWindowPos()
 
 	RECT rcTool; 
 	::GetWindowRect( g_hToolWnd, &rcTool );
-	rcTool.left = rc.left;
-	rcTool.top = rc.top - rcTool.bottom + rcTool.top;
-	rcTool.right = rc.right;
-	rcTool.bottom = rc.top;
+	rcTool.left = rc.left + g_toolbarOffset.left;
+	rcTool.top = rc.top - rcTool.bottom + rcTool.top + g_toolbarOffset.top;
+	rcTool.right = rc.right + g_toolbarOffset.left + g_toolbarOffset.right;
+	rcTool.bottom = rc.top + g_toolbarOffset.top;
 
 	::SetWindowPos( g_hToolWnd, NULL, rcTool.left, rcTool.top, rcTool.right - rcTool.left, rcTool.bottom - rcTool.top, 
 		            SWP_NOZORDER | SWP_NOACTIVATE );
@@ -1033,11 +1035,16 @@ void CreateToolWindow( bool isFileDialog )
 	g_wndProcToolWindowEditPath = (WNDPROC)  
 		SetWindowLong(hEdit, GWL_WNDPROC, (LONG) &ToolWindowEditPathProc);
 
-    //--- set default font for all child controls
+    // set default font for all child controls
 	EnumChildWindows(g_hToolWnd, ToolWndSetFont, (LPARAM) hFont);
 
 	//--- read options from global configuration
+
 	g_globalHistoryMaxEntries = g_profile.GetInt( _T("main"), _T("MaxGlobalHistoryEntries") );
+
+	g_toolbarOffset.left = g_profile.GetInt( _T("Toolbar"), _T("OffsetX") );
+	g_toolbarOffset.top = g_profile.GetInt( _T("Toolbar"), _T("OffsetY") );
+	g_toolbarOffset.right = g_profile.GetInt( _T("Toolbar"), _T("OffsetWidth") );
  
 	//--- enable toolbar buttons / leave disabled ---
 	

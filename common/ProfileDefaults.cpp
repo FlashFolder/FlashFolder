@@ -73,4 +73,10 @@ void GetProfileDefaults( Profile* pProfile )
 	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_title"), 130 + DIALOG_UNITS_FLAG );
 	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_command"), 140 + DIALOG_UNITS_FLAG );
 	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_targetPath"), 140 + DIALOG_UNITS_FLAG );
+
+	//--- toolbar
+	
+	pProfile->SetInt( _T("Toolbar"), _T("OffsetX"), 0 );
+	pProfile->SetInt( _T("Toolbar"), _T("OffsetY"), 0 );
+	pProfile->SetInt( _T("Toolbar"), _T("OffsetWidth"), 0 );
 }
