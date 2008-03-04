@@ -196,7 +196,9 @@ void GotoLastDir()
 
 	SetDlgItemText( g_hToolWnd, ID_FF_PATH, history.GetList().front().c_str() );
 
-	g_spFileDlgHook->SetFolder( history.GetList().front().c_str() );
+	tstring path = GetExistingDirOrParent( history.GetList().front().c_str() );
+	if( ! path.empty() )
+		g_spFileDlgHook->SetFolder( path.c_str() );
 }
 
 //-----------------------------------------------------------------------------------------
@@ -576,6 +578,7 @@ void FavMenu_DisplayForFileDialog()
 		else if( IsFilePath( fav.command.c_str() ) )
 			path = fav.command;
 
+		path = GetExistingDirOrParent( path.c_str() );
 		if( ! path.empty() )
 			if( DirectoryExists( path.c_str() ) )
 			{
