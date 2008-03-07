@@ -34,7 +34,7 @@ BEGIN
             VALUE "FileDescription", "FlashFolder Hook Library"
             VALUE "FileVersion", APP_VER
             VALUE "InternalName", "fflib"
-            VALUE "LegalCopyright", "Copyright © 2007 by zett42"
+            VALUE "LegalCopyright", "Copyright © 2007-2008 by zett42"
             VALUE "OriginalFilename", "fflib.dll"
             VALUE "ProductName", "fflib"
             VALUE "ProductVersion", APP_VER

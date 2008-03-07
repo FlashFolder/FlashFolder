@@ -34,7 +34,7 @@ BEGIN
             VALUE "FileDescription", "FlashFolder Service"
             VALUE "FileVersion", APP_VER
             VALUE "InternalName", "FlashFolder"
-            VALUE "LegalCopyright", "Copyright © 2007 by zett42"
+            VALUE "LegalCopyright", "Copyright © 2007-2008 by zett42"
             VALUE "OriginalFilename", "FlashFolder.EXE"
             VALUE "ProductName", "FlashFolder"
             VALUE "ProductVersion", APP_VER
