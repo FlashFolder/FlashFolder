@@ -112,6 +112,9 @@ void CPageCommonFileDlg::ReadProfile( const Profile& profile )
 	for( int i = 0; i != list.size(); ++i )
 		m_nonResizableExcludes.push_back( list[ i ].c_str() );
 
+	CheckDlgButton( IDC_CHK_KEEP_LISTVIEW_MODE, 
+		profile.GetInt( _T("main"), _T("ListViewMode") ) == FLM_VIEW_DEFAULT ? 0 : 1 );
+
 	// Set initial enabled state for child controls
 	OnBnClickedChkEnable();
 }
@@ -143,6 +146,9 @@ BOOL CPageCommonFileDlg::OnApply()
 	for( int i = 0; i != m_nonResizableExcludes.size(); ++i )
 		list.push_back( m_nonResizableExcludes[ i ].GetString() );
 	g_profile.SetStringList( PROFILE_GROUP + _T(".NonResizableExcludes"), list );
+
+	g_profile.SetInt( _T("main"), _T("ListViewMode"), 
+		IsDlgButtonChecked( IDC_CHK_KEEP_LISTVIEW_MODE ) ? FLM_VIEW_LIST : FLM_VIEW_DEFAULT );
 
 	return base::OnApply();
 }

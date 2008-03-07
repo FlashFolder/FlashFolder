@@ -115,7 +115,6 @@
 #define IDC_SP_OFFSET_X                 1095
 #define IDC_SP_OFFSET_Y                 1096
 #define IDC_ED_OFFSET_W                 1097
-#define IDC_CHECK1                      1097
 #define IDC_CHK_KEEP_LISTVIEW_MODE      1097
 #define IDC_SP_OFFSET_W                 1098
 #define ID_FAVCONTEXT_NEWITEM           32771

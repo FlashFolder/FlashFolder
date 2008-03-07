@@ -87,9 +87,6 @@ void CPageGeneric::ReadProfile( const Profile& profile )
 	CString s;
 	s.Format( _T("%d"), profile.GetInt( PROFILE_GROUP, _T("MaxGlobalHistoryEntries") ) );
 	SetDlgItemText( IDC_ED_MAX_DIRHISTORY, s );
-	
-	CheckDlgButton( IDC_CHK_KEEP_LISTVIEW_MODE, 
-		profile.GetInt( PROFILE_GROUP, _T("ListViewMode") ) == FLM_VIEW_DEFAULT ? 0 : 1 );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -102,10 +99,7 @@ BOOL CPageGeneric::OnApply()
 	CString s;
 	GetDlgItemText( IDC_ED_MAX_DIRHISTORY, s );
 	g_profile.SetInt( PROFILE_GROUP, _T("MaxGlobalHistoryEntries"), _ttoi( s ) );
-	
-	g_profile.SetInt( PROFILE_GROUP, _T("ListViewMode"), 
-		IsDlgButtonChecked( IDC_CHK_KEEP_LISTVIEW_MODE ) ? FLM_VIEW_LIST : FLM_VIEW_DEFAULT );
-	
+		
 	return base::OnApply();
 }
 
