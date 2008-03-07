@@ -115,7 +115,8 @@
 #define IDC_SP_OFFSET_X                 1095
 #define IDC_SP_OFFSET_Y                 1096
 #define IDC_ED_OFFSET_W                 1097
-#define IDC_SP_OFFSET_Y2                1098
+#define IDC_CHECK1                      1097
+#define IDC_CHK_KEEP_LISTVIEW_MODE      1097
 #define IDC_SP_OFFSET_W                 1098
 #define ID_FAVCONTEXT_NEWITEM           32771
 #define ID_FAVCONTEXT_NEWDIVIDER        32772
@@ -131,7 +132,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        169
 #define _APS_NEXT_COMMAND_VALUE         32778
-#define _APS_NEXT_CONTROL_VALUE         1097
+#define _APS_NEXT_CONTROL_VALUE         1098
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif

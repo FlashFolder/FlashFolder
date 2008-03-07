@@ -45,14 +45,18 @@ public:
 
 private:
 	static LRESULT CALLBACK HookWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK HookShellWndProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	void ResizeFileDialog();
 	void ResizeNonResizableFileDialog( int x, int y, int newWidth, int newHeight );
+	void InitShellWnd();
 
 	HWND m_hwndFileDlg, m_hwndTool;
 	WNDPROC m_oldWndProc;
+	WNDPROC m_oldShellWndProc;
 	bool m_isWindowActive;
 	bool m_fileDialogCanceled;
 	bool m_initDone;
+	LRESULT m_listViewMode;
 
 	// options read from INI file specified in Init()
 

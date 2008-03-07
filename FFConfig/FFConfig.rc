@@ -173,6 +173,8 @@ BEGIN
     LTEXT           "&Max. number of folder history entries:",IDC_STATIC,7,91,185,11
     EDITTEXT        IDC_ED_MAX_DIRHISTORY,7,101,34,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_SP_MAX_DIRHISTORY,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,41,101,11,14
+    CONTROL         "Remember &view mode of open/save dialogs",IDC_CHK_KEEP_LISTVIEW_MODE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,155,10
 END
 
 IDD_PAGE_MSO_FILEDLG DIALOGEX 0, 0, 195, 110

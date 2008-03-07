@@ -58,6 +58,7 @@ bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 	m_folderComboHeight = MapProfileY( hwndTool, g_profile.GetInt( _T("CommonFileDlg"), _T("FolderComboHeight") ) );
 	m_filetypesComboHeight = MapProfileY( hwndTool, g_profile.GetInt( _T("CommonFileDlg"), _T("FiletypesComboHeight") ) );
 	m_bResizeNonResizableDlgs = g_profile.GetInt( _T("CommonFileDlg"), _T("ResizeNonResizableDialogs") ) != 0;
+	m_listViewMode = g_profile.GetInt( _T("Main"), _T("ListViewMode") );
 
     //--- check exclusion list for resizing of non-resizable dialogs
 
@@ -121,9 +122,12 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc(
             {
 				g_pHook->m_initDone = true;
 
+				// For persistent list view mode.
+				g_pHook->InitShellWnd();
+				
 				//customize file dialog's initial size + position
 				g_pHook->ResizeFileDialog();
-
+				
 				// notify the tool window
 				FileDlgHookCallbacks::OnInitDone();
             }
@@ -173,8 +177,13 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc(
 			break;
 
 		case WM_DESTROY:
+		{
+			if( g_profile.GetInt( _T("main"), _T("ListViewMode") ) != FLM_VIEW_DEFAULT )
+				g_profile.SetInt( _T("main"), _T("ListViewMode"), g_pHook->m_listViewMode );
+		
 			FileDlgHookCallbacks::OnDestroy( ! g_pHook->m_fileDialogCanceled );
-			break;
+		}
+		break;
 
 		case WM_NCDESTROY:
 		{			
@@ -187,6 +196,51 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc(
 
     //call original message handler
     return CallWindowProc( g_pHook->m_oldWndProc, hwnd, uMsg, wParam, lParam);
+}
+
+//-----------------------------------------------------------------------------------------------
+
+LRESULT CALLBACK CmnFileDlgHook::HookShellWndProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+{
+	if( uMsg == WM_COMMAND )
+	{
+		switch( wParam )
+		{
+			case ODM_VIEW_ICONS:  g_pHook->m_listViewMode = FLM_VIEW_ICONS; break;
+			case ODM_VIEW_LIST:   g_pHook->m_listViewMode = FLM_VIEW_LIST; break;
+			case ODM_VIEW_DETAIL: g_pHook->m_listViewMode = FLM_VIEW_DETAIL; break;
+			case ODM_VIEW_THUMBS: g_pHook->m_listViewMode = FLM_VIEW_THUMBS; break;
+			case ODM_VIEW_TILES:  g_pHook->m_listViewMode = FLM_VIEW_TILES; break;
+		}
+	}	
+	
+    //call original message handler
+    return CallWindowProc( g_pHook->m_oldShellWndProc, hwnd, uMsg, wParam, lParam);
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void CmnFileDlgHook::InitShellWnd()
+{
+	if( HWND shellWnd = ::GetDlgItem( m_hwndFileDlg, lst2 ) )
+	{
+		// restore last view mode
+		WPARAM wp = 0;
+		switch( m_listViewMode )
+		{
+			case FLM_VIEW_ICONS:  wp = ODM_VIEW_ICONS; break; 
+			case FLM_VIEW_LIST:   wp = ODM_VIEW_LIST; break; 
+			case FLM_VIEW_DETAIL: wp = ODM_VIEW_DETAIL; break; 
+			case FLM_VIEW_THUMBS: wp = ODM_VIEW_THUMBS; break; 
+			case FLM_VIEW_TILES:  wp = ODM_VIEW_TILES; break; 
+		}
+		if( wp )
+			::SendMessage( shellWnd, WM_COMMAND, wp, 0 );
+
+		// hook the shell window to get notified of view mode changes
+		g_pHook->m_oldShellWndProc = (WNDPROC)
+			::SetWindowLongPtr(	shellWnd, GWLP_WNDPROC, (LONG_PTR) CmnFileDlgHook::HookShellWndProc );
+	}
 }
 
 //-----------------------------------------------------------------------------------------
