@@ -178,7 +178,8 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc(
 
 		case WM_DESTROY:
 		{
-			if( g_profile.GetInt( _T("main"), _T("ListViewMode") ) != FLM_VIEW_DEFAULT )
+			if( g_profile.GetInt( _T("main"), _T("ListViewMode") ) != FLM_VIEW_DEFAULT &&
+					g_pHook->m_listViewMode != FLM_VIEW_DEFAULT )
 				g_profile.SetInt( _T("main"), _T("ListViewMode"), g_pHook->m_listViewMode );
 		
 			FileDlgHookCallbacks::OnDestroy( ! g_pHook->m_fileDialogCanceled );
