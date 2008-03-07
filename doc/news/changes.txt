@@ -1,6 +1,16 @@
 Changelog for project FlashFolder
 =================================
 
+v1.9.175 beta
+
+ADD: list view mode persistence for common open/save dialog 
+     (see Options -> Common Open/Save -> Remember view mode)
+ADD: toolbar positioning options to fix gap between toolbar and window for some visual themes
+FIX: if user selected a directory that doesn't exist, parent directories would not have been tried 
+     for "last recent folder" and "favorites" functions (only for "recent folders" menu it worked)
+
+---------------
+
 v1.9.167 beta
 
 ADD: Redesigned favorites menu editor that features keyboard interface, drag-n-drop, context menu,
