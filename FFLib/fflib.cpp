@@ -126,7 +126,7 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 
 		case DLL_PROCESS_DETACH:
 		{
-			DebugOut( s, sizeof(s), _T("[fflib] DLL_PROCESS_DETACH (pid %08Xh)\n"), ::GetCurrentProcessId() );
+			DebugOut( _T("[fflib] DLL_PROCESS_DETACH (pid %08Xh)\n"), ::GetCurrentProcessId() );
 		}
 		break;
     }

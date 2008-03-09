@@ -39,7 +39,7 @@ bool MsoFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 	m_hwndFileDlg = hwndFileDlg;
 	m_hwndTool = hwndTool; 
 
-	::OutputDebugString( _T("[fflib] MsoFileDlgHook::Init()\n") );
+	DebugOut( _T("[fflib] MsoFileDlgHook::Init()\n") );
 
 	m_currentDir[ 0 ] = 0;
 

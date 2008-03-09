@@ -55,9 +55,7 @@ void GetDirFavorites( FavoritesList* pList, DirFavoritesSrc source )
 		if( ! GetTotalCmdLocation( NULL, &tcIniPath ) )
 			return;
 		
-		tstring dbg = tstring( _T("[fflib] Found wincmd.ini at ") ) + tcIniPath + 
-			tstring( _T("\n") );
-		::OutputDebugString( dbg.c_str() );
+		DebugOut( _T("[fflib] Found wincmd.ini at %s\n"), tcIniPath.c_str() ); 
 
 		for( int i = 1;; ++i )
 		{

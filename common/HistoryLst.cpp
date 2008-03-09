@@ -92,7 +92,7 @@ void HistoryLst::SetMaxEntries(int count)
 
 bool HistoryLst::LoadFromProfile( const Profile& profile, LPCTSTR sectionName )
 {
-	::OutputDebugString( _T("[fflib] HistoryLst::LoadFromProfile\n") );
+	DebugOut( _T("[fflib] HistoryLst::LoadFromProfile\n") );
 
 	m_list.clear();
 	for( int n = 0;; ++n )
@@ -111,7 +111,7 @@ bool HistoryLst::LoadFromProfile( const Profile& profile, LPCTSTR sectionName )
     
 void HistoryLst::SaveToProfile( Profile& profile, LPCTSTR sectionName )
 {
-	::OutputDebugString( _T("[fflib] HistoryLst::SaveToProfile\n") );
+	DebugOut( _T("[fflib] HistoryLst::SaveToProfile\n") );
 
 	// write new entries to profile
 	TCHAR key[ 16 ];

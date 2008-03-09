@@ -36,7 +36,7 @@ bool CmnFolderDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 	if( m_hwndFileDlg ) return false;  // only init once!
 	m_hwndTool = hwndTool; 
 
-	::OutputDebugString( _T("[fflib] CmnFolderDlgHook::Init()\n") );
+	DebugOut( _T("[fflib] CmnFolderDlgHook::Init()\n") );
 
 	g_pHook = this;
 
@@ -130,8 +130,6 @@ bool CmnFolderDlgHook::UpdateCurrentPath( HWND hwndTree, HTREEITEM hItem )
 
 		hItem = TreeView_GetParent( hwndTree, hItem );
 	}
-
-	::OutputDebugString( m_currentPath );
 
 	return true;
 }

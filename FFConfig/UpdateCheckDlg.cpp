@@ -139,7 +139,7 @@ LRESULT CUpdateCheckDlg::OnThreadNotify( WPARAM wp, LPARAM lp )
 			if( ! status.friendlyText.IsEmpty() )
 			{
 				SetDlgItemText( IDC_ST_STATUS, status.friendlyText );
-				::OutputDebugString( _T("[ffconfig] ") + status.friendlyText + _T("\n") );
+				DebugOut( _T("[ffconfig] %s\n"), status.friendlyText.GetString() );
 			}
 		}
 		break;

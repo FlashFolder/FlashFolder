@@ -36,7 +36,7 @@ bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 	if( m_hwndFileDlg ) return false;  // only init once!
 	m_hwndTool = hwndTool; 
 
-	::OutputDebugString( _T("[fflib] CmnFileDlgHook::Init()\n") );
+	DebugOut( _T("[fflib] CmnFileDlgHook::Init()\n") );
 
 	g_pHook = this;
 
