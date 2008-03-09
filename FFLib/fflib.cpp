@@ -111,11 +111,9 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 				StringCbCopy( g_currentExeDir, sizeof(g_currentExeDir), g_currentExePath );
 				g_currentExeDir[ p - g_currentExePath ] = 0;
 			}
-
-			TCHAR s[512];
-			StringCbPrintf( s, sizeof(s), _T("[fflib] DLL_PROCESS_ATTACH (pid %08Xh, \"%s\")\n"), 
+			
+			DebugOut( _T("[fflib] DLL_PROCESS_ATTACH (pid %08Xh, \"%s\")\n"), 
 				::GetCurrentProcessId(), g_currentExePath );
-			::OutputDebugString( s ); 
 
 			//save the HInstance of the DLL
 			g_hInstDll = hModule;
@@ -128,9 +126,7 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 
 		case DLL_PROCESS_DETACH:
 		{
-			TCHAR s[256];
-			StringCbPrintf( s, sizeof(s), _T("[fflib] DLL_PROCESS_DETACH (pid %08Xh)\n"), ::GetCurrentProcessId() );
-			::OutputDebugString( s ); 
+			DebugOut( s, sizeof(s), _T("[fflib] DLL_PROCESS_DETACH (pid %08Xh)\n"), ::GetCurrentProcessId() );
 		}
 		break;
     }
@@ -291,7 +287,7 @@ struct CNoCaseCompare
 };
 
 //-------------------------------------------------------------------------------------------------
-/// show a menu with the folders of the currently open files
+/// Show a menu with the current folders of the application and other file managers.
 
 void DisplayMenu_OpenDirs()
 {
@@ -336,90 +332,13 @@ void DisplayMenu_OpenDirs()
 		::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
 	}
 	
-	//--- get system directories to filter out system pathes
-	
-    // get Windows directory to filter out system dirs
-    TCHAR windowsDir[ MAX_PATH + 1 ] = { 0 };
-    ::GetWindowsDirectory( windowsDir, MAX_PATH );
-    int windowsDirLen = _tcslen( windowsDir );
+    //--- add application dir to the menu
 
-    //--- allocate buffers for return data of NT kernel APIs
-
-    CTypedBuf<SYSTEM_HANDLE_INFORMATION> handleBuf( 0x40000 );
-    CTypedBuf<OBJECT_NAME_INFORMATION> nameBuf( 4096 );
-
-    //--- get the global handle list 
-
-    NTSTATUS res;
-    while( ( res = D_NtQuerySystemInformation( SystemHandleInformation, handleBuf.Get(), 
-                     handleBuf.GetSize(), NULL ) ) == STATUS_INFO_LENGTH_MISMATCH )
-        handleBuf.Resize( handleBuf.GetSize() * 2 );
-    if( res != STATUS_SUCCESS )
-        return;
-
-    //--- for each file handle of the current process: get the dir path and add it to the set
+	TCHAR exeDir[ MAX_PATH + 20 ] = _T("[Application] ");
+	StringCbCat( exeDir, sizeof(exeDir), g_currentExeDir );
+	::AppendMenu( hMenu, MF_STRING, 1, exeDir );
     
-    set<tstring, CNoCaseCompare> dirset;
-    DWORD processId = ::GetCurrentProcessId();  
-    BYTE objType_file = CNtObjTypeMap::GetTypeId( OT_File );
-    SYSTEM_HANDLE *pHandleInfo = handleBuf.Get()->Handles;
-    
-    for( size_t n = 0; n < handleBuf.Get()->NumberOfHandles; n++, pHandleInfo++ )
-    {
-        if( pHandleInfo->ProcessId != processId || pHandleInfo->ObjectType != objType_file )
-            continue;            
-
-        //--- get file path (in NT namespace format) ---
-        WCHAR filepath[MAX_PATH];
-        if( D_NtQueryObject( (HANDLE) pHandleInfo->Value, ObjectNameInformation, 
-                nameBuf.Get(), nameBuf.GetSize(), NULL ) != STATUS_SUCCESS )
-            continue;
-        if( ! nameBuf.Get()->ObjectName.Buffer )
-            continue;
-
-        //--- get file attributes ---
-        bool bIsDir = false;
-        OBJECT_ATTRIBUTES objAttr = { sizeof(objAttr), NULL, &nameBuf.Get()->ObjectName };
-        FILE_BASIC_INFORMATION fileInfo; 
-        if( D_NtQueryAttributesFile( &objAttr, &fileInfo ) == STATUS_SUCCESS )
-        {
-            // ignore temporary files
-            if( (fileInfo.FileAttributes & FILE_ATTRIBUTE_TEMPORARY) != 0 )
-                continue;
-            bIsDir = (fileInfo.FileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
-        }
-
-        //--- convert filepath to user-level format ---
-        if( ! MapNtFilePathToUserPath( filepath, MAX_PATH, nameBuf.Get()->ObjectName.Buffer ) )
-            continue;
-
-        //--- if its not a directory, extract dir ---
-        if( ! bIsDir )
-        {
-            WCHAR* p = wcsrchr( filepath, _T('\\') );
-            if( p ) *p = 0;
-        } 
-        
-        // filter out system dirs
-		if( windowsDirLen > 0 && _tcsnicmp( filepath, windowsDir, windowsDirLen ) == 0 )
-			continue;        
-
-        // add the directory path - the set eleminates duplicates
-        if( _tcsicmp( filepath, g_currentExeDir ) != 0 )
-            dirset.insert( filepath );
-    } //for       
-
-    vector<tstring> dirlist( dirset.size() + 1 );
-
-    //--- add application dir to the folder list
-    dirlist[0] = g_currentExeDir;
-
-    //--- copy the in-use-folders to the list
-    vector<tstring>::iterator it = dirlist.begin();  it++;
-    copy( dirset.begin(), dirset.end(), it );
-    
-    //--- append menu items ---
-	CreateFolderMenu( dirlist, hMenu );
+    //--- 
     
 	DisplayFolderMenu( hMenu, ID_FF_OPENDIRS );
     
@@ -1343,15 +1262,12 @@ DLLFUNC bool InstallHook()
 	// TODO: make thread safe 
     if( g_hHook == NULL )
     {
-		::OutputDebugString( _T("[fflib] creating hooks...\n") );
+		DebugOut( _T("[fflib] creating hooks...\n") );
 
         // Install the hook
 		g_hHook = ::SetWindowsHookEx( WH_CBT, Hook_CBT, g_hInstDll, 0 );
 
-		TCHAR s[256]; 
-		StringCbPrintf( s, sizeof(s), 
-			_T("[fflib] g_hHook = %08Xh\n"), g_hHook );
-		::OutputDebugString( s );
+		DebugOut( _T("[fflib] g_hHook = %08Xh\n"), g_hHook );
 
 		return g_hHook != NULL;
     }
@@ -1366,8 +1282,7 @@ DLLFUNC bool UninstallHook()
 	
     if( g_hHook != NULL )
     {
-		TCHAR s[256]; StringCbPrintf( s, sizeof(s), _T("[fflib] removing WH_CBT hook %08Xh...\n"), g_hHook );
-		::OutputDebugString( s );
+		DebugOut( _T("[fflib] removing WH_CBT hook %08Xh...\n"), g_hHook );
 
 		if( ::UnhookWindowsHookEx( g_hHook ) )
 			g_hHook = NULL;

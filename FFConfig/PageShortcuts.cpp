@@ -113,7 +113,7 @@ void CPageShortcuts::ReadProfile( const Profile& profile )
 	m_lstShortcuts.SetItemData( nItem, profile.GetInt( PROFILE_GROUP, cmd ) );
 
 	++nItem;
-	title = _T("Menu: folders of open files");
+	title = _T("Menu: currently open folders");
 	cmd   = _T("ff_MenuOpenFolders");
 	m_mapTitleToCmd[ title ] = cmd;
 	m_lstShortcuts.InsertItem( nItem, title );
