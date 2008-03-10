@@ -47,27 +47,30 @@ FileDlgType GetFileDlgType( HWND dlg )
 
 		if( _tcsncmp( className, _T("bosa_sdm_"), 9 ) == 0 )
 		{
-			if( hEditFileName = GetDlgItem( dlg, VS2005_FILEDLG_ED_FILENAME ) )
-			{
-				className[0] = 0;
-				::GetClassName( hEditFileName, className, sizeof(className) / sizeof(TCHAR) - 1 );
-				if( _tcscmp( className, _T("Edit") ) == 0 )
-					return FileDlgType( FDT_MSOFFICE, FDT_VS2005 );
-			}
+			if( ::FindWindowEx( dlg, NULL, _T("Snake List"), NULL ) )
+			{		
+				if( hEditFileName = GetDlgItem( dlg, VS2005_FILEDLG_ED_FILENAME ) )
+				{
+					className[0] = 0;
+					::GetClassName( hEditFileName, className, sizeof(className) / sizeof(TCHAR) - 1 );
+					if( _tcscmp( className, _T("Edit") ) == 0 )
+						return FileDlgType( FDT_MSOFFICE, FDT_VS2005 );
+				}
 
-			FileDlgType res( FDT_MSOFFICE );
+				FileDlgType res( FDT_MSOFFICE );
 
-			if( hEditFileName = GetDlgItem( dlg, MSO2002_FILEDLG_ED_FILENAME ) )
-				res.subType = FDT_MSO2002;
-			else if( hEditFileName = GetDlgItem( dlg, MSO2000_FILEDLG_ED_FILENAME ) )
-				res.subType = FDT_MSO2000;
-			
-			if( hEditFileName )
-			{
-				className[0] = 0;
-				::GetClassName( hEditFileName, className, sizeof(className) / sizeof(TCHAR) - 1 );
-				if( _tcsncmp( className, _T("RichEdit20"), 10 ) == 0 )
-					return res;
+				if( hEditFileName = GetDlgItem( dlg, MSO2002_FILEDLG_ED_FILENAME ) )
+					res.subType = FDT_MSO2002;
+				else if( hEditFileName = GetDlgItem( dlg, MSO2000_FILEDLG_ED_FILENAME ) )
+					res.subType = FDT_MSO2000;
+				
+				if( hEditFileName )
+				{
+					className[0] = 0;
+					::GetClassName( hEditFileName, className, sizeof(className) / sizeof(TCHAR) - 1 );
+					if( _tcsncmp( className, _T("RichEdit20"), 10 ) == 0 )
+						return res;
+				}
 			}
 		}
 		return FileDlgType( FDT_NONE );
