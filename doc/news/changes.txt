@@ -1,6 +1,17 @@
 Changelog for project FlashFolder
 =================================
 
+v1.9.180 beta
+
+FIX: Some MS Office dialogs (like the Find and Replace dialog) were misdetected as Open/Save 
+     dialog, resulting in deletion of the global folder history if these dialogs were canceled.
+
+FIX: "Folders of open files" menu caused Notepad++ and propably other programs to hang. Removed 
+     the list of folders of open files from this menu since there is no other solution to this 
+     problem for now.
+
+---------------
+
 v1.9.175 beta
 
 ADD: list view mode persistence for common open/save dialog 
