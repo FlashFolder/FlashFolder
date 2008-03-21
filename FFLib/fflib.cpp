@@ -439,16 +439,12 @@ void FavMenu_AddDir( HWND hWndParent, FavoritesList& favs, LPCTSTR pPath, LPCTST
 	StringCbCat( path, sizeof(path), _T("FFConfig.exe") );
 
 	TCHAR params[ 1024 ] = _T("");
-	StringCbPrintf( params, sizeof(params),	_T("%d --addfav \"%s"), hWndParent, pPath );
-	if( HasTrailingBackslash( pPath ) )
-		StringCbCat( params, sizeof(params), _T("\\") );
-	StringCbCat( params, sizeof(params), _T("\"") );
+	StringCbPrintf( params, sizeof(params),	_T("%d --addfav \"%s\""), hWndParent, 
+		RemoveBackslash( pPath ).c_str() );
 	if( pTargetPath[ 0 ] != 0 )
 	{	
 		StringCbCat( params, sizeof(params), _T(" \"") );
-		StringCbCat( params, sizeof(params), pTargetPath );
-		if( HasTrailingBackslash( pTargetPath ) )
-			StringCbCat( params, sizeof(params), _T("\\") );
+		StringCbCat( params, sizeof(params), RemoveBackslash( pTargetPath ).c_str() );
 		StringCbCat( params, sizeof(params), _T("\"") );
 	}
 	::ShellExecute( hWndParent, _T("open"), path, params, NULL, SW_SHOW );
