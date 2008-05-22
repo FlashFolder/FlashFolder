@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<!--  
+		This file is part of FlashFolder. 
+		Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+	  
+		This program is free software; you can redistribute it and/or modify
+		it under the terms of the GNU General Public License as published by
+		the Free Software Foundation; either version 2 of the License, or
+		(at your option) any later version.
+	  
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+	  
+		You should have received a copy of the GNU General Public License
+		along with this program; if not, write to the Free Software
+		Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	-->   
+	
+	<?include _defines.wxi?>
+
+	<Fragment>
+		<!-- Program regkeys ................................... -->
+
+		<DirectoryRef Id="TARGETDIR">
+			<Component Id="ProgramRegkeys" Guid="E983DAF0-66CE-4B9E-92EA-174AEE3BABCF">
+			
+				<!-- Generic program regkey -->
+				<RegistryKey Id="RegMain" Action="create"
+					Root="HKLM" Key="Software\$(var.RootReg)\$(var.ProductReg)">
+					
+					<!-- Save install dir so it can be restored when installing an upgrade  -->
+					<RegistryValue Name="InstallDir" Value="[TARGETDIR]" Type="string" Action="write"/>	
+
+					<!-- Save what the user has choosen in the multi-user dialog -->
+					<RegistryValue Name="MultiUserProfileOption" Value="[FF_PROFILEOPTION]" Type="string" Action="write"/>
+				</RegistryKey>
+
+				<!-- Regkey to store profile data if "shared profile" is selected in the multi-user dialog -->
+				<RegistryKey Id="RegShared" Action="create"
+					Root="HKLM" Key="Software\$(var.RootReg)\$(var.ProductReg)\Shared">
+					<Permission User="Everyone" GenericAll="yes" ChangePermission="no" /> 
+				</RegistryKey>	
+
+			</Component>
+		</DirectoryRef>	
+
+		<!-- Get settings of existing product, if any -->
+
+		<Property Id="TARGETDIR" Secure="yes" Admin="yes">
+			<RegistrySearch Id="TargetDirRegSearch" 
+				Root="HKLM" Key="Software\$(var.RootReg)\$(var.ProductReg)" 
+				Name="InstallDir" Type="raw" />
+		</Property>
+
+		<Property Id="FF_PROFILEOPTION" Secure="yes" Admin="yes" Value="individual">
+			<RegistrySearch Id="ProfileOptionRegSearch"
+				Root="HKLM" Key="Software\$(var.RootReg)\$(var.ProductReg)" 
+				Name="MultiUserProfileOption" Type="raw" />	
+		</Property>
+
+	</Fragment>
+</Wix>

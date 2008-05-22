@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<Wix xmlns="http://schemas.microsoft.com/wix/2003/01/wi">
-
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<!--  
 		This file is part of FlashFolder. 
 		Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
@@ -22,125 +20,104 @@
 	-->    
   
 	<?include _version.wxi?>
+	<?include _defines.wxi?>
 	    
 	<!-- Let WiX randomize Product-ID so a full upgrade is always done.
 	     The product will be identified by the Upgrade-ID. -->
-  
-	<Product Id="????????-????-????-????-????????????"
-		UpgradeCode="5F7D22D7-9FCF-46F2-B899-D118AB900C28"
-		Name="$(loc.CptUI_ProductName)" Language="$(loc.CptUI_LANG)" Version="$(var.Version)" 
-		Manufacturer="$(loc.CptUI_ProductManufacturer)">
+	     
+	<Product Id="*"
+		UpgradeCode="$(var.UpgradeCode)"
+		Name="!(loc.ProductName)" Language="!(loc.LCID)" Version="$(var.Version)" 
+		Manufacturer="!(loc.ProductManufacturer)">
 
-		<!-- Let WiX randomize Packacke-ID since this ID should change on every compilation -->
 		<Package 
-			Id="????????-????-????-????-????????????"
-			Description="$(loc.CptUI_PackageDescription)" 
+			Description="!(loc.PackageDescription)" 
 			Comments="v$(var.Version)"
 			InstallerVersion="200" Compressed="yes" />
+			
+		<Icon Id="ProgramIcon.exe" SourceFile="..\FFConfig\res\FFConfig.ico"/>
 
-		<Upgrade Id="5F7D22D7-9FCF-46F2-B899-D118AB900C28">
-			<!-- detect whether the same or a newer version is already installed -->
+		<Media Id="1" Cabinet="Product.cab" EmbedCab="yes" CompressionLevel="high" />
+
+		<Upgrade Id="$(var.UpgradeCode)">
+			<!-- detect whether same or newer version is already installed -->
 			<UpgradeVersion
-				Minimum="$(var.Version)" IncludeMinimum="no"
+				Minimum="$(var.Version)" IncludeMinimum="yes"
 				OnlyDetect="yes"
-				Property="CPTUI_ALREADYUPDATED" />
+				Property="FF_EXISTING_PRODUCT_SAME_OR_NEWER" />
 			<!-- invoke an upgrade otherwise -->
 			<UpgradeVersion
 				Minimum="0.0.0.0" IncludeMinimum="yes"
-				Maximum="$(var.Version)" IncludeMaximum="yes"
-				Property="CPTUI_IS_UPGRADING" />				
+				Maximum="$(var.Version)" IncludeMaximum="no"
+				Property="FF_EXISTING_PRODUCT_OLDER" />				
 		</Upgrade>
-
-		<Media Id="1" Cabinet="Product.cab" EmbedCab="yes" CompressionLevel="high" />
-		
-		<!-- Name of root regkey under HKLM\Software -->
-		<Property Id="CptUI_RootReg">$(loc.CptUI_ProductManufacturer)</Property>
-		<!-- Name of sub regkey under CptUI_RootReg -->
-		<Property Id="CptUI_ProductReg">FlashFolder</Property>
-		
-		<!-- always install program for all users -->
-		<Property Id="ALLUSERS">1</Property>		
 			
-		<!-- Launch conditions (system requirements) -->
+		<FeatureRef Id="MainFeature" />
+
+		<!-- Launch conditions -->
 		
-		<Condition Message="$(loc.CptUI_Win2k_and_above)"><![CDATA[VersionNT >= 500]]></Condition>		
-		
-		<Condition Message="You need administrator privileges to install this program.">
-			<![CDATA[Privileged]]>
-		</Condition>			
-    
-		<!-- product components ................................................................. -->
+		<Condition Message="!(loc.Require_Win2k_or_newer)"><![CDATA[VersionNT >= 500]]></Condition>		
+		<Condition Message="!(loc.Error1925)">Privileged</Condition>
+		<Condition Message="A newer version of !(loc.ProductName) is already installed.">FF_EXISTING_PRODUCT_SAME_OR_NEWER</Condition>
 
-		<Directory Id="TARGETDIR" Name="SourceDir">
-			<Directory Id="ProgramFilesFolder">
-				<Directory Id="INSTALLDIR" Name="ffdir" LongName="$(loc.CptUI_ProductName)" >
+		<!-- Custom action definitions ....................................................... -->
 
-					<Component Id="FFService" Guid="E5EF7F5C-026E-4772-BBC0-075A94198FDA">
-						<File Id="ffexe" Name="ffexe" LongName="FlashFolder.exe" Vital="yes" KeyPath="yes"
-							src="..\exe\FlashFolder.exe" DiskId="1" />
-						<!-- Install program as an interactive, autorun service -->
-						<ServiceInstall Id="ffservice_inst" 
-							Name="[CptUI_ProductReg]" 
-							DisplayName="$(loc.CptUI_ProductName)"
-							Description="$(loc.CptUI_PackageDescription)"
-							ErrorControl="normal"
-							Interactive="yes"
-							Start="auto"
-							Type="ownProcess"
-							Vital="yes" />
-						<ServiceControl Id="ffservice_ctrl"
-							Name="[CptUI_ProductReg]"
-							Start="install"
-							Remove="uninstall" 
-							Wait="yes" />
-					</Component>
+		<CustomAction Id="FF_SetTargetDirDefault" Property="TARGETDIR"
+			Value="[ProgramFilesFolder]!(loc.ProductName)" Execute="firstSequence" />
+		<CustomAction Id="FF_SetArpInstallLocation" Property="ARPINSTALLLOCATION" Value="[TARGETDIR]" />
 
-					<Component Id="FFLib" Guid="ABB79737-52B0-4EA1-AC4C-DD7BE0BC3F16">
-						<File Id="ffdll" Name="fflib" LongName="fflib6439.dll" Vital="yes" KeyPath="yes" 
-							src="..\exe\fflib6439.dll" DiskId="1" />
-					</Component>
-
-					<Component Id="FFConfig" Guid="3E8D86C3-3CA3-41D5-B6E3-D09D01B50CFD">
-						<File Id="ffcfgexe" Name="ffcfgexe" LongName="FFConfig.exe" Vital="yes" KeyPath="yes"  
-							src="..\exe\FFConfig.exe" DiskId="1" />
-					</Component>
-									
-				</Directory>
-			</Directory>
-		</Directory>
-
-		<Feature Id="MainFeature" 
-			Title="$(loc.FF_MainFeature)" Description="$(loc.FF_MainFeatureDescr)" 
-			Level="1" ConfigurableDirectory="INSTALLDIR" Absent="disallow" AllowAdvertise="no">
+		<Binary Id="CustomActionDLL" SourceFile="CustomActions\exe\CustomActions.dll" />
+		<CustomAction Id="FF_CleanupRegistry" Execute="deferred" Return="check"
+			BinaryKey="CustomActionDLL" DllEntry="ClearRegistry"/>
 			
-			<!-- Include creation of standard regkeys under HKLM\Software -->
-			<ComponentRef Id="CptUI_StandardReg" />
-			<ComponentRef Id="FFService" />
-			<ComponentRef Id="FFLib" />
-			<ComponentRef Id="FFConfig" />
-		</Feature>
-		
+		<!-- install sequences ........................................................... -->
 
-		<!-- install sequence + custom actions ........................................... -->
+		<InstallUISequence>
+			<LaunchConditions After="FindRelatedProducts"/>
+		
+			<!-- Set default TARGETDIR, if not already defined -->
+			<Custom Action="FF_SetTargetDirDefault" Before="CostFinalize">NOT Installed AND TARGETDIR=""</Custom>
+		</InstallUISequence>
 
 		<InstallExecuteSequence>
+			<LaunchConditions After="FindRelatedProducts"/>
+		
 			<!-- must uninstall running FlashFolder service before install; else it could not be upgraded -->
 			<RemoveExistingProducts Before="InstallInitialize" />
+
+			<Custom Action="FF_SetTargetDirDefault" Before="CostFinalize">NOT Installed AND TARGETDIR=""</Custom>
+
+			<Custom Action="FF_SetArpInstallLocation" After="InstallInitialize">NOT Installed</Custom>
+
+		    <!-- Remove regkeys only during ARP uninstall, not during major upgrade -->
+		    <Custom Action="FF_CleanupRegistry" After="RemoveRegistryValues">REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE</Custom>	
 		</InstallExecuteSequence>
 
-		<AdminExecuteSequence />
-		
+		<!-- public interface ............................................................ -->
 
-		<!-- Interface to CptUI .......................................................... -->
+		<Property Id="TARGETDIR" Secure="yes" Admin="yes"/>
 
-		<FragmentRef Id="CptUI"/>
+		<!-- standard properties -->
 
-		<Property Id="CptUI_Version">$(var.Version)</Property>
-		<Property Id="CptUI_VersionDisplay">$(var.VersionDisplay)</Property>
-		
-		<Binary Id="CptUI_BmpBanner" src="Bitmaps\banner.jpg" />
-		<Binary Id="CptUI_BmpDialog" src="Bitmaps\dialog.jpg" />		
-		<Icon Id="CptUI_ProductIcon" src="..\FFService\res\FlashFolder.ico" />
+		<Property Id="ALLUSERS">1</Property>
+		<Property Id="PROMPTROLLBACKCOST">P</Property>
+		<Property Id="INSTALLLEVEL">3</Property>
+				
+		<Property Id="ARPINSTALLLOCATION">xxx</Property>
+		<Property Id="ARPPRODUCTICON">ProgramIcon.exe</Property>
+		<Property Id="ARPCOMMENTS">!(loc.PackageDescription)</Property>
+		<Property Id="ARPCONTACT">!(loc.ProductManufacturer)</Property>
+		<Property Id="ARPURLINFOABOUT">http://zett42.de/flashfolder/</Property>
+
+
+		<!-- Configure WixUI user interface library ...................................... -->
+
+		<UIRef Id="MyWixUI_InstallDir" />
+		<UIRef Id="WixUI_ErrorProgressText" />
+		<Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />
+		<WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+		<WixVariable Id="WixUIBannerBmp" Value="Bitmaps\banner.jpg"/>
+		<WixVariable Id="WixUIDialogBmp" Value="Bitmaps\dialog.jpg"/>
 
 	</Product>
 </Wix>

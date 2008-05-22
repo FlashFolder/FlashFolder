@@ -1,13 +1,15 @@
 @echo off
 @echo Building MSI installer...
 
+set CULTURE=en-US
+
 tools\MkVersionFile.exe ..\_version.h _version.wxi.templ _version.wxi
 
-"%WIX_2_0_DIR%\candle.exe" -nologo mainscript.wxs
+"%WIX_3_0_DIR%\candle.exe" -nologo MainScript.wxs Features.wxs ProgramFiles.wxs Regkeys.wxs MyWixUI_InstallDir.wxs -dCulture=%CULTURE% -ext WixUiExtension
 if NOT "%ERRORLEVEL%"=="0" (
 	exit /B 1
 )
-"%WIX_2_0_DIR%\light.exe" -nologo mainscript.wixobj -loc ProductTexts_EN-US.wxl wix-cptui\lib\CptUI_simple.wixlib -loc wix-cptui\lib\Texts_EN-US.wxl -out msi\FlashFolder_setup.msi
+"%WIX_3_0_DIR%\light.exe" -nologo MainScript.wixobj Features.wixobj ProgramFiles.wixobj Regkeys.wixobj MyWixUI_InstallDir.wixobj -loc ProductTexts_%CULTURE%.wxl -cultures:%CULTURE% -ext WixUtilExtension -ext WixUiExtension -out msi\FlashFolder_setup.msi
 if NOT "%ERRORLEVEL%"=="0" (
 	exit /B 1
 )

@@ -134,7 +134,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Features.wxs"
+				>
+			</File>
+			<File
 				RelativePath=".\MainScript.wxs"
+				>
+			</File>
+			<File
+				RelativePath=".\MyWixUI_InstallDir.wxs"
+				>
+			</File>
+			<File
+				RelativePath=".\ProgramFiles.wxs"
+				>
+			</File>
+			<File
+				RelativePath=".\Regkeys.wxs"
 				>
 			</File>
 		</Filter>
@@ -143,6 +159,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\_defines.wxi"
+				>
+			</File>
 			<File
 				RelativePath=".\ProductTexts_EN-US.wxl"
 				>

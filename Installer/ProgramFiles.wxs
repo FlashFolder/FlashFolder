@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<!--  
+		This file is part of FlashFolder. 
+		Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+	  
+		This program is free software; you can redistribute it and/or modify
+		it under the terms of the GNU General Public License as published by
+		the Free Software Foundation; either version 2 of the License, or
+		(at your option) any later version.
+	  
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+	  
+		You should have received a copy of the GNU General Public License
+		along with this program; if not, write to the Free Software
+		Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	--> 
+	
+	<?include _defines.wxi?>
+
+	<Fragment>
+		<ComponentGroup Id="ProgramFiles">
+			<ComponentRef Id="FlashFolder.exe"/>
+			<ComponentRef Id="fflib6439.dll"/>
+			<ComponentRef Id="FFConfig.exe"/>
+		</ComponentGroup>
+
+		<Directory Id="TARGETDIR" Name="SourceDir" FileSource="..\exe">
+			<Component Id="FlashFolder.exe" Guid="E5EF7F5C-026E-4772-BBC0-075A94198FDA">
+				<File Name="FlashFolder.exe" Vital="yes" KeyPath="yes"/>
+
+				<!-- Install program as an interactive, autorun service -->
+				<ServiceInstall Id="ffservice_inst" 
+					Name="$(var.ProductReg)" 
+					DisplayName="!(loc.ProductName)"
+					Description="!(loc.PackageDescription)"
+					ErrorControl="normal"
+					Interactive="yes"
+					Start="auto"
+					Type="ownProcess"
+					Vital="yes" />
+				<ServiceControl Id="ffservice_ctrl"
+					Name="$(var.ProductReg)"
+					Start="install"
+					Remove="uninstall" 
+					Wait="yes" />
+			</Component>
+
+			<Component Id="fflib6439.dll" Guid="ABB79737-52B0-4EA1-AC4C-DD7BE0BC3F16">
+				<File Name="fflib6439.dll" Vital="yes" KeyPath="yes"/> 
+			</Component>
+
+			<Component Id="FFConfig.exe" Guid="3E8D86C3-3CA3-41D5-B6E3-D09D01B50CFD">
+				<File Name="FFConfig.exe" Vital="yes" KeyPath="yes"/>  
+			</Component>						
+		</Directory>
+	</Fragment>
+</Wix>

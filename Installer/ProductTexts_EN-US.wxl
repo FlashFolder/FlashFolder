@@ -1,23 +1,17 @@
-<?xml version="1.0"?> 
-<WixLocalization xmlns="http://schemas.microsoft.com/wix/2003/01/localization" Codepage="1252">   
+<?xml version="1.0" encoding="utf-8"?> 
+<WixLocalization xmlns="http://schemas.microsoft.com/wix/2003/01/localization" Codepage="1252" Culture="en-US">
 <!-- This file contains product-specific localizations ......................................-->
 
-	<!-- Strings that are needed by the CptUI library -->
+	<String Id="LCID">1031</String>
 
-	<String Id="CptUI_LANG">1031</String>
+	<String Id="ProductName">FlashFolder</String>
+	<String Id="ProductManufacturer">zett42</String>
+	<String Id="PackageDescription">FlashFolder is an extension for file-related common dialogs (e.g. open/save dialog) that enables quick access to recently used folders and more.</String>
+	<String Id="PackageDescriptionShort">Extension for open/save and other dialogs</String>
 
-	<String Id="CptUI_ProductName">FlashFolder</String>
-	<String Id="CptUI_ProductWizard">FlashFolder Setup Wizard</String>
-	<String Id="CptUI_ProductManufacturer">zett42</String>
-	<String Id="CptUI_PackageDescription">FlashFolder is an extension for file-related common dialogs (e.g. open/save dialog) that enables quick access to recently used folders and more.</String>
-	<String Id="CptUI_PackageDescriptionShort">An extension for file-related common dialogs</String>
+	<String Id="MainFeature">Program executables</String>
+	<String Id="MainFeatureDescr">The FlashFolder program executables (required)</String>
 
-	<String Id="CptUI_Wizard">Setup Wizard</String>
-	<String Id="CptUI_Setup">Setup</String>
-
-	<!-- custom texts -->
-
-	<String Id="FF_MainFeature">Program executables</String>
-	<String Id="FF_MainFeatureDescr">The FlashFolder program executables (required)</String>
+	<String Id="Require_Win2k_or_newer">You need Windows 2000 or Windows XP to run this installer.</String>
 	
 </WixLocalization>
