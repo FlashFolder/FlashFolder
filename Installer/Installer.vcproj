@@ -164,6 +164,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\_version.wxi"
+				>
+			</File>
+			<File
+				RelativePath=".\_version.wxi.templ"
+				>
+			</File>
+			<File
 				RelativePath=".\ProductTexts_EN-US.wxl"
 				>
 			</File>
