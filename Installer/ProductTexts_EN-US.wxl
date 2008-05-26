@@ -14,4 +14,12 @@
 
 	<String Id="Require_Win2k_or_newer">You need Windows 2000 or Windows XP to run this installer.</String>
 	
+	<String Id="FF_MultiUserDlg_Title">[ProductName] Setup</String>
+	<String Id="FF_MultiUserDlgTitle">{\WixUI_Font_Title}Multi-User Configuration</String>
+	<String Id="FF_MultiUserDlgDescription">Set configuration for multiple user accounts</String>
+	<String Id="FF_IndividualProfiles">Use individual profiles for each user</String>
+	<String Id="FF_SharedProfile">Use one profile for all users</String>
+	<String Id="FF_IndividualProfilesDescr">Each user account has its own, independent program settings. This option is typically used if the computer is used by more than one person.</String>
+	<String Id="FF_SharedProfileDescr">All user accounts share the same program settings. Typically used if there is only one person using this computer.</String>
+		
 </WixLocalization>

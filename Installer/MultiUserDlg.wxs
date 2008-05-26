@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	This file is part of FlashFolder.
+	Copyright (C) 2007-2008 zett42 ( zett42 at users.sourceforge.net )
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>        
+        <UI>
+            <Dialog Id="FF_MultiUserDlg" Width="370" Height="270" Title="!(loc.FF_MultiUserDlg_Title)" NoMinimize="yes">
+                <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+                <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)"/>
+                <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+                    <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                </Control>
+                <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+                <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+                <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+                <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.FF_MultiUserDlgDescription)" />
+                <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.FF_MultiUserDlgTitle)" />
+
+                <Control Id="ProfileOption" Type="RadioButtonGroup"  Width="200" Height="100" X="50" Y="70" Property="FF_PROFILEOPTION" >
+					<RadioButtonGroup Property="FF_PROFILEOPTION">
+						<RadioButton X="0" Y="0" Width="200" Height="15" Value="individual" Text="!(loc.FF_IndividualProfiles)" />
+						<RadioButton X="0" Y="65" Width="200" Height="15" Value="shared" Text="!(loc.FF_SharedProfile)" />
+					</RadioButtonGroup>
+                </Control>                              
+				<Control Id="IndividualProfilesLabel" Type="Text" X="70" Y="95" Width="250" Height="40"	Text="!(loc.FF_IndividualProfilesDescr)" />
+				<Control Id="SharedProfileLabel" Type="Text" X="70" Y="160" Width="250" Height="40"	Text="!(loc.FF_SharedProfileDescr)" />
+            </Dialog>      
+        </UI>        
+    </Fragment>
+</Wix>

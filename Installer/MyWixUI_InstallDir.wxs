@@ -19,6 +19,7 @@ First-time install dialog sequence:      Maintenance dialog sequence:
    - WixUI_VerifyReadyDlg                 - WixUI_VerifyReadyDlg
    - WixUI_DiskCostDlg
 -->
+<!-- Customized for FlashFolder -->
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
@@ -55,9 +56,12 @@ First-time install dialog sequence:      Maintenance dialog sequence:
             <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath" Order="2">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3"><![CDATA[WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[WIXUI_INSTALLDIR_VALID="1"]]></Publish>
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="FF_MultiUserDlg" Order="4"><![CDATA[WIXUI_INSTALLDIR_VALID="1"]]></Publish>
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+
+			<Publish Dialog="FF_MultiUserDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+			<Publish Dialog="FF_MultiUserDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="1">NOT Installed</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed</Publish>
