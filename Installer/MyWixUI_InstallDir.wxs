@@ -63,7 +63,7 @@ First-time install dialog sequence:      Maintenance dialog sequence:
 			<Publish Dialog="FF_MultiUserDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
 			<Publish Dialog="FF_MultiUserDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="1">NOT Installed</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="FF_MultiUserDlg" Order="1">NOT Installed</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed</Publish>
 
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
