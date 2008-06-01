@@ -21,6 +21,7 @@
 #include <shellapi.h>
 #include <uxtheme.h>
 #include <tmschema.h>
+#include <cpl.h>
 
 //--- crt headers
 #include <tchar.h>

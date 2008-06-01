@@ -25,6 +25,7 @@ const TCHAR FF_GUID[] = _T("{163F258C-65E0-483d-8B7A-5ABD9E3D4487}");
 const TCHAR FF_WNDCLASSNAME[] = _T("FlashFolder_3832795"); 
 
 extern RegistryProfile g_profile;
+extern HINSTANCE g_hInstDll;
 
 int FavMenu_Display( HWND hWndParent, int x, int y, const FavoritesList& favs );
 void FavMenu_StartEditor( HWND hWndParent );

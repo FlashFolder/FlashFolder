@@ -113,6 +113,7 @@ ID_FF_TOOLBAR_XP        BITMAP                  "res\\toolbar_new.bmp"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_FOLDER              ICON                    "res\\folder.ico"
+IDI_CPL_ICON            ICON                    "..\\res\\FFConfig.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -122,6 +123,7 @@ IDI_FOLDER              ICON                    "res\\folder.ico"
 STRINGTABLE 
 BEGIN
     ID_FF_GLOBALHIST        "Global folder history"
+    IDS_CPL_INFO            "Configures FlashFolder tool - rapid access to your mostly used folders from common file dialogs"
     ID_FF_FAVORITES         "Favorite folders"
     ID_FF_SHOWALL           "View all files (*.*)"
     ID_FF_OPENDIRS          "Currently open folders"
@@ -130,7 +132,7 @@ END
 STRINGTABLE 
 BEGIN
     ID_FF_LASTDIR           "Go to last folder"
-    ID_FF_CONFIG            "Edit FlashFolder configuration"
+    ID_FF_CONFIG            "FlashFolder configuration"
 END
 
 #endif    // Englisch (USA) resources

@@ -22,7 +22,8 @@
 	<Fragment>
 		<Feature Id="MainFeature" 
 			Title="!(loc.MainFeature)" 
-			Description="!(loc.MainFeatureDescr)" 
+			Description="!(loc.MainFeatureDescr)"
+			Display="expand"  
 			Level="1" 
 			ConfigurableDirectory="TARGETDIR" 
 			Absent="disallow" 
@@ -30,6 +31,17 @@
 			
 			<ComponentRef Id="ProgramRegkeys"/>
 			<ComponentGroupRef Id="ProgramFiles"/>
-		</Feature>
+
+			<Feature Id="ControlPanelApplet"
+				Title="!(loc.FF_ControlPanel)"
+				Description="!(loc.FF_ControlPanelDescr)"
+				Display="expand" 
+				Level="1"
+				Absent="allow"
+				AllowAdvertise="no">
+
+				<ComponentRef Id="FFControlPanel"/>	
+			</Feature>
+		</Feature>		
 	</Fragment>
 </Wix>	

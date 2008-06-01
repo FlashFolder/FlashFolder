@@ -6,11 +6,14 @@
 
 	<String Id="ProductName">FlashFolder</String>
 	<String Id="ProductManufacturer">zett42</String>
-	<String Id="PackageDescription">FlashFolder is an extension for file-related common dialogs (e.g. open/save dialog) that enables quick access to recently used folders and more.</String>
-	<String Id="PackageDescriptionShort">Extension for open/save and other dialogs</String>
+	<String Id="PackageDescription">FlashFolder - rapid access to your mostly used folders from common file dialogs.</String>
+	<String Id="PackageDescriptionShort">Extension for common file dialogs</String>
 
 	<String Id="MainFeature">Program executables</String>
 	<String Id="MainFeatureDescr">The FlashFolder program executables (required)</String>
+
+	<String Id="FF_ControlPanel">Add to Control Panel</String>
+	<String Id="FF_ControlPanelDescr">Install a control panel applet for FlashFolder configuration</String>
 
 	<String Id="Require_Win2k_or_newer">You need Windows 2000 or Windows XP to run this installer.</String>
 	

@@ -7,7 +7,9 @@
 #define IDD_TOOLWND                     111
 #define IDB_BITMAP1                     112
 #define ID_FF_TOOLBAR_XP                112
+#define IDI_CPL_ICON                    113
 #define ID_FF_GLOBALHIST                1001
+#define IDS_CPL_INFO                    1003
 #define ID_FF_FAVORITES                 1005
 #define ID_FF_SHOWALL                   1006
 #define ID_FF_OPENDIRS                  1007
@@ -21,7 +23,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        113
+#define _APS_NEXT_RESOURCE_VALUE        114
 #define _APS_NEXT_COMMAND_VALUE         1011
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101
