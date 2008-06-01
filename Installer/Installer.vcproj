@@ -142,11 +142,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MultiUserDlg.wxs"
+				RelativePath=".\MyWixUI_InstallDir.wxs"
 				>
 			</File>
 			<File
-				RelativePath=".\MyWixUI_InstallDir.wxs"
+				RelativePath=".\MyWixUI_MultiUserDlg.wxs"
+				>
+			</File>
+			<File
+				RelativePath=".\MyWixUI_UpgradeDlg.wxs"
+				>
+			</File>
+			<File
+				RelativePath=".\MyWixUI_WelcomeDlg.wxs"
 				>
 			</File>
 			<File

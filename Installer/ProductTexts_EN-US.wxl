@@ -21,9 +21,18 @@
 	<String Id="FF_MultiUserDlg_Title">[ProductName] Setup</String>
 	<String Id="FF_MultiUserDlgTitle">{\WixUI_Font_Title}Multi-User Configuration</String>
 	<String Id="FF_MultiUserDlgDescription">Set how configuration is used for multiple user accounts</String>
-	<String Id="FF_IndividualProfiles">Use individual profiles for each user</String>
-	<String Id="FF_SharedProfile">Use one profile for all users</String>
+	<String Id="FF_IndividualProfiles">&amp;Use individual profiles for each user</String>
+	<String Id="FF_SharedProfile">Use &amp;one profile for all users</String>
 	<String Id="FF_IndividualProfilesDescr">Each user account has its own, independent program settings. This option is typically used if the computer is used by more than one person.</String>
 	<String Id="FF_SharedProfileDescr">All user accounts share the same program settings. Typically used if there is only one person using this computer.</String>
-		
+
+	<String Id="FF_UpgradeDlg_Title">[ProductName] Setup</String>
+	<String Id="FF_UpgradeDlgTitle">{\WixUI_Font_Title}Upgrade</String>
+	<String Id="FF_UpgradeDlgDescription">Upgrade existing version of [ProductName]</String>
+	<String Id="FF_UpgradeDlgInfo1">An older version of [ProductName] is installed on your computer that will be upgraded by this installation.</String>
+	<String Id="FF_UpgradeDlgInfo2">You can either use the installation settings of this older version or change them for the newer version.</String>
+	<String Id="FF_UpgradeDlgCheckbox">&amp;Use settings of installed version</String>
+
+	<String Id="FF_Version">Version: [ProductVersion]</String>
+
 </WixLocalization>
