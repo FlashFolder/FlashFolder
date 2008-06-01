@@ -58,7 +58,7 @@
 		
 		<Condition Message="!(loc.Require_Win2k_or_newer)"><![CDATA[VersionNT >= 500]]></Condition>		
 		<Condition Message="!(loc.Error1925)">Privileged</Condition>
-		<Condition Message="A newer version of !(loc.ProductName) is already installed.">NOT FF_EXISTING_PRODUCT_SAME_OR_NEWER</Condition>
+		<Condition Message="!(loc.NewerVersionInstalled)">NOT FF_EXISTING_PRODUCT_SAME_OR_NEWER</Condition>
 
 		<!-- Custom action definitions ....................................................... -->
 

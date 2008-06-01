@@ -16,6 +16,7 @@
 	<String Id="FF_ControlPanelDescr">Install a control panel applet for FlashFolder configuration</String>
 
 	<String Id="Require_Win2k_or_newer">You need Windows 2000 or Windows XP to run this installer.</String>
+	<String Id="NewerVersionInstalled">A newer version of [ProductName] is already installed.</String>
 	
 	<String Id="FF_MultiUserDlg_Title">[ProductName] Setup</String>
 	<String Id="FF_MultiUserDlgTitle">{\WixUI_Font_Title}Multi-User Configuration</String>
