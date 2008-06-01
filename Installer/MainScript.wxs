@@ -65,10 +65,6 @@
 		<CustomAction Id="FF_SetTargetDirDefault" Property="TARGETDIR"
 			Value="[ProgramFilesFolder]!(loc.ProductName)" Execute="firstSequence" />
 		<CustomAction Id="FF_SetArpInstallLocation" Property="ARPINSTALLLOCATION" Value="[TARGETDIR]" />
-
-		<Binary Id="CustomActionDLL" SourceFile="CustomActions\exe\CustomActions.dll" />
-		<CustomAction Id="FF_CleanupRegistry" Execute="deferred" Return="check"
-			BinaryKey="CustomActionDLL" DllEntry="ClearRegistry"/>
 			
 		<!-- install sequences ........................................................... -->
 
@@ -88,9 +84,6 @@
 			<Custom Action="FF_SetTargetDirDefault" Before="CostFinalize">NOT Installed AND TARGETDIR=""</Custom>
 
 			<Custom Action="FF_SetArpInstallLocation" After="InstallInitialize">NOT Installed</Custom>
-
-		    <!-- Remove regkeys only during ARP uninstall, not during major upgrade -->
-		    <Custom Action="FF_CleanupRegistry" After="RemoveRegistryValues">REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE</Custom>	
 		</InstallExecuteSequence>
 
 		<!-- public interface ............................................................ -->
@@ -103,7 +96,6 @@
 		<Property Id="PROMPTROLLBACKCOST">P</Property>
 		<Property Id="INSTALLLEVEL">3</Property>
 				
-		<Property Id="ARPINSTALLLOCATION">xxx</Property>
 		<Property Id="ARPPRODUCTICON">ProgramIcon.exe</Property>
 		<Property Id="ARPCOMMENTS">!(loc.PackageDescription)</Property>
 		<Property Id="ARPCONTACT">!(loc.ProductManufacturer)</Property>
