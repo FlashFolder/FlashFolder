@@ -4,5 +4,4 @@
 ;
 LIBRARY    "CustomActions"
 EXPORTS
-	ClearRegistry
 	MsgBox
