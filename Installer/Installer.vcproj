@@ -176,10 +176,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\_version.wxi"
-				>
-			</File>
-			<File
 				RelativePath=".\_version.wxi.templ"
 				>
 			</File>
