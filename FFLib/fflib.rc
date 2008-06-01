@@ -113,7 +113,7 @@ ID_FF_TOOLBAR_XP        BITMAP                  "res\\toolbar_new.bmp"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_FOLDER              ICON                    "res\\folder.ico"
-IDI_CPL_ICON            ICON                    "..\\res\\FFConfig.ico"
+IDI_CPL_ICON            ICON                    "..\\FFConfig\\res\\FFConfig.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
