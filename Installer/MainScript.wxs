@@ -83,7 +83,7 @@
 
 			<Custom Action="FF_SetTargetDirDefault" Before="CostFinalize">NOT Installed AND TARGETDIR=""</Custom>
 
-			<Custom Action="FF_SetArpInstallLocation" After="InstallInitialize">NOT Installed</Custom>
+			<Custom Action="FF_SetArpInstallLocation" After="CostFinalize">NOT Installed OR REINSTALL</Custom>
 		</InstallExecuteSequence>
 
 		<!-- public interface ............................................................ -->

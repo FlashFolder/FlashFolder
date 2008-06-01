@@ -19,7 +19,7 @@
 	
 	<String Id="FF_MultiUserDlg_Title">[ProductName] Setup</String>
 	<String Id="FF_MultiUserDlgTitle">{\WixUI_Font_Title}Multi-User Configuration</String>
-	<String Id="FF_MultiUserDlgDescription">Set configuration for multiple user accounts</String>
+	<String Id="FF_MultiUserDlgDescription">Set how configuration is used for multiple user accounts</String>
 	<String Id="FF_IndividualProfiles">Use individual profiles for each user</String>
 	<String Id="FF_SharedProfile">Use one profile for all users</String>
 	<String Id="FF_IndividualProfilesDescr">Each user account has its own, independent program settings. This option is typically used if the computer is used by more than one person.</String>
