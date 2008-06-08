@@ -32,7 +32,7 @@
 					Root="HKLM" Key="Software\$(var.RootReg)\$(var.ProductReg)">
 					
 					<!-- Save install dir so it can be restored when installing an upgrade  -->
-					<RegistryValue Name="InstallDir" Value="[TARGETDIR]" Type="string" Action="write"/>	
+					<RegistryValue Name="InstallDir" Value="[TARGETDIR]" Type="string" Action="write" KeyPath="yes"/>	
 
 					<!-- Save what the user has choosen in the multi-user dialog -->
 					<RegistryValue Name="MultiUserProfileOption" Value="[FF_PROFILEOPTION]" Type="string" Action="write"/>
