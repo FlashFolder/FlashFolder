@@ -1,1 +1,0 @@
-msiexec /x msi\FlashFolder_setup.msi

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- generic, project-independent properties -->
+  <PropertyGroup>
+    <ProjectGuid>{93c32df2-aee5-44a7-bde1-4adcd29bbda3}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProductVersion>3.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputType>Package</OutputType>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.0\Wix.targets</WixTargetsPath>
+    <OutputPath>msi</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <Name>Installer</Name>
+  </PropertyGroup>
+  <Import Project="_Installer.targets" />
+  <ItemGroup>
+    <Content Include="_defines.wxi" />
+    <Content Include="_Installer.targets" />
+    <Content Include="_version.wxi.templ" />
+  </ItemGroup>
+</Project>

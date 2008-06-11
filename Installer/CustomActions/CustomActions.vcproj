@@ -4,6 +4,7 @@
 	Version="8,00"
 	Name="Installer_CustomActions"
 	ProjectGUID="{EE5C2B4F-E475-4D4B-B174-5D288682A952}"
+	RootNamespace="Installer_CustomActions"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
