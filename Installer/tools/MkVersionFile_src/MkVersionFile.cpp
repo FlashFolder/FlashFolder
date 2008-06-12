@@ -24,6 +24,8 @@
 #include <string>
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
+#include <sys/types.h> 
+#include <sys/stat.h>
 
 using namespace std;
 using namespace boost;
@@ -58,6 +60,23 @@ int main(int argc, char* argv[])
 	char* templpath = argv[2];
 	char* outpath = argv[3];
 
+	struct stat stInFile; struct stat stOutFile;
+	if( stat( inpath, &stInFile ) != 0 )
+	{
+		printf( "[MkVersionFile] ERROR: could not access input file %s", inpath );
+		return 2;		
+	}
+	if( stat( outpath, &stOutFile ) == 0 )
+	{
+		// If output file exists and is not out-of-date, there is nothing to do, so avoid triggering
+		// a recompile in MSBuild that happens if the file modify date changes.
+		if( stOutFile.st_mtime >= stInFile.st_mtime )
+		{
+			printf( "[MkVersionFile] version file is up to date\n" );
+			return 0; 
+		}
+	}
+
 	ifstream infile( inpath, ios_base::binary );
 	if( ! infile )
 	{
@@ -68,7 +87,7 @@ int main(int argc, char* argv[])
 	if( ! templfile )
 	{
 		printf( "[MkVersionFile] ERROR: could not open template file %s", templpath );
-		return 2;		
+		return 3;		
 	}
 
 	string instr, outstr;
@@ -90,29 +109,29 @@ int main(int argc, char* argv[])
 
 	if( ! regex_search( instr.c_str(), match, expr_major ) )
 	{
-		cout << "[MkVersionFile] ERROR: input file has unexpected format." << endl;
-		return 2;
+		printf( "[MkVersionFile] ERROR: input file has unexpected format.\n" );
+		return 4;
 	}
 	v_major = match[1].str();
 
 	if( ! regex_search( instr.c_str(), match, expr_minor ) )
 	{
-		cout << "[MkVersionFile] ERROR: input file has unexpected format." << endl;
-		return 2;
+		printf( "[MkVersionFile] ERROR: input file has unexpected format.\n" );
+		return 5;
 	}
 	v_minor = match[1].str();
 
 	if( ! regex_search( instr.c_str(), match, expr_micro ) )
 	{
-		cout << "[MkVersionFile] ERROR: input file has unexpected format." << endl;
-		return 2;
+		printf( "[MkVersionFile] ERROR: input file has unexpected format.\n" );
+		return 6;
 	}
 	v_micro = match[1].str();
 
 	if( ! regex_search( instr.c_str(), match, expr_build ) )
 	{
-		cout << "[MkVersionFile] ERROR: input file has unexpected format." << endl;
-		return 2;
+		printf( "[MkVersionFile] ERROR: input file has unexpected format.\n" );
+		return 7;
 	}
 	v_build = match[1].str();
 
@@ -121,15 +140,15 @@ int main(int argc, char* argv[])
 	replace_all( outstr, "$APP_VER_MICRO$", v_micro );
 	replace_all( outstr, "$APP_VER_BUILD$", v_build );
 
-	ofstream outfile( outpath );
+	ofstream outfile( outpath, ios_base::binary );
 	if( ! outfile )
 	{
-		printf( "[MkVersionFile] could not open output file %s", outpath );
-		return 2;		
+		printf( "[MkVersionFile] could not open output file %s\n", outpath );
+		return 8;		
 	}
 	outfile.write( outstr.c_str(), outstr.size() ); 
 
-	cout << "[MkVersionFile] Version file created successfully: " << outpath << endl;
+	printf( "[MkVersionFile] Version file created successfully: %s\n", outpath );
 
 	return 0;
 }
