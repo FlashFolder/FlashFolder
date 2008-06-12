@@ -16,13 +16,12 @@
   <ItemGroup>
     <Content Include="_defines.wxi" />
     <Content Include="_Installer.targets" />
+    <Content Include="_version.wxi" />
     <Content Include="_version.wxi.templ" />
   </ItemGroup>
-
-	<!-- Generate version include file from SVN revision number -->
-	<Target Name="BeforeBuild">
-		<Exec Command='"$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe" "$(SolutionDir)\" "$(SolutionDir)_version.templ" "$(SolutionDir)_version.h"'/>
-		<Exec Command='"$(MSBuildProjectDirectory)\tools\MkVersionFile.exe" ..\_version.h _version.wxi.templ _version.wxi'/>
-	</Target>
-
+  <!-- Generate version include file from SVN revision number -->
+  <Target Name="BeforeBuild">
+    <Exec Command="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;" />
+    <Exec Command="&quot;$(MSBuildProjectDirectory)\tools\MkVersionFile.exe&quot; ..\_version.h _version.wxi.templ _version.wxi" />
+  </Target>
 </Project>
