@@ -21,8 +21,8 @@
 
 	<!-- Generate version include file from SVN revision number -->
 	<Target Name="BeforeBuild">
+		<Exec Command='"$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe" "$(SolutionDir)\" "$(SolutionDir)_version.templ" "$(SolutionDir)_version.h"'/>
 		<Exec Command='"$(MSBuildProjectDirectory)\tools\MkVersionFile.exe" ..\_version.h _version.wxi.templ _version.wxi'/>
-		<Message Text='Hallo Welt'/>
 	</Target>
 
 </Project>
