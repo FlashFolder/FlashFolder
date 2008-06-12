@@ -10,7 +10,7 @@
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.0\Wix.targets</WixTargetsPath>
     <OutputPath>msi</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <Name>Installer</Name>
+    <Name>_Installer</Name>
   </PropertyGroup>
   <Import Project="_Installer.targets" />
   <ItemGroup>
@@ -18,4 +18,11 @@
     <Content Include="_Installer.targets" />
     <Content Include="_version.wxi.templ" />
   </ItemGroup>
+
+	<!-- Generate version include file from SVN revision number -->
+	<Target Name="BeforeBuild">
+		<Exec Command='"$(MSBuildProjectDirectory)\tools\MkVersionFile.exe" ..\_version.h _version.wxi.templ _version.wxi'/>
+		<Message Text='Hallo Welt'/>
+	</Target>
+
 </Project>
