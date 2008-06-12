@@ -34,15 +34,7 @@
 	<Import Project="$(WixTargetsPath)" />
 
 	<ItemGroup>
-		<Compile Include="Features.wxs" />
-		<Compile Include="Files.wxs" />
-		<Compile Include="Main.wxs" />
-		<Compile Include="MyWixUI_InstallDir.wxs" />
-		<Compile Include="MyWixUI_MultiUserDlg.wxs" />
-		<Compile Include="MyWixUI_UpgradeDlg.wxs" />
-		<Compile Include="MyWixUI_VerifyRemoveDlg.wxs" />
-		<Compile Include="MyWixUI_WelcomeDlg.wxs" />
-		<Compile Include="Regkeys.wxs" />
+		<Compile Include="*.wxs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -57,13 +49,4 @@
 		  <HintPath>WixUtilExtension.dll</HintPath>
 		</WixExtension>
 	</ItemGroup>
-
-	<!--
-	To modify your build process, add your task inside one of the targets below and uncomment it.
-	Other similar extension points exist, see Wix.targets.
-	<Target Name="BeforeBuild">
-	</Target>
-	<Target Name="AfterBuild">
-	</Target>
-	-->
 </Project>

@@ -13,7 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestGui", "TestGui\TestGui.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Installer_CustomActions", "Installer\CustomActions\CustomActions.vcproj", "{EE5C2B4F-E475-4D4B-B174-5D288682A952}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Installer", "Installer\Installer.wixproj", "{93C32DF2-AEE5-44A7-BDE1-4ADCD29BBDA3}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Installer", "Installer\_Installer.wixproj", "{93C32DF2-AEE5-44A7-BDE1-4ADCD29BBDA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
