@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+	This file is part of FlashFolder.
+	Copyright (C) 2007-2008 zett42 ( zett42 at users.sourceforge.net )
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+<!-- MSBuild-Script to compile the FlashFolder MSI installer -->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+	DefaultTargets="Build">
+
+	<!-- WiX MSBuild properties -->
+	<PropertyGroup>
+		<ProductVersion>3.0</ProductVersion>
+		<SchemaVersion>2.0</SchemaVersion>
+		<OutputType>Package</OutputType>
+		<WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.0\Wix.targets</WixTargetsPath>
+		<OutputPath>msi</OutputPath>
+		<IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+	</PropertyGroup>
+
+	<!-- Project-specific properties -->
+	<PropertyGroup>
+		<OutputName>FlashFolder_$(Configuration)</OutputName>
+		<Cultures>en-US</Cultures>
+	</PropertyGroup>
+
+	<Import Project="$(WixTargetsPath)" />
+
+	<!-- Generate version include file from SVN revision number -->
+	<Target Name="BeforeBuild">
+		<Exec Command="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;" />
+		<Exec Command="&quot;$(MSBuildProjectDirectory)\tools\MkVersionFile.exe&quot; ..\_version.h _version.wxi.templ _version.wxi" />
+	</Target>
+
+	<!-- WiX extensions -->
+	<ItemGroup>
+		<WixExtension Include="$(WixToolPath)WixUIExtension.dll">
+			<HintPath>WixUIExtension.dll</HintPath>
+		</WixExtension>
+		<WixExtension Include="$(WixToolPath)WixUtilExtension.dll">
+			<HintPath>WixUtilExtension.dll</HintPath>
+		</WixExtension>
+	</ItemGroup>
+
+	<!-- Source files -->
+	<ItemGroup>
+		<Content Include="_defines.wxi" />
+		<Content Include="_version.wxi" />
+		<Compile Include="*.wxs" />
+		<EmbeddedResource Include="Texts_$(Cultures).wxl" />
+	</ItemGroup>
+</Project>
