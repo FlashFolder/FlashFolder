@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+	This file is part of FlashFolder.
+	Copyright (C) 2007-2008 zett42 ( zett42 at users.sourceforge.net )
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+<!-- MSBuild-Script for building the FlashFolder MSI installer and all dependent projects -->
+
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!-- Generate version include files from SVN revision number ......................................... 
+		This target will _always_ be run to make sure the revision number is up to date.
+		If the revision number is out-of-date, it will trigger a recompile of the sub projects.
+	-->	
+	<ItemGroup>
+		<VersionOutFile Include="_version.h"/>
+		<VersionOutFile Include="Installer\_version.wxi"/>
+	</ItemGroup>
+	<Target Name="VersionInclude" Outputs="@(VersionOutFile)">
+		<Message Text="_______Creating version include files_______" Importance="high"/>
+		<Exec Command="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; . _version.templ _version.h" />
+		<Exec Command="z_BuildTools\MkVersionFile.exe _version.h Installer\_version.wxi.templ Installer\_version.wxi" />
+	</Target>
+	<Target Name="VersionInclude_clean">
+		<Delete Files="@(VersionOutFile)"/>
+	</Target>
+
+	<!-- Build sub projects ....................................................................... -->
+
+	<ItemGroup>
+		<VCProject Include="FFConfig\FFConfig.vcproj"/>
+		<VCProject Include="FFLib\FFLib.vcproj"/>
+		<VCProject Include="FFService\FFService.vcproj"/>
+	</ItemGroup>
+
+	<Target Name="VCProjects" DependsOnTargets="VersionInclude">
+		<Message Text="_______Building VC projects_______" Importance="high"/>
+		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)"/>
+	</Target>
+	<Target Name="VCProjects_clean">
+		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)" Clean="true"/>
+	</Target>
+
+	<Target Name="Installer" DependsOnTargets="VersionInclude">
+		<Message Text="_______Building Installer_______" Importance="high"/>
+		<MSBuild Projects="Installer\Installer.msbuild" Properties="Configuration=$(Configuration)"/>
+	</Target>
+	<Target Name="Installer_clean">
+		<MSBuild Projects="Installer\Installer.msbuild" Properties="Configuration=$(Configuration)"	Targets="Clean"/>
+	</Target>
+
+	<!-- Build all ................................................................................. -->
+
+	<Target Name="Build" DependsOnTargets="VCProjects;Installer">
+	</Target>
+	<Target Name="Clean" DependsOnTargets="VersionInclude_clean;VCProjects_clean;Installer_clean"/>
+	<Target Name="Rebuild" DependsOnTargets="Clean;Build"/>
+
+</Project>

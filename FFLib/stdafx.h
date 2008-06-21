@@ -51,7 +51,6 @@ using namespace std;
 #include <ExplorerUtils.h>
 
 //--- common project files
-#include "../_version.h"
 #include "../common/Favorites.h"
 #include "../common/ff_utils.h"
 #include "../common/HistoryLst.h"

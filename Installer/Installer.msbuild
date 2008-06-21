@@ -19,10 +19,9 @@
 -->
 <!-- MSBuild-Script to compile the FlashFolder MSI installer -->
 
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
-	DefaultTargets="Build">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<!-- WiX MSBuild properties -->
+	<!-- WiX properties ................................................................... -->
 	<PropertyGroup>
 		<ProductVersion>3.0</ProductVersion>
 		<SchemaVersion>2.0</SchemaVersion>
@@ -30,23 +29,13 @@
 		<WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.0\Wix.targets</WixTargetsPath>
 		<OutputPath>msi</OutputPath>
 		<IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-	</PropertyGroup>
+		<DefineSolutionProperties>false</DefineSolutionProperties>
 
-	<!-- Project-specific properties -->
-	<PropertyGroup>
 		<OutputName>FlashFolder_$(Configuration)</OutputName>
 		<Cultures>en-US</Cultures>
 	</PropertyGroup>
-
-	<Import Project="$(WixTargetsPath)" />
-
-	<!-- Generate version include file from SVN revision number -->
-	<Target Name="BeforeBuild">
-		<Exec Command="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; &quot;$(SolutionDir)\&quot; &quot;$(SolutionDir)_version.templ&quot; &quot;$(SolutionDir)_version.h&quot;" />
-		<Exec Command="&quot;$(MSBuildProjectDirectory)\tools\MkVersionFile.exe&quot; ..\_version.h _version.wxi.templ _version.wxi" />
-	</Target>
-
-	<!-- WiX extensions -->
+		
+	<!-- WiX extensions ................................................................... -->
 	<ItemGroup>
 		<WixExtension Include="$(WixToolPath)WixUIExtension.dll">
 			<HintPath>WixUIExtension.dll</HintPath>
@@ -56,11 +45,25 @@
 		</WixExtension>
 	</ItemGroup>
 
-	<!-- Source files -->
+	<!-- Source files ..................................................................... -->
 	<ItemGroup>
-		<Content Include="_defines.wxi" />
-		<Content Include="_version.wxi" />
+		<!-- The content elements make sure that the build is triggered if these files change. -->
+		<Content Include="..\exe\*"/>
+		<Content Include="*.wxi" />
 		<Compile Include="*.wxs" />
 		<EmbeddedResource Include="Texts_$(Cultures).wxl" />
 	</ItemGroup>
+
+	<!-- Let WiX MSBuild extension do the build -->
+	<Import Project="$(WixTargetsPath)" />
+
+	<!-- Override WiX build extension point -->	
+	<Target Name="BeforeBuild">
+		<VCBuild Projects="CustomActions\CustomActions.vcproj" Configuration="$(Configuration)"/>
+	</Target>
+
+	<Target Name="Clean">
+		<RemoveDir Directories="obj"/>
+	</Target>
+	<Target Name="Rebuild" DependsOnTargets="Clean;Build"/>
 </Project>

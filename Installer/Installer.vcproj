@@ -3,8 +3,8 @@
 	ProjectType="Visual C++"
 	Version="8,00"
 	Name="Installer"
-	ProjectGUID="{4448252F-7E2B-4316-8F67-DD25D6DA9779}"
-	RootNamespace="Installer_msbuild"
+	ProjectGUID="{09D4277C-F9E3-49C9-8E99-AE2D3928520C}"
+	RootNamespace="Installer"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -23,10 +23,10 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="msbuild Installer.targets /nologo /v:minimal /p:SolutionDir=$(SolutionDir)"
-				ReBuildCommandLine="msbuild Installer.targets /nologo /v:minimal /t:rebuild /p:SolutionDir=$(SolutionDir)"
-				CleanCommandLine=""
-				Output="Installer_msbuild.exe"
+				BuildCommandLine="msbuild Installer.msbuild /nologo /v:minimal /p:Configuration=$(ConfigurationName)"
+				ReBuildCommandLine="msbuild Installer.msbuild /nologo /v:minimal /t:Rebuild /p:Configuration=$(ConfigurationName)"
+				CleanCommandLine="msbuild Installer.msbuild /nologo /v:minimal /t:Clean /p:Configuration=$(ConfigurationName)"
+				Output=""
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
 				ForcedIncludes=""
@@ -43,10 +43,10 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="msbuild Installer.targets /nologo /v:minimal /p:SolutionDir=$(SolutionDir)"
-				ReBuildCommandLine="msbuild Installer.targets /nologo /v:minimal /t:rebuild /p:SolutionDir=$(SolutionDir)"
-				CleanCommandLine=""
-				Output="Installer_msbuild.exe"
+				BuildCommandLine="msbuild Installer.msbuild /nologo /v:minimal /p:Configuration=$(ConfigurationName)"
+				ReBuildCommandLine="msbuild Installer.msbuild /nologo /v:minimal /t:Rebuild /p:Configuration=$(ConfigurationName)"
+				CleanCommandLine="msbuild Installer.msbuild /nologo /v:minimal /t:Clean /p:Configuration=$(ConfigurationName)"
+				Output=""
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				IncludeSearchPath=""
 				ForcedIncludes=""
@@ -60,48 +60,6 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Quelldateien"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
-			>
-			<File
-				RelativePath=".\Features.wxs"
-				>
-			</File>
-			<File
-				RelativePath=".\Files.wxs"
-				>
-			</File>
-			<File
-				RelativePath=".\Main.wxs"
-				>
-			</File>
-			<File
-				RelativePath=".\MyWixUI_InstallDir.wxs"
-				>
-			</File>
-			<File
-				RelativePath=".\MyWixUI_MultiUserDlg.wxs"
-				>
-			</File>
-			<File
-				RelativePath=".\MyWixUI_UpgradeDlg.wxs"
-				>
-			</File>
-			<File
-				RelativePath=".\MyWixUI_VerifyRemoveDlg.wxs"
-				>
-			</File>
-			<File
-				RelativePath=".\MyWixUI_WelcomeDlg.wxs"
-				>
-			</File>
-			<File
-				RelativePath=".\Regkeys.wxs"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Headerdateien"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
@@ -111,32 +69,70 @@
 				>
 			</File>
 			<File
-				RelativePath=".\_version.wxi"
+				RelativePath="..\_version.wxi.templ"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Ressourcendateien"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			Name="Source_UI"
 			>
 			<File
-				RelativePath=".\License.rtf"
+				RelativePath="..\UI_Main.wxs"
 				>
 			</File>
 			<File
-				RelativePath=".\Texts_EN-US.wxl"
+				RelativePath="..\UI_MultiUserDlg.wxs"
+				>
+			</File>
+			<File
+				RelativePath="..\UI_UpgradeDlg.wxs"
+				>
+			</File>
+			<File
+				RelativePath="..\UI_VerifyRemoveDlg.wxs"
+				>
+			</File>
+			<File
+				RelativePath="..\UI_WelcomeDlg.wxs"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="_MSBuild"
+			Name="Source"
 			>
 			<File
-				RelativePath=".\Installer.targets"
+				RelativePath="..\Features.wxs"
+				>
+			</File>
+			<File
+				RelativePath="..\Files.wxs"
+				>
+			</File>
+			<File
+				RelativePath="..\Main.wxs"
+				>
+			</File>
+			<File
+				RelativePath="..\Regkeys.wxs"
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Ressources"
+			>
+			<File
+				RelativePath="..\License.rtf"
+				>
+			</File>
+			<File
+				RelativePath="..\Texts_EN-US.wxl"
+				>
+			</File>
+		</Filter>
+		<File
+			RelativePath=".\Installer.msbuild"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

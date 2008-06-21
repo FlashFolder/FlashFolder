@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="MkVersionFile"
+	Name="z_MkVersionFile"
 	ProjectGUID="{0BD5554B-96B3-46AF-9C54-B6BEB268434C}"
 	RootNamespace="MkVersionFile"
 	Keyword="Win32Proj"
@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="exe/MkVersionFile.exe"
+				OutputFile="MkVersionFile.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(CPT_VCPP_LIB)/boost/1.34.1/lib"
 				GenerateDebugInformation="true"
@@ -139,7 +139,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="exe/MkVersionFile.exe"
+				OutputFile="MkVersionFile.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(CPT_VCPP_LIB)/boost/1.34.1/lib"
 				GenerateDebugInformation="true"
@@ -177,28 +177,10 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="Quelldateien"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+		<File
+			RelativePath=".\MkVersionFile.cpp"
 			>
-			<File
-				RelativePath=".\MkVersionFile.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Headerdateien"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-		</Filter>
-		<Filter
-			Name="Ressourcendateien"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-		</Filter>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
