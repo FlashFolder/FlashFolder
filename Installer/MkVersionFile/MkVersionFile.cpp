@@ -60,23 +60,6 @@ int main(int argc, char* argv[])
 	char* templpath = argv[2];
 	char* outpath = argv[3];
 
-	struct stat stInFile; struct stat stOutFile;
-	if( stat( inpath, &stInFile ) != 0 )
-	{
-		printf( "[MkVersionFile] ERROR: could not access input file %s", inpath );
-		return 2;		
-	}
-	if( stat( outpath, &stOutFile ) == 0 )
-	{
-		// If output file exists and is not out-of-date, there is nothing to do, so avoid triggering
-		// a recompile in MSBuild that happens if the file modify date changes.
-		if( stOutFile.st_mtime >= stInFile.st_mtime )
-		{
-			printf( "[MkVersionFile] version file is up to date\n" );
-			return 0; 
-		}
-	}
-
 	ifstream infile( inpath, ios_base::binary );
 	if( ! infile )
 	{
