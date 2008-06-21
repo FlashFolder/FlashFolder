@@ -67,6 +67,10 @@
 			RelativePath=".\ALL.msbuild"
 			>
 		</File>
+		<File
+			RelativePath=".\SvnVersionInclude.targets"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

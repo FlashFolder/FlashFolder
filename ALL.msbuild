@@ -21,17 +21,7 @@
 
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<!-- Generate version include files from SVN revision number ......................................... 
-		This target will _always_ be run to make sure the revision number is up to date.
-		If the revision number is out-of-date, it will trigger a recompile of the sub projects.
-	-->
-	<Target Name="VersionInclude" Outputs="_version.h">
-		<Message Text="_______Creating version include file_______" Importance="high"/>
-		<Exec Command="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; . _version.templ _version.h" />
-	</Target>
-	<Target Name="VersionInclude_clean">
-		<Delete Files="_version.h"/>
-	</Target>
+	<Import Project="SvnVersionInclude.targets" />
 
 	<!-- Build sub projects ....................................................................... -->
 
@@ -41,23 +31,22 @@
 		<VCProject Include="FFService\FFService.vcproj"/>
 	</ItemGroup>
 
-	<Target Name="VCProjects" DependsOnTargets="VersionInclude">
+	<Target Name="VCProjects" DependsOnTargets="SvnVersionInclude">
 		<Message Text="_______Building VC projects_______" Importance="high"/>
 		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)"/>
 	</Target>
-	<Target Name="VCProjects_clean">
-		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)" Clean="true"/>
-	</Target>
 
-	<Target Name="Build" DependsOnTargets="VersionInclude;VCProjects">
+	<Target Name="Build" DependsOnTargets="SvnVersionInclude;VCProjects">
 		<Message Text="_______Building Installer_______" Importance="high"/>
 		<MSBuild Projects="Installer\Installer.msbuild" Properties="Configuration=$(Configuration)"/>
 	</Target>
-	<Target Name="Installer_clean">
-		<MSBuild Projects="Installer\Installer.msbuild" Properties="Configuration=$(Configuration)"	Targets="Clean"/>
-	</Target>
 
-	<Target Name="Clean" DependsOnTargets="VersionInclude_clean;VCProjects_clean;Installer_clean"/>
+	<!-- Clean and Rebuild targets -->
+	<Target Name="Clean">
+		<Delete Files="_version.h"/>
+		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)" Clean="true"/>
+		<MSBuild Projects="Installer\Installer.msbuild" Properties="Configuration=$(Configuration)"	Targets="Clean"/>
+	</Target> 
 	<Target Name="Rebuild" DependsOnTargets="Clean;Build"/>
 
 </Project>

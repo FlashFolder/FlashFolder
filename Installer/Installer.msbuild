@@ -63,13 +63,19 @@
 		<Exec Command="MkVersionFile\MkVersionFile.exe ..\_version.h _version.wxi.templ _version.wxi" />
 	</Target>
 
-	<!-- Override WiX build extension point -->	
+	<!-- Build installer utility projects from WiX build extension point 'BeforeBuild' -->
+	<ItemGroup>
+		<VCProject Include="CustomActions\CustomActions.vcproj"/>
+		<VCProject Include="wcautil\wcautil.vcproj"/>
+	</ItemGroup>
 	<Target Name="BeforeBuild" DependsOnTargets="VersionInclude">
-		<VCBuild Projects="CustomActions\CustomActions.vcproj" Configuration="$(Configuration)"/>
+		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)"/>
 	</Target>
 
+	<!-- Clean and Rebuild targets -->
 	<Target Name="Clean">
-		<RemoveDir Directories="obj"/>
+		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)" Clean="true"/>
+		<RemoveDir Directories="$(IntermediateOutputPath)"/>
 	</Target>
-	<Target Name="Rebuild" DependsOnTargets="Clean;Build"/>
+	<Target Name="Rebuild" DependsOnTargets="Clean;Build"/> 
 </Project>
