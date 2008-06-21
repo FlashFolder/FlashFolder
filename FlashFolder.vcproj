@@ -24,8 +24,8 @@
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName)"
-				ReBuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:rebuild /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName)"
-				CleanCommandLine=""
+				ReBuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Rebuild /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName)"
+				CleanCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Clean /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName)"
 				Output="Installer\msi\FlashFolder_$(ConfigurationName).msi"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
@@ -44,8 +44,8 @@
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName)"
-				ReBuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:rebuild /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName)"
-				CleanCommandLine=""
+				ReBuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Rebuild /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName)"
+				CleanCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Clean /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName)"
 				Output="Installer\msi\FlashFolder_$(ConfigurationName).msi"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				IncludeSearchPath=""
