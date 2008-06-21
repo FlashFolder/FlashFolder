@@ -57,8 +57,14 @@
 	<!-- Let WiX MSBuild extension do the build -->
 	<Import Project="$(WixTargetsPath)" />
 
+	<!-- Create _version.wxi from main version file -->
+	<Target Name="VersionInclude"
+		Inputs="..\_version.h" Outputs="_version.wxi">
+		<Exec Command="MkVersionFile\MkVersionFile.exe ..\_version.h _version.wxi.templ _version.wxi" />
+	</Target>
+
 	<!-- Override WiX build extension point -->	
-	<Target Name="BeforeBuild">
+	<Target Name="BeforeBuild" DependsOnTargets="VersionInclude">
 		<VCBuild Projects="CustomActions\CustomActions.vcproj" Configuration="$(Configuration)"/>
 	</Target>
 

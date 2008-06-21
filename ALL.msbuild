@@ -24,18 +24,13 @@
 	<!-- Generate version include files from SVN revision number ......................................... 
 		This target will _always_ be run to make sure the revision number is up to date.
 		If the revision number is out-of-date, it will trigger a recompile of the sub projects.
-	-->	
-	<ItemGroup>
-		<VersionOutFile Include="_version.h"/>
-		<VersionOutFile Include="Installer\_version.wxi"/>
-	</ItemGroup>
-	<Target Name="VersionInclude" Outputs="@(VersionOutFile)">
-		<Message Text="_______Creating version include files_______" Importance="high"/>
+	-->
+	<Target Name="VersionInclude" Outputs="_version.h">
+		<Message Text="_______Creating version include file_______" Importance="high"/>
 		<Exec Command="&quot;$(CPT_VCPP_LIB)\_tools\SubWCRev\1.4.3\SubWCRev.exe&quot; . _version.templ _version.h" />
-		<Exec Command="z_BuildTools\MkVersionFile.exe _version.h Installer\_version.wxi.templ Installer\_version.wxi" />
 	</Target>
 	<Target Name="VersionInclude_clean">
-		<Delete Files="@(VersionOutFile)"/>
+		<Delete Files="_version.h"/>
 	</Target>
 
 	<!-- Build sub projects ....................................................................... -->
@@ -54,7 +49,7 @@
 		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)" Clean="true"/>
 	</Target>
 
-	<Target Name="Installer" DependsOnTargets="VersionInclude">
+	<Target Name="Build" DependsOnTargets="VersionInclude;VCProjects">
 		<Message Text="_______Building Installer_______" Importance="high"/>
 		<MSBuild Projects="Installer\Installer.msbuild" Properties="Configuration=$(Configuration)"/>
 	</Target>
@@ -62,10 +57,6 @@
 		<MSBuild Projects="Installer\Installer.msbuild" Properties="Configuration=$(Configuration)"	Targets="Clean"/>
 	</Target>
 
-	<!-- Build all ................................................................................. -->
-
-	<Target Name="Build" DependsOnTargets="VCProjects;Installer">
-	</Target>
 	<Target Name="Clean" DependsOnTargets="VersionInclude_clean;VCProjects_clean;Installer_clean"/>
 	<Target Name="Rebuild" DependsOnTargets="Clean;Build"/>
 
