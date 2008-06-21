@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- MSBuild-Script for creating a version include file based on the Subversion revision number 
 	of the build directory. 
+	This target will _always_ be run to make sure the revision number is up to date.
+	
 	Requires:
 		* WiX 3.0 (for ReadRegistry task).
 		* TortoiseSVN (for SubWcRev.exe).
@@ -9,10 +11,6 @@
 
 	<UsingTask TaskName="ReadRegistry" AssemblyFile="$(MSBuildExtensionsPath)\Microsoft\WiX\v3.0\WixTasks.dll"/>
 
-	<!-- Generate version include files from SVN revision number ......................................... 
-		This target will _always_ be run to make sure the revision number is up to date.
-		If the revision number is out-of-date, it will trigger a recompile of the sub projects.
-	-->
 	<Target Name="SvnVersionInclude" Outputs="_version.h">
 		<Message Text="_______Creating version include file_______" Importance="high"/>
 		<!-- Get location of SubWcRev.exe from registry key -->
