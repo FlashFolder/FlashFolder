@@ -35,11 +35,12 @@
 
 				<!-- Install program as an interactive, autorun service -->
 				<ServiceInstall Id="ffservice_inst" 
-					Name="$(var.ProductReg)" 
+					Name="$(var.ProductReg)"
 					DisplayName="!(loc.ProductName)"
 					Description="!(loc.PackageDescription)"
+					Arguments="/startservice" 
 					ErrorControl="normal"
-					Interactive="yes"
+					Interactive="no"
 					Start="auto"
 					Type="ownProcess"
 					Vital="yes" />

@@ -65,8 +65,8 @@
 
 	<!-- Build installer utility projects from WiX build extension point 'BeforeBuild' -->
 	<ItemGroup>
-		<VCProject Include="CustomActions\CustomActions.vcproj"/>
 		<VCProject Include="wcautil\wcautil.vcproj"/>
+		<VCProject Include="CustomActions\CustomActions.vcproj"/>
 	</ItemGroup>
 	<Target Name="BeforeBuild" DependsOnTargets="VersionInclude">
 		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)"/>

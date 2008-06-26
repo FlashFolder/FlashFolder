@@ -5,8 +5,15 @@
 
 // Windows headers
 #include <windows.h>
+#include <WtsApi32.h>
+
+// ATL headers
+#include <atlbase.h>
 
 // CRT headers
 #include <stdio.h>
 #include <tchar.h>
 #include <strsafe.h>
+
+#pragma comment( lib, "fflib" )
+#pragma comment( lib, "WtsApi32" )

@@ -1,0 +1,1 @@
+start msiexec.exe /i FlashFolder_release.msi /L*v log_inst.txt

@@ -69,7 +69,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\_version.wxi.templ"
+				RelativePath=".\_version.wxi.templ"
 				>
 			</File>
 		</Filter>
@@ -77,23 +77,23 @@
 			Name="Source_UI"
 			>
 			<File
-				RelativePath="..\UI_Main.wxs"
+				RelativePath=".\UI_Main.wxs"
 				>
 			</File>
 			<File
-				RelativePath="..\UI_MultiUserDlg.wxs"
+				RelativePath=".\UI_MultiUserDlg.wxs"
 				>
 			</File>
 			<File
-				RelativePath="..\UI_UpgradeDlg.wxs"
+				RelativePath=".\UI_UpgradeDlg.wxs"
 				>
 			</File>
 			<File
-				RelativePath="..\UI_VerifyRemoveDlg.wxs"
+				RelativePath=".\UI_VerifyRemoveDlg.wxs"
 				>
 			</File>
 			<File
-				RelativePath="..\UI_WelcomeDlg.wxs"
+				RelativePath=".\UI_WelcomeDlg.wxs"
 				>
 			</File>
 		</Filter>
@@ -101,19 +101,19 @@
 			Name="Source"
 			>
 			<File
-				RelativePath="..\Features.wxs"
+				RelativePath=".\Features.wxs"
 				>
 			</File>
 			<File
-				RelativePath="..\Files.wxs"
+				RelativePath=".\Files.wxs"
 				>
 			</File>
 			<File
-				RelativePath="..\Main.wxs"
+				RelativePath=".\Main.wxs"
 				>
 			</File>
 			<File
-				RelativePath="..\Regkeys.wxs"
+				RelativePath=".\Regkeys.wxs"
 				>
 			</File>
 		</Filter>
@@ -121,11 +121,11 @@
 			Name="Ressources"
 			>
 			<File
-				RelativePath="..\License.rtf"
+				RelativePath=".\License.rtf"
 				>
 			</File>
 			<File
-				RelativePath="..\Texts_EN-US.wxl"
+				RelativePath=".\Texts_EN-US.wxl"
 				>
 			</File>
 		</Filter>

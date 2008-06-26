@@ -17,6 +17,7 @@
 
 #include <windows.h>
 #include <msiquery.h>
+#include <msidefs.h>
 #include <wchar.h>
 
 const WCHAR MAGIC_MULTISZ_DELIM = 128;

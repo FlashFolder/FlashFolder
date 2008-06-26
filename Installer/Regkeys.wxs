@@ -28,21 +28,19 @@
 			<Component Id="ProgramRegkeys" Guid="E983DAF0-66CE-4B9E-92EA-174AEE3BABCF">
 			
 				<!-- Generic program regkey -->
-				<RegistryKey Id="RegMain" Action="create"
-					Root="HKLM" Key="Software\$(var.RootReg)\$(var.ProductReg)">
-					
+				<RegistryKey Root="HKLM" Key="Software\[FF_RootReg]\[FF_ProductReg]" Action="create">
 					<!-- Save install dir so it can be restored when installing an upgrade  -->
-					<RegistryValue Name="InstallDir" Value="[TARGETDIR]" Type="string" Action="write" KeyPath="yes"/>	
+					<RegistryValue KeyPath="yes"
+						Name="InstallDir" Value="[TARGETDIR]" Type="string" />
 
 					<!-- Save what the user has choosen in the multi-user dialog -->
-					<RegistryValue Name="MultiUserProfileOption" Value="[FF_PROFILEOPTION]" Type="string" Action="write"/>
-				</RegistryKey>
+					<RegistryValue Name="MultiUserProfileOption" Value="[FF_PROFILEOPTION]" Type="string"/>
 
-				<!-- Regkey to store profile data if "shared profile" is selected in the multi-user dialog -->
-				<RegistryKey Id="RegShared" Action="create"
-					Root="HKLM" Key="Software\$(var.RootReg)\$(var.ProductReg)\Shared">
-					<Permission User="Everyone" GenericAll="yes" ChangePermission="no" /> 
-				</RegistryKey>	
+					<!-- Regkey to store profile data if "shared profile" is selected in the multi-user dialog -->
+					<RegistryKey Key="Shared" Action="create">
+						<Permission User="Everyone" GenericAll="yes" ChangePermission="no" />
+					</RegistryKey>
+				</RegistryKey>
 
 			</Component>
 		</DirectoryRef>	
@@ -51,13 +49,13 @@
 
 		<Property Id="TARGETDIR" Secure="yes" Admin="yes">
 			<RegistrySearch Id="TargetDirRegSearch" 
-				Root="HKLM" Key="Software\$(var.RootReg)\$(var.ProductReg)" 
+				Root="HKLM" Key="Software\[FF_RootReg]\[FF_ProductReg]" 
 				Name="InstallDir" Type="raw" />
 		</Property>
 
 		<Property Id="FF_PROFILEOPTION" Secure="yes" Admin="yes" Value="individual">
 			<RegistrySearch Id="ProfileOptionRegSearch"
-				Root="HKLM" Key="Software\$(var.RootReg)\$(var.ProductReg)" 
+				Root="HKLM" Key="Software\[FF_RootReg]\[FF_ProductReg]" 
 				Name="MultiUserProfileOption" Type="raw" />	
 		</Property>
 

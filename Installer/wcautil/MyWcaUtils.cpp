@@ -79,14 +79,13 @@ void MyWcaAddTempRecord(
     __inout MSIHANDLE* phTableView,
     __inout MSIHANDLE* phColumns,
     __in LPCWSTR wzTable,
-    __out_opt MSIDBERROR* pdbError,
     __in UINT uiUniquifyColumn,
     __in UINT cColumns,
     ... )
 {
 	va_list args;
 	va_start( args, cColumns );
-	HRESULT hr = WcaAddTempRecordV(  phTableView, phColumns, wzTable, pdbError, uiUniquifyColumn, cColumns, args );
+	HRESULT hr = WcaAddTempRecordV(  phTableView, phColumns, wzTable, NULL, uiUniquifyColumn, cColumns, args );
 	va_end( args );
 	if( ! SUCCEEDED( hr ) )
 	{
@@ -95,4 +94,3 @@ void MyWcaAddTempRecord(
 		throw MyWcaError( hr, msg ); 
 	}	
 }
- 

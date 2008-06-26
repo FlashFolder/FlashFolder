@@ -26,7 +26,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 			<Tool
@@ -76,7 +75,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="fflib.lib"
 				OutputFile="..\exe\FlashFolder.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -110,7 +108,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 		</Configuration>
@@ -127,7 +124,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 			<Tool
@@ -180,7 +176,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="fflib.lib"
 				OutputFile="..\exe\FlashFolder.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -215,7 +210,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 		</Configuration>

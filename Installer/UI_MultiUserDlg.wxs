@@ -21,7 +21,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>        
         <UI>
-            <Dialog Id="FF_MultiUserDlg" Width="370" Height="270" Title="!(loc.FF_MultiUserDlg_Title)" NoMinimize="yes">
+            <Dialog Id="FF_MultiUserDlg" Width="370" Height="270" Title="{\WixUI_Font_Title}!(loc.FF_MultiUserDlg_Title)" NoMinimize="yes">
                 <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)"/>
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">

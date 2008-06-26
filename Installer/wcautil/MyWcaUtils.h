@@ -43,13 +43,19 @@ private:
 	const WCHAR* m_wwhat;
 };
 
-/// Add temporary row to MSI table, throws MyWcaError exception on error.
+/// Add temporary row to any MSI table, throws MyWcaError exception on error.
 void MyWcaAddTempRecord(
     __inout MSIHANDLE* phTableView,
     __inout MSIHANDLE* phColumns,
     __in LPCWSTR wzTable,
-    __out_opt MSIDBERROR* pdbError,
     __in UINT uiUniquifyColumn,
     __in UINT cColumns,
     ... );
-
+    
+/// Add temp. row to registry table, throws MyWcaError exception on error.
+inline void MyWcaAddTempRecordRegistry( MSIHANDLE* phTableView, MSIHANDLE* phColumns,
+	LPCWSTR registry, msidbRegistryRoot root, LPCWSTR key, LPCWSTR name, LPCWSTR value, LPCWSTR component_ )
+{
+	MyWcaAddTempRecord( phTableView, phColumns, L"Registry", 1, 6, 
+		registry, root, key, name, value, component_ );
+}

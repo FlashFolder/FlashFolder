@@ -5,3 +5,4 @@
 LIBRARY    "CustomActions"
 EXPORTS
 	MsgBox
+	CA_CustomRegistry

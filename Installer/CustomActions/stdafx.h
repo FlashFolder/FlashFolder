@@ -26,4 +26,11 @@
 #include <shlwapi.h>
 #include <msi.h>
 #include <msiquery.h>
+#include <msidefs.h>
 #include <strsafe.h>
+
+#include <wcautil.h>
+#include <MyWcaUtils.h>
+
+#pragma comment( lib, "shlwapi" )
+#pragma comment( lib, "msi" )

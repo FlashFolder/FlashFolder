@@ -65,6 +65,11 @@
 		<CustomAction Id="FF_SetTargetDirDefault" Property="TARGETDIR"
 			Value="[ProgramFilesFolder]!(loc.ProductName)" Execute="firstSequence" />
 		<CustomAction Id="FF_SetArpInstallLocation" Property="ARPINSTALLLOCATION" Value="[TARGETDIR]" />
+
+		<Binary Id="MyCustomActionsDLL" SourceFile="..\exe\CustomActions.dll"/>
+
+		<CustomAction Id="MY_CustomRegistry" Execute="immediate" Return="check"
+			BinaryKey="MyCustomActionsDLL" DllEntry="CA_CustomRegistry" />
 			
 		<!-- install sequences ........................................................... -->
 
@@ -81,16 +86,25 @@
 			<!-- must uninstall running FlashFolder service before install; else it could not be upgraded -->
 			<RemoveExistingProducts Before="InstallInitialize" />
 
-			<Custom Action="FF_SetTargetDirDefault" Before="CostFinalize">NOT Installed AND TARGETDIR=""</Custom>
+			<Custom Action="FF_SetTargetDirDefault" Before="MY_CustomRegistry">NOT Installed AND TARGETDIR=""</Custom>
+
+			<!-- add temp rows to Registry table for regkeys that need special treatment -->
+			<Custom Action="MY_CustomRegistry" Before="CostFinalize"/>
 
 			<Custom Action="FF_SetArpInstallLocation" After="CostFinalize">NOT Installed OR REINSTALL</Custom>
 		</InstallExecuteSequence>
 
-		<!-- public interface ............................................................ -->
+		<!-- Public custom properties ............................................................ -->
 
 		<Property Id="TARGETDIR" Secure="yes" Admin="yes"/>
+		<Property Id="FF_KEEP_SETTINGS" Secure="yes" Admin="yes"/>
+		
+		<!-- Internal custom properties .......................................................... -->
 
-		<!-- standard properties -->
+		<Property Id="FF_RootReg">$(var.RootReg)</Property>
+		<Property Id="FF_ProductReg">$(var.ProductReg)</Property>
+
+		<!-- Standard properties -->
 
 		<Property Id="ALLUSERS">1</Property>
 		<Property Id="PROMPTROLLBACKCOST">P</Property>
