@@ -1262,11 +1262,21 @@ DLLFUNC bool InstallHook()
 
         // Install the hook
 		g_hHook = ::SetWindowsHookEx( WH_CBT, Hook_CBT, g_hInstDll, 0 );
+		int err = ERROR_SUCCESS;
+		if( ! g_hHook )
+			err = ::GetLastError();
 
 		DebugOut( _T("[fflib] g_hHook = %08Xh\n"), g_hHook );
 
+		::SetLastError( err );
+
 		return g_hHook != NULL;
     }
+    else
+    {
+		::SetLastError( ERROR_ALREADY_EXISTS );
+    }
+    
 	return false;
 }
 

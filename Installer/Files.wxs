@@ -58,17 +58,6 @@
 			<Component Id="FFConfig.exe" Guid="3E8D86C3-3CA3-41D5-B6E3-D09D01B50CFD">
 				<File Name="FFConfig.exe" Vital="yes" KeyPath="yes"/>  
 			</Component>
-
-			<!-- Register control panel applet -->
-			<Component Id="FFControlPanel" Guid="C60A6357-914A-45EE-B33F-58174E2F877B">
-				<RegistryKey Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Control Panel">
-					<RegistryValue Key="Cpls" Name="FlashFolderCpl" Value="[TARGETDIR]fflib6439.dll" Type="string"
-						KeyPath="yes"/>
-					<!-- Category "Performance and Maintenance" -->
-					<RegistryValue Key="Extended Properties\{305CA226-D286-468e-B848-2B2E8E697B74} 2"
-						 Name="[TARGETDIR]fflib6439.dll" Value="5" Type="integer"/>
-				</RegistryKey>
-			</Component>	
 							
 		</Directory>
 	</Fragment>

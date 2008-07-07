@@ -79,6 +79,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\fflib\bin"
+				DelayLoadDLLs="fflib6439.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/FlashFolder.pdb"
 				SubSystem="2"
@@ -180,6 +181,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\fflib\bin"
+				DelayLoadDLLs="fflib6439.dll"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -280,6 +282,10 @@
 			>
 			<File
 				RelativePath="..\_version.templ"
+				>
+			</File>
+			<File
+				RelativePath=".\LogFile.h"
 				>
 			</File>
 			<File

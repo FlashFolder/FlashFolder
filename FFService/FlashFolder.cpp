@@ -24,6 +24,7 @@
 */
 #include "stdafx.h"
 #include "resource.h"
+#include "logfile.h"
 #include "../fflib/fflib_exports.h"
 
 HINSTANCE g_hInstance = NULL;
@@ -38,13 +39,21 @@ SERVICE_STATUS_HANDLE   g_myServiceStatusHandle = NULL;
 
 HANDLE g_hEventTerminate = NULL;
 
+LogFile g_logfile;
+
 //---------------------------------------------------------------------------
 
 void DebugOut( LPCTSTR str, DWORD status = 0 ) 
 { 
-   TCHAR buf[1024]; 
-   swprintf_s( buf, L"[%s] %s (%d)\n", INTERNAL_APPNAME, str, status ); 
-   ::OutputDebugString( buf ); 
+	TCHAR msg[ 1024 ];
+	swprintf_s( msg, L"%s (%d)", str, status );
+
+	TCHAR dbg[ 1024 ]; 
+	swprintf_s( dbg, L"[%s] %s", INTERNAL_APPNAME, msg );
+
+	//::OutputDebugString( dbg );
+
+	g_logfile.Write( msg );
 }
 
 //---------------------------------------------------------------------------
@@ -175,8 +184,7 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
 				LPTSTR pBuf = NULL; DWORD bufSize = 0;
 				::WTSQuerySessionInformation( WTS_CURRENT_SERVER_HANDLE, pSession->dwSessionId,
 					WTSUserName, &pBuf, &bufSize );
-				WCHAR msg[ 256 ] = L"";
-				wcscpy_s( msg, L"User: " ); wcscat_s( msg, pBuf );
+				WCHAR msg[ 256 ] = L"User: "; wcscat_s( msg, pBuf );
 				DebugOut( msg );
 				::WTSFreeMemory( pBuf ); 
 			
@@ -184,7 +192,6 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
                   								
 				return NO_ERROR;			
 			}
-			DebugOut( L"SERVICE_CONTROL_SESSIONCHANGE, unhandled eventType", eventType );
 			return ERROR_CALL_NOT_IMPLEMENTED;
 
 		case SERVICE_CONTROL_INTERROGATE: 
@@ -239,6 +246,10 @@ void WINAPI MyServiceStart( DWORD argc, LPTSTR *argv )
 
 int StartService()
 {
+	g_logfile.Open( L"_ffservice_log.txt" );
+
+	DebugOut( L"===== Starting service" );
+
 	SERVICE_TABLE_ENTRY dispatchTable[] = 
 	{ 
 		{ INTERNAL_APPNAME, MyServiceStart }, 
@@ -262,8 +273,23 @@ int StartService()
 
 //---------------------------------------------------------------------------
 
+LRESULT CALLBACK HookWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+{
+	if( msg == WM_DESTROY || ( msg == WM_ENDSESSION && wParam == TRUE ) )
+		::PostQuitMessage( 0 );	
+
+	return ::DefWindowProc( hWnd, msg, wParam, lParam );
+}
+
+//---------------------------------------------------------------------------
+
+
 int SetHook()
 {
+	g_logfile.Open( L"_ffhook_log.txt" );
+	
+	DebugOut( L"===== Setting hook" );
+
 	if( ! InstallHook() )
 	{
 		DWORD err = ::GetLastError();
@@ -275,7 +301,7 @@ int SetHook()
 	
 	DebugOut( L"Running message loop..." );
 	
-	WNDCLASS wc = { 0, DefWindowProc, 0, 0, g_hInstance, 0, 0, 0, 0, L"FlashFolder.jks2hd4fenjcnd3" };
+	WNDCLASS wc = { 0, HookWndProc, 0, 0, g_hInstance, 0, 0, 0, 0, L"FlashFolder.jks2hd4fenjcnd3" };
 	::RegisterClass( &wc );
 	HWND hwnd = ::CreateWindow( wc.lpszClassName, L"", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, g_hInstance, 0 );
 	if( ! hwnd )
@@ -284,15 +310,48 @@ int SetHook()
 		return 1;
 	}
 	
+	UINT removeHookMsg = ::RegisterWindowMessage( L"FF_RemoveHook_kkdlf2mclju3dfj" );
+	
 	MSG msg;
-	while( ::GetMessage( &msg, NULL, 0, 0 )	)
+	while( ::GetMessage( &msg, NULL, 0, 0 ) > 0	)
 	{
+		DebugOut( L"Message received", msg.message );
+	
+		if( msg.message == WM_ENDSESSION && msg.wParam == TRUE )
+		{
+			DebugOut( L"WM_ENDSESSION received" );
+		}
+		if( msg.message == removeHookMsg )
+		{
+			DebugOut( L"RemoveHook message received" );
+			break;
+		}
+	
 		::TranslateMessage( &msg );
-		::DispatchMessage( &msg );
-	}			
-
+		::DispatchMessage( &msg );	
+	}		
+	
 	DebugOut( L"Exiting from message loop." );
 
+	::UnregisterClass( wc.lpszClassName, g_hInstance );	
+
+	return 0;
+}
+
+//---------------------------------------------------------------------------
+
+int RemoveHook()
+{
+	g_logfile.Open( L"_ffhook_log.txt" );
+	
+	DebugOut( L"===== Removing hook" );
+
+	UINT removeHookMsg = ::RegisterWindowMessage( L"FF_RemoveHook_kkdlf2mclju3dfj" );
+	DWORD recipients = BSM_ALLDESKTOPS | BSM_APPLICATIONS;
+	
+	if( ::BroadcastSystemMessage( BSF_POSTMESSAGE | BSF_IGNORECURRENTTASK, &recipients, removeHookMsg, 0, 0 ) <= 0 )
+		DebugOut( L"Failed to broadcast message", ::GetLastError() );
+	
 	return 0;
 }
 
@@ -305,16 +364,16 @@ int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	DebugOut( L"Process started" );
 
 	if( wcsstr( lpCmdLine, L"/startservice" ) )
-	{
-		DebugOut( L"Starting service due to command line argument" );
-	
+	{	
 		return StartService();	
 	}
 	else if( wcsstr( lpCmdLine, L"/sethook" ) )
 	{
-		DebugOut( L"Setting hook due to command line argument" );
-		
 		return SetHook();
+	}
+	else if( wcsstr( lpCmdLine, L"/unhook" ) )
+	{
+		return RemoveHook();
 	}
 	else
 	{
