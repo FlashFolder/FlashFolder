@@ -21,7 +21,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>        
         <UI>
-            <Dialog Id="FF_MultiUserDlg" Width="370" Height="270" Title="{\WixUI_Font_Title}!(loc.FF_MultiUserDlg_Title)" NoMinimize="yes">
+            <Dialog Id="FF_MultiUserDlg" Width="370" Height="270" Title="!(loc.FF_MultiUserDlg_Title)" NoMinimize="yes">
                 <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)"/>
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
@@ -31,9 +31,9 @@
                 <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
                 <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
                 <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.FF_MultiUserDlgDescription)" />
-                <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.FF_MultiUserDlgTitle)" />
+                <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="{\WixUI_Font_Title}!(loc.FF_MultiUserDlgTitle)" />
 
-                <Control Id="ProfileOption" Type="RadioButtonGroup"  Width="200" Height="100" X="50" Y="70" Property="FF_PROFILEOPTION" >
+                <Control Id="ProfileOption" Type="RadioButtonGroup"  Width="200" Height="100" X="50" Y="80" Property="FF_PROFILEOPTION" >
 					<RadioButtonGroup Property="FF_PROFILEOPTION">
 						<RadioButton X="0" Y="0" Width="200" Height="15" Value="individual" Text="!(loc.FF_IndividualProfiles)" />
 						<RadioButton X="0" Y="65" Width="200" Height="15" Value="shared" Text="!(loc.FF_SharedProfile)" />
