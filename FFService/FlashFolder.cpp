@@ -104,7 +104,7 @@ void SetMyServiceStatusUnchanged()
 
 bool StartHookProcessInSession( DWORD dwSessionId )
 {
-	DebugOut( L"Starting hook process in sesssion", dwSessionId );
+	DebugOut( L"Starting hook process in session", dwSessionId );
 
 	CHandle hProcessToken;
 	if( ! ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_ALL_ACCESS, &hProcessToken.m_h ) )
@@ -128,7 +128,7 @@ bool StartHookProcessInSession( DWORD dwSessionId )
 	}
 	
 	STARTUPINFO si = { sizeof(si) };
-	si.lpDesktop = L"WinSta0\\Default";
+	si.lpDesktop = L"WinSta0\\Default";  // The desktop of the interactive WinStation.
 	PROCESS_INFORMATION pi = { 0 };
 	WCHAR cmd[ 1024 ] = L"\"";
 	WCHAR exePath[ 1024 ] = L"";
@@ -170,7 +170,7 @@ bool StartHookProcessInSession( DWORD dwSessionId )
 }
 
 //---------------------------------------------------------------------------
-// handler that receives events from the service manager
+/// Handler that receives events from the service manager.
 
 DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType, 
 	LPVOID pEventData, LPVOID pContext ) 
@@ -234,6 +234,50 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
 }
 
 //---------------------------------------------------------------------------
+/// Start one hook process per user session (if any).
+
+bool StartHookInCurrentSessions()
+{
+	DebugOut( L"StartHookInCurrentSessions()" );
+
+	PWTS_SESSION_INFO pSessions = NULL;
+	DWORD sessionCount = 0;
+
+	// This is expected to fail if there are no user sessions available at the time.
+	if( ! ::WTSEnumerateSessions( WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessions, &sessionCount ) )
+	{
+		DebugOut( L"WTSEnumerateSessions() error", ::GetLastError() );
+		return false;
+	}
+	
+	for( int i = 0; i < sessionCount; ++i )
+	{
+		WCHAR s[ 256 ] = L"";
+		swprintf_s( s, L"Session ID: %d, state: %d, WinStation: %s",
+			pSessions[ i ].SessionId, pSessions[ i ].State, pSessions[ i ].pWinStationName );
+		DebugOut( s );
+		
+		if( pSessions[ i ].State != WTSActive && 
+		    pSessions[ i ].State != WTSConnected && 
+		    pSessions[ i ].State != WTSDisconnected &&
+		    pSessions[ i ].State != WTSIdle )
+		{
+			DebugOut( L"\tSkipping session because of its state" );
+			continue;	
+		}
+		
+		StartHookProcessInSession( pSessions[ i ].SessionId );
+
+		// Notify the SCM so it doesn't think the service is hung.
+		SetMyServiceStatusUnchanged();
+	}
+	
+	::WTSFreeMemory( pSessions );
+	
+	return true;
+}
+
+//---------------------------------------------------------------------------
 
 bool InitService()
 {
@@ -259,14 +303,29 @@ bool InitService()
 		return false;
 	}
 	
+	// Start the hook so it is available immediately after installation,
+	// if the installation is done in an active user session (not for group 
+	// policy installation which is done "per-machine" without user context).
+	StartHookInCurrentSessions();
+	
 	return true;
+}
+
+//---------------------------------------------------------------------------
+
+void FinalizeService()
+{
+	// Terminate hook processes in all sessions.
+	DebugOut( L"Setting hook termination event" );
+	if( ! ::SetEvent( g_hookTerminateEvent ) )
+		DebugOut( L"Failed to set hook termination event", ::GetLastError() );
 }
 
 //---------------------------------------------------------------------------
 
 void WINAPI ServiceMain( DWORD argc, LPTSTR *argv ) 
 { 
-    DebugOut( L"ServiceMain() entered" ); 
+    DebugOut( L"ServiceMain()" ); 
 
 	g_myServiceStatusHandle = ::RegisterServiceCtrlHandlerEx( 
         INTERNAL_APPNAME, MyServiceCtrlHandler, NULL ); 
@@ -289,10 +348,7 @@ void WINAPI ServiceMain( DWORD argc, LPTSTR *argv )
 		::WaitForSingleObject( g_serviceTerminateEvent, INFINITE );
 		::CloseHandle( g_serviceTerminateEvent );
 
-		// Terminate hook processes in all sessions.
-		DebugOut( L"Setting hook termination event" );
-		if( ! ::SetEvent( g_hookTerminateEvent ) )
-			DebugOut( L"Failed to set hook termination event", ::GetLastError() );
+		FinalizeService();
 	}
 	
 	SetMyServiceStatus( SERVICE_STOPPED );
@@ -402,6 +458,10 @@ int SetHook()
 	for(;;)
 	{
 		DWORD waitRes =	::MsgWaitForMultipleObjects( 1, &hookTerminateEvent.m_h, FALSE, INFINITE, QS_ALLINPUT );
+
+		// TODO: Check if FlashFolder toolbar window(s) exists. If yes, we must not exit
+		//       this process since it would crash any program hosting the FlashFolder toolbar.
+		
 		if( waitRes == WAIT_OBJECT_0 )
 		{
 			DebugOut( L"Termination event received" );
