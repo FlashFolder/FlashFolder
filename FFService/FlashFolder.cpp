@@ -87,6 +87,7 @@ void SetMyServiceStatusUnchanged()
 //---------------------------------------------------------------------------
 /// Start an instance of the current process in a different session
 /// but with the same access rights as the current process.
+/// This is to support "fast user switching" available beginning with XP.
 
 bool StartHookProcessInSession( DWORD dwSessionId )
 {
@@ -122,6 +123,11 @@ bool StartHookProcessInSession( DWORD dwSessionId )
 	wcscat_s( cmd, exePath );
 	wcscat_s( cmd, L"\" /sethook" );
 	 
+	// If the FlashFolder hook process is already running in another session, 
+	// CreateProcessAsUser() returns ERROR_PIPE_NOT_CONNECTED if we call it immediately
+	// after we received SERVICE_CONTROL_SESSIONCHANGE notification.
+	// I could not find no another way around this then to call CreateProcessAsUser() 
+	// repeatedly in this case. 
 	DWORD time0 = ::GetTickCount();
 	do	
 	{	 
