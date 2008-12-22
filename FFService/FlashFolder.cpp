@@ -34,7 +34,7 @@ const TCHAR INTERNAL_APPNAME[] = L"FlashFolder";
 //---------------------------------------------------------------------------
 // global state
 
-SERVICE_STATUS          g_myServiceStatus = { 0 }; 
+SERVICE_STATUS          g_myServiceStatus = { SERVICE_WIN32_OWN_PROCESS }; 
 SERVICE_STATUS_HANDLE   g_myServiceStatusHandle = NULL; 
 
 CHandle g_serviceTerminateEvent;
@@ -57,13 +57,26 @@ void DebugOut( LPCTSTR str, DWORD status )
 
 //---------------------------------------------------------------------------
 /// Notify the SCM about a changed service status.
+/// Algorithm taken from the MSDN example "Writing a service main function". 
 
-void SetMyServiceStatus( DWORD status, DWORD err = 0 )
+void SetMyServiceStatus( DWORD status, DWORD err = 0, DWORD waitHint = 0 )
 {
+	static DWORD s_checkPoint = 1;
+
 	g_myServiceStatus.dwWin32ExitCode = err; 
 	g_myServiceStatus.dwCurrentState  = status; 
-	g_myServiceStatus.dwCheckPoint    = 0; 
-	g_myServiceStatus.dwWaitHint      = 0; 
+	g_myServiceStatus.dwWaitHint      = waitHint; 
+	
+	if( status == SERVICE_START_PENDING )
+		g_myServiceStatus.dwControlsAccepted = 0;
+	else
+		g_myServiceStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN | 
+											   SERVICE_ACCEPT_SESSIONCHANGE;
+											   
+	if( status == SERVICE_RUNNING || status == SERVICE_STOPPED )
+		g_myServiceStatus.dwCheckPoint = 0;
+	else 
+		g_myServiceStatus.dwCheckPoint = s_checkPoint++;											   
 
 	if( ! ::SetServiceStatus( g_myServiceStatusHandle, &g_myServiceStatus ) )
 	{ 
@@ -168,7 +181,7 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
 		{
 			DebugOut( L"SERVICE_CONTROL_STOP event received" );
 			
-			SetMyServiceStatus( SERVICE_STOP_PENDING );
+			SetMyServiceStatus( SERVICE_STOP_PENDING, 0, 5000 );
 			::PulseEvent( g_serviceTerminateEvent );
 
 			return NO_ERROR; 
@@ -178,7 +191,7 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
 		{
 			DebugOut( L"SERVICE_CONTROL_SHUTDOWN event received" );
 			
-			SetMyServiceStatus( SERVICE_STOP_PENDING );
+			SetMyServiceStatus( SERVICE_STOP_PENDING, 0, 5000 );
 			::PulseEvent( g_serviceTerminateEvent );
 			
 			return NO_ERROR;
@@ -255,15 +268,6 @@ void WINAPI ServiceMain( DWORD argc, LPTSTR *argv )
 { 
     DebugOut( L"ServiceMain() entered" ); 
 
-    g_myServiceStatus.dwServiceType      = SERVICE_WIN32; 
-    g_myServiceStatus.dwCurrentState     = SERVICE_START_PENDING; 
-    g_myServiceStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN | 
-                                           SERVICE_ACCEPT_SESSIONCHANGE; 
-    g_myServiceStatus.dwWin32ExitCode    = 0; 
-    g_myServiceStatus.dwServiceSpecificExitCode = 0; 
-    g_myServiceStatus.dwCheckPoint       = 0; 
-    g_myServiceStatus.dwWaitHint         = 0; 
- 
 	g_myServiceStatusHandle = ::RegisterServiceCtrlHandlerEx( 
         INTERNAL_APPNAME, MyServiceCtrlHandler, NULL ); 
  
@@ -272,6 +276,8 @@ void WINAPI ServiceMain( DWORD argc, LPTSTR *argv )
 		DebugOut( L"RegisterServiceCtrlHandler() failed", ::GetLastError() ); 
         return;
     } 
+    
+    SetMyServiceStatus( SERVICE_START_PENDING, 0, 30000 );
  
 	if( InitService() )
 	{
