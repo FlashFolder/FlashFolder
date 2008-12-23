@@ -26,6 +26,7 @@
 #include "resource.h"
 #include "logfile.h"
 #include "../fflib/fflib_exports.h"
+#include "../_version.h"
 
 HINSTANCE g_hInstance = NULL;
 
@@ -363,7 +364,9 @@ int StartService()
 {
 	g_logfile.Open( L"_ffservice_log.txt" );
 
-	DebugOut( L"===== Starting service" );
+	WCHAR msg[ 256 ]; swprintf_s( msg, L"===== Starting service v%d.%d.%d.%d", 
+		APP_VER_MAJOR, APP_VER_MINOR, APP_VER_BUILD, APP_VER_MICRO ); 
+	DebugOut( msg );
 
 	SERVICE_TABLE_ENTRY dispatchTable[] = 
 	{ 
@@ -422,8 +425,10 @@ int SetHook()
 {
 	OpenHookLogFile();
 	
-	DebugOut( L"===== Setting hook" );
-	
+	WCHAR msg[ 256 ]; swprintf_s( msg, L"===== Starting hook v%d.%d.%d.%d", 
+		APP_VER_MAJOR, APP_VER_MINOR, APP_VER_BUILD, APP_VER_MICRO ); 
+	DebugOut( msg );
+		
 	// Open/create event for hook termination
 	CHandle hookTerminateEvent( 
 		::CreateEvent( NULL, TRUE, FALSE, L"Global\\FFHookTerminateEvent_du38hndkj4" ) );
@@ -502,8 +507,10 @@ int RemoveHook()
 {
 	OpenHookLogFile();
 	
-	DebugOut( L"===== Removing hook" );
-
+	WCHAR msg[ 256 ]; swprintf_s( msg, L"===== Removing hook v%d.%d.%d.%d", 
+		APP_VER_MAJOR, APP_VER_MINOR, APP_VER_BUILD, APP_VER_MICRO ); 
+	DebugOut( msg );
+	
 	// Open/create event for hook termination
 	CHandle hookTerminateEvent( 
 		::OpenEvent( EVENT_MODIFY_STATE, FALSE, L"Global\\FFHookTerminateEvent_du38hndkj4" ) );

@@ -56,7 +56,7 @@
 
 		<!-- Launch conditions -->
 		
-		<Condition Message="!(loc.Require_Win2k_or_newer)"><![CDATA[VersionNT >= 500]]></Condition>		
+		<Condition Message="!(loc.Require_WinXP_or_newer)"><![CDATA[VersionNT >= 501]]></Condition>		
 		<Condition Message="!(loc.Error1925)">Privileged</Condition>
 		<Condition Message="!(loc.NewerVersionInstalled)">NOT FF_EXISTING_PRODUCT_SAME_OR_NEWER</Condition>
 

@@ -60,7 +60,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\_version.templ"
+			RelativePath=".\_version.h.templ"
 			>
 		</File>
 		<File

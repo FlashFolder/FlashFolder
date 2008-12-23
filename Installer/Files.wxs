@@ -33,7 +33,9 @@
 			<Component Id="FlashFolder.exe" Guid="E5EF7F5C-026E-4772-BBC0-075A94198FDA">
 				<File Name="FlashFolder.exe" Vital="yes" KeyPath="yes"/>
 
-				<!-- Install program as an interactive, autorun service -->
+				<!-- Install program as an interactive, autorun service.
+					LoadOrderGroup should be such that the service is started before user logon.
+				 -->
 				<ServiceInstall Id="ffservice_inst" 
 					Name="$(var.ProductReg)"
 					DisplayName="!(loc.ProductName)"
@@ -42,6 +44,7 @@
 					ErrorControl="normal"
 					Interactive="no"
 					Start="auto"
+					LoadOrderGroup="PlugPlay"
 					Type="ownProcess"
 					Vital="yes" />
 				<ServiceControl Id="ffservice_ctrl"

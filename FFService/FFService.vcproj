@@ -281,10 +281,6 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\_version.templ"
-				>
-			</File>
-			<File
 				RelativePath=".\LogFile.h"
 				>
 			</File>
