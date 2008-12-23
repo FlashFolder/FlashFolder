@@ -74,10 +74,8 @@ First-time install dialog sequence:      Maintenance dialog sequence:
 			<Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
 
             <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="FF_VerifyRemoveDlg">1</Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
-
-			<Publish Dialog="FF_VerifyRemoveDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
 
 			<Property Id="ARPNOMODIFY" Value="1" />
         </UI>

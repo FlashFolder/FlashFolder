@@ -89,10 +89,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\UI_VerifyRemoveDlg.wxs"
-				>
-			</File>
-			<File
 				RelativePath=".\UI_WelcomeDlg.wxs"
 				>
 			</File>

@@ -59,13 +59,13 @@
 
 		<!-- Get settings of existing product, if any -->
 
-		<Property Id="TARGETDIR" Secure="yes" Admin="yes">
+		<Property Id="TARGETDIR" Secure="yes">
 			<RegistrySearch Id="TargetDirRegSearch" 
 				Root="HKLM" Key="Software\[FF_RootReg]\[FF_ProductReg]" 
 				Name="InstallDir" Type="raw" />
 		</Property>
 
-		<Property Id="FF_PROFILEOPTION" Secure="yes" Admin="yes" Value="individual">
+		<Property Id="FF_PROFILEOPTION" Secure="yes" Value="individual">
 			<RegistrySearch Id="ProfileOptionRegSearch"
 				Root="HKLM" Key="Software\[FF_RootReg]\[FF_ProductReg]" 
 				Name="MultiUserProfileOption" Type="raw" />	
