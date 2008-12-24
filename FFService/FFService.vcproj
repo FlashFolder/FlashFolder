@@ -251,6 +251,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LogFile.cpp"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration

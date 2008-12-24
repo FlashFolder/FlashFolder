@@ -26,7 +26,6 @@
 #include "resource.h"
 #include "logfile.h"
 #include "../fflib/fflib_exports.h"
-#include "../_version.h"
 
 HINSTANCE g_hInstance = NULL;
 
@@ -45,12 +44,12 @@ LogFile g_logfile;
 
 //---------------------------------------------------------------------------
 
-void DebugOut( LPCTSTR str ) 
+void Log( LPCTSTR str ) 
 { 
 	g_logfile.Write( str );
 }
 
-void DebugOut( LPCTSTR str, DWORD status ) 
+void Log( LPCTSTR str, DWORD status ) 
 { 
 	TCHAR msg[ 1024 ]; swprintf_s( msg, L"%s (%d)", str, status );
 	g_logfile.Write( msg );
@@ -82,7 +81,7 @@ void SetMyServiceStatus( DWORD status, DWORD err = 0, DWORD waitHint = 0 )
 	if( ! ::SetServiceStatus( g_myServiceStatusHandle, &g_myServiceStatus ) )
 	{ 
 		DWORD err = ::GetLastError(); 
-		DebugOut( L"SetServiceStatus() error", err ); 
+		Log( L"SetServiceStatus() error", err ); 
 	} 
 }
 
@@ -94,7 +93,7 @@ void SetMyServiceStatusUnchanged()
 	if( ! ::SetServiceStatus( g_myServiceStatusHandle, &g_myServiceStatus ) )
 	{ 
 		DWORD err = ::GetLastError(); 
-		DebugOut( L"SetServiceStatus() error", err ); 
+		Log( L"SetServiceStatus() error", err ); 
 	} 
 }
 
@@ -105,12 +104,12 @@ void SetMyServiceStatusUnchanged()
 
 bool StartHookProcessInSession( DWORD dwSessionId )
 {
-	DebugOut( L"Starting hook process in session", dwSessionId );
+	Log( L"Starting hook process in session", dwSessionId );
 
 	CHandle hProcessToken;
 	if( ! ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_ALL_ACCESS, &hProcessToken.m_h ) )
 	{
-		DebugOut( L"OpenProcessToken() failed", ::GetLastError() );
+		Log( L"OpenProcessToken() failed", ::GetLastError() );
 		return false;
 	}	
 	
@@ -118,13 +117,13 @@ bool StartHookProcessInSession( DWORD dwSessionId )
 	if( ! ::DuplicateTokenEx( hProcessToken, 0, NULL, SecurityImpersonation, 
 	                          TokenPrimary, &hDupToken.m_h ) )
 	{
-		DebugOut( L"DuplicateToken() failed", ::GetLastError() );
+		Log( L"DuplicateToken() failed", ::GetLastError() );
 		return false;
 	}					
 
 	if( ! ::SetTokenInformation( hDupToken, TokenSessionId, &dwSessionId, sizeof(DWORD) ) )
 	{
-		DebugOut( L"SetTokenInformation() failed", ::GetLastError() );
+		Log( L"SetTokenInformation() failed", ::GetLastError() );
 		return false;
 	}
 	
@@ -148,24 +147,24 @@ bool StartHookProcessInSession( DWORD dwSessionId )
 		if( ::CreateProcessAsUser( hDupToken, NULL, cmd, NULL, NULL, FALSE, 0,
 					  NULL, NULL, &si, &pi ) )
 		{
-			DebugOut( L"Hook process created" );
+			Log( L"Hook process created" );
 			::CloseHandle( pi.hThread );
 			::CloseHandle( pi.hProcess );
 			return true;
 		}					  
 					
 		DWORD err = ::GetLastError();
-		DebugOut( L"CreateProcessAsUser failed", err );
+		Log( L"CreateProcessAsUser failed", err );
 	
 		if( err != ERROR_PIPE_NOT_CONNECTED )
 			return false;
 			
 		::Sleep( 2000 );
-		DebugOut( L"Retry..." );
+		Log( L"Retry..." );
 	}
 	while( ::GetTickCount() - time0 < 30000 );
 
-	DebugOut( L"Starting hook process failed because of timeout" );
+	Log( L"Starting hook process failed because of timeout" );
 	
 	return false;
 }
@@ -180,7 +179,7 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
 	{ 
 		case SERVICE_CONTROL_STOP: 
 		{
-			DebugOut( L"SERVICE_CONTROL_STOP event received" );
+			Log( L"SERVICE_CONTROL_STOP event received" );
 			
 			SetMyServiceStatus( SERVICE_STOP_PENDING, 0, 5000 );
 			::PulseEvent( g_serviceTerminateEvent );
@@ -190,7 +189,7 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
 
 		case SERVICE_CONTROL_SHUTDOWN:
 		{
-			DebugOut( L"SERVICE_CONTROL_SHUTDOWN event received" );
+			Log( L"SERVICE_CONTROL_SHUTDOWN event received" );
 			
 			SetMyServiceStatus( SERVICE_STOP_PENDING, 0, 5000 );
 			::PulseEvent( g_serviceTerminateEvent );
@@ -206,7 +205,7 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
 			{
 				WTSSESSION_NOTIFICATION* pSession = (WTSSESSION_NOTIFICATION*) pEventData;
 
-				DebugOut( L"WTS_SESSION_LOGON event received", pSession->dwSessionId );				
+				Log( L"WTS_SESSION_LOGON event received", pSession->dwSessionId );				
 				
 				// Hint to self: wait for event "Global\\TermSrvReadyEvent" if you need
 				// terminal services functions like WtsQuerySessionInformation() here. 
@@ -227,7 +226,7 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
 		}
 	} 
 	
-	DebugOut( L"Unrecognized control received", control ); 
+	Log( L"Unrecognized control received", control ); 
 
 	SetMyServiceStatusUnchanged();
 
@@ -239,7 +238,7 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
 
 bool StartHookInCurrentSessions()
 {
-	DebugOut( L"StartHookInCurrentSessions()" );
+	Log( L"StartHookInCurrentSessions()" );
 
 	PWTS_SESSION_INFO pSessions = NULL;
 	DWORD sessionCount = 0;
@@ -247,7 +246,7 @@ bool StartHookInCurrentSessions()
 	// This is expected to fail if there are no user sessions available at the time.
 	if( ! ::WTSEnumerateSessions( WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessions, &sessionCount ) )
 	{
-		DebugOut( L"WTSEnumerateSessions() error", ::GetLastError() );
+		Log( L"WTSEnumerateSessions() error", ::GetLastError() );
 		return false;
 	}
 	
@@ -256,14 +255,14 @@ bool StartHookInCurrentSessions()
 		WCHAR s[ 256 ] = L"";
 		swprintf_s( s, L"Session ID: %d, state: %d, WinStation: %s",
 			pSessions[ i ].SessionId, pSessions[ i ].State, pSessions[ i ].pWinStationName );
-		DebugOut( s );
+		Log( s );
 		
 		if( pSessions[ i ].State != WTSActive && 
 		    pSessions[ i ].State != WTSConnected && 
 		    pSessions[ i ].State != WTSDisconnected &&
 		    pSessions[ i ].State != WTSIdle )
 		{
-			DebugOut( L"\tSkipping session because of its state" );
+			Log( L"\tSkipping session because of its state" );
 			continue;	
 		}
 		
@@ -291,7 +290,7 @@ bool InitService()
 
 	if( ! g_hookTerminateEvent )
 	{
-		DebugOut( L"Failed to create hook termination event.", ::GetLastError() );
+		Log( L"Failed to create hook termination event.", ::GetLastError() );
 		return false;
 	}
 		
@@ -300,7 +299,7 @@ bool InitService()
 		// If the event exists, it could have been created by another process
 		// with lower privileges, so we cannot trust it.		
 	
-		DebugOut( L"Cannot trust existing hook termination event." );
+		Log( L"Cannot trust existing hook termination event." );
 		return false;
 	}
 	
@@ -317,23 +316,23 @@ bool InitService()
 void FinalizeService()
 {
 	// Terminate hook processes in all sessions.
-	DebugOut( L"Setting hook termination event" );
+	Log( L"Setting hook termination event" );
 	if( ! ::SetEvent( g_hookTerminateEvent ) )
-		DebugOut( L"Failed to set hook termination event", ::GetLastError() );
+		Log( L"Failed to set hook termination event", ::GetLastError() );
 }
 
 //---------------------------------------------------------------------------
 
 void WINAPI ServiceMain( DWORD argc, LPTSTR *argv ) 
 { 
-    DebugOut( L"ServiceMain()" ); 
+    Log( L"ServiceMain()" ); 
 
 	g_myServiceStatusHandle = ::RegisterServiceCtrlHandlerEx( 
         INTERNAL_APPNAME, MyServiceCtrlHandler, NULL ); 
  
     if( g_myServiceStatusHandle == (SERVICE_STATUS_HANDLE)0 ) 
     { 
-		DebugOut( L"RegisterServiceCtrlHandler() failed", ::GetLastError() ); 
+		Log( L"RegisterServiceCtrlHandler() failed", ::GetLastError() ); 
         return;
     } 
     
@@ -344,7 +343,7 @@ void WINAPI ServiceMain( DWORD argc, LPTSTR *argv )
 		// Initialization complete - report running status. 
 		SetMyServiceStatus( SERVICE_RUNNING );
 		
-		DebugOut( L"Service running, waiting for events..." );
+		Log( L"Service running, waiting for events..." );
 
 		::WaitForSingleObject( g_serviceTerminateEvent, INFINITE );
 		::CloseHandle( g_serviceTerminateEvent );
@@ -352,8 +351,8 @@ void WINAPI ServiceMain( DWORD argc, LPTSTR *argv )
 		FinalizeService();
 	}
 	
+	Log( L"Service stopped." );
 	SetMyServiceStatus( SERVICE_STOPPED );
-	DebugOut( L"Service stopped." );
 
     return; 
 } 
@@ -363,10 +362,7 @@ void WINAPI ServiceMain( DWORD argc, LPTSTR *argv )
 int StartService()
 {
 	g_logfile.Open( L"_ffservice_log.txt" );
-
-	WCHAR msg[ 256 ]; swprintf_s( msg, L"===== Starting service v%d.%d.%d.%d", 
-		APP_VER_MAJOR, APP_VER_MINOR, APP_VER_BUILD, APP_VER_MICRO ); 
-	DebugOut( msg );
+	Log( L"Task: Starting service" );
 
 	SERVICE_TABLE_ENTRY dispatchTable[] = 
 	{ 
@@ -379,11 +375,11 @@ int StartService()
 		DWORD err = ::GetLastError();
 		if( err == ERROR_SERVICE_ALREADY_RUNNING )	
 		{
-			DebugOut( L"Service is already running." );
+			Log( L"Service is already running." );
 			return 0;
 		}
 
-		DebugOut( L"StartServiceCtrlDispatcher() error, exiting", err );
+		Log( L"StartServiceCtrlDispatcher() error, exiting", err );
 		
 		return 1;
 	} 
@@ -396,12 +392,12 @@ LRESULT CALLBACK HookWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam 
 {
 	if( msg == WM_DESTROY )
 	{
-		DebugOut( L"WM_DESTROY received - exiting" );
+		Log( L"WM_DESTROY received - exiting" );
 		::PostQuitMessage( 0 );
 	}	
 	else if( msg == WM_ENDSESSION && wParam == TRUE )
 	{
-		DebugOut( L"WM_ENDSESSION received - exiting" );
+		Log( L"WM_ENDSESSION received - exiting" );
 		::PostQuitMessage( 0 );	
 	}
 
@@ -424,39 +420,36 @@ void OpenHookLogFile()
 int SetHook()
 {
 	OpenHookLogFile();
-	
-	WCHAR msg[ 256 ]; swprintf_s( msg, L"===== Starting hook v%d.%d.%d.%d", 
-		APP_VER_MAJOR, APP_VER_MINOR, APP_VER_BUILD, APP_VER_MICRO ); 
-	DebugOut( msg );
-		
+	Log( L"Task: Starting hook" );
+			
 	// Open/create event for hook termination
 	CHandle hookTerminateEvent( 
 		::CreateEvent( NULL, TRUE, FALSE, L"Global\\FFHookTerminateEvent_du38hndkj4" ) );
 	if( ! hookTerminateEvent )
 	{
-		DebugOut( L"Failed to create hook termination event.", ::GetLastError() );
+		Log( L"Failed to create hook termination event.", ::GetLastError() );
 		return 1;
 	}	
 
-	DebugOut( L"Installing hook..." );
+	Log( L"Installing hook..." );
 	if( ! InstallHook() )
 	{
 		DWORD err = ::GetLastError();
-		DebugOut( L"InstallHook() failed, exiting", err );
+		Log( L"InstallHook() failed, exiting", err );
 		return 1;
 	}	
 	
 	
 	//--- Run message loop to keep hook alive.
 	
-	DebugOut( L"Running message loop..." );
+	Log( L"Running message loop..." );
 	
 	WNDCLASS wc = { 0, HookWndProc, 0, 0, g_hInstance, 0, 0, 0, 0, L"FlashFolder.jks2hd4fenjcnd3" };
 	::RegisterClass( &wc );
 	HWND hwnd = ::CreateWindow( wc.lpszClassName, L"", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, g_hInstance, 0 );
 	if( ! hwnd )
 	{
-		DebugOut( L"Failed to create message window", ::GetLastError() );
+		Log( L"Failed to create message window", ::GetLastError() );
 		return 1;
 	}
 	
@@ -469,7 +462,7 @@ int SetHook()
 		
 		if( waitRes == WAIT_OBJECT_0 )
 		{
-			DebugOut( L"Termination event received" );
+			Log( L"Termination event received" );
 			break;
 		}
 		else if( waitRes == WAIT_OBJECT_0 + 1 )
@@ -477,25 +470,25 @@ int SetHook()
 			MSG msg;		
 			if( ::GetMessage( &msg, NULL, 0, 0 ) <= 0 )
 			{	
-				DebugOut( L"GetMessage() return value <= 0." );
+				Log( L"GetMessage() return value <= 0." );
 				break;
 			}
 		
-			DebugOut( L"Message received", msg.message );
+			Log( L"Message received", msg.message );
 		
 			::TranslateMessage( &msg );
 			::DispatchMessage( &msg );	
 		}
 		else
 		{
-			DebugOut( L"Unexpected return value of MsgWaitForMultipleObjects()", waitRes );
+			Log( L"Unexpected return value of MsgWaitForMultipleObjects()", waitRes );
 			break;
 		}
 	}
 	 
 	::UnregisterClass( wc.lpszClassName, g_hInstance );	
 
-	DebugOut( L"Hook process exits" );
+	Log( L"Hook process exits" );
 
 	return 0;
 }
@@ -506,26 +499,23 @@ int SetHook()
 int RemoveHook()
 {
 	OpenHookLogFile();
-	
-	WCHAR msg[ 256 ]; swprintf_s( msg, L"===== Removing hook v%d.%d.%d.%d", 
-		APP_VER_MAJOR, APP_VER_MINOR, APP_VER_BUILD, APP_VER_MICRO ); 
-	DebugOut( msg );
+	Log( L"Task: Removing hook" );
 	
 	// Open/create event for hook termination
 	CHandle hookTerminateEvent( 
 		::OpenEvent( EVENT_MODIFY_STATE, FALSE, L"Global\\FFHookTerminateEvent_du38hndkj4" ) );
 	if( ! hookTerminateEvent )
 	{
-		DebugOut( L"Failed to open hook termination event.", ::GetLastError() );
+		Log( L"Failed to open hook termination event.", ::GetLastError() );
 		return 1;
 	}	
 	if( ! ::SetEvent( hookTerminateEvent ) )
 	{
-		DebugOut( L"Failed to set hook termination event", ::GetLastError() );
+		Log( L"Failed to set hook termination event", ::GetLastError() );
 		return 1;
 	}
 
-	DebugOut( L"Termination event set" );
+	Log( L"Termination event set" );
 	
 	return 0;
 }

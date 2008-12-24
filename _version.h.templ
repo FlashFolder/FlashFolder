@@ -15,7 +15,7 @@
 // xMODIFIED "TRUE" to indicate that this revision is not yet in the Subversion repository
 // and should not be delivered. 
  
-#define APP_VER "1, 10, $WCREV$, 0"
+#define APP_VER L"1, 10, $WCREV$, 0"
 
 #define APP_VER_MAJOR 1
 #define APP_VER_MINOR 10
@@ -23,5 +23,7 @@
 #define APP_VER_MICRO 0
 
 $WCMODS?#define APP_VER_MODIFIED:$
+
+#define APP_BUILD_TIME L"$WCNOW$"
 
 

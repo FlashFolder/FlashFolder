@@ -40,15 +40,15 @@
 		<Media Id="1" Cabinet="Product.cab" EmbedCab="yes" CompressionLevel="high" />
 
 		<Upgrade Id="$(var.UpgradeCode)">
-			<!-- detect whether same or newer version is already installed -->
+			<!-- detect whether newer version is already installed -->
 			<UpgradeVersion
-				Minimum="$(var.Version)" IncludeMinimum="yes"
+				Minimum="$(var.Version)" IncludeMinimum="no"
 				OnlyDetect="yes"
-				Property="FF_EXISTING_PRODUCT_SAME_OR_NEWER" />
+				Property="FF_EXISTING_PRODUCT_NEWER" />
 			<!-- invoke an upgrade otherwise -->
 			<UpgradeVersion
 				Minimum="0.0.0.0" IncludeMinimum="yes"
-				Maximum="$(var.Version)" IncludeMaximum="no"
+				Maximum="$(var.Version)" IncludeMaximum="yes"
 				Property="FF_EXISTING_PRODUCT_OLDER" />				
 		</Upgrade>
 			
@@ -58,7 +58,7 @@
 		
 		<Condition Message="!(loc.Require_WinXP_or_newer)"><![CDATA[VersionNT >= 501]]></Condition>		
 		<Condition Message="!(loc.Error1925)">Privileged</Condition>
-		<Condition Message="!(loc.NewerVersionInstalled)">NOT FF_EXISTING_PRODUCT_SAME_OR_NEWER</Condition>
+		<Condition Message="!(loc.NewerVersionInstalled)">NOT FF_EXISTING_PRODUCT_NEWER</Condition>
 
 		<!-- Custom action definitions ....................................................... -->
 
