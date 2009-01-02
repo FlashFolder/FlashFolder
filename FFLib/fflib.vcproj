@@ -27,7 +27,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 			<Tool
@@ -118,7 +117,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 		</Configuration>
@@ -136,7 +134,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 			<Tool
@@ -229,7 +226,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 		</Configuration>
@@ -269,6 +265,10 @@
 						BasicRuntimeChecks="3"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\fflib.def"
+				>
 			</File>
 			<File
 				RelativePath="fflib.rc"
@@ -336,10 +336,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\fflib.def"
-				>
-			</File>
-			<File
 				RelativePath=".\fflib.h"
 				>
 			</File>
@@ -393,6 +389,10 @@
 			Name="common_h"
 			Filter="*.h"
 			>
+			<File
+				RelativePath="..\common\Defines.h"
+				>
+			</File>
 			<File
 				RelativePath="..\common\Favorites.h"
 				>

@@ -17,19 +17,6 @@
  */
 #pragma once
 
-#define DLLIMPORT extern "C" _declspec(dllimport)
-#define DLLEXPORT extern "C" _declspec(dllexport)
-
-#ifdef _USRDLL
-	#define DLLFUNC DLLEXPORT
-#else
-	#define DLLFUNC DLLIMPORT
-#endif
-
 //-----------------------------------------------------------------------------------------
 
-DLLFUNC bool IsHookInstalled();
-
-DLLFUNC bool InstallHook();
-
-DLLFUNC bool UninstallHook();
+HINSTANCE GetFFLibHandle();

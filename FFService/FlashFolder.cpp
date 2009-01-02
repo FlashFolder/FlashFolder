@@ -24,8 +24,10 @@
 */
 #include "stdafx.h"
 #include "resource.h"
-#include "logfile.h"
 #include "../fflib/fflib_exports.h"
+#include "../fflib/HookInstaller.h"
+#include "../common/Defines.h"
+#include "../commonUtils/logfile.h"
 
 HINSTANCE g_hInstance = NULL;
 
@@ -388,24 +390,6 @@ int StartService()
 
 //---------------------------------------------------------------------------
 
-LRESULT CALLBACK HookWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
-{
-	if( msg == WM_DESTROY )
-	{
-		Log( L"WM_DESTROY received - exiting" );
-		::PostQuitMessage( 0 );
-	}	
-	else if( msg == WM_ENDSESSION && wParam == TRUE )
-	{
-		Log( L"WM_ENDSESSION received - exiting" );
-		::PostQuitMessage( 0 );	
-	}
-
-	return ::DefWindowProc( hWnd, msg, wParam, lParam );
-}
-
-//---------------------------------------------------------------------------
-
 void OpenHookLogFile()
 {
 	DWORD sessionId = -1;
@@ -421,75 +405,64 @@ int SetHook()
 {
 	OpenHookLogFile();
 	Log( L"Task: Starting hook" );
-			
-	// Open/create event for hook termination
-	CHandle hookTerminateEvent( 
+				
+	//--- Open/create event for hook termination.
+	
+	CHandle hookTerminateEvent(
 		::CreateEvent( NULL, TRUE, FALSE, L"Global\\FFHookTerminateEvent_du38hndkj4" ) );
 	if( ! hookTerminateEvent )
 	{
 		Log( L"Failed to create hook termination event.", ::GetLastError() );
 		return 1;
 	}	
-
-	Log( L"Installing hook..." );
-	if( ! InstallHook() )
+	
+	FFHookInstaller hookInstaller;
+	
+	if( ! hookInstaller.Install() )
 	{
-		DWORD err = ::GetLastError();
-		Log( L"InstallHook() failed, exiting", err );
-		return 1;
-	}	
-	
-	
-	//--- Run message loop to keep hook alive.
-	
-	Log( L"Running message loop..." );
-	
-	WNDCLASS wc = { 0, HookWndProc, 0, 0, g_hInstance, 0, 0, 0, 0, L"FlashFolder.jks2hd4fenjcnd3" };
-	::RegisterClass( &wc );
-	HWND hwnd = ::CreateWindow( wc.lpszClassName, L"", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, g_hInstance, 0 );
-	if( ! hwnd )
-	{
-		Log( L"Failed to create message window", ::GetLastError() );
+		Log( L"Failed to install hook, exiting", ::GetLastError() );
 		return 1;
 	}
+	
+	Log( L"Hook installed", (DWORD) hookInstaller.GetHHook() );		
+	
+	//--- Don't exit process yet to keep hook alive.
+
+	Log( L"Waiting for termination event..." );
 	
 	for(;;)
 	{
-		DWORD waitRes =	::MsgWaitForMultipleObjects( 1, &hookTerminateEvent.m_h, FALSE, INFINITE, QS_ALLINPUT );
+		::WaitForSingleObject( hookTerminateEvent, INFINITE );
 
-		// TODO: Check if FlashFolder toolbar window(s) exists. If yes, we must not exit
-		//       this process since it would crash any program hosting the FlashFolder toolbar.
-		
-		if( waitRes == WAIT_OBJECT_0 )
+		Log( L"Termination event received" );
+
+		// Check if the FlashFolder toolbar window doesn't exist and it is
+		// therefore safe to exit the hook process.
+		// If the hook process would exit while the toolbar still exists in
+		// any process it would crash the process(es) hosting the toolbar!
+
+		if( ::FindWindow( FF_WNDCLASSNAME, NULL ) == NULL )
 		{
-			Log( L"Termination event received" );
+			Log( L"Toolbar window not found", ::GetLastError() );
 			break;
 		}
-		else if( waitRes == WAIT_OBJECT_0 + 1 )
+
+		Log( L"Cannot terminate because the FlashFolder toolbar window exists" );
+		if( ! ::ResetEvent( hookTerminateEvent ) )
 		{
-			MSG msg;		
-			if( ::GetMessage( &msg, NULL, 0, 0 ) <= 0 )
-			{	
-				Log( L"GetMessage() return value <= 0." );
-				break;
-			}
-		
-			Log( L"Message received", msg.message );
-		
-			::TranslateMessage( &msg );
-			::DispatchMessage( &msg );	
-		}
-		else
-		{
-			Log( L"Unexpected return value of MsgWaitForMultipleObjects()", waitRes );
+			Log( L"Could not reset termination event", ::GetLastError() );
 			break;
-		}
+		}			
 	}
-	 
-	::UnregisterClass( wc.lpszClassName, g_hInstance );	
-
-	Log( L"Hook process exits" );
-
+	
+	Log( L"Removing hook..." );
+	if( ! hookInstaller.Uninstall() )
+	{
+		Log( L"Failed to uninstall hook", ::GetLastError() );
+	}
+	
+	Log( L"Exiting process" );
+	
 	return 0;
 }
 
@@ -501,7 +474,7 @@ int RemoveHook()
 	OpenHookLogFile();
 	Log( L"Task: Removing hook" );
 	
-	// Open/create event for hook termination
+	// Open event for hook termination
 	CHandle hookTerminateEvent( 
 		::OpenEvent( EVENT_MODIFY_STATE, FALSE, L"Global\\FFHookTerminateEvent_du38hndkj4" ) );
 	if( ! hookTerminateEvent )

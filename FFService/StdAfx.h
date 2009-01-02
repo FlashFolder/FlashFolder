@@ -9,6 +9,8 @@
 
 // ATL headers
 #include <atlbase.h>
+#include <atlfile.h>
+#include <atlsecurity.h>
 
 // CRT headers
 #include <stdio.h>

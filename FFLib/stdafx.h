@@ -23,6 +23,9 @@
 #include <tmschema.h>
 #include <cpl.h>
 
+//--- ATL headers
+#include <atlfile.h>
+
 //--- crt headers
 #include <tchar.h>
 #include <crtdbg.h>   //for _ASSERTE

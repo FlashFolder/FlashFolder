@@ -61,6 +61,7 @@ void LogFile::Close()
 	{
 		Write( L"===== Logging ended =====" );	
 		fclose( m_file ); 
+		m_file = NULL;
 	}
 }
 

@@ -37,24 +37,20 @@
 #include "CmnFolderDlgHook.h"
 #include "../common/ProfileDefaults.h"
 
-using namespace NT;
 using namespace std;
-
-//-----------------------------------------------------------------------------------------
-// global variables that are shared by all Instances of the DLL  
-//-----------------------------------------------------------------------------------------
-
-#pragma data_seg( ".shared" )
-
-HHOOK g_hHook = NULL;            // handle of the "window activate" hook
-
-#pragma data_seg()
-#pragma comment( linker, "/SECTION:.shared,RWS" )
 
 //-----------------------------------------------------------------------------------------
 // global variables that are "local" to each instance of the DLL  
 //-----------------------------------------------------------------------------------------
+
 HINSTANCE g_hInstDll = NULL;
+
+CAtlFileMapping<HHOOK> gs_hHook;         // Handle of the "window activate" hook.
+                                        // Note: we do NOT put this in a shared segment (pragma data_seg)
+                                        // as this would impose a security vulnerability since 
+                                        // processes with different privileges would have
+                                        // write access to this variable.
+
 HWND g_hFileDialog = NULL;				// handle of file open/save dialog 
 
 auto_ptr<FileDlgHook_base> g_spFileDlgHook;       // ptr to the hook instance
@@ -90,6 +86,7 @@ int g_globalHistoryMaxEntries;
 // Prototypes
 //-----------------------------------------------------------------------------------------
 
+void GetSharedData();
 void RegisterMyHotkeys();
 void UnregisterMyHotkeys();
 LPCTSTR GetCommandName( int cmd );
@@ -104,6 +101,11 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
     {
 		case DLL_PROCESS_ATTACH:
 		{
+			// Disable unneeded DLL-callbacks (DLL_THREAD_ATTACH).
+			::DisableThreadLibraryCalls( hModule );
+
+			g_hInstDll = hModule;
+
 			::GetModuleFileName( NULL, g_currentExePath, MAX_PATH );
 			if( LPTSTR p = _tcsrchr( g_currentExePath, _T('\\') ) )
 			{
@@ -115,12 +117,9 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 			DebugOut( _T("[fflib] DLL_PROCESS_ATTACH (pid %08Xh, \"%s\")\n"), 
 				::GetCurrentProcessId(), g_currentExePath );
 
-			//save the HInstance of the DLL
-			g_hInstDll = hModule;
-			//optimize DLL loading
-			::DisableThreadLibraryCalls( hModule );
-
 			g_osVersion = GetOsVersion();
+
+			GetSharedData();		
 		}
 		break;
 
@@ -131,6 +130,26 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 		break;
     }
     return TRUE;
+}
+
+//-----------------------------------------------------------------------------------------
+// Get data shared between all processes where this DLL is loaded for the current logon session.
+//
+// For security reasons, we use a memory mapped file instead of the "simple way" of
+// using a shared segment of the DLL. Only processes with administrative privileges have 
+// write access to this data.
+// By using a memory mapped file we also make sure that the hook handle is only shared within 
+// the current logon session, since each session has its own hook.
+
+void GetSharedData()
+{
+	HRESULT hr = gs_hHook.OpenMapping( L"FlashFolder_HHOOK_83472903", sizeof(HHOOK) );
+	if( FAILED( hr ) )
+		DebugOut( L"Failed to open shared memory, error %d", ::GetLastError() );
+	
+	if( gs_hHook )
+		if( HHOOK hHook = *gs_hHook )
+			DebugOut( L"HHOOK=%08Xh", (DWORD) hHook ); 
 }
 
 //-----------------------------------------------------------------------------------------
@@ -1164,9 +1183,56 @@ bool IsCurrentProgramEnabledForDialog( FileDlgType fileDlgType )
 }
 
 //-----------------------------------------------------------------------------------------
-// This function gets called in the context of the hooked process.
 
-LRESULT CALLBACK Hook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
+void InitHook( HWND hwnd, FileDlgType fileDlgType )
+{
+	//--- initialise hook for this dialog
+
+	bool isFileDialog = ( fileDlgType.mainType == FDT_COMMON || fileDlgType.mainType == FDT_MSOFFICE );
+
+	g_hFileDialog = hwnd;
+
+	CreateToolWindow( isFileDialog );
+	RegisterMyHotkeys();
+
+	// create an instance of a file dialog hook class depending on the
+	// type of file dialog
+	switch( fileDlgType.mainType )
+	{
+		case FDT_COMMON:
+		{
+			g_spFileDlgHook.reset( new CmnFileDlgHook );
+			g_spFileDlgHook->Init( hwnd, g_hToolWnd );
+		}
+		break;
+		case FDT_MSOFFICE:
+		{
+			g_spFileDlgHook.reset( new MsoFileDlgHook( fileDlgType.subType ) );
+			g_spFileDlgHook->Init( hwnd, g_hToolWnd );
+		}
+		break;
+		case FDT_COMMON_OPENWITH:
+		{
+			// init the "Open With" dialog hook
+			g_spOpenWithDlgHook.reset( new CmnOpenWithDlgHook );
+			g_spOpenWithDlgHook->Init( hwnd, g_hToolWnd );
+		}
+		break;
+		case FDT_COMMON_FOLDER:
+		{
+			// init the "Open With" dialog hook
+			g_spFileDlgHook.reset( new CmnFolderDlgHook );
+			g_spFileDlgHook->Init( hwnd, g_hToolWnd );
+		}
+		break;
+	}
+}
+
+//-----------------------------------------------------------------------------------------
+/// This function gets called in the context of the hooked process.
+/// (DLL-Export)
+
+LRESULT CALLBACK FFHook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
 {
 	HWND hwnd = reinterpret_cast<HWND>( wParam );
 
@@ -1187,112 +1253,26 @@ LRESULT CALLBACK Hook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
 					g_profile.SetDefaults( &g_profileDefaults );
 				}
 
-				if( ! IsCurrentProgramEnabledForDialog( fileDlgType ) )
-					return CallNextHookEx( g_hHook, nCode, wParam, lParam );
-
-				//--- initialise hook for this dialog
-
-				bool isFileDialog = ( fileDlgType.mainType == FDT_COMMON || fileDlgType.mainType == FDT_MSOFFICE );
-
-				g_hFileDialog = hwnd;
-
-				CreateToolWindow( isFileDialog );
-				RegisterMyHotkeys();
-
-				// create an instance of a file dialog hook class depending on the
-				// type of file dialog
-				switch( fileDlgType.mainType )
-				{
-					case FDT_COMMON:
-					{
-						g_spFileDlgHook.reset( new CmnFileDlgHook );
-						g_spFileDlgHook->Init( hwnd, g_hToolWnd );
-					}
-					break;
-					case FDT_MSOFFICE:
-					{
-						g_spFileDlgHook.reset( new MsoFileDlgHook( fileDlgType.subType ) );
-						g_spFileDlgHook->Init( hwnd, g_hToolWnd );
-					}
-					break;
-					case FDT_COMMON_OPENWITH:
-					{
-						// init the "Open With" dialog hook
-						g_spOpenWithDlgHook.reset( new CmnOpenWithDlgHook );
-						g_spOpenWithDlgHook->Init( hwnd, g_hToolWnd );
-					}
-					break;
-					case FDT_COMMON_FOLDER:
-					{
-						// init the "Open With" dialog hook
-						g_spFileDlgHook.reset( new CmnFolderDlgHook );
-						g_spFileDlgHook->Init( hwnd, g_hToolWnd );
-					}
-					break;
-				}
-
-				return 0;
+				if( IsCurrentProgramEnabledForDialog( fileDlgType ) )
+					InitHook( hwnd, fileDlgType );
 			}
-		} //if
-		
+		} //if		
 	} //if
 
-	// be a good Windoze citizen
-   	return CallNextHookEx( g_hHook, nCode, wParam, lParam );
-}
-
-
-//=========================================================================================
-//  Installation / Deinstallation Functions (DLL-Export)
-//=========================================================================================
-
-DLLFUNC bool IsHookInstalled()
-{  
-	return (g_hHook != NULL);
+	// Be a good Windoze citizen by calling next hook in chain.
+	// Get hook handle from shared memory.
+	HHOOK hHook = gs_hHook ? *gs_hHook : NULL;
+	if( hHook )
+   		return CallNextHookEx( hHook, nCode, wParam, lParam );
+   	return 0;
 }
 
 //-----------------------------------------------------------------------------------------
+/// This function can be used to force loading of this delay-loaded DLL immediately
+/// so its module handle can be referenced.
+/// (DLL-Export)
 
-DLLFUNC bool InstallHook()
-{  
-	// TODO: make thread safe 
-    if( g_hHook == NULL )
-    {
-		DebugOut( _T("[fflib] creating hooks...\n") );
-
-        // Install the hook
-		g_hHook = ::SetWindowsHookEx( WH_CBT, Hook_CBT, g_hInstDll, 0 );
-		int err = ERROR_SUCCESS;
-		if( ! g_hHook )
-			err = ::GetLastError();
-
-		DebugOut( _T("[fflib] g_hHook = %08Xh\n"), g_hHook );
-
-		::SetLastError( err );
-
-		return g_hHook != NULL;
-    }
-    else
-    {
-		::SetLastError( ERROR_ALREADY_EXISTS );
-    }
-    
-	return false;
-}
-
-//-----------------------------------------------------------------------------------------
-
-DLLFUNC bool UninstallHook()
-{  
-	// TODO: make thread safe 
-	
-    if( g_hHook != NULL )
-    {
-		DebugOut( _T("[fflib] removing WH_CBT hook %08Xh...\n"), g_hHook );
-
-		if( ::UnhookWindowsHookEx( g_hHook ) )
-			g_hHook = NULL;
-    }
-
-	return ! g_hHook;
+HINSTANCE GetFFLibHandle()
+{
+	return g_hInstDll;
 }

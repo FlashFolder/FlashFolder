@@ -14,15 +14,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  */
-
+/* \file Class to manage the file dialog hook.
+*/ 
 #pragma once
 
-#include "..\common\defines.h"
+#include "fflib_exports.h"
 
-extern RegistryProfile g_profile;
-extern HINSTANCE g_hInstDll;
-
-int FavMenu_Display( HWND hWndParent, int x, int y, const FavoritesList& favs );
-void FavMenu_StartEditor( HWND hWndParent );
-void FavMenu_AddDir( HWND hWndParent, FavoritesList& favs, LPCTSTR pPath, LPCTSTR pTargetPath );
+class FFHookInstaller
+{
+public:
+	FFHookInstaller() {}
+	~FFHookInstaller()          { Uninstall(); }
+	
+	bool Install();
+	
+	bool Uninstall();
+	
+	bool IsInstalled() const    { return GetHHook() != NULL; }
+	
+	HHOOK GetHHook() const      { return m_sharedHHook ? *m_sharedHHook : NULL; }
+	
+private:
+	CAtlFileMapping<HHOOK> m_sharedHHook;
+};

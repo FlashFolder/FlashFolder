@@ -251,7 +251,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\LogFile.cpp"
+				RelativePath="..\FFLib\HookInstaller.cpp"
 				>
 			</File>
 			<File
@@ -285,7 +285,7 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath=".\LogFile.h"
+				RelativePath="..\FFLib\HookInstaller.h"
 				>
 			</File>
 			<File
@@ -311,6 +311,22 @@
 			</File>
 			<File
 				RelativePath=".\res\manifest.xml"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="common_h"
+			>
+			<File
+				RelativePath="..\commonUtils\LogFile.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="common_cpp"
+			>
+			<File
+				RelativePath="..\commonUtils\LogFile.cpp"
 				>
 			</File>
 		</Filter>

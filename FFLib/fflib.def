@@ -1,4 +1,6 @@
 LIBRARY     fflib6439.dll
 
 EXPORTS
+	GetFFLibHandle
+	FFHook_CBT
 	CPlApplet
