@@ -18,69 +18,34 @@
  */
 #include "stdafx.h"
 #include "HookInstaller.h"
+#include "fflib_exports.h"
 
 //---------------------------------------------------------------------------
 
 bool FFHookInstaller::Install()
 {
-	// SECURITY: Define an ACL for the shared memory holding the hook handle 
-	// to include read access for standard users. If we would not do this, 
-	// nobody except admins could use the hook.
-
-	CSecurityDesc sd;
-	try 
-	{
-		CDacl dacl;
-		dacl.AddAllowedAce( Sids::System(), FILE_MAP_ALL_ACCESS );
-		dacl.AddAllowedAce( Sids::Admins(), FILE_MAP_ALL_ACCESS );
-		dacl.AddAllowedAce( Sids::Users(), FILE_MAP_READ );
-		sd.SetDacl( dacl );
-	} 
-	catch( CAtlException ) 
-	{
-		SetLastError( ERROR_ACCESS_DENIED );		
-		return false;
-	}	
-	CSecurityAttributes sa( sd );	
-
-	//--- Create the shared memory for the hook handle based on the ACL defined above.
-	
-	BOOL fileMapExisted = FALSE;
-	HRESULT hr = m_sharedHHook.MapSharedMem( sizeof(HHOOK), L"FlashFolder_HHOOK_83472903",
-		&fileMapExisted, &sa );
-	if( FAILED( hr ) || fileMapExisted )
-	{
-		// SECURITY: We cannot reuse an existing shared memory object because we
-		//    cannot trust it (it could have been created by lower-privileged process).
-		int err = FAILED( hr ) ? ::GetLastError() : ERROR_ALREADY_EXISTS; 
-		::SetLastError( err );
-		return false;
-	}
-
-    //--- Install the hook and store the handle in the shared memory where it
-    //    will be readable by all processes.
+	if( m_hHook )
+		return ERROR_ALREADY_EXISTS;
 
 	// Force the delay-load DLL to load NOW so that we can reference the hook function.
 	HINSTANCE hMod = GetFFLibHandle();
 	// Need to use GetProcAddress instead of func. pointer because of delay-loading.
 	HOOKPROC hookProc = (HOOKPROC) ::GetProcAddress( hMod, "FFHook_CBT" );
 	
-	HHOOK hHook = ::SetWindowsHookEx( WH_CBT, hookProc, hMod, 0 );
-	*m_sharedHHook = hHook;
+	m_hHook = ::SetWindowsHookEx( WH_CBT, hookProc, hMod, 0 );
 
-	return hHook != NULL;
+	return m_hHook != NULL;
 }
 
 //---------------------------------------------------------------------------
 	
 bool FFHookInstaller::Uninstall()
 {
-	HHOOK hHook = m_sharedHHook ? *m_sharedHHook : NULL;
-    if( hHook )
+    if( m_hHook )
     {
-		if( ::UnhookWindowsHookEx( hHook ) )
+		if( ::UnhookWindowsHookEx( m_hHook ) )
 		{
-			*m_sharedHHook = NULL;
+			m_hHook = NULL;
 			return true;
 		}
     }

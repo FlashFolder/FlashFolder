@@ -40,16 +40,10 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------------------
-// global variables that are "local" to each instance of the DLL  
+// global variables  
 //-----------------------------------------------------------------------------------------
 
 HINSTANCE g_hInstDll = NULL;
-
-CAtlFileMapping<HHOOK> gs_hHook;         // Handle of the "window activate" hook.
-                                        // Note: we do NOT put this in a shared segment (pragma data_seg)
-                                        // as this would impose a security vulnerability since 
-                                        // processes with different privileges would have
-                                        // write access to this variable.
 
 HWND g_hFileDialog = NULL;				// handle of file open/save dialog 
 
@@ -118,8 +112,6 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 				::GetCurrentProcessId(), g_currentExePath );
 
 			g_osVersion = GetOsVersion();
-
-			GetSharedData();		
 		}
 		break;
 
@@ -130,26 +122,6 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 		break;
     }
     return TRUE;
-}
-
-//-----------------------------------------------------------------------------------------
-// Get data shared between all processes where this DLL is loaded for the current logon session.
-//
-// For security reasons, we use a memory mapped file instead of the "simple way" of
-// using a shared segment of the DLL. Only processes with administrative privileges have 
-// write access to this data.
-// By using a memory mapped file we also make sure that the hook handle is only shared within 
-// the current logon session, since each session has its own hook.
-
-void GetSharedData()
-{
-	HRESULT hr = gs_hHook.OpenMapping( L"FlashFolder_HHOOK_83472903", sizeof(HHOOK) );
-	if( FAILED( hr ) )
-		DebugOut( L"Failed to open shared memory, error %d", ::GetLastError() );
-	
-	if( gs_hHook )
-		if( HHOOK hHook = *gs_hHook )
-			DebugOut( L"HHOOK=%08Xh", (DWORD) hHook ); 
 }
 
 //-----------------------------------------------------------------------------------------
@@ -1259,12 +1231,7 @@ LRESULT CALLBACK FFHook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
 		} //if		
 	} //if
 
-	// Be a good Windoze citizen by calling next hook in chain.
-	// Get hook handle from shared memory.
-	HHOOK hHook = gs_hHook ? *gs_hHook : NULL;
-	if( hHook )
-   		return CallNextHookEx( hHook, nCode, wParam, lParam );
-   	return 0;
+	return CallNextHookEx( NULL, nCode, wParam, lParam );
 }
 
 //-----------------------------------------------------------------------------------------

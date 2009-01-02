@@ -20,22 +20,20 @@
 */ 
 #pragma once
 
-#include "fflib_exports.h"
-
 class FFHookInstaller
 {
 public:
-	FFHookInstaller() {}
+	FFHookInstaller() :         m_hHook( NULL ) {}
 	~FFHookInstaller()          { Uninstall(); }
 	
 	bool Install();
 	
 	bool Uninstall();
 	
-	bool IsInstalled() const    { return GetHHook() != NULL; }
+	bool IsInstalled() const    { return m_hHook != NULL; }
 	
-	HHOOK GetHHook() const      { return m_sharedHHook ? *m_sharedHHook : NULL; }
+	HHOOK GetHHook() const      { return m_hHook; }
 	
 private:
-	CAtlFileMapping<HHOOK> m_sharedHHook;
+	HHOOK m_hHook;
 };

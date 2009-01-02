@@ -31,7 +31,8 @@
 		<Directory Id="TARGETDIR" Name="SourceDir" FileSource="..\exe">
 
 			<Component Id="FlashFolder.exe" Guid="E5EF7F5C-026E-4772-BBC0-075A94198FDA">
-				<File Name="FlashFolder.exe" Vital="yes" KeyPath="yes"/>
+				<File Name="FlashFolder.exe" BindPath="[TARGETDIR];[SystemFolder]" 
+					Vital="yes" KeyPath="yes"/>
 
 				<!-- Install program as an interactive, autorun service.
 					LoadOrderGroup should be such that the service is started before user logon.
@@ -55,11 +56,13 @@
 			</Component>
 
 			<Component Id="fflib6439.dll" Guid="ABB79737-52B0-4EA1-AC4C-DD7BE0BC3F16">
-				<File Name="fflib6439.dll" Vital="yes" KeyPath="yes"/> 
+				<File Name="fflib6439.dll" BindPath="[TARGETDIR];[SystemFolder]" 
+					Vital="yes" KeyPath="yes"/>
 			</Component>
 
 			<Component Id="FFConfig.exe" Guid="3E8D86C3-3CA3-41D5-B6E3-D09D01B50CFD">
-				<File Name="FFConfig.exe" Vital="yes" KeyPath="yes"/>  
+				<File Name="FFConfig.exe" BindPath="[TARGETDIR];[SystemFolder]"
+					Vital="yes" KeyPath="yes"/>  
 			</Component>
 							
 		</Directory>

@@ -89,7 +89,7 @@
 				DelayLoadDLLs="uxtheme.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/fflib.pdb"
-				BaseAddress="0x60000000"
+				BaseAddress="0x69000000"
 				ImportLibrary="./bin/fflib.lib"
 				TargetMachine="1"
 			/>
@@ -198,7 +198,7 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
-				BaseAddress="0x60000000"
+				BaseAddress="0x69000000"
 				ImportLibrary="./bin/fflib.lib"
 				TargetMachine="1"
 			/>
