@@ -255,6 +255,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HookProcess.cpp"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
@@ -286,6 +290,10 @@
 			>
 			<File
 				RelativePath="..\FFLib\HookInstaller.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HookProcess.h"
 				>
 			</File>
 			<File

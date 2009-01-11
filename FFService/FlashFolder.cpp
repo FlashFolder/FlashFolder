@@ -17,9 +17,9 @@
  *
  */
 /* \file FlashFolder service.
-  The service is used to wait for session logon events and start an admin process
+  The service is used to wait for session logon events and start a SYSTEM process
   in the new users session which in turn installs the global FlashFolder hook function
-  contained in "fflib.dll". This way FlashFolder is available in admin processes,
+  contained in "fflib.dll". This way FlashFolder is available in elevated processes,
   even if the logged-on user has restricted rights.
 */
 #include "stdafx.h"
@@ -28,8 +28,6 @@
 #include "../fflib/HookInstaller.h"
 #include "../common/Defines.h"
 #include "../commonUtils/logfile.h"
-
-HINSTANCE g_hInstance = NULL;
 
 const TCHAR INTERNAL_APPNAME[] = L"FlashFolder"; 
 
@@ -238,21 +236,25 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
 //---------------------------------------------------------------------------
 /// Start one hook process per user session (if any).
 
-bool StartHookInCurrentSessions()
+bool StartHookInCurrentUserSessions()
 {
-	Log( L"StartHookInCurrentSessions()" );
+	Log( L"StartHookInCurrentUserSessions()" );
 
 	PWTS_SESSION_INFO pSessions = NULL;
 	DWORD sessionCount = 0;
 
-	// This is expected to fail if there are no user sessions available at the time.
+	// This is expected to fail if there are no user sessions available at the time 
+	// (e. g. at boot time).
 	if( ! ::WTSEnumerateSessions( WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessions, &sessionCount ) )
 	{
 		Log( L"WTSEnumerateSessions() error", ::GetLastError() );
 		return false;
 	}
 	
-	for( int i = 0; i < sessionCount; ++i )
+	// Starting with Vista, session 0 is reserved for the services, user session begin at 1.
+	int firstUserSession = ( GetVersion() & 0xFF ) >= 6 ? 1 : 0;
+	
+	for( int i = firstUserSession; i < sessionCount; ++i )
 	{
 		WCHAR s[ 256 ] = L"";
 		swprintf_s( s, L"Session ID: %d, state: %d, WinStation: %s",
@@ -288,7 +290,7 @@ bool InitService()
 	
 	// Create event for hook termination
 	g_hookTerminateEvent.Attach( 
-		::CreateEvent( NULL, TRUE, FALSE, L"Global\\FFHookTerminateEvent_du38hndkj4" ) );
+		::CreateEvent( NULL, TRUE, FALSE, L"Global\\FFHookTerminateEvent_983874652" ) );
 
 	if( ! g_hookTerminateEvent )
 	{
@@ -308,7 +310,7 @@ bool InitService()
 	// Start the hook so it is available immediately after installation,
 	// if the installation is done in an active user session (not for group 
 	// policy installation which is done "per-machine" without user context).
-	StartHookInCurrentSessions();
+	StartHookInCurrentUserSessions();
 	
 	return true;
 }
@@ -401,15 +403,32 @@ void OpenHookLogFile()
 
 //---------------------------------------------------------------------------
 
-int SetHook()
+int RunHook()
 {
 	OpenHookLogFile();
 	Log( L"Task: Starting hook" );
-				
+
+	//--- Open/create mutex to enforce a single instance of this process 
+	//    (per user logon session).
+	
+	CHandle singleInstanceMutex(
+		::CreateMutex( NULL, TRUE, L"Local\\FFHookSingleInstanceMutex_0938746251" ) );
+	DWORD err = ::GetLastError();
+	if( err == ERROR_ALREADY_EXISTS || err == ERROR_ACCESS_DENIED )
+	{
+		Log( L"Hook process is already running in this session" );
+		return 0;
+	}
+	else if( err != ERROR_SUCCESS )
+	{	
+		Log( L"ERROR: Could not create single-instance mutex", err );
+		return 1;
+	}
+	
 	//--- Open/create event for hook termination.
 	
 	CHandle hookTerminateEvent(
-		::CreateEvent( NULL, TRUE, FALSE, L"Global\\FFHookTerminateEvent_du38hndkj4" ) );
+		::CreateEvent( NULL, TRUE, FALSE, L"Global\\FFHookTerminateEvent_983874652" ) );
 	if( ! hookTerminateEvent )
 	{
 		Log( L"Failed to create hook termination event.", ::GetLastError() );
@@ -443,11 +462,11 @@ int SetHook()
 
 		if( ::FindWindow( FF_WNDCLASSNAME, NULL ) == NULL )
 		{
-			Log( L"Toolbar window not found", ::GetLastError() );
+			Log( L"Toolbar window not found - process can terminate", ::GetLastError() );
 			break;
 		}
-
 		Log( L"Cannot terminate because the FlashFolder toolbar window exists" );
+				
 		if( ! ::ResetEvent( hookTerminateEvent ) )
 		{
 			Log( L"Could not reset termination event", ::GetLastError() );
@@ -459,6 +478,18 @@ int SetHook()
 	if( ! hookInstaller.Uninstall() )
 	{
 		Log( L"Failed to uninstall hook", ::GetLastError() );
+	}
+	
+	// Post a broadcast message to finally unload the hook DLL from all processes
+	// that receive the message. Windows seems to unload hook DLLs for a specific process
+	// only the next time the process receives a message after UnhookWindowsHookEx() 
+	// has been called.
+	Log( L"Broadcasting message to unload hook DLL..." );
+	UINT msg = ::RegisterWindowMessage( L"FFHookTerminate_373494500237" );
+	DWORD recipients = BSM_APPLICATIONS | BSF_IGNORECURRENTTASK;	
+	if( ::BroadcastSystemMessage( BSF_FORCEIFHUNG | BSF_POSTMESSAGE, &recipients, msg, 0, 0 ) < 0 )
+	{
+		Log( L"Failed to broadcast message", ::GetLastError() );
 	}
 	
 	Log( L"Exiting process" );
@@ -476,7 +507,7 @@ int RemoveHook()
 	
 	// Open event for hook termination
 	CHandle hookTerminateEvent( 
-		::OpenEvent( EVENT_MODIFY_STATE, FALSE, L"Global\\FFHookTerminateEvent_du38hndkj4" ) );
+		::OpenEvent( EVENT_MODIFY_STATE, FALSE, L"Global\\FFHookTerminateEvent_983874652" ) );
 	if( ! hookTerminateEvent )
 	{
 		Log( L"Failed to open hook termination event.", ::GetLastError() );
@@ -512,15 +543,13 @@ void ShowHelp()
 
 int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )         
 { 
-	g_hInstance = hInstance;
-
 	if( wcsstr( lpCmdLine, L"/startservice" ) )
 	{	
 		return StartService();	
 	}
 	else if( wcsstr( lpCmdLine, L"/sethook" ) )
 	{
-		return SetHook();
+		return RunHook();
 	}
 	else if( wcsstr( lpCmdLine, L"/unhook" ) )
 	{
