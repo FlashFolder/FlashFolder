@@ -2,11 +2,11 @@ How to compile FlashFolder
 --------------------------
 
 Prerequisites:
-- Visual C++ 7.1 (Visual Studio 2003)
-- the WiX (Windows Installer XML) toolkit version 2.0 (http://wix.sourceforge.net/)
-- environment variable WIX_2_0_DIR set to the directory path of the WiX 2.0 binaries (without trailing backslash)
+- Visual C++ 8.0 (Visual Studio 2005) or newer
+- WiX (Windows Installer XML) version 3.0.4827 (or newer version, http://wix.sourceforge.net/releases/)
+- TortoiseSVN (optional, only for generating correct build number)
 
 Compile:
 1. Open FlashFolder.sln in Visual Studio.
-2. Select "Unicode Release" configuration.
-3. Compile the "Installer" sub-project. This should compile all necessary dependencies resulting in the final .msi installer file.
+2. Select "Release" configuration.
+3. Compile the "_BUILD_ALL" project. This should compile all necessary dependencies resulting in the final installer package named "FlashFolder.msi", located under "Installer\msi\en-US".

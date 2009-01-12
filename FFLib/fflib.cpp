@@ -816,6 +816,13 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_TIMER:
 			g_spFileDlgHook->OnTimer();
 		break;
+		
+		case WM_NCHITTEST:
+			// Make sure the window cannot be resized since we have the resize border
+			// solely to match the style of the file dialog.
+			LRESULT ht = ::DefWindowProc( hwnd, WM_NCHITTEST, wParam, lParam );
+			return ht == HTNOWHERE || ht == HTTRANSPARENT ? ht : HTCLIENT;
+		break;
 	}
 
 	return FALSE; 
@@ -930,6 +937,9 @@ void CreateToolWindow( bool isFileDialog )
 
 	// use themed border if possible
 	DWORD edStyleEx = isThemed ? WS_EX_CLIENTEDGE : WS_EX_STATICEDGE;
+	// Visual tuning: remove border on Vista
+	if( ( ::GetVersion() & 0xFF ) >= 6 )
+		edStyleEx = 0;  
 
 	HWND hEdit = ::CreateWindowEx( edStyleEx, _T("Edit"), NULL, 
 		WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL, 

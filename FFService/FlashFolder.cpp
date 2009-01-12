@@ -181,7 +181,7 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
 		{
 			Log( L"SERVICE_CONTROL_STOP event received" );
 			
-			SetMyServiceStatus( SERVICE_STOP_PENDING, 0, 5000 );
+			SetMyServiceStatus( SERVICE_STOP_PENDING, 0, 6000 );
 			::PulseEvent( g_serviceTerminateEvent );
 
 			return NO_ERROR; 
@@ -191,7 +191,7 @@ DWORD WINAPI MyServiceCtrlHandler( DWORD control, DWORD eventType,
 		{
 			Log( L"SERVICE_CONTROL_SHUTDOWN event received" );
 			
-			SetMyServiceStatus( SERVICE_STOP_PENDING, 0, 5000 );
+			SetMyServiceStatus( SERVICE_STOP_PENDING, 0, 6000 );
 			::PulseEvent( g_serviceTerminateEvent );
 			
 			return NO_ERROR;
@@ -323,6 +323,11 @@ void FinalizeService()
 	Log( L"Setting hook termination event" );
 	if( ! ::SetEvent( g_hookTerminateEvent ) )
 		Log( L"Failed to set hook termination event", ::GetLastError() );
+	else
+		// Give hook processes time to settle down and unload the hook DLL so
+		// upgrade installs work smoothly without closing other programs first.
+		// TODO: make this more reliable...
+		::Sleep( 3000 );
 }
 
 //---------------------------------------------------------------------------
