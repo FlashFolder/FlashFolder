@@ -248,7 +248,7 @@ void MsoFileDlgHook::OnTimer()
 	if( HWND hwnd = ::FindWindowEx( g_pHook->m_hwndFileDlg, NULL, _T("Snake List"), NULL ) ) 
 	{
 		TCHAR curDir[ MAX_PATH + 1 ] = _T("");
-		ShellView_GetCurrentDir( hwnd, curDir );
+		ShellViewGetCurrentFolder( hwnd, curDir );
 	
 		if( _tcsicmp( curDir, m_currentDir ) != 0 )
 		{

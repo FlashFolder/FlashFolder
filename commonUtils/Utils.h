@@ -91,3 +91,6 @@ void EnableDlgItem( HWND hDlg, UINT idCtrl, BOOL bEnable = TRUE );
 /// Send a formatted message to the debugger (or external tool). 
 /// Message size can be max. 1024 TCHARs.
 void DebugOut( LPCTSTR pFormat, ... );
+
+/// Find a child window given a class name recursively (FindWindowEx does not do this).
+HWND FindChildWindowRecursively( HWND hwndParent, LPCWSTR pClassName );

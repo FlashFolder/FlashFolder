@@ -308,3 +308,31 @@ void DebugOut( LPCTSTR pFormat, ... )
 	va_end( args );
 	::OutputDebugString( buf );
 }
+
+//-----------------------------------------------------------------------------------------------
+
+struct FindChildWindowRecursivelyInfo
+{
+	HWND hwnd;
+	LPCWSTR pClassName;
+};
+
+BOOL CALLBACK FindChildWindowRecursivelyProc( HWND hwnd, LPARAM lParam )
+{
+	FindChildWindowRecursivelyInfo* pInfo = (FindChildWindowRecursivelyInfo*) lParam;
+	
+	WCHAR className[ 256 ] = L"";
+	::GetClassName( hwnd, className, _countof(className) );
+	if( wcscmp( className, pInfo->pClassName ) == 0 )
+	{
+		pInfo->hwnd = hwnd;
+		return FALSE;
+	} 
+}
+
+HWND FindChildWindowRecursively( HWND hwndParent, LPCWSTR pClassName )
+{
+	FindChildWindowRecursivelyInfo info = { NULL, pClassName };
+	::EnumChildWindows( hwndParent, FindChildWindowRecursivelyProc, (LPARAM) &info );
+	return info.hwnd;
+}

@@ -246,10 +246,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CmnOpenWithDlgHook.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\FFControlPanel.cpp"
 				>
 			</File>
@@ -329,10 +325,6 @@
 			</File>
 			<File
 				RelativePath=".\CmnFolderDlgHook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CmnOpenWithDlgHook.h"
 				>
 			</File>
 			<File

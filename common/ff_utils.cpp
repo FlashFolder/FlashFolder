@@ -28,6 +28,22 @@ static char THIS_FILE[]=__FILE__;
 #endif
 
 //-----------------------------------------------------------------------------------------
+
+BOOL CALLBACK DebugEnumChildProc( HWND hwnd, LPARAM lParam )
+{
+	HWND parent = ::GetParent( hwnd );
+	DWORD id = ::GetDlgCtrlID( hwnd );
+	TCHAR sclass[ 256 ] = L"";
+	TCHAR stitle[ 256 ] = L"";
+	::GetClassName( hwnd, sclass, _countof( sclass ) );
+	::GetWindowText( hwnd, stitle, _countof( sclass ) );
+	DebugOut( L"hwnd = %04x, parent = %04x, id = %d, class = '%s', title = '%s'\n", 
+		hwnd, parent, id, sclass, stitle );  
+
+	return TRUE;	
+}
+
+//-----------------------------------------------------------------------------------------
 // GetFileDlgType()
 //
 //   checks, whether given window handle is the handle of a new-style 
@@ -35,7 +51,7 @@ static char THIS_FILE[]=__FILE__;
 //-----------------------------------------------------------------------------------------
 FileDlgType GetFileDlgType( HWND dlg )
 {
-	HWND hStat1, hCombFolder, hEditFileName, hShellView, hDriveListBox;
+	HWND hStat1, hEditFileName, hShellView, hDriveListBox;
 
 	TCHAR className[256] = _T("");
     ::GetClassName(dlg, className, sizeof(className) / sizeof(TCHAR) - 1 );
@@ -76,29 +92,8 @@ FileDlgType GetFileDlgType( HWND dlg )
 		return FileDlgType( FDT_NONE );
 	}
 
-	// detect the common "Open With" dialog
-	// TODO: do it only if Win2k is running
-	if( HWND hWnd = ::GetDlgItem( dlg, 0x3009 ) )
-	{
-		className[0] = 0;
-		::GetClassName( hWnd, className, sizeof(className) / sizeof(TCHAR) - 1 );
-		if( _tcscmp( className, _T("Static") ) == 0 )
-			if( hWnd = ::GetDlgItem( dlg, 0x3003 ) )
-			{
-				className[0] = 0;
-				::GetClassName( hWnd, className, sizeof(className) / sizeof(TCHAR) - 1 );
-				if( _tcscmp( className, _T("Static") ) == 0 )
-					if( hWnd = ::GetDlgItem( dlg, 0x3605 ) )
-					{
-						className[0] = 0;
-						::GetClassName( hWnd, className, sizeof(className) / sizeof(TCHAR) - 1 );
-						if( _tcscmp( className, _T("SysListView32") ) == 0 )
-							return FileDlgType( FDT_COMMON_OPENWITH );							
-					}
-			}
-	}         
-
-	// detect the common folder dialog
+	// Detect the common folder dialog.
+	
 	if( HWND hWnd = ::GetDlgItem( dlg, 0 ) )
 	{
 		className[0] = 0;
@@ -106,9 +101,14 @@ FileDlgType GetFileDlgType( HWND dlg )
 		if( _tcscmp( className, _T("SHBrowseForFolder ShellNameSpace Control") ) == 0 )
 			return FileDlgType( FDT_COMMON_FOLDER );
 	}
+	
+	//DebugOut( L"--- childs windows of %04x ---\n", dlg );
+	//::EnumChildWindows( dlg, DebugEnumChildProc, 0 );
 
-	// to detect the common file dlg I check various control IDs and class names
-	// that exist only in the common file dlg
+	// To detect the common file dlg we check various control IDs and class names
+	// that should exist only in this dialog. Ideally we would want to check
+	// for the control with "SHELLDLL_DefView" class but this is created only later by
+	// the file dialog.
 
 	if( (hShellView = GetDlgItem(dlg, FILEDLG_LB_SHELLVIEW)) == NULL )
 		return FileDlgType( FDT_NONE );
@@ -124,13 +124,6 @@ FileDlgType GetFileDlgType( HWND dlg )
 	if( _tcscmp( className, _T("Static") ) != 0)
 		return FileDlgType( FDT_NONE );
 
-	if ((hCombFolder = GetDlgItem(dlg, FILEDLG_CB_FOLDER)) == NULL)
-		return FileDlgType( FDT_NONE );
-	className[0] = 0;
-    ::GetClassName( hCombFolder, className, sizeof(className) / sizeof(TCHAR) - 1 );
-	if( _tcscmp( className, _T("ComboBox") ) != 0)
-		return FileDlgType( FDT_NONE );
-
 	if ((hEditFileName = GetDlgItem(dlg, FILEDLG_ED_FILENAME)) == NULL)
 		return FileDlgType( FDT_NONE );
 	className[0] = 0;
@@ -138,10 +131,10 @@ FileDlgType GetFileDlgType( HWND dlg )
 	if( _tcscmp( className, _T("Edit") ) != 0)
 		return FileDlgType( FDT_NONE );
 
-	// filter out old-style (Win 3.1) open/save dialogs
-	//   we detect them by checking for the "drive listbox" that doesn't
-	//   exists in new style dialogs
-	if( (hDriveListBox = GetDlgItem(dlg, FILEDLG_CB_OLD_DRIVES)) != NULL )
+	// Filter out old-style (Win 3.1) open/save dialogs. They are detect by checking 
+	// for the "drive listbox" that doesn't exists in new style dialogs (control ID is
+	// the same as the shellview, which is created only later by new file dialogs).
+	if( ( hDriveListBox = GetDlgItem( dlg, FILEDLG_SHELLVIEW ) ) != NULL )
 		return FileDlgType( FDT_NONE );
 
 	return FileDlgType( FDT_COMMON );
@@ -203,35 +196,6 @@ bool FileDlgBrowseToFolder( HWND hwndFileDlg, LPCTSTR path )
 }
 
 //-----------------------------------------------------------------------------------------
-// FileDlgGetCurrentFolder()
-//
-//    Returns path to folder who's content is currently visible in a common file dialog
-//    Caller must have allocated folderPath with size of MAX_PATH  characters
-//-----------------------------------------------------------------------------------------
-bool FileDlgGetCurrentFolder(HWND hwndFileDlg, LPTSTR folderPath )
-{
-	bool res = false;
-
-	folderPath[0] = 0;
-
-    LPITEMIDLIST pidl = NULL;
-    int pidlSize = 0, cb;
-    do 
-    {
-        pidlSize += 1024;
-        pidl = (LPITEMIDLIST) realloc(pidl, pidlSize);
-        cb = (int) SendMessage(hwndFileDlg, CDM_GETFOLDERIDLIST, pidlSize, (LPARAM) pidl);        
-    }
-    while (cb > pidlSize);
-
-    if (cb > 0)
-		res = (SHGetPathFromIDList( pidl, folderPath ) == TRUE);
-
-    free(pidl);
-	return res;
-}
-
-//-----------------------------------------------------------------------------------------
 // FileDlgSetFilter()
 //
 //   sets a filter for the specified common file dialog
@@ -282,11 +246,46 @@ bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter )
 }
 
 //-----------------------------------------------------------------------------------------
+/// Get the currently selected folder of a shell browser.
+/// Caller must have allocated folderPath with size of MAX_PATH characters
+
+bool GetCurrentFolderFromShellBrowser( IShellBrowser *pShBrowser, LPTSTR folderPath )
+{
+	bool res = false;
+	folderPath[ 0 ] = 0;
+
+	IShellView* psv;
+	if( SUCCEEDED( pShBrowser->QueryActiveShellView( &psv ) ) )
+	{	
+		IFolderView* pfv;
+		if( SUCCEEDED( psv->QueryInterface( IID_IFolderView, (void**) &pfv ) ) ) 
+		{
+			IPersistFolder2* ppf2;
+			if( SUCCEEDED( pfv->GetFolder( IID_IPersistFolder2, (void**) &ppf2 ) ) )
+			{
+				LPITEMIDLIST pidlFolder;
+				if( SUCCEEDED( ppf2->GetCurFolder( &pidlFolder ) ) ) 
+				{
+					if( ::SHGetPathFromIDList( pidlFolder, folderPath ) )
+						res = true;
+					::CoTaskMemFree( pidlFolder );
+				}
+				ppf2->Release();
+			}
+			pfv->Release();
+		}
+
+		psv->Release();
+	}
+
+	return res;
+}
+
+//-----------------------------------------------------------------------------------------
 /**
  * \brief Returns path to folder who's content is currently visible in a shell folder view.
  *
  * Tested successfully with both common file dialog and MS Office file dialog on WinXP.\n
- * TODO: Win2k - find a way to work around IFolderView which isn't supported under this OS.
  * 
  * \param hwnd Window handle that contains the shell view. This should be the parent window
  *             of the control which has the "SHELLDLL_DefView" class. 
@@ -295,38 +294,10 @@ bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter )
  * \retval true success
  * \retval false failure
  */
-bool ShellView_GetCurrentDir( HWND hwnd, LPTSTR path )
+bool ShellViewGetCurrentFolder( HWND hwnd, LPTSTR path )
 {
 	path[ 0 ] = 0;
-	bool res = false;
-
-	IShellBrowser *pShBrowser = 
-		reinterpret_cast<IShellBrowser*>( ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 ) );
-	if( pShBrowser )
-	{
-		IShellView* psv;
-		if( SUCCEEDED( pShBrowser->QueryActiveShellView( &psv ) ) )
-		{	
-			IFolderView* pfv;
-			if( SUCCEEDED( psv->QueryInterface( IID_IFolderView, (void**) &pfv ) ) ) 
-			{
-				IPersistFolder2* ppf2;
-				if( SUCCEEDED( pfv->GetFolder( IID_IPersistFolder2, (void**) &ppf2 ) ) )
-				{
-					LPITEMIDLIST pidlFolder;
-					if( SUCCEEDED( ppf2->GetCurFolder( &pidlFolder ) ) ) 
-					{
-						if( ::SHGetPathFromIDList( pidlFolder, path ) )
-							res = true;
-						::CoTaskMemFree( pidlFolder );
-					}
-					ppf2->Release();
-				}
-				pfv->Release();
-			}
-
-			psv->Release();
-		}
-	}
-	return res;
+	if( IShellBrowser *p = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 ) )
+		return GetCurrentFolderFromShellBrowser( p, path );
+	return false;
 }

@@ -33,30 +33,41 @@
 class CmnFileDlgHook : public FileDlgHook_base
 {
 public:
-	CmnFileDlgHook() : 
-		m_hwndFileDlg( 0 ), m_fileDialogCanceled( false ),
-        m_initDone( false ), m_isWindowActive( false ) {}
+	CmnFileDlgHook() { Reset();	}
 
 	// overridings of FileDlgHook_base
+
 	virtual bool Init( HWND hwndFileDlg, HWND hWndTool );
+	virtual void Uninstall();
+	
 	virtual bool SetFolder( LPCTSTR path );
 	virtual bool GetFolder( LPTSTR folderPath );
 	virtual bool SetFilter( LPCTSTR filter );
 
 private:
-	static LRESULT CALLBACK HookWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static LRESULT CALLBACK HookShellWndProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+	void Reset()
+	{
+		m_hwndFileDlg = NULL;
+		m_shellWnd = NULL; 
+		m_fileDialogCanceled = false;
+        m_isWindowActive = false;
+        m_fileDlgShown = false;
+	}
+	
+	static LRESULT CALLBACK HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 
+		UINT_PTR subclassId, DWORD_PTR refData );
+	static LRESULT CALLBACK HookShellWndProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 	
+		UINT_PTR subclassId, DWORD_PTR refData );
 	void ResizeFileDialog();
 	void ResizeNonResizableFileDialog( int x, int y, int newWidth, int newHeight );
 	void InitShellWnd();
 
 	HWND m_hwndFileDlg, m_hwndTool;
-	WNDPROC m_oldWndProc;
-	WNDPROC m_oldShellWndProc;
 	bool m_isWindowActive;
 	bool m_fileDialogCanceled;
-	bool m_initDone;
+	bool m_fileDlgShown;
 	LRESULT m_listViewMode;
+	HWND m_shellWnd;
 
 	// options read from INI file specified in Init()
 

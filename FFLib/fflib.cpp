@@ -33,11 +33,12 @@
 #include "FileDlg_base.h"
 #include "CmnFileDlgHook.h"
 #include "MsoFileDlgHook.h"
-#include "CmnOpenWithDlgHook.h"
 #include "CmnFolderDlgHook.h"
 #include "../common/ProfileDefaults.h"
 
 using namespace std;
+
+const WORD OSVERSION = GetOsVersion();
 
 //-----------------------------------------------------------------------------------------
 // global variables  
@@ -59,8 +60,6 @@ TCHAR g_favIniFilePath[MAX_PATH+1];		// Path to INI-File with favorite folders
 RegistryProfile g_profile;   
 MemoryProfile g_profileDefaults;
 
-WORD g_osVersion = 0;
-
 TCHAR g_currentExePath[ MAX_PATH + 1 ] = _T("");
 LPCTSTR g_currentExeName = _T("");
 TCHAR g_currentExeDir[ MAX_PATH + 1 ] = _T("");
@@ -71,6 +70,7 @@ RECT g_toolbarOffset = { 0 };            // Toolbar position / width offset to a
 
 bool g_isFileDlgActive = false;
 bool g_isToolWndActive = false;
+bool g_isToolWndVisible = false;
 
 //--- options read from profile
 int g_globalHistoryMaxEntries;
@@ -110,8 +110,6 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 			
 			DebugOut( _T("[fflib] DLL_PROCESS_ATTACH (pid %08Xh, \"%s\")\n"), 
 				::GetCurrentProcessId(), g_currentExePath );
-
-			g_osVersion = GetOsVersion();
 		}
 		break;
 
@@ -757,6 +755,16 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
+		case WM_WINDOWPOSCHANGING:
+		{
+			// Make sure the toolbar window is initially shown hidden, since dialog manager always
+			// calls ShowWindow( SW_SHOW ).
+			WINDOWPOS* wp = (WINDOWPOS*) lParam;
+		    if( ! g_isToolWndVisible )
+				wp->flags &= ~SWP_SHOWWINDOW;
+		}
+		break;
+
 		case WM_WINDOWPOSCHANGED:
 		{
 			//resize path edit control
@@ -841,10 +849,12 @@ BOOL CALLBACK ToolWndSetFont(HWND hwnd, LPARAM lParam)
 void CreateToolWindow( bool isFileDialog )
 {
 	bool isThemed = false;
-	if( g_osVersion >= 0x0501 )
+	if( OSVERSION >= 0x0501 )
 		isThemed = ::IsThemeActive() != 0;	
 
 	//--- create the external tool window ---
+	
+	g_isToolWndVisible = false;
 
 	// Register unique class name so FF can be identified by other tools.
 	WNDCLASS wc = { 0 };
@@ -898,7 +908,7 @@ void CreateToolWindow( bool isFileDialog )
 	// Check whether the 32 bpp version of the toolbar bitmap is supported. 
 	// For this, OS must be >= WinXP and display mode >= 16 bpp.
 	bool isToolbar32bpp = false;
-	if( g_osVersion >= 0x0501 )
+	if( OSVERSION >= 0x0501 )
 	{
 		HDC hScreenIC = ::CreateIC( _T("DISPLAY"), NULL, NULL, NULL );
 		isToolbar32bpp = ::GetDeviceCaps( hScreenIC, BITSPIXEL ) >= 16;
@@ -931,15 +941,19 @@ void CreateToolWindow( bool isFileDialog )
 
 	//--- create + sub-class the edit control 
 
-	RECT rcDiv = { 0, 0, 3, 1 };  ::MapDialogRect( g_hToolWnd, &rcDiv ); 
-	RECT rcDivR = { 0, 0, 2, 1 }; ::MapDialogRect( g_hToolWnd, &rcDivR ); 
-	int xEdit = tbSize.cx + rcDiv.right;
-
+	RECT rcDiv = { 0, 0, 3, 1 }; 
+	RECT rcDivR = { 0, 0, 2, 1 }; 
 	// use themed border if possible
 	DWORD edStyleEx = isThemed ? WS_EX_CLIENTEDGE : WS_EX_STATICEDGE;
-	// Visual tuning: remove border on Vista
-	if( ( ::GetVersion() & 0xFF ) >= 6 )
+	if( OSVERSION >= 0x0600 && isThemed )
+	{
+		// Visual tuning for Vista
+		rcDiv.bottom = rcDivR.bottom = 3;
 		edStyleEx = 0;  
+	}
+	::MapDialogRect( g_hToolWnd, &rcDiv ); 
+	::MapDialogRect( g_hToolWnd, &rcDivR ); 
+	int xEdit = tbSize.cx + rcDiv.right;
 
 	HWND hEdit = ::CreateWindowEx( edStyleEx, _T("Edit"), NULL, 
 		WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL, 
@@ -1048,78 +1062,78 @@ void UnregisterMyHotkeys()
 
 namespace FileDlgHookCallbacks
 {
-
-void OnInitDone()
-{
-	//--- initial show + update of the tool window ---
-	UpdatePathEdit();
-	::ShowWindow( g_hToolWnd, SW_SHOWNA );
-}
-
-void OnFolderChange()
-{
-	UpdatePathEdit();
-}
-
-void OnResize()
-{
-	//reposition the tool window to "dock" it onto the file dialog
-	AdjustToolWindowPos();
-}
-
-void OnEnable( bool bEnable )
-{
-	::EnableWindow( g_hToolWnd, bEnable );
-}
-
-void OnShow( bool bShow )
-{
-	::ShowWindow( g_hToolWnd, bShow ? SW_SHOW : SW_HIDE );
-}
-
-void OnActivate( WPARAM wParam, LPARAM lParam )
-{
-	// since we are using global hotkeys, disable them if both toolbar and filedialog are not active
-
-	g_isFileDlgActive = LOWORD( wParam ) != WA_INACTIVE;
-	if( g_isToolWndActive || g_isFileDlgActive )
-		RegisterMyHotkeys();
-	else
-		UnregisterMyHotkeys();
-}
-
-void OnDestroy( bool isOkBtnPressed )
-{
-	//--- add folder to history if file dialog was closed with OK
-
-	if( isOkBtnPressed )
-		AddCurrentFolderToHistory();			
-
-	//--- unregister hotkeys 
-
-	UnregisterMyHotkeys();
-
-	//--- destroy tool window + class
-
-	::DestroyWindow( g_hToolWnd );
-	g_hToolWnd = NULL;
-	g_hFileDialog = NULL;
-
-	::UnregisterClass( FF_WNDCLASSNAME, g_hInstDll );
-
-	//--- destroy additional resources
-
-	if( g_hToolbarImages )
+	void OnInitDone()
 	{
-		::ImageList_Destroy( g_hToolbarImages );
-		g_hToolbarImages = NULL;
+		//--- initial show + update of the tool window ---
+		UpdatePathEdit();
+		g_isToolWndVisible = true;
+		::ShowWindow( g_hToolWnd, SW_SHOWNA );
 	}
-}
 
-void SetTimer( DWORD interval )
-{
-	::SetTimer( g_hToolWnd, 1, interval, NULL );
-}
+	void OnFolderChange()
+	{
+		UpdatePathEdit();
+	}
+
+	void OnResize()
+	{
+		//reposition the tool window to "dock" it onto the file dialog
+		AdjustToolWindowPos();
+	}
+
+	void OnEnable( bool bEnable )
+	{
+		::EnableWindow( g_hToolWnd, bEnable );
+	}
+
+	void OnShow( bool bShow )
+	{
+		::ShowWindow( g_hToolWnd, bShow ? SW_SHOW : SW_HIDE );
+	}
+
+	void OnActivate( WPARAM wParam, LPARAM lParam )
+	{
+		// since we are using global hotkeys, disable them if both toolbar and filedialog are not active
+
+		g_isFileDlgActive = LOWORD( wParam ) != WA_INACTIVE;
+		if( g_isToolWndActive || g_isFileDlgActive )
+			RegisterMyHotkeys();
+		else
+			UnregisterMyHotkeys();
+	}
+
+	void OnDestroy( bool isOkBtnPressed )
+	{
+		//--- add folder to history if file dialog was closed with OK
+
+		if( isOkBtnPressed )
+			AddCurrentFolderToHistory();			
+
+		//--- unregister hotkeys 
+
+		UnregisterMyHotkeys();
+
+		//--- destroy tool window + class
+
+		::DestroyWindow( g_hToolWnd );
+		g_hToolWnd = NULL;
+		g_hFileDialog = NULL;
+
+		::UnregisterClass( FF_WNDCLASSNAME, g_hInstDll );
+
+		//--- destroy additional resources
+
+		if( g_hToolbarImages )
+		{
+			::ImageList_Destroy( g_hToolbarImages );
+			g_hToolbarImages = NULL;
+		}
+	}
+
+	void SetTimer( DWORD interval )
+	{
+		::SetTimer( g_hToolWnd, 1, interval, NULL );
+	}
 
 }; //namespace FileDlgHookCallbacks
 
@@ -1193,16 +1207,8 @@ void InitHook( HWND hwnd, FileDlgType fileDlgType )
 			g_spFileDlgHook->Init( hwnd, g_hToolWnd );
 		}
 		break;
-		case FDT_COMMON_OPENWITH:
-		{
-			// init the "Open With" dialog hook
-			g_spOpenWithDlgHook.reset( new CmnOpenWithDlgHook );
-			g_spOpenWithDlgHook->Init( hwnd, g_hToolWnd );
-		}
-		break;
 		case FDT_COMMON_FOLDER:
 		{
-			// init the "Open With" dialog hook
 			g_spFileDlgHook.reset( new CmnFolderDlgHook );
 			g_spFileDlgHook->Init( hwnd, g_hToolWnd );
 		}
@@ -1228,6 +1234,9 @@ LRESULT CALLBACK FFHook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
 			FileDlgType fileDlgType = GetFileDlgType( hwnd );
 			if( fileDlgType.mainType != FDT_NONE )
 			{
+				DebugOut( L"[fflib] file dialog detected, type %d.%d", 
+					fileDlgType.mainType, fileDlgType.subType );
+			
 				if( g_profileDefaults.IsEmpty() )
 				{
 					GetProfileDefaults( &g_profileDefaults );

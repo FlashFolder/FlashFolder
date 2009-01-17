@@ -490,9 +490,8 @@ int RunHook()
 	// only the next time the process receives a message after UnhookWindowsHookEx() 
 	// has been called.
 	Log( L"Broadcasting message to unload hook DLL..." );
-	UINT msg = ::RegisterWindowMessage( L"FFHookTerminate_373494500237" );
 	DWORD recipients = BSM_APPLICATIONS | BSF_IGNORECURRENTTASK;	
-	if( ::BroadcastSystemMessage( BSF_FORCEIFHUNG | BSF_POSTMESSAGE, &recipients, msg, 0, 0 ) < 0 )
+	if( ::BroadcastSystemMessage( BSF_FORCEIFHUNG | BSF_POSTMESSAGE, &recipients, WM_NULL, 0, 0 ) < 0 )
 	{
 		Log( L"Failed to broadcast message", ::GetLastError() );
 	}

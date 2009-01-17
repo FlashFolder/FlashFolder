@@ -52,6 +52,7 @@ public:
 	virtual ~FileDlgHook_base() {}
 
 	virtual bool Init( HWND hWndFileDlg, HWND hWndTool ) = 0;
+	virtual void Uninstall() {}
 
 	virtual bool SetFolder( LPCTSTR path ) = 0;
 	virtual bool GetFolder( LPTSTR folderPath ) = 0;

@@ -34,22 +34,20 @@ struct FileDlgType
 FileDlgType GetFileDlgType( HWND dlg );
 
 bool FileDlgBrowseToFolder( HWND hwndFileDlg, LPCTSTR path );
-bool FileDlgGetCurrentFolder( HWND hwndFileDlg, LPTSTR folderPath );
 bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter );
-
-bool ShellView_GetCurrentDir( HWND hwnd, LPTSTR path );
+bool ShellViewGetCurrentFolder( HWND hwnd, LPTSTR path );
 
 // undocumented message for explorer / common file dialog
 const UINT WM_GETISHELLBROWSER = WM_USER + 7;
 
 // some control ID's of common file dialog
+const unsigned FILEDLG_SHELLVIEW    = 1121;
 const unsigned FILEDLG_LB_SHELLVIEW = 1120;
 const unsigned FILEDLG_ST_SEARCH    = 1091;
 const unsigned FILEDLG_CB_FOLDER    = 1137;
 const unsigned FILEDLG_CB_FILETYPES = 1136;
 const unsigned FILEDLG_ED_FILENAME  = 1152;
 const unsigned FILEDLG_CB_FILENAME  = 1148;      // sometimes in Win NT systems instead of 1152
-const unsigned FILEDLG_CB_OLD_DRIVES = 1121;      // Win 3.1 style dialogs only 
 
 // some control ID's of the MS Office file dialog
 const unsigned MSO2000_FILEDLG_ED_FILENAME = 48;

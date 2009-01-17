@@ -22,12 +22,7 @@
 
 //-----------------------------------------------------------------------------------------
 
-namespace {
-	const TCHAR FLASHFOLDER_HOOK_PROPERTY[] = _T("FlashFolderHook.k5evf782uxt56a8zp29");
-};
-
-// for easy access from the subclassed WindowProc
-CmnFileDlgHook* g_pHook = NULL;
+const UINT WM_FF_INIT_DONE = ::RegisterWindowMessage( FF_GUID );
 
 //-----------------------------------------------------------------------------------------
 
@@ -38,18 +33,11 @@ bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 
 	DebugOut( _T("[fflib] CmnFileDlgHook::Init()\n") );
 
-	g_pHook = this;
-
 	m_hwndFileDlg = hwndFileDlg;
 
 	// Subclass the window proc of the file dialog.
-	m_oldWndProc = reinterpret_cast<WNDPROC>( 
-		::SetWindowLongPtr( hwndFileDlg, GWL_WNDPROC, 
-		                    reinterpret_cast<LONG_PTR>( HookWindowProc) ) );
-	_ASSERTE( m_oldWndProc );
-
-	// Set a window property for debugging purposes (makes identifying "hooked" windows easier).
-	::SetProp( hwndFileDlg, FLASHFOLDER_HOOK_PROPERTY, NULL );
+	
+	::SetWindowSubclass( hwndFileDlg, HookWindowProc, 0, reinterpret_cast<DWORD_PTR>( this ) );
 
 	//--- read settings from INI file ---
 	m_minFileDialogWidth = MapProfileX( hwndTool, g_profile.GetInt( _T("CommonFileDlg"), _T("MinWidth") ) );
@@ -83,7 +71,18 @@ bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 			}
 		}
 	}
+	
 	return true;
+}
+
+//-----------------------------------------------------------------------------------------
+
+void CmnFileDlgHook::Uninstall()
+{
+	::RemoveWindowSubclass( m_shellWnd, HookShellWndProc, 0 );
+	::RemoveWindowSubclass( m_hwndFileDlg, HookWindowProc, 0 );
+	
+	Reset();
 }
 
 //-----------------------------------------------------------------------------------------
@@ -97,7 +96,7 @@ bool CmnFileDlgHook::SetFolder( LPCTSTR path )
 
 bool CmnFileDlgHook::GetFolder( LPTSTR folderPath )
 {
-	return FileDlgGetCurrentFolder( m_hwndFileDlg, folderPath );
+	return ShellViewGetCurrentFolder( m_hwndFileDlg, folderPath );
 }
 
 //-----------------------------------------------------------------------------------------
@@ -109,32 +108,68 @@ bool CmnFileDlgHook::SetFilter( LPCTSTR filter )
 
 //-----------------------------------------------------------------------------------------
 
-LRESULT CALLBACK CmnFileDlgHook::HookWindowProc(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK CmnFileDlgHook::HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 
+	UINT_PTR subclassId, DWORD_PTR refData )
 {
+	CmnFileDlgHook* pHook = reinterpret_cast<CmnFileDlgHook*>( refData );
+
+	if( uMsg == WM_FF_INIT_DONE )
+	{
+		DebugOut( L"WM_FF_INIT_DONE" );
+
+		// At this time the file dialog has finally settled down.
+	
+		if( wParam == FALSE )
+		{
+			//customize file dialog's initial size + position.
+			// TODO: this should be done earlier so the dialog does not flicker during position change.
+			// (WM_WINDOWPOSCHANGING could be a candidate)
+			pHook->ResizeFileDialog();
+
+			// Hook the shell window the first time.
+			pHook->InitShellWnd();		
+				
+			// notify the tool window
+			FileDlgHookCallbacks::OnInitDone();
+		}
+		else
+		{
+			// Hook the shell window again if it was destroyed and recreated 
+			// which happens when the user switched to another folder.
+			pHook->InitShellWnd();
+			
+			FileDlgHookCallbacks::OnFolderChange();
+		}
+	}
+
 	switch( uMsg )
 	{
-		case WM_PAINT:
-		{
-			//hooking WM_PAINT may seem curious here but we need a message that is send
-			// AFTER the file dialogs controls are initialised
-			if( ! g_pHook->m_initDone )
-            {
-				g_pHook->m_initDone = true;
-
-				// For persistent list view mode.
-				g_pHook->InitShellWnd();
+        case WM_WINDOWPOSCHANGED:
+        {
+			LRESULT res = ::DefSubclassProc( hwnd, uMsg, wParam, lParam );
+        
+			WINDOWPOS* wp = (WINDOWPOS*) lParam;
+		
+			FileDlgHookCallbacks::OnResize();
 				
-				//customize file dialog's initial size + position
-				g_pHook->ResizeFileDialog();
+			if( ( wp->flags & SWP_SHOWWINDOW ) && ! pHook->m_fileDlgShown ) 
+			{
+				// This is the last message during dialog initialization after which
+				// we know the dialog has finally settled down. 
+				pHook->m_fileDlgShown = true;
 				
-				// notify the tool window
-				FileDlgHookCallbacks::OnInitDone();
-            }
+				// We post a private message to do any processing after the current
+				// operation, where WM_WINDOWPOSCHANGED is part of, has actually finished.
+				// See http://blogs.msdn.com/oldnewthing/archive/2006/09/25/770536.aspx
+				if( WM_FF_INIT_DONE != 0 )
+					::PostMessage( hwnd, WM_FF_INIT_DONE, FALSE, 0 );
+			}
+			
+			return res;
 		}
 		break;
 
-        case WM_COMMAND:
+	    case WM_COMMAND:
 		{
 			WORD wNotifyCode = HIWORD(wParam); // notification code 
 			WORD wID = LOWORD(wParam);         // item, control, or accelerator identifier 
@@ -147,25 +182,14 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc(
 				//  the listview. Instead, we check if not IDCANCEL was received.
 				//  IDCANCEL will be send for all ways of cancel: button and keyboard.
 				if( wID == IDCANCEL )	      
-					g_pHook->m_fileDialogCanceled = true;
+					pHook->m_fileDialogCanceled = true;
 			}
 		}
 		break;
 
-		case WM_USER + 300:
-			// I don't really know what this message means, but I need it to check
-			// whether the user has changed the actual folder path.
-            if( g_pHook->m_isWindowActive )
-				FileDlgHookCallbacks::OnFolderChange();
-			break;
-
 		case WM_ACTIVATE:
-			g_pHook->m_isWindowActive = LOWORD(wParam) != 0;
+			pHook->m_isWindowActive = LOWORD(wParam) != 0;
 			FileDlgHookCallbacks::OnActivate( wParam, lParam );
-			break;
-
-        case WM_WINDOWPOSCHANGED:
-			FileDlgHookCallbacks::OnResize();
 			break;
 
         case WM_ENABLE:
@@ -179,52 +203,65 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc(
 		case WM_DESTROY:
 		{
 			if( g_profile.GetInt( _T("main"), _T("ListViewMode") ) != FLM_VIEW_DEFAULT &&
-					g_pHook->m_listViewMode != FLM_VIEW_DEFAULT )
-				g_profile.SetInt( _T("main"), _T("ListViewMode"), g_pHook->m_listViewMode );
+					pHook->m_listViewMode != FLM_VIEW_DEFAULT )
+				g_profile.SetInt( _T("main"), _T("ListViewMode"), pHook->m_listViewMode );
 		
-			FileDlgHookCallbacks::OnDestroy( ! g_pHook->m_fileDialogCanceled );
+			FileDlgHookCallbacks::OnDestroy( ! pHook->m_fileDialogCanceled );
 		}
 		break;
 
 		case WM_NCDESTROY:
 		{			
-			// Remove our window property from the file dialog.
-			// We stored it there in CmnFileDlgHook::Init().
-			::RemoveProp( hwnd, FLASHFOLDER_HOOK_PROPERTY );     
+			::RemoveWindowSubclass( hwnd, HookWindowProc, subclassId );
 		}
 		break;
     }
 
-    //call original message handler
-    return CallWindowProc( g_pHook->m_oldWndProc, hwnd, uMsg, wParam, lParam);
+	// Call the next handler in the window's subclass chain.
+	return ::DefSubclassProc( hwnd, uMsg, wParam, lParam );
 }
 
 //-----------------------------------------------------------------------------------------------
 
-LRESULT CALLBACK CmnFileDlgHook::HookShellWndProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT CALLBACK CmnFileDlgHook::HookShellWndProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR subclassId, DWORD_PTR refData )
 {
+	CmnFileDlgHook* pHook = reinterpret_cast<CmnFileDlgHook*>( refData );
+
 	if( uMsg == WM_COMMAND )
 	{
+		DebugOut( L"ShellView WM_COMMAND, wp=%08X\n", wParam );
+	
 		switch( wParam )
 		{
-			case ODM_VIEW_ICONS:  g_pHook->m_listViewMode = FLM_VIEW_ICONS; break;
-			case ODM_VIEW_LIST:   g_pHook->m_listViewMode = FLM_VIEW_LIST; break;
-			case ODM_VIEW_DETAIL: g_pHook->m_listViewMode = FLM_VIEW_DETAIL; break;
-			case ODM_VIEW_THUMBS: g_pHook->m_listViewMode = FLM_VIEW_THUMBS; break;
-			case ODM_VIEW_TILES:  g_pHook->m_listViewMode = FLM_VIEW_TILES; break;
+			case ODM_VIEW_ICONS:  pHook->m_listViewMode = FLM_VIEW_ICONS; break;
+			case ODM_VIEW_LIST:   pHook->m_listViewMode = FLM_VIEW_LIST; break;
+			case ODM_VIEW_DETAIL: pHook->m_listViewMode = FLM_VIEW_DETAIL; break;
+			case ODM_VIEW_THUMBS: pHook->m_listViewMode = FLM_VIEW_THUMBS; break;
+			case ODM_VIEW_TILES:  pHook->m_listViewMode = FLM_VIEW_TILES; break;
 		}
-	}	
+	}
+	else if( uMsg == WM_NCDESTROY )
+	{
+		DebugOut( L"Shell view destroyed\n" );
 	
-    //call original message handler
-    return CallWindowProc( g_pHook->m_oldShellWndProc, hwnd, uMsg, wParam, lParam);
+		// Make sure we get notified when the shell view is recreated.
+		PostMessage( pHook->m_hwndFileDlg, WM_FF_INIT_DONE, TRUE, 0 );
+		::RemoveWindowSubclass( hwnd, HookShellWndProc, subclassId );
+	}
+	
+	// Call the next handler in the window's subclass chain.
+	return ::DefSubclassProc( hwnd, uMsg, wParam, lParam );
 }
 
 //-----------------------------------------------------------------------------------------------
 
 void CmnFileDlgHook::InitShellWnd()
 {
-	if( HWND shellWnd = ::GetDlgItem( m_hwndFileDlg, lst2 ) )
+	if( m_shellWnd = FindChildWindowRecursively( m_hwndFileDlg, L"SHELLDLL_DefView" ) )
 	{
+		DebugOut( L"Hooking shell view\n" );
+	
 		// restore last view mode
 		WPARAM wp = 0;
 		switch( m_listViewMode )
@@ -236,11 +273,10 @@ void CmnFileDlgHook::InitShellWnd()
 			case FLM_VIEW_TILES:  wp = ODM_VIEW_TILES; break; 
 		}
 		if( wp )
-			::SendMessage( shellWnd, WM_COMMAND, wp, 0 );
+			::SendMessage( m_shellWnd, WM_COMMAND, wp, 0 );
 
 		// hook the shell window to get notified of view mode changes
-		g_pHook->m_oldShellWndProc = (WNDPROC)
-			::SetWindowLongPtr(	shellWnd, GWLP_WNDPROC, (LONG_PTR) CmnFileDlgHook::HookShellWndProc );
+		::SetWindowSubclass( m_shellWnd, HookShellWndProc, 0, reinterpret_cast<DWORD_PTR>( this ) );
 	}
 }
 
@@ -348,7 +384,7 @@ void CmnFileDlgHook::ResizeNonResizableFileDialog( int x, int y, int newWidth, i
 
 	//force size update of the listview:
 	TCHAR folderPath[MAX_PATH +1];
-	FileDlgGetCurrentFolder(m_hwndFileDlg, folderPath);
+	ShellViewGetCurrentFolder(m_hwndFileDlg, folderPath);
 	FileDlgBrowseToFolder(m_hwndFileDlg, folderPath);
 }
 
