@@ -327,7 +327,8 @@ BOOL CALLBACK FindChildWindowRecursivelyProc( HWND hwnd, LPARAM lParam )
 	{
 		pInfo->hwnd = hwnd;
 		return FALSE;
-	} 
+	}
+	return TRUE;
 }
 
 HWND FindChildWindowRecursively( HWND hwndParent, LPCWSTR pClassName )

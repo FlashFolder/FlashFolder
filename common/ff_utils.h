@@ -33,9 +33,11 @@ struct FileDlgType
 
 FileDlgType GetFileDlgType( HWND dlg );
 
-bool FileDlgBrowseToFolder( HWND hwndFileDlg, LPCTSTR path );
 bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter );
 bool ShellViewGetCurrentFolder( HWND hwnd, LPTSTR path );
+bool ShellViewBrowseToFolder( HWND hwndFileDlg, LPCTSTR path );
+bool ShellViewGetViewMode( HWND hwnd, FOLDERVIEWMODE* pViewMode, int* pImageSize = NULL );
+bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize = -1 );
 
 // undocumented message for explorer / common file dialog
 const UINT WM_GETISHELLBROWSER = WM_USER + 7;
@@ -53,24 +55,3 @@ const unsigned FILEDLG_CB_FILENAME  = 1148;      // sometimes in Win NT systems 
 const unsigned MSO2000_FILEDLG_ED_FILENAME = 48;
 const unsigned MSO2002_FILEDLG_ED_FILENAME = 54;
 const unsigned VS2005_FILEDLG_ED_FILENAME = 51;   ///< e.g. Visual Studio 2005
-
-// reverse-engineered command codes for SHELLDLL_DefView
-enum ShellListViewMode
-{
-	ODM_VIEW_ICONS  = 0x7029,
-	ODM_VIEW_LIST   = 0x702B,
-	ODM_VIEW_DETAIL = 0x702C,
-	ODM_VIEW_THUMBS = 0x702D,
-	ODM_VIEW_TILES  = 0x702E
-};
-
-// constants for storing listview modes
-enum FFListViewMode
-{
-	FLM_VIEW_DEFAULT = -1,
-	FLM_VIEW_ICONS   = 0,
-	FLM_VIEW_LIST    = 1,
-	FLM_VIEW_DETAIL  = 2,
-	FLM_VIEW_THUMBS  = 3,
-	FLM_VIEW_TILES   = 4
-};

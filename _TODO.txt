@@ -1,10 +1,26 @@
+-----
+Generic:
+
+[ ] 64-bit: control panel, hooks (service can stay 32-bit?)
+[ ] Test if iTunes is still incompatible
 [ ] autostart fails if terminal services are not running
 	-> start FF via Run regkey?
+[ ] specify log file path per commandline, otherwise create no log file (for running from external drive, etc.)
+[ ] Favmenu editor: use shell folder icon
+[ ] Optionally save last folder even on Cancel
+[x] Fix "remember view mode" for Vista
+
+-----
+Security:
+
 [ ] check if FlashFolder toolbar window exists - deny termination of hook process then
 	-> blocks installation, need at least a user message
-[ ] specify log file path per commandline, otherwise create no log file (for running from external drive, etc.)
 [ ] Restrict services privileges under Vista
 [ ] Use private namespaces for kernel objects under Vista ( http://www.codeguru.com/columns/kate/article.php/c13249 )
 [ ] RemoveHook(), FinalizeService() - wait until Hook processes are actually terminated (with timeout)
-[ ] Fix "remember view mode" for Vista
 
+-----
+Cosmetic:
+
+[ ] Use Vista-style file dialogs in FFConfig (do not use CFileDialog)
+[ ] Use Vista-style treeview and listview controls

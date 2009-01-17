@@ -141,61 +141,6 @@ FileDlgType GetFileDlgType( HWND dlg )
 }
 
 //-----------------------------------------------------------------------------------------
-// FileDlgBrowseToFolder()
-//
-//   browses in a common file dialog to a specific folder 
-//   --> needs Win2k or newer version
-//   --> should be called only in the address space of the process which owns the
-//       file dialog
-//   returns true if successful
-//-----------------------------------------------------------------------------------------
-bool FileDlgBrowseToFolder( HWND hwndFileDlg, LPCTSTR path )
-{	
-	if( ! DirectoryExists( path ) )
-		return false;
-
-	bool res = false;
-
-    WCHAR wpath[MAX_PATH + 1] = L"";
-
-    IShellBrowser *pShellBrowser = 
-        (IShellBrowser *) SendMessage(hwndFileDlg, WM_GETISHELLBROWSER, 0,0);
-    if (pShellBrowser != NULL)
-    {
-		//get the shell memory allocator object
-		IMalloc *pShellAlloc = NULL;			
-		if (SHGetMalloc(&pShellAlloc) == NOERROR)
-		{
-			IShellFolder *pDesktopFolder;
-			if (SHGetDesktopFolder(&pDesktopFolder) == NOERROR)
-			{                
-#ifdef _UNICODE
-                StringCbCopy( wpath, sizeof(wpath), path );
-#else
-                ::MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, path, -1, wpath, MAX_PATH);
-                LPWSTR p_wpath = wpath;
-#endif
-				ULONG eaten;
-				LPITEMIDLIST pidl;
-				if (pDesktopFolder->ParseDisplayName(hwndFileDlg, NULL, wpath, &eaten, &pidl, NULL)
-					== NOERROR)
-				{
-					pShellBrowser->BrowseObject(pidl, SBSP_SAMEBROWSER );
-					pShellAlloc->Free(pidl);
-					res = true;
-				}
-				pDesktopFolder->Release();
-			}
-
-			//release the shell memory allocator object
-			pShellAlloc->Release();
-		}
-    }
-
-	return res;
-}
-
-//-----------------------------------------------------------------------------------------
 // FileDlgSetFilter()
 //
 //   sets a filter for the specified common file dialog
@@ -246,46 +191,42 @@ bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter )
 }
 
 //-----------------------------------------------------------------------------------------
-/// Get the currently selected folder of a shell browser.
-/// Caller must have allocated folderPath with size of MAX_PATH characters
+/// Browses in a shell view to a given folder.
+///
+/// Tested successfully with both common file dialog and MS Office file dialog on WinXP.
+///
+/// \return true if successful
 
-bool GetCurrentFolderFromShellBrowser( IShellBrowser *pShBrowser, LPTSTR folderPath )
-{
+bool ShellViewBrowseToFolder( HWND hwnd, LPCWSTR path )
+{	
+	if( ! DirectoryExists( path ) )
+		return false;
+
 	bool res = false;
-	folderPath[ 0 ] = 0;
 
-	IShellView* psv;
-	if( SUCCEEDED( pShBrowser->QueryActiveShellView( &psv ) ) )
-	{	
-		IFolderView* pfv;
-		if( SUCCEEDED( psv->QueryInterface( IID_IFolderView, (void**) &pfv ) ) ) 
-		{
-			IPersistFolder2* ppf2;
-			if( SUCCEEDED( pfv->GetFolder( IID_IPersistFolder2, (void**) &ppf2 ) ) )
-			{
-				LPITEMIDLIST pidlFolder;
-				if( SUCCEEDED( ppf2->GetCurFolder( &pidlFolder ) ) ) 
-				{
-					if( ::SHGetPathFromIDList( pidlFolder, folderPath ) )
-						res = true;
-					::CoTaskMemFree( pidlFolder );
-				}
-				ppf2->Release();
-			}
-			pfv->Release();
-		}
+    IShellBrowser *psb = (IShellBrowser *) SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
+    if( ! psb )
+		return false;
+		
+	CComPtr<IShellFolder> pDesktopFolder;
+	if( FAILED( ::SHGetDesktopFolder( &pDesktopFolder ) ) )
+		return false;
+		
+	LPITEMIDLIST pidl;
+	if( FAILED( pDesktopFolder->ParseDisplayName( hwnd, NULL, const_cast<LPWSTR>( path ), NULL, &pidl, NULL ) ) )
+		return false;
 
-		psv->Release();
-	}
+	HRESULT hr = psb->BrowseObject( pidl, SBSP_SAMEBROWSER );
+	::CoTaskMemFree( pidl );
 
-	return res;
+	return SUCCEEDED( hr );
 }
 
 //-----------------------------------------------------------------------------------------
 /**
  * \brief Returns path to folder who's content is currently visible in a shell folder view.
  *
- * Tested successfully with both common file dialog and MS Office file dialog on WinXP.\n
+ * Tested successfully with both common file dialog and MS Office file dialog on WinXP.
  * 
  * \param hwnd Window handle that contains the shell view. This should be the parent window
  *             of the control which has the "SHELLDLL_DefView" class. 
@@ -297,7 +238,102 @@ bool GetCurrentFolderFromShellBrowser( IShellBrowser *pShBrowser, LPTSTR folderP
 bool ShellViewGetCurrentFolder( HWND hwnd, LPTSTR path )
 {
 	path[ 0 ] = 0;
-	if( IShellBrowser *p = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 ) )
-		return GetCurrentFolderFromShellBrowser( p, path );
+
+	IShellBrowser *psb = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
+	if( ! psb )
+		return false;
+		
+	CComPtr<IShellView> psv;
+	if( FAILED( psb->QueryActiveShellView( &psv ) ) )
+		return false;
+		
+	CComPtr<IFolderView> pfv;
+	if( FAILED( psv->QueryInterface( IID_IFolderView, (void**) &pfv ) ) )
+		return false;
+		 
+	CComPtr<IPersistFolder2> ppf2;
+	if( FAILED( pfv->GetFolder( IID_IPersistFolder2, (void**) &ppf2 ) ) )
+		return false;
+		
+	LPITEMIDLIST pidlFolder;
+	if( SUCCEEDED( ppf2->GetCurFolder( &pidlFolder ) ) ) 
+	{
+		bool res = false;
+		if( ::SHGetPathFromIDList( pidlFolder, path ) )
+			res = true;
+		::CoTaskMemFree( pidlFolder );
+		return res;
+	}
+	
 	return false;
+}
+
+//-----------------------------------------------------------------------------------------
+
+bool ShellViewGetViewMode( HWND hwnd, FOLDERVIEWMODE* pViewMode, int* pImageSize )
+{
+	IShellBrowser *psb = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
+	if( ! psb )
+		return false;
+
+	CComPtr<IShellView> psv;
+	if( FAILED( psb->QueryActiveShellView( &psv ) ) ) 
+		return false;
+
+	CComPtr<IFolderView2> pfv2;  
+	if( SUCCEEDED( psv->QueryInterface( IID_IFolderView2, (void**) &pfv2 ) ) )
+	{		
+		// Vista and above
+	
+		return SUCCEEDED( pfv2->GetViewModeAndIconSize( pViewMode, pImageSize ) );
+	}
+	else
+	{
+		// XP and below
+		
+		CComPtr<IFolderView> pfv;
+		if( FAILED( psv->QueryInterface( IID_IFolderView, (void**) &pfv ) ) ) 
+			return false;
+
+		UINT viewMode = FVM_AUTO;
+		if( SUCCEEDED( pfv->GetCurrentViewMode( &viewMode ) ) )
+		{
+			*pViewMode = (FOLDERVIEWMODE) viewMode;
+			*pImageSize = -1;
+			return true;
+		}
+	}
+		
+	return false;
+}
+
+//-----------------------------------------------------------------------------------------
+
+bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize )
+{
+	IShellBrowser *psb = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
+	if( ! psb )
+		return false;
+
+	CComPtr<IShellView> psv;
+	if( FAILED( psb->QueryActiveShellView( &psv ) ) )
+		return false;
+
+	CComPtr<IFolderView2> pfv2;  
+	if( SUCCEEDED( psv->QueryInterface( IID_IFolderView2, (void**) &pfv2 ) ) )
+	{		
+		// Vista and above
+	
+		return SUCCEEDED( pfv2->SetViewModeAndIconSize( viewMode, imageSize ) );
+	}
+	else
+	{
+		// XP and below
+		
+		CComPtr<IFolderView> pfv;
+		if( FAILED( psv->QueryInterface( IID_IFolderView, (void**) &pfv ) ) )
+			return false;
+
+		return SUCCEEDED( pfv->SetCurrentViewMode( (UINT) viewMode ) );
+	}
 }

@@ -49,9 +49,11 @@ private:
 	{
 		m_hwndFileDlg = NULL;
 		m_shellWnd = NULL; 
+        m_fileDlgShown = false;
 		m_fileDialogCanceled = false;
         m_isWindowActive = false;
-        m_fileDlgShown = false;
+        m_shellViewMode = FVM_AUTO;
+        m_shellViewImageSize = -1;
 	}
 	
 	static LRESULT CALLBACK HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 
@@ -66,7 +68,8 @@ private:
 	bool m_isWindowActive;
 	bool m_fileDialogCanceled;
 	bool m_fileDlgShown;
-	LRESULT m_listViewMode;
+	FOLDERVIEWMODE m_shellViewMode;
+	int m_shellViewImageSize;
 	HWND m_shellWnd;
 
 	// options read from INI file specified in Init()

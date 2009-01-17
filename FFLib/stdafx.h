@@ -3,9 +3,9 @@
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely used Windows-Headers
 
-#define WINVER 0x0501
-#define _WIN32_WINNT 0x0501
-#define _WIN32_WINDOWS 0x0501 
+#define WINVER 0x0600
+#define _WIN32_WINNT WINVER
+#define _WIN32_WINDOWS WINVER 
 #define _WIN32_IE 0x0600
 
 #pragma warning(disable:4995) // "deprecated" warnings caused by strsafe.h
@@ -20,7 +20,7 @@
 #include <shlwapi.h>
 #include <shellapi.h>
 #include <uxtheme.h>
-#include <tmschema.h>
+#include <vssym32.h>
 #include <cpl.h>
 
 //--- ATL headers

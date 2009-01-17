@@ -28,25 +28,28 @@ const UINT WM_FF_INIT_DONE = ::RegisterWindowMessage( FF_GUID );
 
 bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 {
-	if( m_hwndFileDlg ) return false;  // only init once!
-	m_hwndTool = hwndTool; 
-
+	if( m_hwndFileDlg ) 
+		return false;  // only init once
+	
 	DebugOut( _T("[fflib] CmnFileDlgHook::Init()\n") );
-
+	
 	m_hwndFileDlg = hwndFileDlg;
+	m_hwndTool = hwndTool; 
 
 	// Subclass the window proc of the file dialog.
 	
 	::SetWindowSubclass( hwndFileDlg, HookWindowProc, 0, reinterpret_cast<DWORD_PTR>( this ) );
 
 	//--- read settings from INI file ---
+	
 	m_minFileDialogWidth = MapProfileX( hwndTool, g_profile.GetInt( _T("CommonFileDlg"), _T("MinWidth") ) );
 	m_minFileDialogHeight = MapProfileY( hwndTool, g_profile.GetInt( _T("CommonFileDlg"), _T("MinHeight") ) );
 	m_centerFileDialog = g_profile.GetInt( _T("CommonFileDlg"), _T("Center") );
 	m_folderComboHeight = MapProfileY( hwndTool, g_profile.GetInt( _T("CommonFileDlg"), _T("FolderComboHeight") ) );
 	m_filetypesComboHeight = MapProfileY( hwndTool, g_profile.GetInt( _T("CommonFileDlg"), _T("FiletypesComboHeight") ) );
 	m_bResizeNonResizableDlgs = g_profile.GetInt( _T("CommonFileDlg"), _T("ResizeNonResizableDialogs") ) != 0;
-	m_listViewMode = g_profile.GetInt( _T("Main"), _T("ListViewMode") );
+	m_shellViewMode = (FOLDERVIEWMODE) g_profile.GetInt( L"Main", L"ListViewMode" );
+	m_shellViewImageSize = g_profile.GetInt( L"Main", L"ListViewImageSize" );
 
     //--- check exclusion list for resizing of non-resizable dialogs
 
@@ -89,7 +92,7 @@ void CmnFileDlgHook::Uninstall()
 
 bool CmnFileDlgHook::SetFolder( LPCTSTR path )
 {
-	return FileDlgBrowseToFolder( m_hwndFileDlg, path );
+	return ShellViewBrowseToFolder( m_hwndFileDlg, path );
 }
 
 //-----------------------------------------------------------------------------------------
@@ -115,13 +118,15 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wP
 
 	if( uMsg == WM_FF_INIT_DONE )
 	{
-		DebugOut( L"WM_FF_INIT_DONE" );
-
 		// At this time the file dialog has finally settled down.
+
+		DebugOut( L"WM_FF_INIT_DONE" );		
 	
 		if( wParam == FALSE )
 		{
-			//customize file dialog's initial size + position.
+			// File dialog has been initialized the first time.
+		
+			// Customize file dialog's initial size + position.
 			// TODO: this should be done earlier so the dialog does not flicker during position change.
 			// (WM_WINDOWPOSCHANGING could be a candidate)
 			pHook->ResizeFileDialog();
@@ -134,8 +139,9 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wP
 		}
 		else
 		{
-			// Hook the shell window again if it was destroyed and recreated 
-			// which happens when the user switched to another folder.
+			// Shell window was destroyed and recreated after the user has changed the 
+			// current folder.
+
 			pHook->InitShellWnd();
 			
 			FileDlgHookCallbacks::OnFolderChange();
@@ -188,10 +194,11 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wP
 		break;
 
 		case WM_ACTIVATE:
+		{		
 			pHook->m_isWindowActive = LOWORD(wParam) != 0;
 			FileDlgHookCallbacks::OnActivate( wParam, lParam );
 			break;
-
+		}
         case WM_ENABLE:
 			FileDlgHookCallbacks::OnEnable( wParam != 0 );
             break;
@@ -202,10 +209,14 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wP
 
 		case WM_DESTROY:
 		{
-			if( g_profile.GetInt( _T("main"), _T("ListViewMode") ) != FLM_VIEW_DEFAULT &&
-					pHook->m_listViewMode != FLM_VIEW_DEFAULT )
-				g_profile.SetInt( _T("main"), _T("ListViewMode"), pHook->m_listViewMode );
+			// Save view mode permanently.
 		
+			if( g_profile.GetInt( L"main", L"ListViewMode" ) != FVM_AUTO )
+			{
+				if( pHook->m_shellViewMode != FVM_AUTO )
+					g_profile.SetInt( L"main", L"ListViewMode", (int) pHook->m_shellViewMode );
+				g_profile.SetInt( L"main", L"ListViewImageSize", (int) pHook->m_shellViewImageSize );
+			}
 			FileDlgHookCallbacks::OnDestroy( ! pHook->m_fileDialogCanceled );
 		}
 		break;
@@ -228,26 +239,25 @@ LRESULT CALLBACK CmnFileDlgHook::HookShellWndProc( HWND hwnd, UINT uMsg, WPARAM 
 {
 	CmnFileDlgHook* pHook = reinterpret_cast<CmnFileDlgHook*>( refData );
 
-	if( uMsg == WM_COMMAND )
+	if( uMsg == WM_DESTROY )
 	{
-		DebugOut( L"ShellView WM_COMMAND, wp=%08X\n", wParam );
-	
-		switch( wParam )
-		{
-			case ODM_VIEW_ICONS:  pHook->m_listViewMode = FLM_VIEW_ICONS; break;
-			case ODM_VIEW_LIST:   pHook->m_listViewMode = FLM_VIEW_LIST; break;
-			case ODM_VIEW_DETAIL: pHook->m_listViewMode = FLM_VIEW_DETAIL; break;
-			case ODM_VIEW_THUMBS: pHook->m_listViewMode = FLM_VIEW_THUMBS; break;
-			case ODM_VIEW_TILES:  pHook->m_listViewMode = FLM_VIEW_TILES; break;
-		}
+		// Save view mode in memory (to survive folder changes).
+		
+		ShellViewGetViewMode( pHook->m_hwndFileDlg, &pHook->m_shellViewMode, &pHook->m_shellViewImageSize );
+		DebugOut( L"[fflib] Save viewMode = %d, imageSize = %d\n", pHook->m_shellViewMode, pHook->m_shellViewImageSize );
 	}
-	else if( uMsg == WM_NCDESTROY )
+	if( uMsg == WM_NCDESTROY )
 	{
-		DebugOut( L"Shell view destroyed\n" );
+		// We first call DefSubclassProc so that the original window proc can clean up.
+		LRESULT res = ::DefSubclassProc( hwnd, uMsg, wParam, lParam );
 	
-		// Make sure we get notified when the shell view is recreated.
+		DebugOut( L"[fflib] Shell view destroyed\n" );
+	
+		// Make sure we get notified when the shell view is recreated (on folder change).
 		PostMessage( pHook->m_hwndFileDlg, WM_FF_INIT_DONE, TRUE, 0 );
 		::RemoveWindowSubclass( hwnd, HookShellWndProc, subclassId );
+
+		return res;
 	}
 	
 	// Call the next handler in the window's subclass chain.
@@ -260,23 +270,13 @@ void CmnFileDlgHook::InitShellWnd()
 {
 	if( m_shellWnd = FindChildWindowRecursively( m_hwndFileDlg, L"SHELLDLL_DefView" ) )
 	{
-		DebugOut( L"Hooking shell view\n" );
-	
-		// restore last view mode
-		WPARAM wp = 0;
-		switch( m_listViewMode )
-		{
-			case FLM_VIEW_ICONS:  wp = ODM_VIEW_ICONS; break; 
-			case FLM_VIEW_LIST:   wp = ODM_VIEW_LIST; break; 
-			case FLM_VIEW_DETAIL: wp = ODM_VIEW_DETAIL; break; 
-			case FLM_VIEW_THUMBS: wp = ODM_VIEW_THUMBS; break; 
-			case FLM_VIEW_TILES:  wp = ODM_VIEW_TILES; break; 
-		}
-		if( wp )
-			::SendMessage( m_shellWnd, WM_COMMAND, wp, 0 );
+		// Restore last view mode.		
+		DebugOut( L"[fflib] Restore viewMode = %d, imageSize = %d\n", m_shellViewMode, m_shellViewImageSize );
+		ShellViewSetViewMode( m_hwndFileDlg, m_shellViewMode, m_shellViewImageSize );
 
 		// hook the shell window to get notified of view mode changes
-		::SetWindowSubclass( m_shellWnd, HookShellWndProc, 0, reinterpret_cast<DWORD_PTR>( this ) );
+		DebugOut( L"[fflib] Hooking shell view\n" );
+		::SetWindowSubclass( m_shellWnd, HookShellWndProc, 0, reinterpret_cast<DWORD_PTR>( this ) );		
 	}
 }
 
@@ -385,7 +385,7 @@ void CmnFileDlgHook::ResizeNonResizableFileDialog( int x, int y, int newWidth, i
 	//force size update of the listview:
 	TCHAR folderPath[MAX_PATH +1];
 	ShellViewGetCurrentFolder(m_hwndFileDlg, folderPath);
-	FileDlgBrowseToFolder(m_hwndFileDlg, folderPath);
+	ShellViewBrowseToFolder(m_hwndFileDlg, folderPath);
 }
 
 //-----------------------------------------------------------------------------------------

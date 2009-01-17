@@ -31,6 +31,7 @@ void GetProfileDefaults( Profile* pProfile )
 
 	pProfile->SetInt( _T("main"), _T("MaxGlobalHistoryEntries"), 15 );
 	pProfile->SetInt( _T("main"), _T("ListViewMode"), -1 );
+	pProfile->SetInt( _T("main"), _T("ListViewImageSize"), -1 );
 
 	//--- common file dialog
 
