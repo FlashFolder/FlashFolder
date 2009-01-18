@@ -81,6 +81,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
+				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib"
 				OutputFile="..\exe\fflib6439.dll"
 				LinkIncremental="1"
@@ -189,6 +190,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
+				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib"
 				OutputFile="..\exe\fflib6439.dll"
 				LinkIncremental="1"

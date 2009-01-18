@@ -23,4 +23,4 @@ Security:
 Cosmetic:
 
 [ ] Use Vista-style file dialogs in FFConfig (do not use CFileDialog)
-[ ] Use Vista-style treeview and listview controls
+[ ] Use Vista-style treeview, listview, link controls

@@ -13,9 +13,11 @@
 #define _WIN32_WINDOWS WINVER
 #define _WIN32_IE 0x0600
 
-
 // turns off MFC's hiding of some common and often safely ignored warning messages
 #define _AFX_ALL_WARNINGS
+
+// Defend some kind of buffer overrun possibilities.
+#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
 
 #pragma warning(disable:4995)  // caused by strsafe.h
 

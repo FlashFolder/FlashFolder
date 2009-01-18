@@ -75,6 +75,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				OutputFile="..\exe\FlashFolder.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -177,6 +178,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				OutputFile="..\exe\FlashFolder.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

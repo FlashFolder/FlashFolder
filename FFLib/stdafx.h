@@ -8,6 +8,9 @@
 #define _WIN32_WINDOWS WINVER 
 #define _WIN32_IE 0x0600
 
+// Defend some kind of buffer overrun possibilities.
+#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
+
 #pragma warning(disable:4995) // "deprecated" warnings caused by strsafe.h
 
 //--- windows headers

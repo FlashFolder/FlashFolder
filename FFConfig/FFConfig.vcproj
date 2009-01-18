@@ -26,7 +26,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 			<Tool
@@ -71,6 +70,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="2"
@@ -104,7 +104,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 		</Configuration>
@@ -120,7 +119,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 			<Tool
@@ -166,6 +164,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="1"
@@ -202,7 +201,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 		</Configuration>
