@@ -34,7 +34,7 @@ BEGIN
             VALUE "FileDescription", "FlashFolder Configuration"
             VALUE "FileVersion", APP_VER
             VALUE "InternalName", "FFConfig"
-            VALUE "LegalCopyright", "Copyright © 2007-2008 zett42"
+            VALUE "LegalCopyright", "Copyright © 2007-2009 zett42.de"
             VALUE "OriginalFilename", "FFConfig.exe"
             VALUE "ProductName", "FlashFolder"
             VALUE "ProductVersion", APP_VER

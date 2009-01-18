@@ -27,13 +27,15 @@
 	     
 	<Product Id="*"
 		UpgradeCode="$(var.UpgradeCode)"
-		Name="!(loc.ProductName)" Language="!(loc.LCID)" Version="$(var.Version)" 
+		Name="!(loc.ProductName) ($(var.Platform))" 
+		Language="!(loc.LCID)" Version="$(var.Version)" 
 		Manufacturer="!(loc.ProductManufacturer)">
 
-		<Package 
-			Description="!(loc.PackageDescription)" 
-			Comments="v$(var.Version)"
-			InstallerVersion="200" Compressed="yes" />
+		<Package
+			Description="!(loc.PackageDescription)" Comments="v$(var.Version)"
+			InstallerVersion="200" Compressed="yes"
+			Platform="$(var.Platform)" 
+		/>
 			
 		<Icon Id="ProgramIcon.exe" SourceFile="..\FFConfig\res\FFConfig.ico"/>
 
@@ -61,9 +63,14 @@
 		<Condition Message="!(loc.NewerVersionInstalled)">NOT FF_EXISTING_PRODUCT_NEWER</Condition>
 
 		<!-- Custom action definitions ....................................................... -->
+		<?if $(var.Platform) = x64 ?>
+			<CustomAction Id="FF_SetTargetDirDefault" Property="TARGETDIR"
+				Value="[ProgramFiles64Folder]!(loc.ProductName)" Execute="firstSequence" />
+		<?else?>
+			<CustomAction Id="FF_SetTargetDirDefault" Property="TARGETDIR"
+				Value="[ProgramFilesFolder]!(loc.ProductName)" Execute="firstSequence" />
+		<?endif?>
 
-		<CustomAction Id="FF_SetTargetDirDefault" Property="TARGETDIR"
-			Value="[ProgramFilesFolder]!(loc.ProductName)" Execute="firstSequence" />
 		<CustomAction Id="FF_SetArpInstallLocation" Property="ARPINSTALLLOCATION" Value="[TARGETDIR]" />
 
 		<!-- install sequences ........................................................... -->

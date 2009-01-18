@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Include>
-	<?define UpgradeCode="5F7D22D7-9FCF-46F2-B899-D118AB900C28"?>
+	<?if $(var.Platform) = x64 ?>
+		<?define UpgradeCode="04A24082-CFF2-4C91-96B7-F0D0739F1326"?>
+	<?else?>
+		<?define UpgradeCode="5F7D22D7-9FCF-46F2-B899-D118AB900C28"?>
+	<?endif?>
+	
 	<?define RootReg = "zett42"?>
 	<?define ProductReg = "FlashFolder"?>
 </Include>

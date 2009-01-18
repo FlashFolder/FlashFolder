@@ -44,15 +44,28 @@ LogFile g_logfile;
 
 //---------------------------------------------------------------------------
 
+void DebugOut( LPCTSTR pFormat, ... )
+{
+	const size_t bufsize = 1024;
+	TCHAR buf[ bufsize ];
+	va_list args;
+	va_start( args, pFormat );
+	StringCbVPrintf( buf, sizeof(buf), pFormat, args );
+	va_end( args );
+	::OutputDebugString( buf );
+}
+
 void Log( LPCTSTR str ) 
 { 
 	g_logfile.Write( str );
+	DebugOut( L"%s\n", str );
 }
 
 void Log( LPCTSTR str, DWORD status ) 
 { 
 	TCHAR msg[ 1024 ]; swprintf_s( msg, L"%s (%d)", str, status );
 	g_logfile.Write( msg );
+	DebugOut( L"%s\n", msg );
 }
 
 //---------------------------------------------------------------------------
@@ -254,7 +267,7 @@ bool StartHookInCurrentUserSessions()
 	// Starting with Vista, session 0 is reserved for the services, user session begin at 1.
 	int firstUserSession = ( GetVersion() & 0xFF ) >= 6 ? 1 : 0;
 	
-	for( int i = firstUserSession; i < sessionCount; ++i )
+	for( DWORD i = firstUserSession; i < sessionCount; ++i )
 	{
 		WCHAR s[ 256 ] = L"";
 		swprintf_s( s, L"Session ID: %d, state: %d, WinStation: %s",
@@ -402,22 +415,30 @@ void OpenHookLogFile()
 	DWORD sessionId = -1;
 	::ProcessIdToSessionId( ::GetCurrentProcessId(), &sessionId );
 
-	WCHAR logName[ 100 ]; swprintf_s( logName, L"_ffhook_log%d.txt", sessionId );
+#ifdef WIN64
+	WCHAR logName[ 100 ]; swprintf_s( logName, L"_ffhook64_log%d.txt", sessionId );
+#else
+	WCHAR logName[ 100 ]; swprintf_s( logName, L"_ffhook32_log%d.txt", sessionId );
+#endif
 	g_logfile.Open( logName );
 }
 
 //---------------------------------------------------------------------------
 
-int RunHook()
+int RunHook( bool startFromService )
 {
 	OpenHookLogFile();
-	Log( L"Task: Starting hook" );
+	Log( startFromService ? L"Task: Starting hook from service" : L"Task: Starting hook locally" );
 
 	//--- Open/create mutex to enforce a single instance of this process 
-	//    (per user logon session).
+	//    (per user logon session and 32-bit / 64-bit).
 	
-	CHandle singleInstanceMutex(
-		::CreateMutex( NULL, TRUE, L"Local\\FFHookSingleInstanceMutex_0938746251" ) );
+#ifdef WIN64
+	LPCWSTR singleInstanceMutexName = L"Local\\FFHookSingleInstanceMutex64_0938746251";
+#else
+	LPCWSTR singleInstanceMutexName = L"Local\\FFHookSingleInstanceMutex32_0938746251";
+#endif
+	CHandle singleInstanceMutex( ::CreateMutex( NULL, TRUE, singleInstanceMutexName ) );
 	DWORD err = ::GetLastError();
 	if( err == ERROR_ALREADY_EXISTS || err == ERROR_ACCESS_DENIED )
 	{
@@ -432,8 +453,10 @@ int RunHook()
 	
 	//--- Open/create event for hook termination.
 	
-	CHandle hookTerminateEvent(
-		::CreateEvent( NULL, TRUE, FALSE, L"Global\\FFHookTerminateEvent_983874652" ) );
+	LPCWSTR hookTerminateEventName = startFromService ? 
+		L"Global\\FFHookTerminateEvent_983874652" :
+		L"Local\\FFHookTerminateEvent_983874652";		
+	CHandle hookTerminateEvent(	::CreateEvent( NULL, TRUE, FALSE, hookTerminateEventName ) );
 	if( ! hookTerminateEvent )
 	{
 		Log( L"Failed to create hook termination event.", ::GetLastError() );
@@ -502,7 +525,7 @@ int RunHook()
 }
 
 //---------------------------------------------------------------------------
-/// Remove the FlashFolder hook for all sessions.
+/// Remove the FlashFolder hook for the current sessions.
 
 int RemoveHook()
 {
@@ -511,7 +534,7 @@ int RemoveHook()
 	
 	// Open event for hook termination
 	CHandle hookTerminateEvent( 
-		::OpenEvent( EVENT_MODIFY_STATE, FALSE, L"Global\\FFHookTerminateEvent_983874652" ) );
+		::OpenEvent( EVENT_MODIFY_STATE, FALSE, L"Local\\FFHookTerminateEvent_983874652" ) );
 	if( ! hookTerminateEvent )
 	{
 		Log( L"Failed to open hook termination event.", ::GetLastError() );
@@ -533,37 +556,35 @@ int RemoveHook()
 void ShowHelp()
 {
 	::MessageBox( NULL,
-		L"FlashFolder command line syntax:\n\n"
-		L"FlashFolder.exe <Parameter>\n\n"
-		L"<Parameter> can be one of:\n"
-		L"/startservice Starts the FlashFolder service and activates the hook for any active user sessions.\n"
-		L"/sethook Activates the FlashFolder hook.\n"
-		L"/unhook Terminates the FlashFolder hook.\n",
-		L"FlashFolder commandline help",
+		L"FlashFolder commandline syntax:\n\n"
+		L"FlashFolder.exe [/sethook | /unhook | /startservice]\n\n"
+		L"/sethook - Activates the FlashFolder hook for the current session.\n"
+		L"/unhook - Terminates the FlashFolder hook for the current session.\n"
+		L"/startservice - Entry point for the Service Control Manager.\n",
+#ifdef WIN64
+		L"FlashFolder (64-bit)",
+#else
+		L"FlashFolder (32-bit)",
+#endif
 		MB_OK );
 }
 
 //---------------------------------------------------------------------------
 
-int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )         
+int WINAPI _tWinMain( HINSTANCE, HINSTANCE, LPTSTR, int )         
 { 
-	if( wcsstr( lpCmdLine, L"/startservice" ) )
-	{	
-		return StartService();	
-	}
-	else if( wcsstr( lpCmdLine, L"/sethook" ) )
+	if( __argc == 2 )
 	{
-		return RunHook();
-	}
-	else if( wcsstr( lpCmdLine, L"/unhook" ) )
-	{
-		return RemoveHook();
-	}
-	else
-	{
-		ShowHelp();
-		return 1;
+		if( wcscmp( __wargv[ 1 ], L"/startservice" ) == 0 )
+			return StartService();	
+		else if( wcscmp( __wargv[ 1 ], L"/sethooksvc" ) == 0 )
+			return RunHook( true );
+		else if( wcscmp( __wargv[ 1 ], L"/sethook" ) == 0 )
+			return RunHook( false );
+		else if( wcscmp( __wargv[ 1 ], L"/unhook" ) == 0 )
+			return RemoveHook();
 	}
 
-	return 0;
+	ShowHelp();
+	return 1;
 } 

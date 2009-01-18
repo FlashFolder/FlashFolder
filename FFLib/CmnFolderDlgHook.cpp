@@ -46,7 +46,7 @@ bool CmnFolderDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 
 	// Subclass the window proc of the file dialog.
 	m_oldWndProc = reinterpret_cast<WNDPROC>( 
-		::SetWindowLongPtr( hwndFileDlg, GWL_WNDPROC, 
+		::SetWindowLongPtr( hwndFileDlg, GWLP_WNDPROC, 
 		                    reinterpret_cast<LONG_PTR>( HookWindowProc) ) );
 	_ASSERTE( m_oldWndProc );
 

@@ -8,6 +8,7 @@
 // Feel free to use and distribute. May not be sold for profit. 
 
 // 2/29/00 -- P. Shaffer standard font mod.
+// 01/18/2009 -- zett42 made x64 compatible
 
 #if !defined(AFX_HYPERLINK_H__D1625061_574B_11D1_ABBA_00A0243D1382__INCLUDED_)
 #define AFX_HYPERLINK_H__D1625061_574B_11D1_ABBA_00A0243D1382__INCLUDED_
@@ -91,7 +92,7 @@ protected:
     afx_msg HBRUSH CtlColor(CDC* pDC, UINT nCtlColor);
     afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
     afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	//}}AFX_MSG
     afx_msg void OnClicked();

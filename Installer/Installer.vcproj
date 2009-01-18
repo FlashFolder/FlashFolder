@@ -11,6 +11,9 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -39,6 +42,46 @@
 			Name="Release|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="msbuild Installer.msbuild /nologo /v:minimal /p:Configuration=$(ConfigurationName)"
+				ReBuildCommandLine="msbuild Installer.msbuild /nologo /v:minimal /t:Rebuild /p:Configuration=$(ConfigurationName)"
+				CleanCommandLine="msbuild Installer.msbuild /nologo /v:minimal /t:Clean /p:Configuration=$(ConfigurationName)"
+				Output=""
+				PreprocessorDefinitions="WIN32;NDEBUG"
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="msbuild Installer.msbuild /nologo /v:minimal /p:Configuration=$(ConfigurationName)"
+				ReBuildCommandLine="msbuild Installer.msbuild /nologo /v:minimal /t:Rebuild /p:Configuration=$(ConfigurationName)"
+				CleanCommandLine="msbuild Installer.msbuild /nologo /v:minimal /t:Clean /p:Configuration=$(ConfigurationName)"
+				Output=""
+				PreprocessorDefinitions="WIN32;_DEBUG"
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="0"
 			>
 			<Tool

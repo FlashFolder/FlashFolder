@@ -216,7 +216,9 @@ bool ShellViewBrowseToFolder( HWND hwnd, LPCWSTR path )
 	if( FAILED( pDesktopFolder->ParseDisplayName( hwnd, NULL, const_cast<LPWSTR>( path ), NULL, &pidl, NULL ) ) )
 		return false;
 
-	HRESULT hr = psb->BrowseObject( pidl, SBSP_SAMEBROWSER );
+	HRESULT hr = psb->BrowseObject( pidl, SBSP_DEFBROWSER | SBSP_ABSOLUTE );
+	if( FAILED( hr ) )
+		DebugOut( L"ShellViewBrowseToFolder failed, hr = %08X\n", hr );
 	::CoTaskMemFree( pidl );
 
 	return SUCCEEDED( hr );

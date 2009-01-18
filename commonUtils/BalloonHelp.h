@@ -57,6 +57,7 @@
 // - fixed default font: now uses tooltip font from system metrics rather than
 //   wrong DEFAULT_GUI_FONT
 // - made tooltip corners less rounded to look more like system tooltip
+// - made x64 compatible
 //
 // ******************************************************************************
 
@@ -189,7 +190,7 @@ protected:
 	afx_msg void OnLButtonDown(UINT, CPoint point);
 	afx_msg void OnLButtonUp(UINT, CPoint point);
 	afx_msg void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS FAR* lpncsp);
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
    afx_msg void OnMouseMove(UINT, CPoint point);
    afx_msg LRESULT OnNcHitTest(CPoint point);
    afx_msg void OnClose();

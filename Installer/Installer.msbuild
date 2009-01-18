@@ -27,12 +27,12 @@
 		<SchemaVersion>2.0</SchemaVersion>
 		<OutputType>Package</OutputType>
 		<WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.0\Wix.targets</WixTargetsPath>
-		<OutputPath>msi</OutputPath>
-		<IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+		<IntermediateOutputPath>obj\$(Configuration)_$(Platform)\</IntermediateOutputPath>
 		<DefineSolutionProperties>false</DefineSolutionProperties>
 
-		<OutputName>FlashFolder_$(Configuration)</OutputName>
 		<Cultures>en-US</Cultures>
+		<OutputPath>msi</OutputPath>
+		<OutputName>FlashFolder</OutputName>
 	</PropertyGroup>
 		
 	<!-- WiX extensions ................................................................... -->
@@ -72,9 +72,15 @@
 		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)"/>
 	</Target>
 
+	<Target Name="AfterBuild">
+		<Copy SourceFiles="msi\$(Cultures)\FlashFolder.msi"
+			DestinationFiles="msi\$(Cultures)\FlashFolder_$(Configuration)_$(Platform).msi"/>
+		<Delete Files="msi\$(Cultures)\FlashFolder.msi"/>
+	</Target>
+
 	<!-- Clean and Rebuild targets -->
 	<Target Name="Clean">
-		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)" Clean="true"/>
+		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)" Platform="$(Platform)" Clean="true"/>
 		<RemoveDir Directories="$(IntermediateOutputPath)"/>
 	</Target>
 	<Target Name="Rebuild" DependsOnTargets="Clean;Build"/> 

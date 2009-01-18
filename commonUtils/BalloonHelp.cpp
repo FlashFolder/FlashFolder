@@ -1272,7 +1272,7 @@ void CBalloonHelp::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS FAR* lpn
 }
 
 // handle kill timer
-void CBalloonHelp::OnTimer(UINT nIDEvent) 
+void CBalloonHelp::OnTimer(UINT_PTR nIDEvent) 
 {
    // really shouldn't be any other timers firing, but might as well make sure
    if ( nIDEvent == ID_TIMER_CLOSE )
@@ -1321,7 +1321,7 @@ LRESULT CBalloonHelp::KeyboardHookProc( int code, WPARAM wParam, LPARAM lParam)
    {
       s_this->PostMessage(WM_CLOSE);
    }
-   return ::CallNextHookEx(s_this->m_hKeyboardHook, code, wParam, lParam);
+   return ::CallNextHookEx( NULL, code, wParam, lParam);
 }
 
 // Mouse hook: used to implement un-obtrusive mouse tracking
@@ -1373,7 +1373,7 @@ LRESULT CBalloonHelp::MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
          break;
       }
    }
-   return ::CallNextHookEx(s_this->m_hMouseHook, code, wParam, lParam);
+   return ::CallNextHookEx( NULL, code, wParam, lParam);
 }
 
 // Window Return hook: used to implement window following
@@ -1386,5 +1386,5 @@ LRESULT CBalloonHelp::CallWndRetProc(int code, WPARAM wParam, LPARAM lParam)
          s_this->PositionWindow();
    }
 
-   return ::CallNextHookEx(s_this->m_hCallWndRetHook, code, wParam, lParam);
+   return ::CallNextHookEx( NULL, code, wParam, lParam);
 }
