@@ -877,6 +877,14 @@ BOOL CTreePropSheet::OnInitDialog()
 
 	m_pwndPageTree->SetFont( GetFont() );
 	
+	// Use Vista theme if possible
+	if( ( ::GetVersion() & 0xFF ) >= 6 )
+	{
+		::SetWindowTheme( *m_pwndPageTree, L"explorer", NULL );
+		TreeView_SetExtendedStyle( *m_pwndPageTree, 
+			TVS_EX_FADEINOUTEXPANDOS | TVS_EX_DOUBLEBUFFER, TVS_EX_FADEINOUTEXPANDOS | TVS_EX_DOUBLEBUFFER );
+	}
+		
 	if (m_bTreeImages)
 	{
 		m_pwndPageTree->SetImageList(&m_Images, TVSIL_NORMAL);

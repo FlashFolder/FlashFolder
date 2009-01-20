@@ -32,7 +32,7 @@ void GetSysMessageFont( LOGFONT* plf, HWND hwnd )
 	OSVERSIONINFO ovi = { sizeof(ovi) };
 	GetVersionEx( &ovi );
 	if( ( ovi.dwMajorVersion << 8 | ovi.dwMinorVersion ) >= 0x0501 ) 
-		isThemed = ::IsThemeActive() != 0 ? true : false;
+		isThemed = ::IsThemeActive() != 0;
 	if( isThemed )
 	{
 		if( HTHEME hTheme = ::OpenThemeData( hwnd, L"WINDOW") )

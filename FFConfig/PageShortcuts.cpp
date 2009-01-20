@@ -68,7 +68,11 @@ BOOL CPageShortcuts::OnInitDialog()
 
 	//--- init controls
 
-	m_lstShortcuts.SetExtendedStyle( LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP );
+	// Use Vista theme for listview if possible
+	if( ( ::GetVersion() & 0xFF ) >= 6 )
+		::SetWindowTheme( m_lstShortcuts, L"explorer", NULL );
+
+	m_lstShortcuts.SetExtendedStyle( LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_DOUBLEBUFFER );
 	m_lstShortcuts.InsertColumn( 0, _T("Function"), LVCFMT_LEFT, MapDialogX( *this, 105 ) );
 	m_lstShortcuts.InsertColumn( 1, _T("Shortcut Key"), LVCFMT_LEFT, MapDialogX( *this, 105 ) );
 
@@ -202,7 +206,7 @@ void CPageShortcuts::OnLvnItemchangedLstShortcuts(NMHDR *pNMHDR, LRESULT *pResul
 		
 		m_hotkeyCtrl.SetHotKey( 0, 0 );
 	}
-}
+} 
 
 //-----------------------------------------------------------------------------------------------
 

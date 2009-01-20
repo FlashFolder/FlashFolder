@@ -120,7 +120,7 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wP
 	{
 		// At this time the file dialog has finally settled down.
 
-		DebugOut( L"WM_FF_INIT_DONE" );		
+		DebugOut( L"[fflib] WM_FF_INIT_DONE" );		
 	
 		if( wParam == FALSE )
 		{

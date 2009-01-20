@@ -53,7 +53,8 @@ auto_ptr<FileDlgHook_base> g_spOpenWithDlgHook;   // ptr to the hook instance
 
 HWND g_hToolWnd = NULL;					// handle of cool external tool window
 WNDPROC g_wndProcToolWindowEditPath;
-HIMAGELIST g_hToolbarImages = NULL; 
+HIMAGELIST g_hToolbarImages = NULL;
+HFONT g_hStdFont = NULL;
 
 TCHAR g_favIniFilePath[MAX_PATH+1];		// Path to INI-File with favorite folders
 
@@ -871,8 +872,6 @@ void CreateToolWindow( bool isFileDialog )
 
 	AdjustToolWindowPos();
 
-	HFONT hFont = reinterpret_cast<HFONT>( ::SendMessage( g_hToolWnd, WM_GETFONT, 0, 0 ) );
-
 	RECT rcClient;
 	GetClientRect( g_hToolWnd, &rcClient );
 
@@ -915,13 +914,14 @@ void CreateToolWindow( bool isFileDialog )
 		::DeleteDC( hScreenIC );
 	}
 
-    HWND hTb = ::CreateToolbarEx( g_hToolWnd, WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | 
-		CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS, 
+    HWND hTb = ::CreateToolbarEx( g_hToolWnd, WS_CHILD | TBSTYLE_FLAT | 
+		CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS,
 		ID_FF_TOOLBAR, tbButtons.size(), 
 		isToolbar32bpp ? NULL : g_hInstDll, isToolbar32bpp ? 0 : ID_FF_TOOLBAR, 
 		&tbButtons[ 0 ], tbButtons.size(), 16,16, 16,16, sizeof(TBBUTTON) );
 
-	::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS );
+	::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_DOUBLEBUFFER );
+	::ShowWindow( hTb, SW_SHOW );
 
 	if( isToolbar32bpp )
 	{
@@ -948,7 +948,7 @@ void CreateToolWindow( bool isFileDialog )
 	if( OSVERSION >= 0x0600 && isThemed )
 	{
 		// Visual tuning for Vista
-		rcDiv.bottom = rcDivR.bottom = 3;
+		rcDiv.bottom = rcDivR.bottom = 2;
 		edStyleEx = 0;  
 	}
 	::MapDialogRect( g_hToolWnd, &rcDiv ); 
@@ -961,15 +961,20 @@ void CreateToolWindow( bool isFileDialog )
 		rcClient.right - rcClient.left - xEdit - rcDivR.right, 
 		rcClient.bottom - rcClient.top - rcDiv.bottom * 2, 
 		g_hToolWnd, (HMENU) ID_FF_PATH, g_hInstDll, NULL);
-	
+					
 	// enable auto-complete for the edit control
 	::SHAutoComplete( hEdit, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
 	//sub-class the edit control to handle key-stroke messages
 	g_wndProcToolWindowEditPath = (WNDPROC)  
-		SetWindowLong(hEdit, GWL_WNDPROC, (LONG) &ToolWindowEditPathProc);
+		SetWindowLong(hEdit, GWLP_WNDPROC, (LONG) &ToolWindowEditPathProc);
 
-    // set default font for all child controls
-	EnumChildWindows(g_hToolWnd, ToolWndSetFont, (LPARAM) hFont);
+    //--- set default font for all child controls
+    
+    if( ! g_hStdFont && OSVERSION >= 0x0600 )
+		g_hStdFont = CreateSysMessageFont( g_hToolWnd );  
+	HFONT hFont = g_hStdFont ? g_hStdFont :
+		reinterpret_cast<HFONT>( ::SendMessage( g_hToolWnd, WM_GETFONT, 0, 0 ) );
+	EnumChildWindows( g_hToolWnd, ToolWndSetFont, (LPARAM) hFont );
 
 	//--- read options from global configuration
 
@@ -1127,6 +1132,12 @@ namespace FileDlgHookCallbacks
 		{
 			::ImageList_Destroy( g_hToolbarImages );
 			g_hToolbarImages = NULL;
+		}
+		
+		if( g_hStdFont )
+		{
+			::DeleteObject( g_hStdFont );
+			g_hStdFont = NULL;
 		}
 	}
 
