@@ -97,7 +97,7 @@ CTreePropSheet::~CTreePropSheet()
 
 //----------------------------------------------------------------------------------------------------
 
-int CTreePropSheet::DoModal() 
+INT_PTR CTreePropSheet::DoModal() 
 {
 	// Enable callback for setting Vista font.
     m_psh.dwFlags |= PSH_USECALLBACK;

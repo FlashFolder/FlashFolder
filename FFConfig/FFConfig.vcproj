@@ -448,10 +448,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\PageCommonOpenWithDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\PageGeneric.cpp"
 				>
 			</File>
@@ -551,10 +547,6 @@
 			</File>
 			<File
 				RelativePath=".\PageCommonFileDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageCommonOpenWithDlg.h"
 				>
 			</File>
 			<File
