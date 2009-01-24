@@ -88,12 +88,18 @@ void CImportDlg::OnEnChangeEdit1()
 
 void CImportDlg::OnBnClickedBtnBrowse()
 {
-	CFileDialog dlg( TRUE, _T("ini"), _T("wincmd.ini"), 
-		OFN_HIDEREADONLY | OFN_ENABLESIZING | OFN_PATHMUSTEXIST, 
-		_T("INI files (*.ini)|*.ini|All files (*.*)|*.*||"), this );
-	if( dlg.DoModal() == IDOK )
+	OPENFILENAME ofn = { sizeof(ofn) };
+	ofn.hwndOwner = *this;
+	ofn.Flags = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST;
+	ofn.lpstrDefExt = L"ini";
+	ofn.lpstrFilter = L"INI files (*.ini)\0*.ini\0All files (*.*)\0*.*\0";
+	WCHAR filePath[ MAX_PATH ] = L"wincmd.ini";
+	ofn.lpstrFile = filePath; 
+	ofn.nMaxFile = _countof( filePath );
+	
+	if( ::GetOpenFileName( &ofn ) )
 	{
-		SetDlgItemText( IDC_ED_PATH, dlg.GetPathName() );
+		SetDlgItemText( IDC_ED_PATH, ofn.lpstrFile );
 	}
 }
 

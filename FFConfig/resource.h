@@ -18,7 +18,6 @@
 #define IDD_ABOUT                       136
 #define IDS_MU_SHARED                   136
 #define IDS_EXCLUDES                    137
-#define IDD_PAGE_COMMON_OPENWITHDLG     140
 #define IDD_PAGE_GENERIC                142
 #define IDD_PAGE_MSO_FILEDLG            143
 #define IDD_PAGE_COMMON_DIRDLG          150

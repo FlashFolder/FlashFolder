@@ -72,9 +72,6 @@ BOOL CExcludesDlg::OnInitDialog()
 
 //-----------------------------------------------------------------------------------------------
 
-
-//-----------------------------------------------------------------------------------------------
-
 namespace {
 void GetProgramsList( vector<CString>* pList, CString s )
 {
@@ -104,11 +101,18 @@ void CExcludesDlg::OnOK()
 
 void CExcludesDlg::OnBnClickedBtnAdd()
 {
-	CFileDialog dlg( TRUE, _T("exe"), _T(""), OFN_HIDEREADONLY | OFN_ENABLESIZING, 
-		_T("Applications (*.exe)|*.exe|All files (*.*)|*.*||"), this );
-	if( dlg.DoModal() == IDOK )
+	OPENFILENAME ofn = { sizeof(ofn) };
+	ofn.hwndOwner = *this;
+	ofn.Flags = OFN_HIDEREADONLY;
+	ofn.lpstrDefExt = L"exe";
+	ofn.lpstrFilter = L"Applications (*.exe)\0*.exe\0All files (*.*)\0*.*\0";
+	WCHAR filePath[ MAX_PATH ] = L"";
+	ofn.lpstrFile = filePath; 
+	ofn.nMaxFile = _countof( filePath );
+	
+	if( ::GetOpenFileName( &ofn ) )
 	{
-		CString fileName = dlg.GetFileName();
+		CString fileName = ExtractSubPath( ofn.lpstrFile );
 		CString s; m_edList.GetWindowText( s );
 
 		// Check if program is already in list
