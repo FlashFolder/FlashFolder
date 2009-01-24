@@ -11,6 +11,7 @@
 *    FIX: CTreePropSheet did not use DPI-independent metrics
 *    FIX: Prop-page caption colors did not work with some XP themes
 *    ADD: Allow different captions for tree and prop-page.
+*    ADD: Draw page headline with task dialog "main instruction" style
 *********************************************************************/
 
 
@@ -55,40 +56,38 @@ IMPLEMENT_DYNAMIC(CTreePropSheet, CPropertySheet)
 const UINT CTreePropSheet::s_unPageTreeId = 0x7EEE;
 
 CTreePropSheet::CTreePropSheet()
-:	CPropertySheet(),
-	m_bPageTreeSelChangedActive(FALSE),
-	m_bTreeViewMode(TRUE),
-	m_bPageCaption(FALSE),
-	m_bTreeImages(FALSE),
-	m_nPageTreeWidth(150),
-	m_pwndPageTree(NULL),
-	m_pFrame(NULL)
-{}
+:	CPropertySheet()
+{
+	Init();
+}
 
 
 CTreePropSheet::CTreePropSheet(UINT nIDCaption, CWnd* pParentWnd, UINT iSelectPage)
-:	CPropertySheet(nIDCaption, pParentWnd, iSelectPage),
-	m_bPageTreeSelChangedActive(FALSE),
-	m_bTreeViewMode(TRUE),
-	m_bPageCaption(FALSE),
-	m_bTreeImages(FALSE),
-	m_nPageTreeWidth(150),
-	m_pwndPageTree(NULL),
-	m_pFrame(NULL)
+:	CPropertySheet(nIDCaption, pParentWnd, iSelectPage)
 {
+	Init();
 }
 
 
 CTreePropSheet::CTreePropSheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
-:	CPropertySheet(pszCaption, pParentWnd, iSelectPage),
-	m_bPageTreeSelChangedActive(FALSE),
-	m_bTreeViewMode(TRUE),
-	m_bPageCaption(FALSE),
-	m_bTreeImages(FALSE),
-	m_nPageTreeWidth(150),
-	m_pwndPageTree(NULL),
-	m_pFrame(NULL)
+:	CPropertySheet(pszCaption, pParentWnd, iSelectPage)
 {
+	Init();
+}
+
+void CTreePropSheet::Init()
+{
+	m_bPageTreeSelChangedActive = FALSE;
+	m_bTreeViewMode = TRUE;
+	m_bPageCaption = FALSE;
+	m_bTreeImages = FALSE;
+	m_nPageTreeWidth = 150;
+	m_pwndPageTree = NULL;
+	m_pFrame = NULL;
+
+	OSVERSIONINFO verInfo = { sizeof(verInfo) };
+	::GetVersionEx( &verInfo );
+	m_osVer = ( verInfo.dwMajorVersion << 8 ) | verInfo.dwMinorVersion;
 }
 
 
@@ -752,6 +751,10 @@ void CTreePropSheet::ActivateNextPage()
 
 BOOL CTreePropSheet::OnInitDialog() 
 {
+	bool isThemed = false;
+	if( m_osVer >= 0x0501 )
+		isThemed = ::IsThemeActive() == TRUE;
+
 	if (m_bTreeViewMode)
 	{
 		// be sure, there are no stacked tabs, because otherwise the
@@ -824,22 +827,67 @@ BOOL CTreePropSheet::OnInitDialog()
 	rectTree.right = rectTree.left + rcTreeWidth.Width() - rcTreeSpace.Width();
 
 	// calculate caption height
+
+	CRect	rectFrameCaption;
 	CTabCtrl	wndTabCtrl;
 	wndTabCtrl.Create(WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS, rectFrame, this, 0x1234);
 	wndTabCtrl.InsertItem(0, _T(""));
-	CRect	rectFrameCaption;
 	wndTabCtrl.GetItemRect(0, rectFrameCaption);
 	wndTabCtrl.DestroyWindow();
+	
 	m_pFrame->SetCaptionHeight(rectFrameCaption.Height());
 
-	// if no caption should be displayed, make the window smaller in
-	// height
-	if (!m_bPageCaption)
+	if( m_bPageCaption )
 	{
+		if( m_osVer >= 0x0600 && isThemed )
+			if( HTHEME hTheme = ::OpenThemeData( *this, L"TEXTSTYLE" ) )
+			{
+				// Vista: get height of task dialog "main instruction" font and
+				// move / resize everything to fit the headline.
+
+				CRect rc( 0, 0, 1, 1 ); 
+				CWindowDC dc( this );
+				::GetThemeTextExtent( hTheme, dc, TEXT_MAININSTRUCTION, 0, L"Äy", -1, 
+					DT_SINGLELINE | DT_CALCRECT, NULL, rc );		
+				::CloseThemeData( hTheme );				
+
+				CRect margins( 0, 0, 6, 6 ); ::MapDialogRect( *this, margins );			
+				rc.bottom += margins.bottom * 2;
+
+				m_pFrame->SetCaptionHeight( rc.Height() );
+									
+				int diff = rc.Height() - rectFrameCaption.Height();
+									
+				// enlarge frame
+				m_pFrame->GetWnd()->GetWindowRect(rectFrame);
+				ScreenToClient(rectFrame);
+				rectFrame.top -= diff;		
+				m_pFrame->GetWnd()->MoveWindow(rectFrame);
+				
+				// move all child windows down
+				MoveChildWindows( 0, diff );
+
+				// modify rectangle for the tree ctrl
+				rectTree.bottom += diff;
+
+				// make us larger
+				CRect	rect;
+				GetWindowRect(rect);
+				rect.top -= diff / 2;
+				rect.bottom += diff / 2 + diff % 2 * 2;
+				if( GetParent() )
+					GetParent()->ScreenToClient( rect );
+				MoveWindow( rect );				
+			}			
+	}
+	else
+	{
+		// No caption should be displayed -> reduce the window height.
+
 		// make frame smaller
 		m_pFrame->GetWnd()->GetWindowRect(rectFrame);
 		ScreenToClient(rectFrame);
-		rectFrame.top+= rectFrameCaption.Height();
+		rectFrame.top += rectFrameCaption.Height();		
 		m_pFrame->GetWnd()->MoveWindow(rectFrame);
 
 		// move all child windows up
@@ -878,7 +926,7 @@ BOOL CTreePropSheet::OnInitDialog()
 	m_pwndPageTree->SetFont( GetFont() );
 	
 	// Use Vista theme if possible
-	if( ( ::GetVersion() & 0xFF ) >= 6 )
+	if( m_osVer >= 0x0600 )
 	{
 		::SetWindowTheme( *m_pwndPageTree, L"explorer", NULL );
 		TreeView_SetExtendedStyle( *m_pwndPageTree, 
@@ -897,7 +945,6 @@ BOOL CTreePropSheet::OnInitDialog()
 	// Select item for the current page
 	if (pTab->GetCurSel() > -1)
 		SelectPageTreeItem(pTab->GetCurSel());
-
 	return bResult;
 }
 

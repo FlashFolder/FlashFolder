@@ -11,7 +11,7 @@
 *    FIX: CTreePropSheet did not use DPI-independent metrics
 *    FIX: Prop-page caption colors did not work with some XP themes
 *    ADD: Allow different captions for tree and prop-page.
-*
+*    ADD: Draw page headline with task dialog "main instruction" style
 *********************************************************************/
 
 #include "stdafx.h"
@@ -124,8 +124,7 @@ CRect CPropPageFrameDefault::CalcMsgArea()
 		isThemed = ::IsThemeActive();
 	if( isThemed )
 	{
-		HTHEME	hTheme = ::OpenThemeData(m_hWnd, L"Tab");
-		if (hTheme)
+		if( HTHEME hTheme = ::OpenThemeData(m_hWnd, L"Tab") )
 		{
 			CRect	rectContent;
 			CDC		*pDc = GetDC();
@@ -157,8 +156,7 @@ CRect CPropPageFrameDefault::CalcCaptionArea()
 		isThemed = ::IsThemeActive();
 	if( isThemed )
 	{
-		HTHEME	hTheme = ::OpenThemeData(m_hWnd, L"Tab");
-		if (hTheme)
+		if( HTHEME hTheme = ::OpenThemeData(m_hWnd, L"Tab") )
 		{
 			CRect	rectContent;
 			CDC		*pDc = GetDC();
@@ -172,7 +170,7 @@ CRect CPropPageFrameDefault::CalcCaptionArea()
 				rectContent.bottom = rectContent.top;
 
 			rect = rectContent;
-		}
+		}		
 	}
 	else
 	{
@@ -187,17 +185,24 @@ CRect CPropPageFrameDefault::CalcCaptionArea()
 
 void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaption, HICON hIcon)
 {
+	bool isThemed = false;
+	if( m_osVer >= 0x0501 )
+		isThemed = ::IsThemeActive();
+
 	//--- draw background
 
-	COLORREF	clrLeft = ::GetSysColor( COLOR_HIGHLIGHT );
-	COLORREF	clrRight = ::GetSysColor( COLOR_BTNFACE );	
-	TRIVERTEX gVert[ 2 ] = { 
-		rect.left, rect.top,     ( clrLeft & 0xFF ) << 8, clrLeft & 0xFF00, ( clrLeft & 0xFF0000 ) >> 8, 0,
-		rect.right, rect.bottom, ( clrRight & 0xFF ) << 8, clrRight & 0xFF00, ( clrRight & 0xFF0000 ) >> 8, 0
-	};
-	GRADIENT_RECT gRect = { 0, 1 };
-	pDc->GradientFill( gVert, 2, &gRect, 1, GRADIENT_FILL_RECT_H );
-	
+	if( m_osVer < 0x0600 || ! isThemed )
+	{
+		COLORREF	clrLeft = ::GetSysColor( COLOR_HIGHLIGHT );
+		COLORREF	clrRight = ::GetSysColor( COLOR_BTNFACE );	
+		TRIVERTEX gVert[ 2 ] = { 
+			rect.left, rect.top,     ( clrLeft & 0xFF ) << 8, clrLeft & 0xFF00, ( clrLeft & 0xFF0000 ) >> 8, 0,
+			rect.right, rect.bottom, ( clrRight & 0xFF ) << 8, clrRight & 0xFF00, ( clrRight & 0xFF0000 ) >> 8, 0
+		};
+		GRADIENT_RECT gRect = { 0, 1 };
+		pDc->GradientFill( gVert, 2, &gRect, 1, GRADIENT_FILL_RECT_H );
+	}
+
 	CDialog* pParent = (CDialog*) GetParent();
 	CRect rcMargin( 0, 0, 2, 1 );
 	pParent->MapDialogRect( rcMargin );
@@ -217,23 +222,41 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 
 	rect.left += rcMargin.Width();
 
-	int	nBkStyle = pDc->SetBkMode(TRANSPARENT);
+	if( m_osVer < 0x0600 || ! isThemed )
+	{
+		int	nBkStyle = pDc->SetBkMode(TRANSPARENT);
 
-	// get correctly themed font
-	LOGFONT lf;
-	GetSysMessageFont( &lf, GetSafeHwnd() );
-	lf.lfWeight = FW_BOLD;
-	CFont font;
-	font.CreateFontIndirect( &lf );
-	CFont* pOldFont = pDc->SelectObject( &font );
+		// get correctly themed font
+		LOGFONT lf;
+		GetSysMessageFont( &lf, GetSafeHwnd() );
+		lf.lfWeight = FW_BOLD;
+		CFont font;
+		font.CreateFontIndirect( &lf );
+		CFont* pOldFont = pDc->SelectObject( &font );
 
-	COLORREF clrPrev = pDc->SetTextColor( GetSysColor( COLOR_HIGHLIGHTTEXT ) );
+		COLORREF clrPrev = pDc->SetTextColor( GetSysColor( COLOR_HIGHLIGHTTEXT ) );
 
-	pDc->DrawText(lpszCaption, rect, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
+		pDc->DrawText(lpszCaption, rect, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
-	pDc->SetTextColor(clrPrev);
-	pDc->SetBkMode(nBkStyle);
-	pDc->SelectObject(pOldFont);
+		pDc->SetTextColor(clrPrev);
+		pDc->SetBkMode(nBkStyle);
+		pDc->SelectObject(pOldFont);
+	}
+	else
+	{
+		// Vista: draw caption with the style of task dialog "main instruction".
+	
+		HTHEME hTheme = ::OpenThemeData( *this, L"TEXTSTYLE" );
+		
+		CRect margins( 0, 0, 6, 6 ); ::MapDialogRect( *this, margins );
+		rect.top += margins.bottom;
+		rect.left += margins.right;		
+		
+		::DrawThemeText( hTheme, *pDc, TEXT_MAININSTRUCTION, 0, lpszCaption, -1, 
+			DT_SINGLELINE, 0, rect );
+		
+		::CloseThemeData( hTheme );	
+	}
 }
 
 /////////////////////////////////////////////////////////////////////

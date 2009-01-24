@@ -11,6 +11,7 @@
 *    FIX: CTreePropSheet did not use DPI-independent metrics
 *    FIX: Prop-page caption colors did not work with some XP themes
 *    ADD: Allow different captions for tree and prop-page.
+*    ADD: Draw page headline with task dialog "main instruction" style
 *********************************************************************/
 
 
@@ -422,6 +423,8 @@ protected:
 
 // Properties
 private:
+	void Init();
+
 	/** TRUE if we should use the tree control instead of the tab ctrl. */
 	BOOL m_bTreeViewMode;
 
@@ -458,6 +461,8 @@ private:
 
 	/** The width of the page tree control in pixels. */
 	int m_nPageTreeWidth;
+
+	DWORD m_osVer;
 
 // Static Properties
 private:
