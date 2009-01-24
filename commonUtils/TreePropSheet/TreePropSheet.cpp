@@ -11,7 +11,8 @@
 *    FIX: CTreePropSheet did not use DPI-independent metrics
 *    FIX: Prop-page caption colors did not work with some XP themes
 *    ADD: Allow different captions for tree and prop-page.
-*    ADD: Draw page headline with task dialog "main instruction" style
+*    ADD: Vista - draw page headline with task dialog "main instruction" style
+*    ADD: Vista - use standard OS font and size (typically "Segoe UI", 9 pt)
 *********************************************************************/
 
 
@@ -19,6 +20,7 @@
 #include "TreePropSheet.h"
 #include "PropPageFrameDefault.h"
 #include "..\HighColorTab.hpp"
+#include "..\VistaFontHelper.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -90,14 +92,41 @@ void CTreePropSheet::Init()
 	m_osVer = ( verInfo.dwMajorVersion << 8 ) | verInfo.dwMinorVersion;
 }
 
-
 CTreePropSheet::~CTreePropSheet()
+{}
+
+//----------------------------------------------------------------------------------------------------
+
+int CTreePropSheet::DoModal() 
 {
+	// Enable callback for setting Vista font.
+    m_psh.dwFlags |= PSH_USECALLBACK;
+    m_psh.pfnCallback = PropSheetProc;
+
+    return CPropertySheet::DoModal();
 }
 
+void CTreePropSheet::BuildPropPageArray()
+{
+    CPropertySheet::BuildPropPageArray();
 
-/////////////////////////////////////////////////////////////////////
-// Operationen
+	// Set standard OS font and size for all pages 
+	// (especially important on Vista where the standard font has changed).
+    for( int nPage = 0; nPage < m_pages.GetSize(); ++nPage )
+		SetStandardOsFontInDlgResource( (LPDLGTEMPLATE) m_psh.ppsp[ nPage ].pResource );
+}
+
+int CALLBACK CTreePropSheet::PropSheetProc( HWND hwndDlg, UINT uMsg, LPARAM lParam )
+{
+    if( uMsg == PSCB_PRECREATE )
+		// Set standard OS font for the property sheet itself 
+		// (especially important on Vista where the standard font has changed).
+		SetStandardOsFontInDlgResource( (LPDLGTEMPLATE) lParam );
+
+    return 0;
+}
+
+//----------------------------------------------------------------------------------------------------
 
 BOOL CTreePropSheet::SetTreeViewMode(BOOL bTreeViewMode /* = TRUE */, BOOL bPageCaption /* = FALSE */, BOOL bTreeImages /* = FALSE */)
 {

@@ -11,7 +11,7 @@
 *    FIX: CTreePropSheet did not use DPI-independent metrics
 *    FIX: Prop-page caption colors did not work with some XP themes
 *    ADD: Allow different captions for tree and prop-page.
-*    ADD: Draw page headline with task dialog "main instruction" style
+*    ADD: Vista - draw page headline with task dialog "main instruction" style
 *********************************************************************/
 
 #include "stdafx.h"

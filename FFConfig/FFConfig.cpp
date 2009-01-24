@@ -74,8 +74,8 @@ BOOL CFFConfigApp::InitInstance()
 	// visual styles.  Otherwise, any window creation will fail.
 	InitCommonControls();
 
-	AfxInitRichEdit2();
-
+	// Enable Vista font (typically "Segoe UI") for all dialogs.
+	AfxEnableControlContainer( new CFontOccManager() );
 
 	HWND hwndParent = NULL;
 	if( __argc > 1 )

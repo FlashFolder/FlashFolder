@@ -85,6 +85,7 @@
 #include <PopupDlg.h>
 #include <CacheImageList.h>
 #include <MessageBox.h>
+#include <VistaFontHelper.h>
 
 // project-specific
 #include "../common/ff_utils.h"

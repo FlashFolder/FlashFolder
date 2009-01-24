@@ -11,7 +11,8 @@
 *    FIX: CTreePropSheet did not use DPI-independent metrics
 *    FIX: Prop-page caption colors did not work with some XP themes
 *    ADD: Allow different captions for tree and prop-page.
-*    ADD: Draw page headline with task dialog "main instruction" style
+*    ADD: Vista - draw page headline with task dialog "main instruction" style
+*    ADD: Vista - use standard OS font and size (typically "Segoe UI", 9 pt)
 *********************************************************************/
 
 
@@ -192,6 +193,9 @@ public:
 	tree view mode, NULL otherwise.
 	*/
 	CTreeCtrl* GetPageTreeControl();
+	
+	/// Overrides CPropertySheet to support Vista font.
+	virtual INT_PTR DoModal();
 
 // Public helpers
 public:
@@ -291,6 +295,12 @@ protected:
 	new and returns it.
 	*/
 	virtual CPropPageFrame* CreatePageFrame();
+	
+	/// Overrides CPropertySheet to support Vista font.	
+    virtual void BuildPropPageArray();
+
+	/// Callback to support Vista font.	
+    static int CALLBACK PropSheetProc( HWND hwndDlg, UINT uMsg, LPARAM lParam );	
 
 // Implementation helpers
 protected:
