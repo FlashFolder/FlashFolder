@@ -48,6 +48,7 @@ void CAddFavoriteDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CAddFavoriteDlg, CDialog)
 	ON_BN_CLICKED(IDOK, &CAddFavoriteDlg::OnBnClickedOk)
+	ON_CBN_DBLCLK(IDC_CB_TITLE, &CAddFavoriteDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_EDIT_MENU, &CAddFavoriteDlg::OnBnClickedEditMenu)
 END_MESSAGE_MAP()
 
@@ -135,3 +136,4 @@ void CAddFavoriteDlg::OnBnClickedEditMenu()
 	if( Save() )
 		EndDialog( ID_EDITMENU );		
 }
+

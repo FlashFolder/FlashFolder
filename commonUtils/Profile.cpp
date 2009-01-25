@@ -161,13 +161,16 @@ void MemoryProfile::DeleteValue( LPCTSTR pSectionName, LPCTSTR pValueName )
 
 //===============================================================================================
 // RegistryProfile methods
+//
+// Note: All methods use KEY_WOW64_64KEY flag for opening the 64-bit view of the registry.
+//       This way the profile can share registry data between 32- and 64-bit versions of a process. 
 
 void RegistryProfile::SetRoot( LPCTSTR rootPath )
 {
 	m_hRootKey = HKEY_CURRENT_USER;
 	m_regPath = tstring( _T("Software\\") ) + tstring( rootPath ); 
 
-	RegKey key( HKEY_LOCAL_MACHINE, m_regPath.c_str() );
+	RegKey key( HKEY_LOCAL_MACHINE, m_regPath.c_str(), KEY_QUERY_VALUE | KEY_WOW64_64KEY );
 	tstring multiUserOption = key.GetString( _T("MultiUserProfileOption") );
 	m_isShared = ( multiUserOption == _T("shared") );
 	if( m_isShared )
@@ -182,7 +185,7 @@ void RegistryProfile::SetRoot( LPCTSTR rootPath )
 bool RegistryProfile::ValueExists( LPCTSTR pSectionName, LPCTSTR pValueName ) const
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
-	RegKey key( m_hRootKey, path.c_str() ); 
+	RegKey key( m_hRootKey, path.c_str(), KEY_QUERY_VALUE | KEY_WOW64_64KEY ); 
 	return key.ValueExists( pValueName );
 }
 
@@ -191,7 +194,7 @@ bool RegistryProfile::ValueExists( LPCTSTR pSectionName, LPCTSTR pValueName ) co
 bool RegistryProfile::SectionExists( LPCTSTR pSectionName ) const
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
-	RegKey key( m_hRootKey, path.c_str() ); 
+	RegKey key( m_hRootKey, path.c_str(), KEY_QUERY_VALUE | KEY_WOW64_64KEY  ); 
 	return key != NULL;
 }
 
@@ -200,7 +203,7 @@ bool RegistryProfile::SectionExists( LPCTSTR pSectionName ) const
 tstring RegistryProfile::GetString( LPCTSTR pSectionName, LPCTSTR pValueName ) const
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
-	RegKey key( m_hRootKey, path.c_str() ); 
+	RegKey key( m_hRootKey, path.c_str(), KEY_QUERY_VALUE | KEY_WOW64_64KEY ); 
 	tstring res;
 	if( key.GetString( &res, pValueName ) )
 		return res;
@@ -214,7 +217,7 @@ tstring RegistryProfile::GetString( LPCTSTR pSectionName, LPCTSTR pValueName ) c
 int RegistryProfile::GetInt( LPCTSTR pSectionName, LPCTSTR pValueName ) const
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
-	RegKey key( m_hRootKey, path.c_str() ); 
+	RegKey key( m_hRootKey, path.c_str(), KEY_QUERY_VALUE | KEY_WOW64_64KEY ); 
 	int res;
 	if( key.GetInt( &res, pValueName ) )
 		return res;
@@ -228,7 +231,7 @@ int RegistryProfile::GetInt( LPCTSTR pSectionName, LPCTSTR pValueName ) const
 void RegistryProfile::SetString( LPCTSTR pSectionName, LPCTSTR pValueName, LPCTSTR pValue, DWORD flags )
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
-	RegKey key( m_hRootKey, path.c_str(), KEY_QUERY_VALUE | KEY_SET_VALUE, true ); 
+	RegKey key( m_hRootKey, path.c_str(), KEY_QUERY_VALUE | KEY_SET_VALUE | KEY_WOW64_64KEY, true ); 
 	if( ! key )
 		return;
 	if( flags & DONT_OVERWRITE )
@@ -242,7 +245,7 @@ void RegistryProfile::SetString( LPCTSTR pSectionName, LPCTSTR pValueName, LPCTS
 void RegistryProfile::SetInt( LPCTSTR pSectionName, LPCTSTR pValueName, int value, DWORD flags )
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
-	RegKey key( m_hRootKey, path.c_str(), KEY_QUERY_VALUE | KEY_SET_VALUE, true ); 
+	RegKey key( m_hRootKey, path.c_str(), KEY_QUERY_VALUE | KEY_SET_VALUE | KEY_WOW64_64KEY, true ); 
 	if( ! key )
 		return;
 	if( flags & DONT_OVERWRITE )
@@ -255,7 +258,7 @@ void RegistryProfile::SetInt( LPCTSTR pSectionName, LPCTSTR pValueName, int valu
 
 void RegistryProfile::DeleteSection( LPCTSTR pSectionName )
 {
-	RegKey key( m_hRootKey, m_regPath.c_str(), DELETE );
+	RegKey key( m_hRootKey, m_regPath.c_str(), DELETE | KEY_WOW64_64KEY );
 	key.DeleteKey( pSectionName );
 }
 
@@ -264,7 +267,7 @@ void RegistryProfile::DeleteSection( LPCTSTR pSectionName )
 void RegistryProfile::ClearSection( LPCTSTR pSectionName )
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
-	RegKey key( m_hRootKey, path.c_str(), KEY_ALL_ACCESS );
+	RegKey key( m_hRootKey, path.c_str(), KEY_ALL_ACCESS | KEY_WOW64_64KEY );
 	key.Clear();
 }
 
@@ -273,7 +276,7 @@ void RegistryProfile::ClearSection( LPCTSTR pSectionName )
 void RegistryProfile::DeleteValue( LPCTSTR pSectionName, LPCTSTR pValueName )
 {
 	tstring path = m_regPath + tstring( _T("\\") ) + tstring( pSectionName );
-	RegKey key( m_hRootKey, path.c_str(), KEY_SET_VALUE );
+	RegKey key( m_hRootKey, path.c_str(), KEY_SET_VALUE | KEY_WOW64_64KEY );
 	key.DeleteValue( pValueName );
 }
 
@@ -281,6 +284,6 @@ void RegistryProfile::DeleteValue( LPCTSTR pSectionName, LPCTSTR pValueName )
 
 void RegistryProfile::Clear()
 {
-	RegKey key( m_hRootKey, m_regPath.c_str(), KEY_ALL_ACCESS );
+	RegKey key( m_hRootKey, m_regPath.c_str(), KEY_ALL_ACCESS | KEY_WOW64_64KEY );
 	key.Clear();
 }

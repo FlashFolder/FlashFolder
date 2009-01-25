@@ -407,12 +407,26 @@ int FavMenu_Display( HWND hWndParent, int x, int y, const FavoritesList& favs )
 }
 
 //-----------------------------------------------------------------------------------------------
+/// Get path of "FFConfig.exe" - prefer x64 version, if available. 
+
+void GetConfigProcessPath( LPWSTR path, DWORD nChars )
+{
+	WCHAR dir[ 4096 ] = L"";
+	GetAppDir( g_hInstDll, dir, _countof( dir ) );
+	wcscpy_s( path, nChars, dir );
+	wcscat_s( path, nChars, L"FFConfig64.exe" );
+	if( FileExists( path ) )
+		return;
+	wcscpy_s( path, nChars, dir );
+	wcscat_s( path, nChars, L"FFConfig.exe" );	
+}
+
+//-----------------------------------------------------------------------------------------------
 
 void FavMenu_StartEditor( HWND hWndParent )
 {
-	TCHAR path[ 4096 ] = _T("");
-	GetAppDir( g_hInstDll, path, _countof( path ) );
-	StringCbCat( path, sizeof(path), FFCONFIG_EXE );
+	TCHAR path[ 4096 ] = L"";
+	GetConfigProcessPath( path, _countof( path ) );
 
 	TCHAR params[ 256 ] = _T("");
 	StringCbPrintf( params, sizeof(params),	_T("%d --fav"), hWndParent ); 
@@ -424,9 +438,8 @@ void FavMenu_StartEditor( HWND hWndParent )
 
 void FavMenu_AddDir( HWND hWndParent, FavoritesList& favs, LPCTSTR pPath, LPCTSTR pTargetPath = _T("") )
 {
-	TCHAR path[ 4096 ] = _T("");
-	GetAppDir( g_hInstDll, path, _countof( path ) );
-	StringCbCat( path, sizeof(path), FFCONFIG_EXE );
+	TCHAR path[ 4096 ] = L"";
+	GetConfigProcessPath( path, _countof( path ) );
 
 	TCHAR params[ 4096 ] = _T("");
 	StringCbPrintf( params, sizeof(params),	_T("%d --addfav \"%s\""), hWndParent, 
@@ -519,9 +532,8 @@ void DisplayMenu_Config()
 		TPM_LEFTALIGN | TPM_TOPALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD | TPM_NONOTIFY, 
 		rc.left, rc.bottom, 0, g_hToolWnd, NULL);
 
-	TCHAR path[ 4096 ] = _T("");
-	GetAppDir( g_hInstDll, path, _countof( path ) );
-	StringCbCat( path, sizeof(path), FFCONFIG_EXE );
+	TCHAR path[ 4096 ] = L"";
+	GetConfigProcessPath( path, _countof( path ) );
 	
 	TCHAR params[ 256 ] = _T("");
 	StringCbPrintf( params, sizeof(params), _T("%d"), g_hFileDialog ); 

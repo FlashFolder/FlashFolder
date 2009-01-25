@@ -49,7 +49,7 @@
 
 	<!-- For x64, we need to build both 32- and 64-bit executables. -->
 	<Target Name="Build_x64" DependsOnTargets="SvnVersionInclude;VCProjects_x86;VCProjects_x64">
-		<Message Text="_______Building Installer_______" Importance="high"/>
+		<Message Text="_______Building Installer (x64)_______" Importance="high"/>
 		<MSBuild Projects="Installer\Installer.msbuild" 
 			Properties="Configuration=$(Configuration);Platform=x64"/>
 	</Target>

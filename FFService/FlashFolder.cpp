@@ -100,6 +100,7 @@ void SetMyServiceStatusUnchanged()
 }
 
 //----------------------------------------------------------------------------------------------------
+/// Start a hook process as the user specified by the token.
 
 bool TryCreateHookProcess( HANDLE hToken, LPCTSTR cmd )
 {
@@ -182,7 +183,7 @@ bool StartHookProcessInSession( DWORD dwSessionId )
 
 	WCHAR cmd[ 4096 ] = L"\"";
 	wcscat_s( cmd, exeDir );
-	wcscat_s( cmd, L"FlashFolder.exe\" /sethook" );	 
+	wcscat_s( cmd, L"FlashFolder.exe\" /sethooksvc" );	 
 
 	Log( L"Starting 32-bit hook process" );
 	if( ! TryCreateHookProcess( hDupToken, cmd ) )
@@ -191,7 +192,7 @@ bool StartHookProcessInSession( DWORD dwSessionId )
 #ifdef WIN64
 	WCHAR cmd64[ 1024 ] = L"\"";
 	wcscat_s( cmd64, exeDir );
-	wcscat_s( cmd64, L"FlashFolder64.exe\" /sethook" );	 
+	wcscat_s( cmd64, L"FlashFolder64.exe\" /sethooksvc" );	 
 
 	Log( L"Starting 64-bit hook process" );
 	if( ! TryCreateHookProcess( hDupToken, cmd64 ) )

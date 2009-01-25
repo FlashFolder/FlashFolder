@@ -43,4 +43,6 @@ private:
 	CString m_path, m_targetPath;
 	CComboBox m_cbTitle;
 	int m_newItemId;
+public:
+	afx_msg void OnCbnDblclkCbTitle();
 };
