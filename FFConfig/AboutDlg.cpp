@@ -51,48 +51,69 @@ END_MESSAGE_MAP()
 BOOL CAboutDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	
+	SetWindowText( L"About: " FLASHFOLDER_NAME );
 
 	VS_FIXEDFILEINFO ver;
 
-	CString appDir;
-	GetAppDir( NULL, appDir.GetBuffer( 4096 ), 4096 );
+	CString appDir;	GetAppDir( NULL, appDir.GetBuffer( 4096 ), 4096 );
 	appDir.ReleaseBuffer();
 	
-	CString s, s0, s1; 
+	CString s, s1; 
 
-	s0 = L"";
+	s = L"";
+#ifndef WIN64
 	if( GetFileVersion( &ver, appDir + L"FFConfig.exe" ) )
-		s0.Format( _T(" %d.%d.%d.%d (32)"),
+		s.Format( _T("v%d.%d.%d.%d (x86)"),
 			ver.dwFileVersionMS >> 16, ver.dwFileVersionMS & 0xFFFF,
 			ver.dwFileVersionLS >> 16, ver.dwFileVersionLS & 0xFFFF );
+#else
 	if( GetFileVersion( &ver, appDir + L"FFConfig64.exe" ) )
-		s1.Format( _T(" %d.%d.%d.%d (64)"),
+	{
+		s1.Format( _T("v%d.%d.%d.%d (x64)"),
 			ver.dwFileVersionMS >> 16, ver.dwFileVersionMS & 0xFFFF,
 			ver.dwFileVersionLS >> 16, ver.dwFileVersionLS & 0xFFFF );
-	GetDlgItemText( IDC_ST_FFCONFIG, s );
-	SetDlgItemText( IDC_ST_FFCONFIG, s + s0 + s1 );
+		if( ! s.IsEmpty() ) s += L", ";
+		s += s1;
+	}
+#endif
+	SetDlgItemText( IDC_ST_FFCONFIG, s );
 
+	s = L"";
 	if( GetFileVersion( &ver, appDir + _T("FlashFolder.exe") ) )
-		s0.Format( _T(" %d.%d.%d.%d (32)"),
+		s.Format( _T("v%d.%d.%d.%d (x86)"),
 			ver.dwFileVersionMS >> 16, ver.dwFileVersionMS & 0xFFFF,
 			ver.dwFileVersionLS >> 16, ver.dwFileVersionLS & 0xFFFF );
+#ifdef WIN64
 	if( GetFileVersion( &ver, appDir + _T("FlashFolder64.exe") ) )
-		s1.Format( _T(" %d.%d.%d.%d (64)"),
+	{
+		s1.Format( _T("v%d.%d.%d.%d (x64)"),
 			ver.dwFileVersionMS >> 16, ver.dwFileVersionMS & 0xFFFF,
 			ver.dwFileVersionLS >> 16, ver.dwFileVersionLS & 0xFFFF );
-	GetDlgItemText( IDC_ST_FFCONFIG, s );
-	SetDlgItemText( IDC_ST_FFCONFIG, s + s0 + s1 );
+		if( ! s.IsEmpty() ) s += L", ";
+		s += s1;
+	}
+#endif
+	SetDlgItemText( IDC_ST_FFSERVICE, s );
 
+	s = L"";
 	if( GetFileVersion( &ver, appDir + _T("fflib6439.dll") ) )
-		s0.Format( _T(" %d.%d.%d.%d (32)"),
+	{
+		s.Format( _T("v%d.%d.%d.%d (x86)"),
 			ver.dwFileVersionMS >> 16, ver.dwFileVersionMS & 0xFFFF,
 			ver.dwFileVersionLS >> 16, ver.dwFileVersionLS & 0xFFFF );
+	}
+#ifdef WIN64
 	if( GetFileVersion( &ver, appDir + _T("fflib6439_64.dll") ) )
-		s1.Format( _T(" %d.%d.%d.%d (64)"),
+	{
+		s1.Format( _T("v%d.%d.%d.%d (x64)"),
 			ver.dwFileVersionMS >> 16, ver.dwFileVersionMS & 0xFFFF,
 			ver.dwFileVersionLS >> 16, ver.dwFileVersionLS & 0xFFFF );
-	GetDlgItemText( IDC_ST_FFCONFIG, s );
-	SetDlgItemText( IDC_ST_FFCONFIG, s + s0 + s1 );
+		if( ! s.IsEmpty() ) s += L", ";
+		s += s1;
+	}
+#endif
+	SetDlgItemText( IDC_ST_FFLIB, s );
 
 	m_linkHomepage.SetURL( _T("http://www.zett42.de/flashfolder/") );
 	m_linkProjectPage.SetURL( _T("http://sourceforge.net/projects/flashfolder/") );
