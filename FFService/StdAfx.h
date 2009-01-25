@@ -20,5 +20,9 @@
 #include <tchar.h>
 #include <strsafe.h>
 
+// Common headers
+#include <utils.h>
+#include "../common/ProcessNames.h"
+
 #pragma comment( lib, "fflib" )
 #pragma comment( lib, "WtsApi32" )

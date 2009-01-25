@@ -45,13 +45,20 @@
 			</Component>
 
 			<!-- Register control panel applet -->
+
+			<?if $(var.Platform) = x64 ?>
+				<?define FFLIB_CPL = "fflib6439_64.dll"?>
+			<?else?>
+				<?define FFLIB_CPL = "fflib6439.dll"?>
+			<?endif?>
+			
 			<Component Id="FFControlPanel" Guid="C60A6357-914A-45EE-B33F-58174E2F877B">
 				<RegistryKey Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Control Panel">
-					<RegistryValue Key="Cpls" Name="FlashFolderCpl" Value="[TARGETDIR]fflib6439.dll" Type="string"
+					<RegistryValue Key="Cpls" Name="FlashFolderCpl" Value="[TARGETDIR]$(var.FFLIB_CPL)" Type="string"
 						KeyPath="yes"/>
 					<!-- Category "Performance and Maintenance" -->
 					<RegistryValue Key="Extended Properties\{305CA226-D286-468e-B848-2B2E8E697B74} 2"
-						 Name="[TARGETDIR]fflib6439.dll" Value="5" Type="integer"/>
+						 Name="[TARGETDIR]$(var.FFLIB_CPL)" Value="5" Type="integer"/>
 				</RegistryKey>
 			</Component>
 

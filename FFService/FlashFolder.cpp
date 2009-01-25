@@ -44,17 +44,6 @@ LogFile g_logfile;
 
 //---------------------------------------------------------------------------
 
-void DebugOut( LPCTSTR pFormat, ... )
-{
-	const size_t bufsize = 1024;
-	TCHAR buf[ bufsize ];
-	va_list args;
-	va_start( args, pFormat );
-	StringCbVPrintf( buf, sizeof(buf), pFormat, args );
-	va_end( args );
-	::OutputDebugString( buf );
-}
-
 void Log( LPCTSTR str ) 
 { 
 	g_logfile.Write( str );
@@ -110,10 +99,55 @@ void SetMyServiceStatusUnchanged()
 	} 
 }
 
+//----------------------------------------------------------------------------------------------------
+
+bool TryCreateHookProcess( HANDLE hToken, LPCTSTR cmd )
+{
+	STARTUPINFO si = { sizeof(si) };
+	si.lpDesktop = L"WinSta0\\Default";  // The desktop of the interactive WinStation.
+	
+	PROCESS_INFORMATION pi = { 0 };
+
+	// If the FlashFolder hook process is already running in another session, 
+	// CreateProcessAsUser() returns ERROR_PIPE_NOT_CONNECTED if we call it immediately
+	// after we received SERVICE_CONTROL_SESSIONCHANGE notification.
+	// I could not find no another way around this then to call CreateProcessAsUser() 
+	// repeatedly in this case. 
+	DWORD time0 = ::GetTickCount();
+	do	
+	{	 
+		if( ::CreateProcessAsUser( hToken, NULL, const_cast<LPTSTR>( cmd ), NULL, NULL, FALSE, 0,
+					  NULL, NULL, &si, &pi ) )
+		{
+			Log( L"Hook process created" );
+			::CloseHandle( pi.hThread );
+			::CloseHandle( pi.hProcess );
+			return true;
+		}					  
+					
+		DWORD err = ::GetLastError();
+		Log( L"CreateProcessAsUser failed", err );
+	
+		if( err != ERROR_PIPE_NOT_CONNECTED )
+			return false;
+			
+		::Sleep( 2000 );
+		Log( L"Retry..." );
+	}
+	while( ::GetTickCount() - time0 < 30000 );
+
+	Log( L"Starting hook process failed because of timeout" );
+	
+	return false;
+}
+
 //---------------------------------------------------------------------------
-/// Start an instance of the current process in a different session
-/// but with the same access rights as the current process.
-/// This is to support "fast user switching" available beginning with XP.
+/// Start 32/64-bit instances of the hook process in a different session
+/// but with the same access rights as the current process (i. e. SYSTEM privileges).
+/// This is to support "fast user switching" available beginning with XP and also
+/// beginning with Vista, services run in a separate session than the user.
+/// We need to run both 32- and 64-bit instances in parallel, so that both 32- and 64-bit
+/// processes can be hooked.
 
 bool StartHookProcessInSession( DWORD dwSessionId )
 {
@@ -140,46 +174,31 @@ bool StartHookProcessInSession( DWORD dwSessionId )
 		return false;
 	}
 	
-	STARTUPINFO si = { sizeof(si) };
-	si.lpDesktop = L"WinSta0\\Default";  // The desktop of the interactive WinStation.
-	PROCESS_INFORMATION pi = { 0 };
-	WCHAR cmd[ 1024 ] = L"\"";
-	WCHAR exePath[ 1024 ] = L"";
+	WCHAR exePath[ 4096 ] = L"";
 	::GetModuleFileName( NULL, exePath, _countof( exePath ) );
-	wcscat_s( cmd, exePath );
-	wcscat_s( cmd, L"\" /sethook" );
-	 
-	// If the FlashFolder hook process is already running in another session, 
-	// CreateProcessAsUser() returns ERROR_PIPE_NOT_CONNECTED if we call it immediately
-	// after we received SERVICE_CONTROL_SESSIONCHANGE notification.
-	// I could not find no another way around this then to call CreateProcessAsUser() 
-	// repeatedly in this case. 
-	DWORD time0 = ::GetTickCount();
-	do	
-	{	 
-		if( ::CreateProcessAsUser( hDupToken, NULL, cmd, NULL, NULL, FALSE, 0,
-					  NULL, NULL, &si, &pi ) )
-		{
-			Log( L"Hook process created" );
-			::CloseHandle( pi.hThread );
-			::CloseHandle( pi.hProcess );
-			return true;
-		}					  
-					
-		DWORD err = ::GetLastError();
-		Log( L"CreateProcessAsUser failed", err );
 	
-		if( err != ERROR_PIPE_NOT_CONNECTED )
-			return false;
-			
-		::Sleep( 2000 );
-		Log( L"Retry..." );
-	}
-	while( ::GetTickCount() - time0 < 30000 );
+	WCHAR exeDir[ 4096 ];
+	GetAppDir( NULL, exeDir, _countof( exeDir ) );
 
-	Log( L"Starting hook process failed because of timeout" );
-	
-	return false;
+	WCHAR cmd[ 4096 ] = L"\"";
+	wcscat_s( cmd, exeDir );
+	wcscat_s( cmd, L"FlashFolder.exe\" /sethook" );	 
+
+	Log( L"Starting 32-bit hook process" );
+	if( ! TryCreateHookProcess( hDupToken, cmd ) )
+		return false;
+
+#ifdef WIN64
+	WCHAR cmd64[ 1024 ] = L"\"";
+	wcscat_s( cmd64, exeDir );
+	wcscat_s( cmd64, L"FlashFolder64.exe\" /sethook" );	 
+
+	Log( L"Starting 64-bit hook process" );
+	if( ! TryCreateHookProcess( hDupToken, cmd64 ) )
+		return false;
+#endif
+
+	return true;
 }
 
 //---------------------------------------------------------------------------
@@ -557,15 +576,11 @@ void ShowHelp()
 {
 	::MessageBox( NULL,
 		L"FlashFolder commandline syntax:\n\n"
-		L"FlashFolder.exe [/sethook | /unhook | /startservice]\n\n"
+		FLASHFOLDER_EXE L" [/sethook | /unhook | /startservice]\n\n"
 		L"/sethook - Activates the FlashFolder hook for the current session.\n"
 		L"/unhook - Terminates the FlashFolder hook for the current session.\n"
 		L"/startservice - Entry point for the Service Control Manager.\n",
-#ifdef WIN64
-		L"FlashFolder (64-bit)",
-#else
-		L"FlashFolder (32-bit)",
-#endif
+		FLASHFOLDER_NAME, 
 		MB_OK );
 }
 

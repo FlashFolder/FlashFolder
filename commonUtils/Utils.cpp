@@ -32,28 +32,28 @@ static char THIS_FILE[]=__FILE__;
 #endif
 
 //-----------------------------------------------------------------------------------------
-// GetAppDir()
-//
-//   retrieves the directory where the specified application or DLL is located
-//   szDir must point to a buffer with a size of at least MAX_PATH characters
-//-----------------------------------------------------------------------------------------
-void GetAppDir( HINSTANCE hInstApp, LPTSTR szDir)
+
+bool GetAppDir( HINSTANCE hInstApp, LPTSTR szDir, DWORD nSize )
 {
 	szDir[0] = 0;
-    ::GetModuleFileName( hInstApp, szDir, MAX_PATH - 1 );
+    DWORD res = ::GetModuleFileName( hInstApp, szDir, nSize );
 	LPTSTR p = _tcsrchr( szDir, _T('\\') );
 	if( p ) p[1] = 0;
+
+	return res == ERROR_SUCCESS;	
 }
 
 //-----------------------------------------------------------------------------------------------
 
-void GetAppFilename( HINSTANCE hInstApp, LPTSTR pName )
+bool GetAppFilename( HINSTANCE hInstApp, LPTSTR pName, DWORD nSize )
 {
 	*pName = 0;
-	TCHAR exePath[ MAX_PATH + 1 ] = _T("");
-	::GetModuleFileName( NULL, exePath, MAX_PATH );
+	TCHAR exePath[ 4096 ] = _T("");
+	DWORD res = ::GetModuleFileName( NULL, exePath, _countof( exePath ) );
 	if( LPTSTR p = _tcsrchr( exePath, _T('\\') ) )
-		StringCchCopy( pName, MAX_PATH, p + 1 );
+		StringCchCopy( pName, nSize, p + 1 );
+
+	return res == ERROR_SUCCESS;	
 }
 
 //-----------------------------------------------------------------------------------------

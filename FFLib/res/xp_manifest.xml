@@ -26,4 +26,12 @@
 		</asmv3:windowsSettings>
 	</asmv3:application>
 
+	<v3:trustInfo xmlns:v3="urn:schemas-microsoft-com:asm.v3"> 
+		<v3:security>
+			<v3:requestedPrivileges>  
+				<v3:requestedExecutionLevel level="asInvoker" /> 
+			</v3:requestedPrivileges> 
+		</v3:security> 
+	</v3:trustInfo>
+
 </assembly>

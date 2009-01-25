@@ -410,9 +410,9 @@ int FavMenu_Display( HWND hWndParent, int x, int y, const FavoritesList& favs )
 
 void FavMenu_StartEditor( HWND hWndParent )
 {
-	TCHAR path[ MAX_PATH + 1 ] = _T("");
-	GetAppDir( g_hInstDll, path );
-	StringCbCat( path, sizeof(path), _T("FFConfig.exe") );
+	TCHAR path[ 4096 ] = _T("");
+	GetAppDir( g_hInstDll, path, _countof( path ) );
+	StringCbCat( path, sizeof(path), FFCONFIG_EXE );
 
 	TCHAR params[ 256 ] = _T("");
 	StringCbPrintf( params, sizeof(params),	_T("%d --fav"), hWndParent ); 
@@ -424,11 +424,11 @@ void FavMenu_StartEditor( HWND hWndParent )
 
 void FavMenu_AddDir( HWND hWndParent, FavoritesList& favs, LPCTSTR pPath, LPCTSTR pTargetPath = _T("") )
 {
-	TCHAR path[ MAX_PATH + 1 ] = _T("");
-	GetAppDir( g_hInstDll, path );
-	StringCbCat( path, sizeof(path), _T("FFConfig.exe") );
+	TCHAR path[ 4096 ] = _T("");
+	GetAppDir( g_hInstDll, path, _countof( path ) );
+	StringCbCat( path, sizeof(path), FFCONFIG_EXE );
 
-	TCHAR params[ 1024 ] = _T("");
+	TCHAR params[ 4096 ] = _T("");
 	StringCbPrintf( params, sizeof(params),	_T("%d --addfav \"%s\""), hWndParent, 
 		RemoveBackslash( pPath ).c_str() );
 	if( pTargetPath[ 0 ] != 0 )
@@ -519,9 +519,9 @@ void DisplayMenu_Config()
 		TPM_LEFTALIGN | TPM_TOPALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD | TPM_NONOTIFY, 
 		rc.left, rc.bottom, 0, g_hToolWnd, NULL);
 
-	TCHAR path[ MAX_PATH + 1 ] = _T("");
-	GetAppDir( g_hInstDll, path );
-	StringCbCat( path, sizeof(path), _T("FFConfig.exe") );
+	TCHAR path[ 4096 ] = _T("");
+	GetAppDir( g_hInstDll, path, _countof( path ) );
+	StringCbCat( path, sizeof(path), FFCONFIG_EXE );
 	
 	TCHAR params[ 256 ] = _T("");
 	StringCbPrintf( params, sizeof(params), _T("%d"), g_hFileDialog ); 

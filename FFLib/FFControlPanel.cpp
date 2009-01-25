@@ -43,22 +43,27 @@ LONG CALLBACK CPlApplet( HWND hwndCPl, UINT uMsg, LPARAM lParam1, LPARAM lParam2
 		}
 		case CPL_DBLCLK:
 		{
-			// Create command for starting ffconfig.exe in same directory as this DLL.
-			TCHAR cmd[ MAX_PATH + 1024 ] = L"";
-			TCHAR cplDir[ MAX_PATH ] = L"";
+			// Create command for starting FFConfig in same directory as this DLL.
+			TCHAR cmd[ 4096 ] = L"";
+			TCHAR cplDir[ 4096 ] = L"";
 			::GetModuleFileName( g_hInstDll, cplDir, _countof( cplDir ) );
 			::PathRemoveFileSpec( cplDir );
 			wcscpy_s( cmd, L"\"" );
 			wcscat_s( cmd, cplDir );
-			wcscat_s( cmd, L"\\ffconfig.exe\"" );
-			
-			// Start ffconfig.exe
+			wcscat_s( cmd, L"\\" FFCONFIG_EXE );
+
+			// Start FFConfig
 			PROCESS_INFORMATION pi = { 0 };
 			STARTUPINFO si = { sizeof( si ) };
 			if( ::CreateProcess( NULL, cmd, NULL, NULL, FALSE, 0, NULL, cplDir, &si, &pi ) )
 			{
 				::CloseHandle( pi.hThread );
 				::CloseHandle( pi.hProcess );
+			}
+			else
+			{
+				::MessageBox( hwndCPl, L"Could not start configuration program.", L"FlashFolder",
+					MB_ICONERROR );
 			}
 			return 0;
 		}

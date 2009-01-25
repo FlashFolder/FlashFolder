@@ -19,7 +19,7 @@
 -->
 <!-- MSBuild-Script for building the FlashFolder MSI installer and all dependent projects -->
 
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build_x64" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<Import Project="SvnVersionInclude.targets" />
 
@@ -31,22 +31,46 @@
 		<VCProject Include="FFService\FFService.vcproj"/>
 	</ItemGroup>
 
-	<Target Name="VCProjects" DependsOnTargets="SvnVersionInclude">
-		<Message Text="_______Building VC projects_______" Importance="high"/>
-		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)"/>
+	<Target Name="VCProjects_x86" DependsOnTargets="SvnVersionInclude">
+		<Message Text="_______Building VC projects (x86)_______" Importance="high"/>
+		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)|Win32"/>
 	</Target>
 
-	<Target Name="Build" DependsOnTargets="SvnVersionInclude;VCProjects">
+	<Target Name="VCProjects_x64" DependsOnTargets="SvnVersionInclude">
+		<Message Text="_______Building VC projects (x64)_______" Importance="high"/>
+		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)|x64"/>
+	</Target>
+
+	<Target Name="Build_x86" DependsOnTargets="SvnVersionInclude;VCProjects_x86">
+		<Message Text="_______Building Installer (x86)_______" Importance="high"/>
+		<MSBuild Projects="Installer\Installer.msbuild" 
+			Properties="Configuration=$(Configuration);Platform=x86"/>
+	</Target>
+
+	<!-- For x64, we need to build both 32- and 64-bit executables. -->
+	<Target Name="Build_x64" DependsOnTargets="SvnVersionInclude;VCProjects_x86;VCProjects_x64">
 		<Message Text="_______Building Installer_______" Importance="high"/>
-		<MSBuild Projects="Installer\Installer.msbuild" Properties="Configuration=$(Configuration)"/>
+		<MSBuild Projects="Installer\Installer.msbuild" 
+			Properties="Configuration=$(Configuration);Platform=x64"/>
 	</Target>
 
-	<!-- Clean and Rebuild targets -->
-	<Target Name="Clean">
+	<!-- Clean and Rebuild targets ............................................................... -->
+
+	<Target Name="Clean_x86">
 		<Delete Files="_version.h"/>
-		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)" Clean="true"/>
-		<MSBuild Projects="Installer\Installer.msbuild" Properties="Configuration=$(Configuration)"	Targets="Clean"/>
-	</Target> 
-	<Target Name="Rebuild" DependsOnTargets="Clean;Build"/>
+		<VCBuild Clean="true" Projects="@(VCProject)" Configuration="$(Configuration)|Win32" />
+		<MSBuild Targets="Clean" Projects="Installer\Installer.msbuild"
+			Properties="Configuration=$(Configuration);Platform=x86" />
+	</Target>
+
+	<Target Name="Clean_x64" DependsOnTargets="Clean_x86">
+		<Delete Files="_version.h"/>
+		<VCBuild Clean="true" Projects="@(VCProject)" Configuration="$(Configuration)|x64" />
+		<MSBuild Targets="Clean" Projects="Installer\Installer.msbuild"
+			Properties="Configuration=$(Configuration);Platform=x64" />
+	</Target>
+
+	<Target Name="Rebuild_x86" DependsOnTargets="Clean_x86;Build_x86"/>
+	<Target Name="Rebuild_x64" DependsOnTargets="Clean_x64;Build_x64"/>
 
 </Project>

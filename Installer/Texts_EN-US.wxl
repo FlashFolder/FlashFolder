@@ -17,6 +17,8 @@
 
 	<String Id="Require_Win2k_or_newer">You need Windows 2000 or Windows XP to run this installer.</String>
 	<String Id="Require_WinXP_or_newer">You need Windows XP to run this installer.</String>
+	<String Id="Require_Win64">You need to run the 32-bit version of this installer since you have a 32-bit version of Windows installed.</String>
+	<String Id="Require_Win32">You need to run the 64-bit version of this installer since you have a 64-bit version of Windows installed.</String>
 	<String Id="NewerVersionInstalled">A newer version of [ProductName] is already installed.</String>
 	
 	<String Id="FF_MultiUserDlg_Title">[ProductName] Setup</String>
@@ -35,7 +37,5 @@
 	<String Id="FF_UpgradeDlgCheckbox">&amp;Use settings of installed version</String>
 
 	<String Id="FF_Version">Version: [ProductVersion]</String>
-
-	<String Id="FF_KeepSettingsCheckbox">&amp;Keep program settings, history and favorites</String>
 
 </WixLocalization>

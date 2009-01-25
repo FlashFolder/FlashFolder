@@ -21,9 +21,10 @@
 #pragma once
 
 #include <vector>
+#include "tstring.h"
 
-void GetAppDir( HINSTANCE hInstApp, LPTSTR szDir );
-void GetAppFilename( HINSTANCE hInstApp, LPTSTR pName );
+bool GetAppDir( HINSTANCE hInstApp, LPTSTR szDir, DWORD nSize );
+bool GetAppFilename( HINSTANCE hInstApp, LPTSTR pName, DWORD nSize );
 
 inline bool DirectoryExists( LPCTSTR szName )
 {

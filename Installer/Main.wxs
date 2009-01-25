@@ -61,6 +61,11 @@
 		<Condition Message="!(loc.Require_WinXP_or_newer)"><![CDATA[VersionNT >= 501]]></Condition>		
 		<Condition Message="!(loc.Error1925)">Privileged</Condition>
 		<Condition Message="!(loc.NewerVersionInstalled)">NOT FF_EXISTING_PRODUCT_NEWER</Condition>
+		<?if $(var.Platform) = x64 ?>
+			<Condition Message="!(loc.Require_Win64)">VersionNT64</Condition>
+		<?else?>
+			<Condition Message="!(loc.Require_Win32)">NOT VersionNT64</Condition>
+		<?endif?>
 
 		<!-- Custom action definitions ....................................................... -->
 		<?if $(var.Platform) = x64 ?>

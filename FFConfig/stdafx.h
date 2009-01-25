@@ -91,3 +91,4 @@
 #include "../common/ff_utils.h"
 #include "../common/Favorites.h"
 #include "../common/ProfileDefaults.h"
+#include "../common/ProcessNames.h"

@@ -241,9 +241,10 @@ bool CUpdateCheckDlg::ProcessDownloadedFile()
 	//--- get installed version number
 
 	CString appPath;
-	GetAppDir( NULL, appPath.GetBuffer( MAX_PATH ) );
+	GetAppDir( NULL, appPath.GetBuffer( 4096 ), 4096 );
 	appPath.ReleaseBuffer();
-	appPath += _T("FlashFolder.exe");
+	appPath += FLASHFOLDER_EXE;
+
 	VS_FIXEDFILEINFO ver = { 0 };
 	GetFileVersion( &ver, appPath );
 	m_instVer[ 0 ] = ver.dwFileVersionMS >> 16;

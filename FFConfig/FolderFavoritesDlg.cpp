@@ -113,7 +113,7 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	CResizableDlg::OnInitDialog();
 
 	CString exeName;
-	GetAppFilename( AfxGetInstanceHandle(), exeName.GetBuffer( MAX_PATH ) );
+	GetAppFilename( AfxGetInstanceHandle(), exeName.GetBuffer( 4096 ), 4096 );
 	exeName.ReleaseBuffer();
 
 	if( m_isOwned )

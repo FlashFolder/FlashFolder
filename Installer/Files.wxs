@@ -22,25 +22,32 @@
 	<?include _defines.wxi?>
 
 	<Fragment>
+
 		<ComponentGroup Id="ProgramFiles">
+			<?if $(var.Platform) = x64 ?>
+				<ComponentRef Id="FlashFolder64.exe"/>
+				<ComponentRef Id="fflib6439_64.dll"/>
+				<ComponentRef Id="FFConfig64.exe"/>
+			<?else?>
+				<ComponentRef Id="FFConfig.exe"/>
+			<?endif?>
 			<ComponentRef Id="FlashFolder.exe"/>
 			<ComponentRef Id="fflib6439.dll"/>
-			<ComponentRef Id="FFConfig.exe"/>
 		</ComponentGroup>
 
-		<?if $(var.Platform) = x64 ?>
+		<Directory Id="TARGETDIR" Name="SourceDir" FileSource="..\exe">
 
-			<Directory Id="TARGETDIR" Name="SourceDir" FileSource="..\exe64">
+			<?if $(var.Platform) = x64 ?>
 
-				<Component Id="FlashFolder.exe" Guid="0E8B27BC-E2E4-4D1C-8FE8-629732CA7E74">
-					<File Name="FlashFolder.exe" BindPath="[TARGETDIR];[SystemFolder]" 
-						Vital="yes" KeyPath="yes" />
+				<Component Id="FlashFolder64.exe" Guid="0E8B27BC-E2E4-4D1C-8FE8-629732CA7E74">
+						<File Name="FlashFolder64.exe" BindPath="[TARGETDIR];[SystemFolder]" 
+							Vital="yes" KeyPath="yes" />
 
-					<!-- Install program as an interactive, autorun service.
+					<!-- Install autorun service.
 						LoadOrderGroup should be such that the service is started before user logon.
-					 -->
+					-->
 					<ServiceInstall Id="ffservice_inst" 
-						Name="FlashFolder64"
+						Name="FlashFolder"
 						DisplayName="[ProductName]"
 						Description="!(loc.PackageDescription)"
 						Arguments="/startservice" 
@@ -51,37 +58,39 @@
 						Type="ownProcess"
 						Vital="yes" />
 					<ServiceControl Id="ffservice_ctrl"
-						Name="FlashFolder64"
+						Name="FlashFolder"
 						Start="install"
 						Remove="uninstall" 
 						Wait="yes" />
 				</Component>
 
-				<Component Id="fflib6439.dll" Guid="919196F1-A7A9-41C5-959F-A45625C7047E">
-					<File Name="fflib6439.dll" BindPath="[TARGETDIR];[SystemFolder]" 
+				<Component Id="fflib6439_64.dll" Guid="919196F1-A7A9-41C5-959F-A45625C7047E">
+					<File Name="fflib6439_64.dll" BindPath="[TARGETDIR];[SystemFolder]" 
 						Vital="yes" KeyPath="yes"/>
 				</Component>
 
-				<Component Id="FFConfig.exe" Guid="84EBA09D-8050-4107-939B-9DCF1235A854">
-					<File Name="FFConfig.exe" BindPath="[TARGETDIR];[SystemFolder]"
+				<Component Id="FFConfig64.exe" Guid="84EBA09D-8050-4107-939B-9DCF1235A854">
+					<File Name="FFConfig64.exe" BindPath="[TARGETDIR];[SystemFolder]"
 						Vital="yes" KeyPath="yes"/>  
 				</Component>
-								
-			</Directory>
-		
-		<?else?>   <!-- Platform = x86 -->
 
-			<Directory Id="TARGETDIR" Name="SourceDir" FileSource="..\exe">
+				<!-- 32-bit hook process (not run as service) -->
+				<Component Id="FlashFolder.exe" Guid="05CC9489-77F6-425F-87A3-98AB9BBA60C3">
+					<File Name="FlashFolder.exe" BindPath="[TARGETDIR];[SystemFolder]"
+						Vital="yes" KeyPath="yes"/>
+				</Component>
+
+			<?else?>   <!-- Platform = x86 ............................................................ -->
 
 				<Component Id="FlashFolder.exe" Guid="E5EF7F5C-026E-4772-BBC0-075A94198FDA">
 					<File Name="FlashFolder.exe" BindPath="[TARGETDIR];[SystemFolder]"
 						Vital="yes" KeyPath="yes"/>
 
-					<!-- Install program as an interactive, autorun service.
-							LoadOrderGroup should be such that the service is started before user logon.
-						 -->
+					<!-- Install autorun service.
+						LoadOrderGroup should be such that the service is started before user logon.
+					-->
 					<ServiceInstall Id="ffservice_inst"
-						Name="FlashFolder32"
+						Name="FlashFolder"
 						DisplayName="[ProductName]"
 						Description="!(loc.PackageDescription)"
 						Arguments="/startservice"
@@ -92,15 +101,10 @@
 						Type="ownProcess"
 						Vital="yes" />
 					<ServiceControl Id="ffservice_ctrl"
-						Name="FlashFolder32"
+						Name="FlashFolder"
 						Start="install"
 						Remove="uninstall"
 						Wait="yes" />
-				</Component>
-
-				<Component Id="fflib6439.dll" Guid="ABB79737-52B0-4EA1-AC4C-DD7BE0BC3F16">
-					<File Name="fflib6439.dll" BindPath="[TARGETDIR];[SystemFolder]"
-						Vital="yes" KeyPath="yes"/>
 				</Component>
 
 				<Component Id="FFConfig.exe" Guid="3E8D86C3-3CA3-41D5-B6E3-D09D01B50CFD">
@@ -108,9 +112,15 @@
 						Vital="yes" KeyPath="yes"/>
 				</Component>
 
-			</Directory>
+			<?endif?>
 
-		<?endif?>
-		
+			<!-- 32-bit components required to hook into 32-bit processes, even under x64 -->
+
+			<Component Id="fflib6439.dll" Guid="ABB79737-52B0-4EA1-AC4C-DD7BE0BC3F16">
+				<File Name="fflib6439.dll" BindPath="[TARGETDIR];[SystemFolder]"
+					Vital="yes" KeyPath="yes"/>
+			</Component>
+
+		</Directory>
 	</Fragment>
 </Wix>

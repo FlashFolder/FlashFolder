@@ -37,12 +37,8 @@
 		
 	<!-- WiX extensions ................................................................... -->
 	<ItemGroup>
-		<WixExtension Include="$(WixToolPath)WixUIExtension.dll">
-			<HintPath>WixUIExtension.dll</HintPath>
-		</WixExtension>
-		<WixExtension Include="$(WixToolPath)WixUtilExtension.dll">
-			<HintPath>WixUtilExtension.dll</HintPath>
-		</WixExtension>
+		<WixExtension Include="$(WixToolPath)WixUIExtension"/>
+		<WixExtension Include="$(WixToolPath)WixUtilExtension"/>
 	</ItemGroup>
 
 	<!-- Source files ..................................................................... -->
@@ -58,21 +54,15 @@
 	<Import Project="$(WixTargetsPath)" />
 
 	<!-- Create _version.wxi from main version file -->
-	<Target Name="VersionInclude"
+	<Target Name="BeforeBuild"
 		Inputs="..\_version.h" Outputs="_version.wxi">
 		<Exec Command="MkVersionFile\MkVersionFile.exe ..\_version.h _version.wxi.templ _version.wxi" />
 	</Target>
 
-	<!-- Build installer utility projects from WiX build extension point 'BeforeBuild' -->
-	<ItemGroup>
-		<VCProject Include="wcautil\wcautil.vcproj"/>
-		<VCProject Include="CustomActions\CustomActions.vcproj"/>
-	</ItemGroup>
-	<Target Name="BeforeBuild" DependsOnTargets="VersionInclude">
-		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)"/>
-	</Target>
-
-	<Target Name="AfterBuild">
+	<Target Name="AfterBuild" 
+		Inputs="msi\$(Cultures)\FlashFolder.msi"
+		Outputs="msi\$(Cultures)\FlashFolder_$(Configuration)_$(Platform).msi">
+		
 		<Copy SourceFiles="msi\$(Cultures)\FlashFolder.msi"
 			DestinationFiles="msi\$(Cultures)\FlashFolder_$(Configuration)_$(Platform).msi"/>
 		<Delete Files="msi\$(Cultures)\FlashFolder.msi"/>
@@ -80,7 +70,6 @@
 
 	<!-- Clean and Rebuild targets -->
 	<Target Name="Clean">
-		<VCBuild Projects="@(VCProject)" Configuration="$(Configuration)" Platform="$(Platform)" Clean="true"/>
 		<RemoveDir Directories="$(IntermediateOutputPath)"/>
 	</Target>
 	<Target Name="Rebuild" DependsOnTargets="Clean;Build"/> 

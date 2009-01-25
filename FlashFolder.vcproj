@@ -26,9 +26,29 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=x86"
-				ReBuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Rebuild /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=x86"
-				CleanCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Clean /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=x86"
+				BuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Build_x86 /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=x86"
+				ReBuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Rebuild_x86 /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=x86"
+				CleanCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Clean_x86 /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=x86"
+				Output="Installer\msi\FlashFolder.msi"
+				PreprocessorDefinitions="WIN32;_DEBUG"
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Build_x64 /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=$(PlatformName)"
+				ReBuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Rebuild_x64 /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=$(PlatformName)"
+				CleanCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Clean_x64 /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=$(PlatformName)"
 				Output="Installer\msi\FlashFolder.msi"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
@@ -46,31 +66,11 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=x86"
-				ReBuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Rebuild /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=x86"
-				CleanCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Clean /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=x86"
+				BuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Build_x86 /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=x86"
+				ReBuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Rebuild_x86 /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=x86"
+				CleanCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Clean_x86 /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=x86"
 				Output="Installer\msi\FlashFolder.msi"
 				PreprocessorDefinitions="WIN32;NDEBUG"
-				IncludeSearchPath=""
-				ForcedIncludes=""
-				AssemblySearchPath=""
-				ForcedUsingAssemblies=""
-				CompileAsManaged=""
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="0"
-			>
-			<Tool
-				Name="VCNMakeTool"
-				BuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=$(PlatformName)"
-				ReBuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Rebuild /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=$(PlatformName)"
-				CleanCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Clean /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=$(PlatformName)"
-				Output="Installer\msi\FlashFolder.msi"
-				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -86,9 +86,9 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=$(PlatformName)"
-				ReBuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Rebuild /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=$(PlatformName)"
-				CleanCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Clean /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=$(PlatformName)"
+				BuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Build_x64 /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=$(PlatformName)"
+				ReBuildCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Rebuild_x64 /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=$(PlatformName)"
+				CleanCommandLine="msbuild ALL.msbuild /nologo /v:minimal /t:Clean_x64 /p:SolutionDir=$(SolutionDir);Configuration=$(ConfigurationName);Platform=$(PlatformName)"
 				Output="Installer\msi\FlashFolder.msi"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				IncludeSearchPath=""
