@@ -109,20 +109,24 @@ INT_PTR CTreePropSheet::DoModal()
 void CTreePropSheet::BuildPropPageArray()
 {
     CPropertySheet::BuildPropPageArray();
-
-	// Set standard OS font and size for all pages 
-	// (especially important on Vista where the standard font has changed).
-    for( int nPage = 0; nPage < m_pages.GetSize(); ++nPage )
-		SetStandardOsFontInDlgResource( (LPDLGTEMPLATE) m_psh.ppsp[ nPage ].pResource );
+    
+	if( (BYTE) ::GetVersion() >= 6 )
+	{
+		// Vista and above: set standard OS font and size for all pages 
+		// (typically "Segoe UI", 9 pt).
+		for( int nPage = 0; nPage < m_pages.GetSize(); ++nPage )
+			SetStandardOsFontInDlgResource( (LPDLGTEMPLATE) m_psh.ppsp[ nPage ].pResource );
+	}
 }
 
 int CALLBACK CTreePropSheet::PropSheetProc( HWND hwndDlg, UINT uMsg, LPARAM lParam )
 {
-    if( uMsg == PSCB_PRECREATE )
-		// Set standard OS font for the property sheet itself 
-		// (especially important on Vista where the standard font has changed).
+    if( uMsg == PSCB_PRECREATE && (BYTE) ::GetVersion() >= 6 )
+    {
+		// Vista and above: set standard OS font and size for the property sheet itself 
+		// (typically "Segoe UI", 9 pt).
 		SetStandardOsFontInDlgResource( (LPDLGTEMPLATE) lParam );
-
+	}
     return 0;
 }
 

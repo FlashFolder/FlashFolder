@@ -1,7 +1,8 @@
 -----
 Generic:
 
-[ ] 64-bit: control panel, hooks (service can stay 32-bit?)
+[ ] DPI-Scaling for toolbar icons
+
 [ ] Test if iTunes is still incompatible
 [ ] autostart fails if terminal services are not running
 	-> start FF via Run regkey?
@@ -9,6 +10,7 @@ Generic:
 [ ] Favmenu editor: use shell folder icon
 [ ] Optionally save last folder even on Cancel
 [x] Fix "remember view mode" for Vista
+[x] 64-bit: control panel, hooks (service can stay 32-bit?)
 
 -----
 Security:
