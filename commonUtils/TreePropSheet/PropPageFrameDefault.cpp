@@ -226,9 +226,9 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 	{
 		int	nBkStyle = pDc->SetBkMode(TRANSPARENT);
 
-		// get correctly themed font
+		// get correct OS font
 		LOGFONT lf;
-		GetSysMessageFont( &lf, GetSafeHwnd() );
+		GetStandardOsFont( &lf );
 		lf.lfWeight = FW_BOLD;
 		CFont font;
 		font.CreateFontIndirect( &lf );

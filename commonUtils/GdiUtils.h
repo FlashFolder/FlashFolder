@@ -124,24 +124,23 @@ inline DWORD BlendColor( DWORD col1, DWORD col2, int blend = 128 )
 /// GetStockObject( DEFAULT_GUI_FONT ) which returns the wrong font on XP / Vista and doesn't 
 /// respect themes.\n
 /// NOTE: When using a high-DPI setting, the resulting font size is too big, i.e. the font size
-/// differs from the dialog font that was set in the dialog template.
- 
+/// differs from the dialog font that was set in the dialog template.  
 
-void GetSysMessageFont( LOGFONT* plf, HWND hwnd );
+void GetStandardOsFont( LOGFONT *pLF, WORD* pDefSize = NULL );
 
 #ifdef _MFC_VER
-inline void CreateSysMessageFont( CFont* pFont, HWND hwnd )
+inline void CreateStandardOsFont( CFont* pFont )
 {
 	LOGFONT lf;
-	GetSysMessageFont( &lf, hwnd );
+	GetStandardOsFont( &lf );
 	pFont->CreateFontIndirect( &lf );
 }
 #endif
 
-inline HFONT CreateSysMessageFont( HWND hwnd )
+inline HFONT CreateStandardOsFont()
 {
 	LOGFONT lf;
-	GetSysMessageFont( &lf, hwnd );
+	GetStandardOsFont( &lf );
 	return ::CreateFontIndirect( &lf );	
 }
 

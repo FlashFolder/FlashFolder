@@ -150,7 +150,7 @@ CRect CPropPageFrame::CalcMsgArea()
 void CPropPageFrame::DrawMsg(CDC *pDc, CRect rect, LPCTSTR /*lpszMsg*/, DWORD /*dwFormat*/) 
 {
 	CFont font;
-	CreateSysMessageFont( &font, GetWnd()->GetSafeHwnd() );
+	CreateStandardOsFont( &font );
 
 	CFont *pPrevFont = pDc->SelectObject( &font );
 	int		nPrevBkMode = pDc->SetBkMode(TRANSPARENT);

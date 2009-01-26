@@ -982,11 +982,9 @@ void CreateToolWindow( bool isFileDialog )
 
     //--- set default font for all child controls
     
-    if( ! g_hStdFont && OSVERSION >= 0x0600 )
-		g_hStdFont = CreateSysMessageFont( g_hToolWnd );  
-	HFONT hFont = g_hStdFont ? g_hStdFont :
-		reinterpret_cast<HFONT>( ::SendMessage( g_hToolWnd, WM_GETFONT, 0, 0 ) );
-	EnumChildWindows( g_hToolWnd, ToolWndSetFont, (LPARAM) hFont );
+    if( ! g_hStdFont )
+		g_hStdFont = CreateStandardOsFont();  
+	EnumChildWindows( g_hToolWnd, ToolWndSetFont, (LPARAM) g_hStdFont );
 
 	//--- read options from global configuration
 

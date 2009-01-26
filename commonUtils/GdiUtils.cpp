@@ -20,32 +20,23 @@
 #include "stdafx.h"
 #include "GdiUtils.h"
 
-#ifndef TMT_MSGBOXFONT
-	#define TMT_MSGBOXFONT 805
-#endif
-
 //-----------------------------------------------------------------------------------------------
 
-void GetSysMessageFont( LOGFONT* plf, HWND hwnd )
+void GetStandardOsFont( LOGFONT *pLF, WORD* pDefSize )
 {
-	bool isThemed = false, hasFont = false;
-	OSVERSIONINFO ovi = { sizeof(ovi) };
-	GetVersionEx( &ovi );
-	if( ( ovi.dwMajorVersion << 8 | ovi.dwMinorVersion ) >= 0x0501 ) 
-		isThemed = ::IsThemeActive() != 0;
-	if( isThemed )
+	// Use explicit size here, otherwise when compiling with WINVER >= 0x0600, it would break
+	// backwards compatibility with XP.
+	NONCLIENTMETRICS ncm = { sizeof(UINT) + 9 * sizeof(int) + 5 * sizeof(LOGFONT) };
+	::SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0 );
+	*pLF = ncm.lfMessageFont;
+
+	if( pDefSize )
 	{
-		if( HTHEME hTheme = ::OpenThemeData( hwnd, L"WINDOW") )
-		{
-			if( ::GetThemeSysFont( hTheme, TMT_MSGBOXFONT, plf ) == S_OK )
-				hasFont = true;
-			::CloseThemeData( hTheme );
-		}
-	}
-	if( ! hasFont )
-	{
-		NONCLIENTMETRICS ncm = { sizeof(ncm) };
-		::SystemParametersInfo( SPI_GETNONCLIENTMETRICS, sizeof(ncm), &ncm, 0 );
-		*plf = ncm.lfMessageFont;
+		// CreateIC() is less overhead than GetDC().
+		HDC hScreenIC = ::CreateIC( _T("DISPLAY"), NULL, NULL, NULL );
+
+		int h = pLF->lfHeight < 0 ? -pLF->lfHeight : pLF->lfHeight;
+		*pDefSize = (WORD) MulDiv( h, 72, GetDeviceCaps( hScreenIC, LOGPIXELSY ) );
+		::DeleteDC( hScreenIC );
 	}
 }

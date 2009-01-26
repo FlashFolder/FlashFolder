@@ -18,23 +18,7 @@
  */
 #include "StdAfx.h"
 #include "VistaFontHelper.h"
-
-//------------------------------------------------------------------------------------------------------
-
-void GetStandardOsFont( LOGFONT *pLF, WORD* pDefSize )
-{
-	NONCLIENTMETRICS ncm;
-	ncm.cbSize = sizeof( NONCLIENTMETRICS );
-	::SystemParametersInfo( SPI_GETNONCLIENTMETRICS, sizeof( NONCLIENTMETRICS ), &ncm, 0 );
-	*pLF = ncm.lfMessageFont;
-
-	HDC hDC = ::GetDC( NULL );
-	if( pLF->lfHeight < 0 )
-		pLF->lfHeight = -pLF->lfHeight;
-	if( pDefSize )
-		*pDefSize = (WORD) MulDiv( pLF->lfHeight, 72, GetDeviceCaps( hDC, LOGPIXELSY ) );
-	::ReleaseDC( NULL, hDC );
-}
+#include "GdiUtils.h"
 
 //------------------------------------------------------------------------------------------------------
 
