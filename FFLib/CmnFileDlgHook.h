@@ -49,6 +49,7 @@ private:
 	{
 		m_hwndFileDlg = NULL;
 		m_shellWnd = NULL; 
+		m_pShellBrowser = NULL;
         m_fileDlgShown = false;
 		m_fileDialogCanceled = false;
         m_isWindowActive = false;
@@ -71,7 +72,6 @@ private:
 	FOLDERVIEWMODE m_shellViewMode;
 	int m_shellViewImageSize;
 	HWND m_shellWnd;
-
 	IShellBrowser *m_pShellBrowser;
 
 	// options read from INI file specified in Init()
