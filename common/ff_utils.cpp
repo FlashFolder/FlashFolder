@@ -272,12 +272,8 @@ bool ShellViewGetCurrentFolder( HWND hwnd, LPTSTR path )
 
 //-----------------------------------------------------------------------------------------
 
-bool ShellViewGetViewMode( HWND hwnd, FOLDERVIEWMODE* pViewMode, int* pImageSize )
+bool ShellViewGetViewMode( IShellBrowser *psb, FOLDERVIEWMODE* pViewMode, int* pImageSize )
 {
-	IShellBrowser *psb = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
-	if( ! psb )
-		return false;
-
 	CComPtr<IShellView> psv;
 	if( FAILED( psb->QueryActiveShellView( &psv ) ) ) 
 		return false;
@@ -286,7 +282,7 @@ bool ShellViewGetViewMode( HWND hwnd, FOLDERVIEWMODE* pViewMode, int* pImageSize
 	if( SUCCEEDED( psv->QueryInterface( IID_IFolderView2, (void**) &pfv2 ) ) )
 	{		
 		// Vista and above
-	
+
 		return SUCCEEDED( pfv2->GetViewModeAndIconSize( pViewMode, pImageSize ) );
 	}
 	else
@@ -311,12 +307,8 @@ bool ShellViewGetViewMode( HWND hwnd, FOLDERVIEWMODE* pViewMode, int* pImageSize
 
 //-----------------------------------------------------------------------------------------
 
-bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize )
+bool ShellViewSetViewMode( IShellBrowser* psb, FOLDERVIEWMODE viewMode, int imageSize )
 {
-	IShellBrowser *psb = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
-	if( ! psb )
-		return false;
-
 	CComPtr<IShellView> psv;
 	if( FAILED( psb->QueryActiveShellView( &psv ) ) )
 		return false;
@@ -338,4 +330,26 @@ bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize )
 
 		return SUCCEEDED( pfv->SetCurrentViewMode( (UINT) viewMode ) );
 	}
+}
+
+//-----------------------------------------------------------------------------------------
+
+bool ShellViewGetViewMode( HWND hwnd, FOLDERVIEWMODE* pViewMode, int* pImageSize )
+{
+	IShellBrowser *psb = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
+	if( ! psb )
+		return false;
+		
+	return ShellViewGetViewMode( psb, pViewMode, pImageSize );
+}
+
+//-----------------------------------------------------------------------------------------
+
+bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize )
+{
+	IShellBrowser *psb = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
+	if( ! psb )
+		return false;
+		
+	return ShellViewSetViewMode( psb, viewMode, imageSize );
 }

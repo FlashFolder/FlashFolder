@@ -209,7 +209,14 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wP
 
 		case WM_DESTROY:
 		{
+		}
+		break;
+
+		case WM_NCDESTROY:
+		{			
 			// Save view mode permanently.
+			
+			DebugOut( L"WM_NCDESTROY of file dialog\n" );
 		
 			if( g_profile.GetInt( L"main", L"ListViewMode" ) != FVM_AUTO )
 			{
@@ -218,11 +225,7 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wP
 				g_profile.SetInt( L"main", L"ListViewImageSize", (int) pHook->m_shellViewImageSize );
 			}
 			FileDlgHookCallbacks::OnDestroy( ! pHook->m_fileDialogCanceled );
-		}
-		break;
 
-		case WM_NCDESTROY:
-		{			
 			::RemoveWindowSubclass( hwnd, HookWindowProc, subclassId );
 		}
 		break;
@@ -243,16 +246,23 @@ LRESULT CALLBACK CmnFileDlgHook::HookShellWndProc( HWND hwnd, UINT uMsg, WPARAM 
 	{
 		// Save view mode in memory (to survive folder changes).
 		
-		ShellViewGetViewMode( pHook->m_hwndFileDlg, &pHook->m_shellViewMode, &pHook->m_shellViewImageSize );
+		ShellViewGetViewMode( pHook->m_pShellBrowser, &pHook->m_shellViewMode, &pHook->m_shellViewImageSize );
 		DebugOut( L"[fflib] Save viewMode = %d, imageSize = %d\n", pHook->m_shellViewMode, pHook->m_shellViewImageSize );
+
+		// Let the shell browser go since we are done with it.
+		if( pHook->m_pShellBrowser )
+		{
+			pHook->m_pShellBrowser->Release();
+			pHook->m_pShellBrowser = NULL;	
+		}
 	}
 	if( uMsg == WM_NCDESTROY )
 	{
-		// We first call DefSubclassProc so that the original window proc can clean up.
+		// Call DefSubclassProc so that the original window proc can clean up.
 		LRESULT res = ::DefSubclassProc( hwnd, uMsg, wParam, lParam );
 	
 		DebugOut( L"[fflib] Shell view destroyed\n" );
-	
+
 		// Make sure we get notified when the shell view is recreated (on folder change).
 		PostMessage( pHook->m_hwndFileDlg, WM_FF_INIT_DONE, TRUE, 0 );
 		::RemoveWindowSubclass( hwnd, HookShellWndProc, subclassId );
@@ -270,9 +280,16 @@ void CmnFileDlgHook::InitShellWnd()
 {
 	if( m_shellWnd = FindChildWindowRecursively( m_hwndFileDlg, L"SHELLDLL_DefView" ) )
 	{
-		// Restore last view mode.		
-		DebugOut( L"[fflib] Restore viewMode = %d, imageSize = %d\n", m_shellViewMode, m_shellViewImageSize );
-		ShellViewSetViewMode( m_hwndFileDlg, m_shellViewMode, m_shellViewImageSize );
+		// Acquire a shell browser instance so WE can decide when it will be finally gone.
+		m_pShellBrowser = (IShellBrowser*) ::SendMessage( m_hwndFileDlg, WM_GETISHELLBROWSER, 0, 0 );
+		if( m_pShellBrowser )
+		{
+			m_pShellBrowser->AddRef();	
+	
+			// Restore last view mode.		
+			DebugOut( L"[fflib] Restore viewMode = %d, imageSize = %d\n", m_shellViewMode, m_shellViewImageSize );
+			ShellViewSetViewMode( m_pShellBrowser, m_shellViewMode, m_shellViewImageSize );
+		}
 
 		// hook the shell window to get notified of view mode changes
 		DebugOut( L"[fflib] Hooking shell view\n" );

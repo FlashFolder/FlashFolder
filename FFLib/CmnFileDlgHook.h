@@ -72,6 +72,8 @@ private:
 	int m_shellViewImageSize;
 	HWND m_shellWnd;
 
+	IShellBrowser *m_pShellBrowser;
+
 	// options read from INI file specified in Init()
 
 	int m_minFileDialogWidth;			    // prefered minimum size of file dialog
