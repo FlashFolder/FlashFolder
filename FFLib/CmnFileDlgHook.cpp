@@ -209,23 +209,21 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wP
 
 		case WM_DESTROY:
 		{
-		}
-		break;
-
-		case WM_NCDESTROY:
-		{			
-			// Save view mode permanently.
-			
-			DebugOut( L"WM_NCDESTROY of file dialog\n" );
+			DebugOut( L"WM_DESTROY of file dialog\n" );
 		
 			if( g_profile.GetInt( L"main", L"ListViewMode" ) != FVM_AUTO )
 			{
+				// Save view mode permanently.
 				if( pHook->m_shellViewMode != FVM_AUTO )
 					g_profile.SetInt( L"main", L"ListViewMode", (int) pHook->m_shellViewMode );
 				g_profile.SetInt( L"main", L"ListViewImageSize", (int) pHook->m_shellViewImageSize );
 			}
 			FileDlgHookCallbacks::OnDestroy( ! pHook->m_fileDialogCanceled );
+		}
+		break;
 
+		case WM_NCDESTROY:
+		{	
 			::RemoveWindowSubclass( hwnd, HookWindowProc, subclassId );
 		}
 		break;
