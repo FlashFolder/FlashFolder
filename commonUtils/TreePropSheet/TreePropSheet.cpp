@@ -908,8 +908,6 @@ BOOL CTreePropSheet::OnInitDialog()
 				GetWindowRect(rect);
 				rect.top -= diff / 2;
 				rect.bottom += diff / 2 + diff % 2 * 2;
-				if( GetParent() )
-					GetParent()->ScreenToClient( rect );
 				MoveWindow( rect );				
 			}			
 	}
@@ -934,8 +932,6 @@ BOOL CTreePropSheet::OnInitDialog()
 		GetWindowRect(rect);
 		rect.top+= rectFrameCaption.Height()/2;
 		rect.bottom-= rectFrameCaption.Height()-rectFrameCaption.Height()/2;
-		if (GetParent())
-			GetParent()->ScreenToClient(rect);
 		MoveWindow(rect);
 	}
 
