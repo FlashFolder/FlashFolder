@@ -23,4 +23,4 @@
 #include <vector>
 
 /// Get current pathes of all open Explorer windows, beginning from topmost window.
-int GetAllExplorerPathes( std::vector<tstring>* pPathes );
+size_t GetAllExplorerPathes( std::vector<tstring>* pPathes );

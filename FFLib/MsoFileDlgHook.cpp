@@ -196,7 +196,7 @@ bool MsoFileDlgHook::EnterFilenameEditText( LPCTSTR pText )
 
 	//--- send the prepared input stream ---
 
-	::SendInput( vinp.size(), &vinp[0], sizeof(INPUT) );
+	::SendInput( (UINT) vinp.size(), &vinp[0], sizeof(INPUT) );
 
 	return true;
 }

@@ -584,10 +584,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\FFConfig.ico"
-				>
-			</File>
-			<File
 				RelativePath=".\FFConfig.rc"
 				>
 			</File>

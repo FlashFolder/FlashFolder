@@ -25,7 +25,10 @@
 bool FFHookInstaller::Install()
 {
 	if( m_hHook )
-		return ERROR_ALREADY_EXISTS;
+	{
+		::SetLastError( ERROR_ALREADY_EXISTS );
+		return false;
+	}
 
 	// Force the delay-load DLL to load NOW so that we can reference the hook function.
 	HINSTANCE hMod = GetFFLibHandle();

@@ -16,13 +16,14 @@
 #include <atlsecurity.h>
 
 // CRT headers
-#include <stdio.h>
+#include <cstdio>
 #include <tchar.h>
-#include <strsafe.h>
 
 // Common headers
 #include <utils.h>
 #include "../common/ProcessNames.h"
+
+#include <strsafe.h>
 
 #pragma comment( lib, "fflib" )
 #pragma comment( lib, "WtsApi32" )

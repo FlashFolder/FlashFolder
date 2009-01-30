@@ -568,10 +568,6 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath="res\FlashFolder.ico"
-				>
-			</File>
-			<File
 				RelativePath="res\FlashFolder.rc2"
 				>
 			</File>

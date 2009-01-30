@@ -26,7 +26,7 @@ bool LogFile::Open( LPCWSTR fileNameOrPath )
 		wcscpy_s( path, fileNameOrPath );
 	}
 
-	if( ( m_file = _wfopen( path, L"ab" ) ) != NULL )
+	if( _wfopen_s( &m_file, path, L"ab" ) == 0 )
 	{
 		fseek( m_file, 0, SEEK_END );
 		fpos_t pos = 0;	fgetpos( m_file, &pos );

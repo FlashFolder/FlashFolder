@@ -60,7 +60,7 @@ bool MapNtFilePathToUserPath( LPTSTR pUserPath, unsigned userPathLen, LPCTSTR nt
                 
                 if( ::QueryDosDevice( drive, ntDrivePath, 255 ) )
                 {
-                    unsigned len = _tcslen( ntDrivePath );
+                    size_t len = _tcslen( ntDrivePath );
                     if( len <= _tcslen( ntPath ) &&
                         _tcsncmp( ntPath, ntDrivePath, len ) == 0 )
                     {

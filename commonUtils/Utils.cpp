@@ -108,7 +108,7 @@ LPCTSTR ExtractSubPath( LPCTSTR pPath, unsigned depth )
 {
 	if( depth == 0 )
 		return _T("");
-	int len = _tcslen( pPath );
+	size_t len = _tcslen( pPath );
 	if( len <= 2 )
 		return pPath;
 
@@ -128,7 +128,7 @@ LPCTSTR ExtractSubPath( LPCTSTR pPath, unsigned depth )
 
 tstring RemoveBackslash( LPCTSTR pPath )
 {
-	int len = _tcslen( pPath );
+	size_t len = _tcslen( pPath );
 	if( len == 0 )
 		return _T("");
 	LPCTSTR pLast = ( len == 1 ? pPath : _tcsninc( pPath, len - 1 ) );
@@ -144,7 +144,7 @@ tstring GetParentDir( LPCTSTR pPath )
 	if( ::PathIsRoot( pPath ) )
 		return _T("");
 	tstring dir = RemoveBackslash( pPath );
-	int iSlash = dir.rfind( '\\' );
+	size_t iSlash = dir.rfind( '\\' );
 	if( iSlash == tstring::npos )
 		return _T("");
 	return dir.substr( 0, iSlash + 1 );

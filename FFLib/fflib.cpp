@@ -686,17 +686,17 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					// use most recent entry of global history as tooltip
 					tstring sLastDir = g_profile.GetString( _T("GlobalFolderHistory"), _T("0") );
 					if( sLastDir.empty() )
-						::LoadString( g_hInstDll, pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
+						::LoadString( g_hInstDll, (UINT) pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
 					else
 						StringCbCopy( s_tooltipBuf, sizeof(s_tooltipBuf), sLastDir.c_str() );
 				}
 				else
 				{
-					::LoadString( g_hInstDll, pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
+					::LoadString( g_hInstDll, (UINT) pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
 				}
 
 				// append hotkey name
-				if( int hotkey = g_profile.GetInt( _T("Hotkeys"), GetCommandName( pTTT->hdr.idFrom ) ) )
+				if( int hotkey = g_profile.GetInt( _T("Hotkeys"), GetCommandName( (int) pTTT->hdr.idFrom ) ) )
 				{
 					StringCchCat( s_tooltipBuf, TOOLTIP_BUFSIZE, _T("\nShortcut: ") ); 					
 					TCHAR hkName[ 256 ]; GetHotkeyName( hkName, 255, hotkey );
@@ -928,9 +928,9 @@ void CreateToolWindow( bool isFileDialog )
 
     HWND hTb = ::CreateToolbarEx( g_hToolWnd, WS_CHILD | TBSTYLE_FLAT | 
 		CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS,
-		ID_FF_TOOLBAR, tbButtons.size(), 
+		ID_FF_TOOLBAR, (int) tbButtons.size(), 
 		isToolbar32bpp ? NULL : g_hInstDll, isToolbar32bpp ? 0 : ID_FF_TOOLBAR, 
-		&tbButtons[ 0 ], tbButtons.size(), 16,16, 16,16, sizeof(TBBUTTON) );
+		&tbButtons[ 0 ], (int) tbButtons.size(), 16,16, 16,16, sizeof(TBBUTTON) );
 
 	::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_DOUBLEBUFFER );
 	::ShowWindow( hTb, SW_SHOW );

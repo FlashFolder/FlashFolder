@@ -226,9 +226,9 @@ int GetFavItemByPath( const FavoritesList& favs, LPCTSTR pPath, LPCTSTR pTargetP
 		if( _tcsicmp( itemPath.c_str(), pPath ) == 0 )
 		{
 			if( ! pTargetPath )  
-				return i;
+				return (int) i;
 			if( _tcsicmp( fav.targetpath.c_str(), pTargetPath ) == 0 )
-				return i;
+				return (int) i;
 		}		
 	}
 	return -1;

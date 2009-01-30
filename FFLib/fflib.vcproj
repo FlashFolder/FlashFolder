@@ -620,10 +620,6 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath="..\FFConfig\res\FFConfig.ico"
-				>
-			</File>
-			<File
 				RelativePath="res\folder.ico"
 				>
 			</File>

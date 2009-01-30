@@ -81,7 +81,7 @@ BOOL CALLBACK FindExplorerWnd_Proc( HWND hwnd, LPARAM lParam )
 
 //-----------------------------------------------------------------------------------------------
 
-int GetAllExplorerPathes( std::vector<tstring>* pPathes )
+size_t GetAllExplorerPathes( std::vector<tstring>* pPathes )
 {
 	pPathes->clear();
 	::EnumWindows( FindExplorerWnd_Proc, reinterpret_cast<LPARAM>( pPathes ) );
