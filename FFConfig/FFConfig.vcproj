@@ -596,6 +596,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\res\FlashFolder.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\manifest.xml"
 				>
 			</File>

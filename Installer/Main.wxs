@@ -37,7 +37,7 @@
 			Platform="$(var.Platform)" 
 		/>
 			
-		<Icon Id="ProgramIcon.exe" SourceFile="..\FFConfig\res\FFConfig.ico"/>
+		<Icon Id="ProgramIcon.exe" SourceFile="..\common\res\FlashFolder.ico"/>
 
 		<Media Id="1" Cabinet="Product.cab" EmbedCab="yes" CompressionLevel="high" />
 

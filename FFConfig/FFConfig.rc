@@ -78,7 +78,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\FFConfig.ico"
+IDR_MAINFRAME           ICON                    "..\\common\\res\\FlashFolder.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -125,24 +125,24 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,174,73,50,14
 END
 
-IDD_ABOUT DIALOGEX 0, 0, 218, 129
+IDD_ABOUT DIALOGEX 0, 0, 220, 129
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "About FlashFolder"
 CLASS "FFAbout.xmgn4ngertu4mnsf"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "FlashFolder Service",IDC_ST_FFSERVICE2,7,7,90,8
-    LTEXT           "",IDC_ST_FFLIB,97,17,114,8
-    LTEXT           "",IDC_ST_FFCONFIG,97,28,114,8
-    LTEXT           "Copyright © 2007-2009 zett42.de",IDC_STATIC,7,43,204,8
-    LTEXT           "Homepage",IDC_ST_HOMEPAGE,7,59,204,8
-    LTEXT           "Project page at SourceForge.net",IDC_ST_PROJECTPAGE,7,70,204,8
-    LTEXT           "Submit bug report",IDC_ST_BUGREPORT,7,82,204,8
-    LTEXT           "Submit feature request",IDC_ST_FEATUREREQ,7,93,204,8
-    DEFPUSHBUTTON   "OK",IDOK,161,108,50,14
-    LTEXT           "",IDC_ST_FFSERVICE,97,7,114,8
-    LTEXT           "FlashFolder Hook Library",IDC_ST_FFLIB2,7,17,90,8
-    LTEXT           "FlashFolder Config",IDC_ST_FFCONFIG2,7,28,90,8
+    LTEXT           "FlashFolder Service",IDC_ST_FFSERVICE2,7,7,86,8
+    LTEXT           "",IDC_ST_FFLIB,93,17,120,8
+    LTEXT           "",IDC_ST_FFCONFIG,93,28,120,8
+    LTEXT           "Copyright © 2007-2009 zett42.de",IDC_STATIC,7,43,206,8
+    LTEXT           "Homepage",IDC_ST_HOMEPAGE,7,59,86,8
+    LTEXT           "Project page at SourceForge.net",IDC_ST_PROJECTPAGE,7,70,115,8
+    LTEXT           "Submit bug report",IDC_ST_BUGREPORT,7,82,86,8
+    LTEXT           "Submit feature request",IDC_ST_FEATUREREQ,7,93,86,8
+    DEFPUSHBUTTON   "OK",IDOK,163,108,50,14
+    LTEXT           "",IDC_ST_FFSERVICE,93,7,120,8
+    LTEXT           "FlashFolder Hook Library",IDC_ST_FFLIB2,7,17,86,8
+    LTEXT           "FlashFolder Config",IDC_ST_FFCONFIG2,7,28,86,8
 END
 
 IDD_PAGE_GENERIC DIALOGEX 0, 0, 199, 157
@@ -346,13 +346,14 @@ BEGIN
     IDD_ABOUT, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 211
-        VERTGUIDE, 97
+        RIGHTMARGIN, 213
+        VERTGUIDE, 93
         TOPMARGIN, 7
         BOTTOMMARGIN, 122
         HORZGUIDE, 15
         HORZGUIDE, 25
         HORZGUIDE, 36
+        HORZGUIDE, 59
     END
 
     IDD_PAGE_GENERIC, DIALOG
