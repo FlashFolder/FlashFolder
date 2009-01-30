@@ -68,6 +68,14 @@ END_MESSAGE_MAP()
 BOOL CFFConfigDlg::OnInitDialog()
 {
 	CTreePropSheet::OnInitDialog();
+	
+	SetIcon( (HICON) ::LoadImage( AfxGetInstanceHandle(), MAKEINTRESOURCE( IDR_MAINFRAME ), IMAGE_ICON,
+		::GetSystemMetrics( SM_CXSMICON ), ::GetSystemMetrics( SM_CYSMICON ), LR_SHARED ),
+		FALSE ); 
+	SetIcon( (HICON) ::LoadImage( AfxGetInstanceHandle(), MAKEINTRESOURCE( IDR_MAINFRAME ), IMAGE_ICON,
+		::GetSystemMetrics( SM_CXICON ), ::GetSystemMetrics( SM_CYICON ), LR_SHARED ),
+		TRUE ); 
+	
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
