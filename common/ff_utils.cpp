@@ -191,83 +191,56 @@ bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter )
 }
 
 //-----------------------------------------------------------------------------------------
-/// Browses in a shell view to a given folder.
-///
-/// Tested successfully with both common file dialog and MS Office file dialog on WinXP.
-///
-/// \return true if successful
 
-bool ShellViewBrowseToFolder( HWND hwnd, LPCWSTR path )
+bool ShellViewSetCurrentFolder( IShellBrowser* psb, LPCWSTR path )
 {	
 	if( ! DirectoryExists( path ) )
 		return false;
 
 	bool res = false;
 
-    IShellBrowser *psb = (IShellBrowser *) SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
-    if( ! psb )
-		return false;
-		
 	CComPtr<IShellFolder> pDesktopFolder;
 	if( FAILED( ::SHGetDesktopFolder( &pDesktopFolder ) ) )
 		return false;
 		
 	LPITEMIDLIST pidl;
-	if( FAILED( pDesktopFolder->ParseDisplayName( hwnd, NULL, const_cast<LPWSTR>( path ), NULL, &pidl, NULL ) ) )
+	if( FAILED( pDesktopFolder->ParseDisplayName( NULL, NULL, const_cast<LPWSTR>( path ), NULL, &pidl, NULL ) ) )
 		return false;
 
 	HRESULT hr = psb->BrowseObject( pidl, SBSP_DEFBROWSER | SBSP_ABSOLUTE );
 	if( FAILED( hr ) )
-		DebugOut( L"ShellViewBrowseToFolder failed, hr = %08X\n", hr );
+		DebugOut( L"ShellViewSetCurrentFolder failed, hr = %08X\n", hr );
 	::CoTaskMemFree( pidl );
 
 	return SUCCEEDED( hr );
 }
 
 //-----------------------------------------------------------------------------------------
-/**
- * \brief Returns path to folder who's content is currently visible in a shell folder view.
- *
- * Tested successfully with both common file dialog and MS Office file dialog on WinXP.
- * 
- * \param hwnd Window handle that contains the shell view. This should be the parent window
- *             of the control which has the "SHELLDLL_DefView" class. 
- * \param path Receives the path if the folder is from the file system. Otherwise an empty string
- *             returned. The buffer must be at least MAX_PATH characters in size.
- * \retval true success
- * \retval false failure
- */
-bool ShellViewGetCurrentFolder( HWND hwnd, LPTSTR path )
-{
-	path[ 0 ] = 0;
 
-	IShellBrowser *psb = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
-	if( ! psb )
-		return false;
-		
+tstring ShellViewGetCurrentFolder( IShellBrowser* psb )
+{
 	CComPtr<IShellView> psv;
 	if( FAILED( psb->QueryActiveShellView( &psv ) ) )
-		return false;
+		return L"";
 		
 	CComPtr<IFolderView> pfv;
 	if( FAILED( psv->QueryInterface( IID_IFolderView, (void**) &pfv ) ) )
-		return false;
+		return L"";
 		 
 	CComPtr<IPersistFolder2> ppf2;
 	if( FAILED( pfv->GetFolder( IID_IPersistFolder2, (void**) &ppf2 ) ) )
-		return false;
+		return L"";
 		
 	LPITEMIDLIST pidlFolder;
 	if( SUCCEEDED( ppf2->GetCurFolder( &pidlFolder ) ) ) 
 	{
-		bool res = false;
-		if( ::SHGetPathFromIDList( pidlFolder, path ) )
-			res = true;
+		WCHAR path[ MAX_PATH ] = L"";
+		BOOL success = ::SHGetPathFromIDList( pidlFolder, path );
 		::CoTaskMemFree( pidlFolder );
-		return res;
+		return success ? path : L"";
 	}
 	
-	return false;
+	return L"";
 }
 
 //-----------------------------------------------------------------------------------------
@@ -330,6 +303,28 @@ bool ShellViewSetViewMode( IShellBrowser* psb, FOLDERVIEWMODE viewMode, int imag
 
 		return SUCCEEDED( pfv->SetCurrentViewMode( (UINT) viewMode ) );
 	}
+}
+
+//-----------------------------------------------------------------------------------------
+
+tstring ShellViewGetCurrentFolder( HWND hwnd )
+{
+	IShellBrowser *psb = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
+	if( ! psb )
+		return L"";
+
+	return ShellViewGetCurrentFolder( psb );
+}
+
+//-----------------------------------------------------------------------------------------
+
+bool ShellViewSetCurrentFolder( HWND hwnd, LPCWSTR path )
+{	
+    IShellBrowser *psb = (IShellBrowser *) SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
+    if( ! psb )
+		return false;
+
+	return ShellViewSetCurrentFolder( psb, path );		
 }
 
 //-----------------------------------------------------------------------------------------

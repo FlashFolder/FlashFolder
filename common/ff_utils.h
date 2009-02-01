@@ -34,10 +34,14 @@ struct FileDlgType
 FileDlgType GetFileDlgType( HWND dlg );
 
 bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter );
-bool ShellViewGetCurrentFolder( HWND hwnd, LPTSTR path );
-bool ShellViewBrowseToFolder( HWND hwndFileDlg, LPCTSTR path );
+
+tstring ShellViewGetCurrentFolder( IShellBrowser *psb );
+bool ShellViewSetCurrentFolder( IShellBrowser *psb, LPCTSTR path );
 bool ShellViewGetViewMode( IShellBrowser *psb, FOLDERVIEWMODE* pViewMode, int* pImageSize );
 bool ShellViewSetViewMode( IShellBrowser* psb, FOLDERVIEWMODE viewMode, int imageSize );
+
+tstring ShellViewGetCurrentFolder( HWND hwnd );
+bool ShellViewSetCurrentFolder( HWND hwndFileDlg, LPCTSTR path );
 bool ShellViewGetViewMode( HWND hwnd, FOLDERVIEWMODE* pViewMode, int* pImageSize = NULL );
 bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize = -1 );
 

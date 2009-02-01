@@ -55,6 +55,7 @@ private:
         m_isWindowActive = false;
         m_shellViewMode = FVM_AUTO;
         m_shellViewImageSize = -1;
+        m_folderPath = L"";
 	}
 	
 	static LRESULT CALLBACK HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 
@@ -73,6 +74,7 @@ private:
 	int m_shellViewImageSize;
 	HWND m_shellWnd;
 	IShellBrowser *m_pShellBrowser;
+	tstring m_folderPath;
 
 	// options read from INI file specified in Init()
 

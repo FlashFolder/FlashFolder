@@ -92,14 +92,20 @@ void CmnFileDlgHook::Uninstall()
 
 bool CmnFileDlgHook::SetFolder( LPCTSTR path )
 {
-	return ShellViewBrowseToFolder( m_hwndFileDlg, path );
+	if( ShellViewSetCurrentFolder( m_hwndFileDlg, path ) )
+	{
+		m_folderPath = path;
+		return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------------------
 
 bool CmnFileDlgHook::GetFolder( LPTSTR folderPath )
 {
-	return ShellViewGetCurrentFolder( m_hwndFileDlg, folderPath );
+	wcscpy_s( folderPath, MAX_PATH, m_folderPath.c_str() );
+	return true;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -207,9 +213,9 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wP
 			FileDlgHookCallbacks::OnShow( wParam != 0 );
 			break;
 
-		case WM_DESTROY:
-		{
-			DebugOut( L"WM_DESTROY of file dialog\n" );
+		case WM_NCDESTROY:
+		{	
+			DebugOut( L"WM_NCDESTROY of file dialog\n" );
 		
 			if( g_profile.GetInt( L"main", L"ListViewMode" ) != FVM_AUTO )
 			{
@@ -218,13 +224,15 @@ LRESULT CALLBACK CmnFileDlgHook::HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wP
 					g_profile.SetInt( L"main", L"ListViewMode", (int) pHook->m_shellViewMode );
 				g_profile.SetInt( L"main", L"ListViewImageSize", (int) pHook->m_shellViewImageSize );
 			}
-			FileDlgHookCallbacks::OnDestroy( ! pHook->m_fileDialogCanceled );
-		}
-		break;
 
-		case WM_NCDESTROY:
-		{	
 			::RemoveWindowSubclass( hwnd, HookWindowProc, subclassId );
+			
+			// Call the next handler in the window's subclass chain.
+			LRESULT res = ::DefSubclassProc( hwnd, uMsg, wParam, lParam );
+
+			FileDlgHookCallbacks::OnDestroy( ! pHook->m_fileDialogCanceled );
+			
+			return res;
 		}
 		break;
     }
@@ -287,6 +295,9 @@ void CmnFileDlgHook::InitShellWnd()
 			// Restore last view mode.		
 			DebugOut( L"[fflib] Restore viewMode = %d, imageSize = %d\n", m_shellViewMode, m_shellViewImageSize );
 			ShellViewSetViewMode( m_pShellBrowser, m_shellViewMode, m_shellViewImageSize );
+			
+			// Cache path of current folder so it will be available even after the shellview is destroyed.
+			m_folderPath = ShellViewGetCurrentFolder( m_pShellBrowser );
 		}
 
 		// hook the shell window to get notified of view mode changes
@@ -398,9 +409,8 @@ void CmnFileDlgHook::ResizeNonResizableFileDialog( int x, int y, int newWidth, i
 		   SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 
 	//force size update of the listview:
-	TCHAR folderPath[MAX_PATH +1];
-	ShellViewGetCurrentFolder(m_hwndFileDlg, folderPath);
-	ShellViewBrowseToFolder(m_hwndFileDlg, folderPath);
+	tstring folderPath = ShellViewGetCurrentFolder( m_hwndFileDlg );
+	ShellViewSetCurrentFolder( m_hwndFileDlg, folderPath.c_str() );
 }
 
 //-----------------------------------------------------------------------------------------

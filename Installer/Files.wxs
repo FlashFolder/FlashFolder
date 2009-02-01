@@ -59,7 +59,7 @@
 						Vital="yes" />
 					<ServiceControl Id="ffservice_ctrl"
 						Name="FlashFolder"
-						Start="install"
+						Start="install" 
 						Remove="uninstall" 
 						Wait="yes" />
 				</Component>
@@ -102,7 +102,7 @@
 						Vital="yes" />
 					<ServiceControl Id="ffservice_ctrl"
 						Name="FlashFolder"
-						Start="install"
+						Start="install"						
 						Remove="uninstall"
 						Wait="yes" />
 				</Component>

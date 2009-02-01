@@ -247,12 +247,11 @@ void MsoFileDlgHook::OnTimer()
 
 	if( HWND hwnd = ::FindWindowEx( g_pHook->m_hwndFileDlg, NULL, _T("Snake List"), NULL ) ) 
 	{
-		TCHAR curDir[ MAX_PATH + 1 ] = _T("");
-		ShellViewGetCurrentFolder( hwnd, curDir );
+		tstring curDir = ShellViewGetCurrentFolder( hwnd );
 	
-		if( _tcsicmp( curDir, m_currentDir ) != 0 )
+		if( _tcsicmp( curDir.c_str(), m_currentDir ) != 0 )
 		{
-			StringCbCopy( m_currentDir, sizeof(m_currentDir), curDir );
+			StringCbCopy( m_currentDir, sizeof(m_currentDir), curDir.c_str() );
 			FileDlgHookCallbacks::OnFolderChange();
 		}
 	}
