@@ -68,6 +68,7 @@
 		<?endif?>
 
 		<!-- Custom action definitions ....................................................... -->
+		
 		<?if $(var.Platform) = x64 ?>
 			<CustomAction Id="FF_SetTargetDirDefault" Property="TARGETDIR"
 				Value="[ProgramFiles64Folder]!(loc.ProductName)" Execute="firstSequence" />
@@ -77,6 +78,10 @@
 		<?endif?>
 
 		<CustomAction Id="FF_SetArpInstallLocation" Property="ARPINSTALLLOCATION" Value="[TARGETDIR]" />
+
+		<Binary Id="CustomActionsDll" SourceFile="..\exe\CustomActions_$(var.Platform).dll"/>
+		<CustomAction Id="FF_SetServicePrivileges" BinaryKey="CustomActionsDll" DllEntry="FF_SetServicePrivileges" 
+			Execute="deferred" Impersonate="no" />
 
 		<!-- install sequences ........................................................... -->
 
@@ -96,6 +101,9 @@
 			<Custom Action="FF_SetTargetDirDefault" Before="CostFinalize">NOT Installed AND TARGETDIR=""</Custom>
 
 			<Custom Action="FF_SetArpInstallLocation" After="CostFinalize">NOT Installed OR REINSTALL</Custom>
+
+			<Custom Action="FF_SetServicePrivileges" After="InstallServices">
+				(NOT Installed OR REINSTALL) AND VersionNT >= 600</Custom>
 		</InstallExecuteSequence>
 
 		<!-- Public custom properties ............................................................ -->

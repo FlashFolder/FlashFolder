@@ -174,7 +174,16 @@ bool StartHookProcessInSession( DWORD dwSessionId )
 		Log( L"SetTokenInformation() failed", ::GetLastError() );
 		return false;
 	}
-	
+
+	// The hook process doesn't need the service privileges, so remove them.
+	CHandle hRestrictedToken;
+	if( ! ::CreateRestrictedToken( hDupToken, DISABLE_MAX_PRIVILEGE, 0, NULL,
+		0, NULL, 0, NULL, &hRestrictedToken.m_h ) )
+	{
+		Log( L"CreateRestrictedToken() failed", ::GetLastError() );
+		return false;
+	}
+
 	WCHAR exePath[ 4096 ] = L"";
 	::GetModuleFileName( NULL, exePath, _countof( exePath ) );
 	
@@ -186,7 +195,7 @@ bool StartHookProcessInSession( DWORD dwSessionId )
 	wcscat_s( cmd, L"FlashFolder.exe\" /sethooksvc" );	 
 
 	Log( L"Starting 32-bit hook process" );
-	if( ! TryCreateHookProcess( hDupToken, cmd ) )
+	if( ! TryCreateHookProcess( hRestrictedToken, cmd ) )
 		return false;
 
 #ifdef WIN64
@@ -195,7 +204,7 @@ bool StartHookProcessInSession( DWORD dwSessionId )
 	wcscat_s( cmd64, L"FlashFolder64.exe\" /sethooksvc" );	 
 
 	Log( L"Starting 64-bit hook process" );
-	if( ! TryCreateHookProcess( hDupToken, cmd64 ) )
+	if( ! TryCreateHookProcess( hRestrictedToken, cmd64 ) )
 		return false;
 #endif
 

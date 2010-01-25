@@ -5,3 +5,4 @@
 LIBRARY    "CustomActions"
 EXPORTS
 	MsgBox
+	FF_SetServicePrivileges
