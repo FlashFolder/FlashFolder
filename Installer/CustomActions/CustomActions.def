@@ -2,7 +2,6 @@
 ;
 ; defines the exported functions which will be available to the MSI engine
 ;
-LIBRARY    "CustomActions"
 EXPORTS
 	MsgBox
 	FF_SetServicePrivileges

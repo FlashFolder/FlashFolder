@@ -36,7 +36,7 @@ BOOL CALLBACK DebugEnumChildProc( HWND hwnd, LPARAM lParam )
 	TCHAR sclass[ 256 ] = L"";
 	TCHAR stitle[ 256 ] = L"";
 	::GetClassName( hwnd, sclass, _countof( sclass ) );
-	::GetWindowText( hwnd, stitle, _countof( sclass ) );
+	::GetWindowText( hwnd, stitle, _countof( stitle ) );
 	DebugOut( L"hwnd = %04x, parent = %04x, id = %d, class = '%s', title = '%s'\n", 
 		hwnd, parent, id, sclass, stitle );  
 
@@ -102,13 +102,17 @@ FileDlgType GetFileDlgType( HWND dlg )
 			return FileDlgType( FDT_COMMON_FOLDER );
 	}
 	
-	//DebugOut( L"--- childs windows of %04x ---\n", dlg );
-	//::EnumChildWindows( dlg, DebugEnumChildProc, 0 );
+//	DebugOut( L"--- childs windows of %04x ---\n", dlg );
+//	::EnumChildWindows( dlg, DebugEnumChildProc, 0 );
 
-	// To detect the common file dlg we check various control IDs and class names
-	// that should exist only in this dialog. Ideally we would want to check
-	// for the control with "SHELLDLL_DefView" class but this is created only later by
-	// the file dialog.
+	// Only the "Save as" dialog can be detected easily, since at this time it already has
+	// the shell view child window created.
+	
+	if( FindChildWindowRecursively( dlg, L"SHELLDLL_DefView" ) )
+		return FileDlgType( FDT_COMMON );
+
+	// To detect the "Open" dialog we do a heuristic check of various control IDs and 
+	// class names that should exist only in this dialog.
 
 	if( (hShellView = GetDlgItem(dlg, FILEDLG_LB_SHELLVIEW)) == NULL )
 		return FileDlgType( FDT_NONE );
@@ -160,6 +164,11 @@ bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter )
     // in NT systems, the filename edit control can actually be a combobox
     if( ! hEditFileName )
         hEditFileName = ::GetDlgItem( hwndFileDlg, FILEDLG_CB_FILENAME );
+        
+	// Try to get the combo box of Vista's new "Save as" file dialog.
+    if( ! hEditFileName )
+		if( HWND hwnd = FindChildWindowRecursively( hwndFileDlg, FILEDLG_SAVEAS_VISTA_ED_FILENAME ) )
+			hEditFileName = ::GetParent( hwnd );
 
 	if( hEditFileName )
 	{

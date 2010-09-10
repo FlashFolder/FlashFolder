@@ -95,3 +95,5 @@ void DebugOut( LPCTSTR pFormat, ... );
 
 /// Find a child window given a class name recursively (FindWindowEx does not do this).
 HWND FindChildWindowRecursively( HWND hwndParent, LPCWSTR pClassName );
+/// Find a child window given its dialog control ID recursively.
+HWND FindChildWindowRecursively( HWND hwndParent, int dlgCtrlId );

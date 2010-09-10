@@ -315,25 +315,45 @@ struct FindChildWindowRecursivelyInfo
 {
 	HWND hwnd;
 	LPCWSTR pClassName;
+	int dlgCtrlId;
 };
 
 BOOL CALLBACK FindChildWindowRecursivelyProc( HWND hwnd, LPARAM lParam )
 {
 	FindChildWindowRecursivelyInfo* pInfo = (FindChildWindowRecursivelyInfo*) lParam;
 	
-	WCHAR className[ 256 ] = L"";
-	::GetClassName( hwnd, className, _countof(className) );
-	if( wcscmp( className, pInfo->pClassName ) == 0 )
+	if( pInfo->pClassName )
 	{
-		pInfo->hwnd = hwnd;
-		return FALSE;
+		WCHAR className[ 256 ] = L"";
+		::GetClassName( hwnd, className, _countof(className) );
+		if( wcscmp( className, pInfo->pClassName ) == 0 )
+		{
+			pInfo->hwnd = hwnd;
+			return FALSE;
+		}
 	}
+	else
+	{
+		if( ::GetDlgCtrlID( hwnd ) == pInfo->dlgCtrlId )
+		{
+			pInfo->hwnd = hwnd;
+			return FALSE;		
+		}
+	}
+		
 	return TRUE;
 }
 
 HWND FindChildWindowRecursively( HWND hwndParent, LPCWSTR pClassName )
 {
 	FindChildWindowRecursivelyInfo info = { NULL, pClassName };
+	::EnumChildWindows( hwndParent, FindChildWindowRecursivelyProc, (LPARAM) &info );
+	return info.hwnd;
+}
+
+HWND FindChildWindowRecursively( HWND hwndParent, int dlgCtrlId )
+{
+	FindChildWindowRecursivelyInfo info = { NULL, NULL, dlgCtrlId };
 	::EnumChildWindows( hwndParent, FindChildWindowRecursivelyProc, (LPARAM) &info );
 	return info.hwnd;
 }

@@ -56,6 +56,7 @@ const unsigned FILEDLG_CB_FOLDER    = 1137;
 const unsigned FILEDLG_CB_FILETYPES = 1136;
 const unsigned FILEDLG_ED_FILENAME  = 1152;
 const unsigned FILEDLG_CB_FILENAME  = 1148;      // sometimes in Win NT systems instead of 1152
+const unsigned FILEDLG_SAVEAS_VISTA_ED_FILENAME = 1001;   // New "Save as" dialog beginning with Vista.
 
 // some control ID's of the MS Office file dialog
 const unsigned MSO2000_FILEDLG_ED_FILENAME = 48;
