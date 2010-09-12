@@ -5,27 +5,12 @@
 
 //---------------------------------------------------------------------------
 
-bool LogFile::Open( LPCWSTR fileNameOrPath )
+bool LogFile::Open( LPCWSTR path )
 {	
 	Close(); 
 	
 	m_pid = ::GetCurrentProcessId();
-	
-	WCHAR path[ MAX_PATH ] = L"";
-	
-	if( ::PathIsRelative( fileNameOrPath ) )
-	{
-		// Prepend directory of current process to filename
-		::GetModuleFileName( NULL, path, _countof(path) );
-		LPWSTR p = wcsrchr( path, '\\' );
-		if( p ) *(++p) = 0;
-		wcscat_s( path, fileNameOrPath );  	
-	}
-	else
-	{
-		wcscpy_s( path, fileNameOrPath );
-	}
-
+		
 	if( m_file = _wfsopen( path, L"ab", _SH_DENYWR ) )
 	{
 		fseek( m_file, 0, SEEK_END );
@@ -80,5 +65,25 @@ void LogFile::Write( LPCWSTR text )
 		fwrite( text, sizeof( WCHAR ), wcslen( text ), m_file ); 
 		fwrite( L"\r\n", sizeof(WCHAR), 2, m_file ); 
 		fflush( m_file );
+	}
+}
+
+//----------------------------------------------------------------------------------------------------
+
+void LogFile::GetPath( LPWSTR path, LPCWSTR fileNameOrPath )
+{
+	*path = 0;
+	
+	if( ::PathIsRelative( fileNameOrPath ) )
+	{
+		// Prepend directory of current process to filename
+		::GetModuleFileName( NULL, path, MAX_PATH );
+		LPWSTR p = wcsrchr( path, '\\' );
+		if( p ) *(++p) = 0;
+		wcscat_s( path, MAX_PATH, fileNameOrPath );  	
+	}
+	else
+	{
+		wcscpy_s( path, MAX_PATH, fileNameOrPath );
 	}
 }

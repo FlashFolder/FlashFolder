@@ -46,17 +46,19 @@
 					<!-- Install autorun service.
 						LoadOrderGroup should be such that the service is started before user logon.
 					-->
-					<ServiceInstall Id="ffservice_inst" 
+					<ServiceInstall Id="ffservice_inst"
 						Name="FlashFolder"
 						DisplayName="[ProductName]"
 						Description="!(loc.PackageDescription)"
-						Arguments="/startservice" 
+						Arguments="/startservice"
 						ErrorControl="normal"
 						Interactive="no"
 						Start="auto"
 						LoadOrderGroup="PlugPlay"
 						Type="ownProcess"
-						Vital="yes" />
+						Vital="yes">
+						<ServiceDependency Id="TermService"/>
+					</ServiceInstall>
 					<ServiceControl Id="ffservice_ctrl"
 						Name="FlashFolder"
 						Start="install" 
@@ -88,6 +90,8 @@
 
 					<!-- Install autorun service.
 						LoadOrderGroup should be such that the service is started before user logon.
+						Dependency on TermService is required since we need the WTSEnumerateSessions()
+						function provided by it.
 					-->
 					<ServiceInstall Id="ffservice_inst"
 						Name="FlashFolder"
@@ -99,7 +103,9 @@
 						Start="auto"
 						LoadOrderGroup="PlugPlay"
 						Type="ownProcess"
-						Vital="yes" />
+						Vital="yes">
+						<ServiceDependency Id="TermService"/>
+					</ServiceInstall>
 					<ServiceControl Id="ffservice_ctrl"
 						Name="FlashFolder"
 						Start="install"						

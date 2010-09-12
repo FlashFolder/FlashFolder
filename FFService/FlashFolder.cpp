@@ -29,7 +29,8 @@
 #include "../common/Defines.h"
 #include "../commonUtils/logfile.h"
 
-const TCHAR INTERNAL_APPNAME[] = L"FlashFolder"; 
+const WCHAR INTERNAL_APPNAME[] = L"FlashFolder"; 
+const WCHAR SERVICE_LOG_NAME[] = L"_ffservice_log.txt";
 
 //---------------------------------------------------------------------------
 // global state
@@ -412,7 +413,13 @@ void WINAPI ServiceMain( DWORD argc, LPTSTR *argv )
 
 int StartService()
 {
-	g_logfile.Open( L"_ffservice_log.txt" );
+	WCHAR logPath[ MAX_PATH ] = L"";
+	LogFile::GetPath( logPath, SERVICE_LOG_NAME );	
+	// Open log file only if it already exists. So normally we don't create the log, but it can optionally
+	// be created to analyze problems. 
+	if( ::GetFileAttributes( logPath ) != INVALID_FILE_ATTRIBUTES )
+		g_logfile.Open( logPath );
+
 	Log( L"Task: Starting service" );
 
 	SERVICE_TABLE_ENTRY dispatchTable[] = 
@@ -449,7 +456,17 @@ void OpenHookLogFile()
 #else
 	WCHAR logName[ 100 ]; swprintf_s( logName, L"_ffhook32_log%d.txt", sessionId );
 #endif
-	g_logfile.Open( logName );
+
+	WCHAR serviceLogPath[ MAX_PATH ] = L"";
+	LogFile::GetPath( serviceLogPath, SERVICE_LOG_NAME );	
+	// Open log file only if main log file already exists. So normally we don't create the log, 
+	// but it can optionally be created to analyze problems. 
+	if( ::GetFileAttributes( serviceLogPath ) != INVALID_FILE_ATTRIBUTES )
+	{
+		WCHAR logPath[ MAX_PATH ] = L"";
+		LogFile::GetPath( logPath, logName );	
+		g_logfile.Open( logPath );
+	}
 }
 
 //---------------------------------------------------------------------------
