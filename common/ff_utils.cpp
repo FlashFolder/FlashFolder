@@ -27,6 +27,7 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
+
 //-----------------------------------------------------------------------------------------
 
 BOOL CALLBACK DebugEnumChildProc( HWND hwnd, LPARAM lParam )
@@ -175,7 +176,16 @@ bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter )
         HWND hBtnOk = ::GetDlgItem( hwndFileDlg, IDOK );
 		if( hBtnOk )
 		{
-			// Make sure the listcontrol is not focused, otherwise it would react on BN_CLICKED.
+			// Make sure the listcontrol has no item selected and is not focused, 
+			// otherwise it would save or load the selected items when BN_CLICKED is sent.
+
+			if( IShellBrowser* psb = GetShellBrowser( hwndFileDlg ) )
+			{
+				CComPtr<IShellView> psv;
+				if( SUCCEEDED( psb->QueryActiveShellView( &psv ) ) )
+					psv->SelectItem( NULL, SVSI_DESELECTOTHERS | SVSI_NOTAKEFOCUS );
+			}
+
 			HWND hOldFocus = ::GetFocus();
 			if( hOldFocus != hEditFileName )
 				::SendMessage( hwndFileDlg, WM_NEXTDLGCTL, (WPARAM) hEditFileName, TRUE ); 
@@ -318,42 +328,34 @@ bool ShellViewSetViewMode( IShellBrowser* psb, FOLDERVIEWMODE viewMode, int imag
 
 tstring ShellViewGetCurrentFolder( HWND hwnd )
 {
-	IShellBrowser *psb = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
-	if( ! psb )
-		return L"";
-
-	return ShellViewGetCurrentFolder( psb );
+	if( IShellBrowser *psb = GetShellBrowser( hwnd ) )
+		return ShellViewGetCurrentFolder( psb );
+	return L"";
 }
 
 //-----------------------------------------------------------------------------------------
 
 bool ShellViewSetCurrentFolder( HWND hwnd, LPCWSTR path )
 {	
-    IShellBrowser *psb = (IShellBrowser *) SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
-    if( ! psb )
-		return false;
-
-	return ShellViewSetCurrentFolder( psb, path );		
+	if( IShellBrowser *psb = GetShellBrowser( hwnd ) )
+		return ShellViewSetCurrentFolder( psb, path );
+	return false;
 }
 
 //-----------------------------------------------------------------------------------------
 
 bool ShellViewGetViewMode( HWND hwnd, FOLDERVIEWMODE* pViewMode, int* pImageSize )
 {
-	IShellBrowser *psb = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
-	if( ! psb )
-		return false;
-		
-	return ShellViewGetViewMode( psb, pViewMode, pImageSize );
+	if( IShellBrowser *psb = GetShellBrowser( hwnd ) )
+		return ShellViewGetViewMode( psb, pViewMode, pImageSize );
+	return false;
 }
 
 //-----------------------------------------------------------------------------------------
 
 bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize )
 {
-	IShellBrowser *psb = (IShellBrowser*) ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 );
-	if( ! psb )
-		return false;
-		
-	return ShellViewSetViewMode( psb, viewMode, imageSize );
+	if( IShellBrowser *psb = GetShellBrowser( hwnd ) )
+		return ShellViewSetViewMode( psb, viewMode, imageSize );
+	return false;
 }

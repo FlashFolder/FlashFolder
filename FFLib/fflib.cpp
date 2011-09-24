@@ -34,7 +34,6 @@
 #include "CmnFileDlgHook.h"
 #include "MsoFileDlgHook.h"
 #include "CmnFolderDlgHook.h"
-#include "../common/ProfileDefaults.h"
 
 using namespace std;
 
@@ -67,7 +66,7 @@ TCHAR g_currentExeDir[ MAX_PATH + 1 ] = _T("");
 
 vector<ATOM> g_hotkeyAtoms;              // unique identifiers of assigned hotkeys
 
-RECT g_toolbarOffset = { 0 };            // Toolbar position / width offset to adjust for some XP themes.
+Rect g_toolbarOffset;                    // Toolbar position / width offset to adjust for some XP themes.
 
 bool g_isFileDlgActive = false;
 bool g_isToolWndActive = false;
@@ -130,10 +129,10 @@ void AdjustToolWindowPos()
 	//calculates the position + size of the tool window accordingly to the size
 	// of the file dialog
 
-	RECT rc;
+	Rect rc;
 	::GetWindowRect( g_hFileDialog, &rc );
 
-	RECT rcTool; 
+	Rect rcTool; 
 	::GetWindowRect( g_hToolWnd, &rcTool );
 	rcTool.left = rc.left + g_toolbarOffset.left;
 	rcTool.top = rc.top - rcTool.bottom + rcTool.top + g_toolbarOffset.top;
@@ -210,7 +209,7 @@ HMENU CreateFolderMenu( const vector<tstring> &folderList, HMENU hMenu = NULL )
 int DisplayFolderMenu( HMENU hMenu, int buttonID )
 {
 	HWND hTb = GetDlgItem(g_hToolWnd, ID_FF_TOOLBAR);
-	RECT rc;
+	Rect rc;
 	SendMessage(hTb, TB_GETRECT, buttonID, (LPARAM) &rc);
 	::ClientToScreen( hTb, reinterpret_cast<POINT*>( &rc ) ); 
 	::ClientToScreen( hTb, reinterpret_cast<POINT*>( &rc.right ) ); 
@@ -266,15 +265,6 @@ void DisplayMenu_GlobalHist()
 		
 	SetForegroundWindow(g_hFileDialog);
 }
-
-//-----------------------------------------------------------------------------------------
-
-// helper for DisplayMenu_OpenDirs()
-struct CNoCaseCompare
-{
-    const bool operator()( const tstring& s1, const tstring& s2 ) const 
-        { return _tcsicmp( s1.c_str(), s2.c_str() ) < 0; }
-};
 
 //-------------------------------------------------------------------------------------------------
 /// Show a menu with the current folders of the application and other file managers.
@@ -463,7 +453,7 @@ void FavMenu_DisplayForFileDialog()
 	GetDirFavorites( &favs );
 
 	HWND hTb = GetDlgItem( g_hToolWnd, ID_FF_TOOLBAR );
-	RECT rc;
+	Rect rc;
 	::SendMessage( hTb, TB_GETRECT, ID_FF_FAVORITES, reinterpret_cast<LPARAM>( &rc ) );
 	ClientToScreenRect( hTb, &rc );
 
@@ -518,7 +508,7 @@ void DisplayMenu_Config()
 
 	// get menu position
 	HWND hTb = ::GetDlgItem( g_hToolWnd, ID_FF_TOOLBAR );
-	RECT rc;
+	Rect rc;
 	::SendMessage( hTb, TB_GETRECT, buttonId, (LPARAM) &rc );
 	::ClientToScreen( hTb, reinterpret_cast<POINT*>( &rc ) ); 
 	::ClientToScreen( hTb, reinterpret_cast<POINT*>( &rc.right ) ); 
@@ -562,7 +552,7 @@ LRESULT CALLBACK ToolWindowEditPathProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 {
 	//window proc for the path edit ctrl of the tool window
 
-	switch (uMsg)
+	switch( uMsg )
 	{
 		case WM_KEYDOWN:
 			if (wParam == VK_RETURN)
@@ -593,13 +583,69 @@ LRESULT CALLBACK ToolWindowEditPathProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 				return 0;
 			}
 			break;
+			
+		case WM_PAINT:
+		{
+			if( ::GetFocus() != hwnd )
+			{
+				// Paint only background of parent (glowing text) when not editing.								
+				PaintDC dc( hwnd );
+				if( dc )
+				{
+					Rect rcClient; ::GetClientRect( hwnd, &rcClient );
+					PaintBuf buf( rcClient );
+					::DrawThemeParentBackground( hwnd, buf, &dc.PS().rcPaint );
+					::BitBlt( dc, dc.PS().rcPaint.left, dc.PS().rcPaint.top, buf.GetWidth(), buf.GetHeight(), 
+					          buf, dc.PS().rcPaint.left, dc.PS().rcPaint.top, SRCCOPY );
+				}		
+				return 0;
+			}
+		
+			break;
+		}
+		
+		case WM_SETFOCUS:
+			// redraw parent background to remove glowing text
+			::InvalidateRect( g_hToolWnd, NULL, FALSE );
+			break;
+
+		case WM_KILLFOCUS:
+			// redraw parent background to show glowing text
+			::InvalidateRect( g_hToolWnd, NULL, FALSE );
+			break;
+
+		case WM_SETTEXT:
+			// redraw parent background to update glowing text
+			if( ::GetFocus() != hwnd )
+			{
+				LRESULT res = CallWindowProc( g_wndProcToolWindowEditPath, hwnd, uMsg, wParam, lParam );
+				::InvalidateRect( g_hToolWnd, NULL, FALSE );
+				return res;
+			}
+			break;
 	}
 
 	//call original message handler
-    return CallWindowProc(g_wndProcToolWindowEditPath, hwnd, uMsg, wParam, lParam);
+    return CallWindowProc( g_wndProcToolWindowEditPath, hwnd, uMsg, wParam, lParam );
 }
 
 //-----------------------------------------------------------------------------------------------
+
+struct PressTbButton
+{
+	PressTbButton( UINT cmd ) : m_cmd( cmd ) 
+	{
+		::SendDlgItemMessage( g_hToolWnd, ID_FF_TOOLBAR, TB_PRESSBUTTON, m_cmd, TRUE );
+	} 
+	~PressTbButton()
+	{
+		::SendDlgItemMessage( g_hToolWnd, ID_FF_TOOLBAR, TB_PRESSBUTTON, m_cmd, FALSE );
+	}
+	
+	UINT m_cmd;
+};
+
+//----------------------------------------------------------------------------------------------------
 
 void ExecuteToolbarCommand( UINT cmd )
 {
@@ -619,17 +665,29 @@ void ExecuteToolbarCommand( UINT cmd )
 			break;
 		}
 		case ID_FF_GLOBALHIST:
+		{
+			PressTbButton ptb( ID_FF_GLOBALHIST );				
 			DisplayMenu_GlobalHist();
 			break;
+		}
 		case ID_FF_OPENDIRS:
+		{
+			PressTbButton ptb( ID_FF_OPENDIRS );				
 			DisplayMenu_OpenDirs();
 			break;
+		}
 		case ID_FF_FAVORITES:
+		{
+			PressTbButton ptb( ID_FF_FAVORITES );		
 			FavMenu_DisplayForFileDialog();
 			break;
+		}
 		case ID_FF_CONFIG:
+		{
+			PressTbButton ptb( ID_FF_CONFIG );
 			DisplayMenu_Config();
 			break;
+		}
 		default:
 			DebugOut( _T("[fflib] ERROR: invalid command") );
 	}	
@@ -644,6 +702,21 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     switch( uMsg )
     {
+		case WM_INITDIALOG:
+		{
+			// make full glass window
+			MARGINS glassMargins = { -1, -1, -1, -1 };
+			::DwmExtendFrameIntoClientArea( hwnd, &glassMargins );
+
+			// Inform the window of the frame change made by WM_NCCALCSIZE.
+			Rect rc = GetWindowRect( hwnd );
+			::SetWindowPos( hwnd, NULL, rc.left, rc.top, rc.Width(), rc.Height(), SWP_FRAMECHANGED );
+
+			// no default focus wanted
+			return FALSE;
+		}
+		break;
+    
 		case WM_COMMAND:
 		{
 			WORD wNotifyCode = HIWORD(wParam); // notification code 
@@ -710,7 +783,7 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			// hotkeys make only sense if the hooked dialog is the foreground window
 			HWND hwndFg = ::GetForegroundWindow();
-			if( hwndFg != g_hToolWnd && hwndFg != g_hFileDialog )
+			if( hwndFg != hwnd && hwndFg != g_hFileDialog )
 				break;
 
 			ATOM hotkeyAtom = static_cast<ATOM>( wParam );
@@ -719,7 +792,7 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			tstring ffGuid = tstring( _T(".") ) + tstring( FF_GUID );
 
-			HWND hTb = ::GetDlgItem( g_hToolWnd, ID_FF_TOOLBAR );
+			HWND hTb = ::GetDlgItem( hwnd, ID_FF_TOOLBAR );
 			
 			UINT cmd = 0;
 			const UINT IS_MENU = 0x10000;
@@ -740,7 +813,7 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if( s_inMenu )
 			{
 				// cancel currently open menu
-				::SendMessage( g_hToolWnd, WM_CANCELMODE, 0, 0 );
+				::SendMessage( hwnd, WM_CANCELMODE, 0, 0 );
 				return FALSE;
 			}
 
@@ -753,18 +826,6 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if( cmd & IS_MENU )
 				::SendMessage( hTb, TB_PRESSBUTTON, cmd & 0xFFFF, FALSE );
-		}
-		break;
-
-		case WM_ACTIVATE:
-		{
-			// since we are using global hotkeys, disable them if both toolbar and filedialog are not active
-
-			g_isToolWndActive = LOWORD( wParam ) != WA_INACTIVE;
-			if( g_isToolWndActive || g_isFileDlgActive )
-				RegisterMyHotkeys();
-			else
-				UnregisterMyHotkeys();
 		}
 		break;
 
@@ -784,49 +845,20 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			
 			WINDOWPOS *wp = reinterpret_cast<WINDOWPOS*>( lParam );
 			
-			RECT rcClient; ::GetClientRect( hwnd, &rcClient );
+			Rect rcClient; ::GetClientRect( hwnd, &rcClient );
 
 			HWND hPath = GetDlgItem( hwnd, ID_FF_PATH );
-			RECT rcPath; ::GetWindowRect( hPath, &rcPath ); ScreenToClientRect( hwnd, &rcPath );
+			Rect rcPath = GetChildRect( hwnd, hPath ); 
 
-			RECT rcDivR = { 0, 0, 1, 1 };
-			::MapDialogRect( g_hToolWnd, &rcDivR ); 
+			Rect rcDivR( 0, 0, 4, 1 );
+			::MapDialogRect( hwnd, &rcDivR ); 
 
 			::SetWindowPos( hPath, NULL, 0, 0, rcClient.right - rcPath.left - rcDivR.right, rcPath.bottom - rcPath.top, 
 				SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE );
-		}
-		break;
 
-		case WM_CTLCOLOREDIT:
-		{
-			//called when the path control is redrawn by windows
-			//make it a different text color if the folder path is invalid
-
-			static bool bLastValidDir = true;
-
-			HDC hdcEdit = (HDC) wParam;   // handle to display context 
-			HWND hwndEdit = (HWND) lParam; // handle to static control 
-		
-			TCHAR path[MAX_PATH+1];
-			GetWindowText(hwndEdit, path, MAX_PATH);
-			
-			bool bValidDir = DirectoryExists(path);
-			if (bValidDir)
-				SetTextColor(hdcEdit, GetSysColor(COLOR_WINDOWTEXT));	
-			else
-				SetTextColor(hdcEdit, GetSysColor(COLOR_GRAYTEXT));
-			if (bValidDir != bLastValidDir)
-			{
-				bLastValidDir = bValidDir;
-				InvalidateRect(hwndEdit, NULL, FALSE);
-			}
-
-			SetBkColor(hdcEdit, GetSysColor(COLOR_WINDOW));
-			
-			static HBRUSH s_hWindowBrush = NULL; 
-			if( ! s_hWindowBrush )
-				s_hWindowBrush = ::GetSysColorBrush( COLOR_WINDOW );
-			return reinterpret_cast<INT_PTR>( s_hWindowBrush );
+			// Update glowing path text
+			if( GetFocus() != hPath )
+				InvalidateRect( hwnd, NULL, FALSE );
 		}
 		break;
 
@@ -837,12 +869,99 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_TIMER:
 			g_spFileDlgHook->OnTimer();
 		break;
-		
+	
 		case WM_NCHITTEST:
+		{
 			// Make sure the window cannot be resized since we have the resize border
 			// solely to match the style of the file dialog.
 			LRESULT ht = ::DefWindowProc( hwnd, WM_NCHITTEST, wParam, lParam );
-			return ht == HTNOWHERE || ht == HTTRANSPARENT ? ht : HTCLIENT;
+			
+			if( ht != HTNOWHERE && ht != HTTRANSPARENT )
+				ht = HTCLIENT;
+				
+			::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, ht );
+			return TRUE;								
+		}
+		break;
+
+		case WM_ERASEBKGND:
+		{
+			// Erasing background behind toolbar is crucial for having correct transparency over aero glass.
+			// The rest of the window we paint completely in WM_PAINT.
+			HDC hdc = reinterpret_cast<HDC>( wParam );
+			Rect rc = GetChildRect( hwnd, ID_FF_TOOLBAR );
+			::FillRect( hdc, rc, GetStockBrush( BLACK_BRUSH ) );
+		
+			::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, TRUE );
+			return TRUE;
+		}
+		break;
+		
+		case WM_PAINT:
+		{
+			PaintDC dc( hwnd );
+			ToolDlgProc( hwnd, WM_PRINTCLIENT, reinterpret_cast<WPARAM>( static_cast<HDC>( dc ) ), PRF_CLIENT );
+			return TRUE;
+		}
+		break;
+		
+		// Processing this message helps with some transparency issues when putting controls on aero glass.
+		case WM_PRINTCLIENT:
+		{
+			HDC dc = reinterpret_cast<HDC>( wParam );
+			Rect rcClient = GetClientRect( hwnd );
+			
+			HWND hEdit = ::GetDlgItem( hwnd, ID_FF_PATH );
+			if( ::GetFocus() != hEdit )
+			{
+				// Draw glowing text for background of edit control when it is not focused.
+				// So the text looks good on aero glass but still has enough contrast on dark background.
+				
+				Theme theme( hwnd, L"CompositedWindow::Window" );
+
+				PaintBuf buf( rcClient );
+
+				HFONT font = reinterpret_cast<HFONT>( ::SendMessage( hEdit, WM_GETFONT, 0, 0 ) );
+				AutoSelectObj selFont( buf, font );
+
+				WCHAR text[ MAX_PATH ] = L"";
+				::GetWindowText( hEdit, text, _countof( text ) );
+
+				Rect rcText = GetChildRect( hwnd, hEdit );
+				rcText.left += static_cast<int>( ::SendMessage( hEdit, EM_GETMARGINS, 0, 0 ) & 0xFFFF );
+
+				DTTOPTS opt = { sizeof( opt ), DTT_COMPOSITED | DTT_GLOWSIZE };
+				opt.iGlowSize = 12;
+				::DrawThemeTextEx( theme, buf, WP_CAPTION, CS_ACTIVE, text, -1, DT_NOPREFIX | DT_PATH_ELLIPSIS, &rcText, &opt );
+
+				::BitBlt( dc, 0, 0, rcClient.right, rcClient.bottom, buf, 0, 0, SRCCOPY );
+			}
+			else
+			{
+				::FillRect( dc, rcClient, GetStockBrush( BLACK_BRUSH ) );
+			}
+			
+			return TRUE;
+		}		
+		break;
+		
+		case WM_NCACTIVATE:
+		{
+			// Keep the toolbar always in the inactive visual state, which looks better.
+			if( wParam )
+				return TRUE;
+		}	
+		break;
+		
+		case WM_NCCALCSIZE:
+		{
+			// Extend client area into whole glass window (removing non-client area).
+			if( wParam != FALSE )
+			{
+				::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, 0 );
+				return TRUE;
+			}
+		}		
 		break;
 	}
 
@@ -881,11 +1000,13 @@ void CreateToolWindow( bool isFileDialog )
 	g_hToolWnd = ::CreateDialog( g_hInstDll, MAKEINTRESOURCE( IDD_TOOLWND ), g_hFileDialog, ToolDlgProc );
 	if( g_hToolWnd == NULL )
 		return;
-
+		
+	int toolWndHeight = MapDialogY( g_hToolWnd, 20 );
+	::MoveWindow( g_hToolWnd, 0, 0, 100, toolWndHeight, FALSE );
+		
 	AdjustToolWindowPos();
 
-	RECT rcClient;
-	GetClientRect( g_hToolWnd, &rcClient );
+	Rect rcClient = GetClientRect( g_hToolWnd );
 
 	//--- create the toolbar ---
 
@@ -895,15 +1016,15 @@ void CreateToolWindow( bool isFileDialog )
 		tbButtons.push_back( btn );
 	}
 	{
-		TBBUTTON btn = { 0, ID_FF_GLOBALHIST,              0, BTNS_BUTTON | BTNS_WHOLEDROPDOWN, 0, 0, 0, 0 };
+		TBBUTTON btn = { 0, ID_FF_GLOBALHIST,              0, BTNS_BUTTON, 0, 0, 0, 0 };
 		tbButtons.push_back( btn );
 	}
 	{
-		TBBUTTON btn = { 2, ID_FF_OPENDIRS,  TBSTATE_ENABLED, BTNS_BUTTON | BTNS_WHOLEDROPDOWN, 0, 0, 0, 0 };
+		TBBUTTON btn = { 2, ID_FF_OPENDIRS,  TBSTATE_ENABLED, BTNS_BUTTON, 0, 0, 0, 0 };
 		tbButtons.push_back( btn );
 	}
 	{
-		TBBUTTON btn = { 3, ID_FF_FAVORITES, TBSTATE_ENABLED, BTNS_BUTTON | BTNS_WHOLEDROPDOWN, 0, 0, 0, 0 };
+		TBBUTTON btn = { 3, ID_FF_FAVORITES, TBSTATE_ENABLED, BTNS_BUTTON, 0, 0, 0, 0 };
 		tbButtons.push_back( btn );
 	}	  
 	if( isFileDialog )
@@ -912,7 +1033,7 @@ void CreateToolWindow( bool isFileDialog )
 		tbButtons.push_back( btn );
 	}
 	{
-		TBBUTTON btn = { 6, ID_FF_CONFIG,    TBSTATE_ENABLED, BTNS_BUTTON | BTNS_WHOLEDROPDOWN, 0, 0, 0, 0 };
+		TBBUTTON btn = { 6, ID_FF_CONFIG,    TBSTATE_ENABLED, BTNS_BUTTON, 0, 0, 0, 0 };
 		tbButtons.push_back( btn );
 	}
 
@@ -926,13 +1047,13 @@ void CreateToolWindow( bool isFileDialog )
 		::DeleteDC( hScreenIC );
 	}
 
-    HWND hTb = ::CreateToolbarEx( g_hToolWnd, WS_CHILD | TBSTYLE_FLAT | 
+    HWND hTb = ::CreateToolbarEx( g_hToolWnd, WS_CHILD | WS_TABSTOP | TBSTYLE_FLAT | 
 		CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS,
 		ID_FF_TOOLBAR, (int) tbButtons.size(), 
 		isToolbar32bpp ? NULL : g_hInstDll, isToolbar32bpp ? 0 : ID_FF_TOOLBAR, 
 		&tbButtons[ 0 ], (int) tbButtons.size(), 16,16, 16,16, sizeof(TBBUTTON) );
 
-	::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_DOUBLEBUFFER );
+	::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS );
 	::ShowWindow( hTb, SW_SHOW );
 
 	if( isToolbar32bpp )
@@ -945,40 +1066,46 @@ void CreateToolWindow( bool isFileDialog )
 	::SendMessage( hTb, TB_AUTOSIZE, 0, 0 );
 
 	// calculate width of the toolbar from position of last button (TB_GETMAXSIZE has a bug under Win2k!)
-	RECT tbRC = { 0 };
+	Rect tbRC;
 	::SendMessage( hTb, TB_GETRECT, tbButtons.back().idCommand, reinterpret_cast<LPARAM>( &tbRC ) );
 	SIZE tbSize = { tbRC.right, tbRC.bottom };
-
-	SetWindowPos( hTb, NULL, 0, ( rcClient.bottom - tbSize.cy ) / 2, tbSize.cx, tbSize.cy, SWP_NOZORDER | SWP_NOACTIVATE );
+	
+	int xTB = MapDialogX( g_hToolWnd, 4 );
+	SetWindowPos( hTb, NULL, xTB, ( rcClient.bottom - tbSize.cy ) / 2, tbSize.cx, tbSize.cy, SWP_NOZORDER | SWP_NOACTIVATE );
 
 	//--- create + sub-class the edit control 
 
-	RECT rcDiv = { 0, 0, 3, 1 }; 
-	RECT rcDivR = { 0, 0, 2, 1 }; 
+	Rect rcDiv( 0, 0, 6, 1 ); 
+	Rect rcDivR( 0, 0, 4, 1 ); 
 	// use themed border if possible
 	DWORD edStyleEx = isThemed ? WS_EX_CLIENTEDGE : WS_EX_STATICEDGE;
 	if( OSVERSION >= 0x0600 && isThemed )
 	{
 		// Visual tuning for Vista
 		rcDiv.bottom = rcDivR.bottom = 2;
-		edStyleEx = 0;  
+		edStyleEx = 0;
 	}
 	::MapDialogRect( g_hToolWnd, &rcDiv ); 
 	::MapDialogRect( g_hToolWnd, &rcDivR ); 
-	int xEdit = tbSize.cx + rcDiv.right;
+	int xEdit = xTB + tbSize.cx + rcDiv.right;
+	int editHeight = MapDialogY( g_hToolWnd, 10 );
 
 	HWND hEdit = ::CreateWindowEx( edStyleEx, _T("Edit"), NULL, 
-		WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL, 
-		xEdit, rcDiv.bottom, 
+		WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL | WS_TABSTOP, 
+		xEdit, ( rcClient.bottom - editHeight ) / 2, 
 		rcClient.right - rcClient.left - xEdit - rcDivR.right, 
-		rcClient.bottom - rcClient.top - rcDiv.bottom * 2, 
+		editHeight, 
 		g_hToolWnd, (HMENU) ID_FF_PATH, g_hInstDll, NULL);
-					
+
+	if( OSVERSION >= 0x0600 && isThemed )
+		::SetWindowTheme( hEdit, NULL, L"EditComposited::Edit" );
+						
 	// enable auto-complete for the edit control
 	::SHAutoComplete( hEdit, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
 	//sub-class the edit control to handle key-stroke messages
 	g_wndProcToolWindowEditPath = (WNDPROC)  
-		SetWindowLong(hEdit, GWLP_WNDPROC, (LONG) &ToolWindowEditPathProc);
+		SetWindowLongPtr( hEdit, GWLP_WNDPROC, (LONG) &ToolWindowEditPathProc );
+
 
     //--- set default font for all child controls
     

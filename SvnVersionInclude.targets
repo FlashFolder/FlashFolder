@@ -9,7 +9,7 @@
 -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<UsingTask TaskName="ReadRegistry" AssemblyFile="$(MSBuildExtensionsPath)\Microsoft\WiX\v3.0\WixTasks.dll"/>
+	<UsingTask TaskName="ReadRegistry" AssemblyFile="$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\WixTasks.dll"/>
 
 	<Target Name="SvnVersionInclude" Outputs="_version.h">
 		<Message Text="_______Creating version include file_______" Importance="high"/>

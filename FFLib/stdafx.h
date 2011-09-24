@@ -25,6 +25,7 @@
 #include <uxtheme.h>
 #include <vssym32.h>
 #include <cpl.h>
+#include <dwmapi.h>
 
 //--- ATL headers
 #include <atlfile.h>
@@ -50,8 +51,6 @@ using namespace std;
 #include <Utils.h>
 #include <GdiUtils.h>
 #include <Profile.h>
-#include <NtKernelApi.h>
-#include <NtKernelUtils.h>
 #include <TotalCmdUtils.h>
 #include <Registry.h>
 #include <ExplorerUtils.h>

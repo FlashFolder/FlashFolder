@@ -20,13 +20,194 @@
 
 #pragma once
 
+#include "boost\noncopyable.hpp"
+#include <windows.h>
+
+//----------------------------------------------------------------------------------------------------
+
+class DC : boost::noncopyable
+{
+public:
+	explicit DC( HDC handle = NULL ) : m_handle( handle ) {}
+	
+	~DC() { Close(); }
+	
+	HDC Attach( HDC h ) { Close(); m_handle = h; return h; }
+	
+	HDC Detach() { HDC h = m_handle; m_handle = NULL; return h; }
+
+	operator HDC() const { return m_handle; }
+
+	void Close() 
+	{ 
+		if( m_handle )
+			::DeleteDC( m_handle ); m_handle = NULL; 
+	}
+
+private:
+	HDC m_handle;
+};
+
+//----------------------------------------------------------------------------------------------------
+
+class WindowDC : boost::noncopyable
+{
+public:
+	explicit WindowDC( HWND hwnd = NULL, HDC handle = NULL ) : 
+		m_hwnd( hwnd ), m_handle( handle ) {}
+	
+	~WindowDC() { Close(); }
+	
+	HDC Detach() { HDC h = m_handle; m_handle = NULL; return h; }
+
+	operator HDC() const { return m_handle; }
+
+	void Close() 
+	{ 
+		if( m_handle )
+		{
+			::ReleaseDC( m_hwnd, m_handle ); 
+			m_handle = NULL; m_hwnd = NULL; 
+		}
+	}
+
+private:
+	HWND m_hwnd;
+	HDC m_handle;
+};
+
+//----------------------------------------------------------------------------------------------------
+
+class PaintDC : boost::noncopyable
+{
+public:
+	explicit PaintDC( HWND hwnd ) :
+		m_hwnd( hwnd ),
+		m_hdc( NULL )
+	{
+		if( ::GetUpdateRect( hwnd, NULL, FALSE ) )
+			m_hdc = ::BeginPaint( hwnd, &m_ps );
+		else
+			memset( &m_ps, 0, sizeof( m_ps ) );
+	}
+
+	~PaintDC()
+	{
+		if( m_hdc )
+			::EndPaint( m_hwnd, &m_ps );
+	}
+	
+	operator HDC() const { return m_hdc; }
+
+	const PAINTSTRUCT& PS() const { return m_ps; }
+	
+private:
+	HWND m_hwnd;
+	HDC m_hdc;
+	PAINTSTRUCT m_ps;
+};
+
+//----------------------------------------------------------------------------------------------------
+
+template< typename T >
+class GdiObject : boost::noncopyable
+{
+public:
+	explicit GdiObject( T handle = NULL ) : m_handle( handle ) {}
+	
+	~GdiObject() { Close(); }
+	
+	T Attach( T h ) { Close(); m_handle = h; return h; }
+	
+	T Detach() { HDC h = m_handle; m_handle = NULL; return h; }
+
+	operator T() const { return m_handle; }
+
+	void Close() 
+	{ 
+		if( m_handle )
+		{
+			::DeleteObject( m_handle ); 
+			m_handle = NULL; 
+		}
+	}
+
+private:
+	T m_handle;
+};
+
+typedef GdiObject< HBITMAP > Bitmap;
+typedef GdiObject< HFONT > Font;
+typedef GdiObject< HBRUSH > Brush;
+typedef GdiObject< HPEN > Pen;
+typedef GdiObject< HRGN > Region;
+
+//----------------------------------------------------------------------------------------------------
+/// 32 bpp paint buffer (DIB section + device context)
+
+class PaintBuf : boost::noncopyable
+{
+public:
+	PaintBuf( int width, int height )
+	{
+		Create( width, height );
+	}
+
+	PaintBuf( const RECT& rc ) 
+	{
+		Create( rc.right - rc.left, rc.bottom - rc.top );
+	}
+	
+	~PaintBuf()
+	{
+		if( m_dc && m_oldBmp )
+			::SelectObject( m_dc, m_oldBmp );
+	}
+	
+	int GetWidth() const { return m_width; }
+	int GetHeight() const { return m_height; }
+
+	operator HDC() const { return m_dc; }
+
+	HBITMAP GetBitmap() const { return m_bmp; }
+	
+	DWORD* GetBits() const { return m_bits; }
+
+private:
+	void Create( int width, int height )
+	{
+		m_width = m_height = 0;
+		m_bits = NULL;
+		m_oldBmp = NULL;
+
+		BITMAPINFO bmi = { sizeof( bmi ) };
+		bmi.bmiHeader.biPlanes = 1;
+		bmi.bmiHeader.biBitCount = 32;
+		bmi.bmiHeader.biWidth = width;
+		bmi.bmiHeader.biHeight = -height;
+		if( m_bmp.Attach( ::CreateDIBSection( NULL, &bmi, DIB_RGB_COLORS, (void**) &m_bits, NULL, 0 ) ) )
+			if( m_dc.Attach( ::CreateCompatibleDC( NULL ) ) )
+			{
+				m_oldBmp = ::SelectObject( m_dc, m_bmp );
+				m_width = width;
+				m_height = height;
+			}
+	}
+
+	DWORD* m_bits;
+	int m_width, m_height;
+	Bitmap m_bmp;
+	DC m_dc;	
+	HGDIOBJ m_oldBmp;
+};
+
 //-----------------------------------------------------------------------------------------------
 
 /// Wrapper for SelectObject() API
-class AutoSelectObj
+class AutoSelectObj : boost::noncopyable
 {
 public:
-	AutoSelectObj( HDC hDC, HGDIOBJ hObject = NULL )
+	explicit AutoSelectObj( HDC hDC, HGDIOBJ hObject = NULL )
 		: m_hDC( hDC ), m_hOldObject( NULL )
 	{
 		if( hObject )
@@ -56,10 +237,10 @@ private:
 //-----------------------------------------------------------------------------------------------
 
 /// Wrapper for SaveDC() API
-class AutoSaveDC
+class AutoSaveDC : boost::noncopyable
 {
 public:
-	AutoSaveDC( HDC hDC ) 
+	explicit AutoSaveDC( HDC hDC ) 
 		: m_hDC( hDC )
 	{ 
 		m_saveId = ::SaveDC( hDC ); 
@@ -82,10 +263,10 @@ private:
 //-----------------------------------------------------------------------------------------------
 
 /// Wrapper for WM_SETREDRAW
-class AutoRedraw
+class AutoRedraw : boost::noncopyable
 {
 public:
-	AutoRedraw( HWND hwnd, UINT flags = RDW_INVALIDATE ) :
+	explicit AutoRedraw( HWND hwnd, UINT flags = RDW_INVALIDATE ) :
 		m_hwnd( hwnd ), m_flags( flags )
 	{
 		::SendMessage( m_hwnd, WM_SETREDRAW, FALSE, 0 );	
@@ -99,6 +280,76 @@ public:
 private:
 	HWND m_hwnd;
 	UINT m_flags;
+};
+
+//-----------------------------------------------------------------------------------------------
+
+class Theme : boost::noncopyable
+{
+public:
+	explicit Theme( HTHEME hTheme = NULL ) : m_hTheme( hTheme ) {}
+
+	Theme( HWND hwnd, LPCWSTR classNames )
+	{
+		m_hTheme = ::OpenThemeData( hwnd, classNames );
+	}
+
+	~Theme() { Close(); }
+
+	void Close() { if( m_hTheme ) ::CloseThemeData( m_hTheme ); m_hTheme = NULL; }
+
+	void Attach( HTHEME h ) { Close(); m_hTheme = h; }
+
+	HTHEME Detach() { HTHEME h = m_hTheme; m_hTheme = NULL; return h; }
+
+	operator HTHEME() const { return m_hTheme; }
+
+private:
+	HTHEME m_hTheme;
+};
+
+//----------------------------------------------------------------------------------------------------
+
+struct Point : POINT
+{
+	Point() { x = y = 0; } 
+	Point( LONG x_, LONG y_ ) { x = x_; y = y_; }
+	bool operator==( const POINT& other ) const { return x == other.x && y == other.y; }
+
+	operator const POINT*() const { return this; }
+};
+
+struct Size : SIZE
+{
+	Size() { cx = cy = 0; }
+	Size( LONG cx_, LONG cy_ ) { cx = cx_; cy = cy_; }
+	bool operator==( const SIZE& other ) const { return cx == other.cx && cy == other.cy; }
+
+	operator const SIZE*() const { return this; }
+};
+
+struct Rect : RECT
+{
+	Rect() { left = top = right = bottom = 0; }
+	Rect( LONG left_, LONG top_, LONG right_, LONG bottom_ ) 
+		{ left = left_; top = top_; right = right_; bottom = bottom_; }
+	Rect( const POINT& pos, const SIZE& size )
+		{ left = pos.x; top = pos.y; right = pos.x + size.cx; bottom = pos.y + size.cy; }
+
+	LONG Width() const { return right - left; }
+	LONG Height() const { return bottom - top; }
+
+	Point TopLeft() const { return Point( left, top ); }
+	Point BottomRight() const { return Point( right, bottom ); }
+	Size GetSize() const { return Size( Width(), Height() ); }
+
+	Rect Offset( LONG cx, LONG cy ) const { return Rect( left + cx, top + cy, right + cx, bottom + cy ); }
+	Rect Inflate( LONG cx, LONG cy ) const { return Rect( left - cx, top - cy, right + cx, bottom + cy ); } 
+
+	bool operator==( const RECT& other ) const 
+		{ return left == other.left && top == other.top && right == other.right && bottom == other.bottom; }
+
+	operator LPCRECT() const { return this; }
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -191,6 +442,40 @@ inline void ScreenToClientRect( HWND hwnd, RECT* prc )
 	prc->left = pt1.x; prc->top = pt1.y; prc->right = pt2.x; prc->bottom = pt2.y;
 }
 
+/// Convenience wrapper for GetClientRect() API
+inline Rect GetClientRect( HWND hwnd )
+{
+	Rect rc; ::GetClientRect( hwnd, &rc );
+	return rc;
+}
+
+/// Convenience wrapper for GetWindowRect() API
+inline Rect GetWindowRect( HWND hwnd )
+{
+	Rect rc; ::GetWindowRect( hwnd, &rc );
+	return rc;
+}
+
+/// Convenience wrapper for GetWindowRect() / ScreenToClient() API
+inline Rect GetChildRect( HWND parent, HWND child )
+{
+	Rect rc = GetWindowRect( child );
+	ScreenToClientRect( parent, &rc );
+	return rc;
+}
+
+/// Convenience wrapper for GetWindowRect() / ScreenToClient() API
+inline Rect GetChildRect( HWND child )
+{
+	return GetChildRect( ::GetParent( child ), child );
+}
+
+/// Convenience wrapper for GetWindowRect() / ScreenToClient() API
+inline Rect GetChildRect( HWND parent, int childId )
+{
+	return GetChildRect( parent, ::GetDlgItem( parent, childId ) );
+}
+
 /// Convenience wrapper for ClientToScreen() API
 inline void ClientToScreenRect( HWND hwnd, RECT* prc )
 {
@@ -201,3 +486,6 @@ inline void ClientToScreenRect( HWND hwnd, RECT* prc )
 	prc->left = pt1.x; prc->top = pt1.y; prc->right = pt2.x; prc->bottom = pt2.y;
 }
 
+//-----------------------------------------------------------------------------------------------
+
+inline HBRUSH GetStockBrush( int i ) { return reinterpret_cast<HBRUSH>( ::GetStockObject( i ) ); }

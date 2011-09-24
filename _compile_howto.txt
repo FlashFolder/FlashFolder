@@ -3,7 +3,7 @@ How to compile FlashFolder
 
 Prerequisites:
 - Visual C++ 8.0 (Visual Studio 2005) or newer
-- WiX (Windows Installer XML) version 3.0.4827 (or newer version, http://wix.sourceforge.net/releases/)
+- WiX (Windows Installer XML) version 3.5 (http://wix.sourceforge.net/releases/)
 - TortoiseSVN (optional, only for generating correct build number)
 
 Compile:

@@ -34,7 +34,9 @@
 		<Package
 			Description="!(loc.PackageDescription)" Comments="v$(var.Version)"
 			InstallerVersion="200" Compressed="yes"
-			Platform="$(var.Platform)" 
+			Platform="$(var.Platform)"  
+			InstallScope="perMachine" 
+			InstallPrivileges="elevated"
 		/>
 			
 		<Icon Id="ProgramIcon.exe" SourceFile="..\common\res\FlashFolder.ico"/>
@@ -117,20 +119,22 @@
 
 		<!-- Standard properties -->
 
-		<Property Id="ALLUSERS">1</Property>
-		<Property Id="PROMPTROLLBACKCOST">P</Property>
-		<Property Id="INSTALLLEVEL">3</Property>
+		<Property Id="PROMPTROLLBACKCOST" Secure="yes">F</Property>
+		<Property Id="INSTALLLEVEL" Secure="yes">3</Property>
 				
-		<Property Id="ARPPRODUCTICON">ProgramIcon.exe</Property>
-		<Property Id="ARPCOMMENTS">!(loc.PackageDescription)</Property>
-		<Property Id="ARPURLINFOABOUT">http://zett42.de/flashfolder/</Property>
+		<Property Id="ARPPRODUCTICON" Secure="yes">ProgramIcon.exe</Property>
+		<Property Id="ARPCOMMENTS" Secure="yes">!(loc.PackageDescription)</Property>
+		<Property Id="ARPURLINFOABOUT" Secure="yes">http://zett42.de/flashfolder/</Property>
 
+		<!--
+		<Property Id="MSIRESTARTMANAGERCONTROL" Secure="yes">Disable</Property>
+		-->
 
 		<!-- Configure WixUI user interface library ...................................... -->
 
 		<UIRef Id="MyWixUI_InstallDir" />
 		<UIRef Id="WixUI_ErrorProgressText" />
-		<Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />
+		<Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" Secure="yes"/>
 		<WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
 		<WixVariable Id="WixUIBannerBmp" Value="Bitmaps\banner.jpg"/>
 		<WixVariable Id="WixUIDialogBmp" Value="Bitmaps\dialog.jpg"/>

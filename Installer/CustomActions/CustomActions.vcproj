@@ -66,7 +66,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
-				AdditionalDependencies="wcautil.lib"
+				AdditionalDependencies="wcautil_d.lib"
 				OutputFile="..\..\exe\CustomActions_x86.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\wcautil\lib"
@@ -232,7 +232,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
-				AdditionalDependencies="wcautil_d.lib"
+				AdditionalDependencies="wcautil.lib"
 				OutputFile="..\..\exe\CustomActions_x86.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\wcautil\lib"

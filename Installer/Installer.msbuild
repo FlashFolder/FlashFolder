@@ -26,7 +26,7 @@
 		<ProductVersion>3.0</ProductVersion>
 		<SchemaVersion>2.0</SchemaVersion>
 		<OutputType>Package</OutputType>
-		<WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.0\Wix.targets</WixTargetsPath>
+		<WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
 		<IntermediateOutputPath>obj\$(Configuration)_$(Platform)\</IntermediateOutputPath>
 		<DefineSolutionProperties>false</DefineSolutionProperties>
 

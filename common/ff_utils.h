@@ -33,6 +33,12 @@ struct FileDlgType
 
 FileDlgType GetFileDlgType( HWND dlg );
 
+// Undocumented message for explorer / common file dialog to get a pointer to the IShellBrowser instance.
+const UINT WM_GETISHELLBROWSER = WM_USER + 7;
+
+inline IShellBrowser* GetShellBrowser( HWND hwnd )
+	{ return reinterpret_cast<IShellBrowser*>( ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 ) ); }
+
 bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter );
 
 tstring ShellViewGetCurrentFolder( IShellBrowser *psb );
@@ -44,9 +50,6 @@ tstring ShellViewGetCurrentFolder( HWND hwnd );
 bool ShellViewSetCurrentFolder( HWND hwndFileDlg, LPCTSTR path );
 bool ShellViewGetViewMode( HWND hwnd, FOLDERVIEWMODE* pViewMode, int* pImageSize = NULL );
 bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize = -1 );
-
-// undocumented message for explorer / common file dialog
-const UINT WM_GETISHELLBROWSER = WM_USER + 7;
 
 // some control ID's of common file dialog
 const unsigned FILEDLG_SHELLVIEW    = 1121;

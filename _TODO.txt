@@ -1,28 +1,25 @@
 -----
 Generic:
 
-[ ] DPI-Scaling for toolbar icons
-
+[ ] Hotkeys bug
+[ ] Fix toolbar UI if Aero Glass is not enabled
 [ ] Test if iTunes is still incompatible
-[ ] autostart fails if terminal services are not running
-	-> start FF via Run regkey?
-[ ] specify log file path per commandline, otherwise create no log file (for running from external drive, etc.)
-[ ] Favmenu editor: use shell folder icon
 [ ] Optionally save last folder even on Cancel
+[x] "View all files" bug
 [x] Fix "remember view mode" for Vista
 [x] 64-bit: control panel, hooks (service can stay 32-bit?)
 
 -----
 Security:
 
-[ ] check if FlashFolder toolbar window exists - deny termination of hook process then
-	-> blocks installation, need at least a user message
-[ ] Restrict services privileges under Vista
+[x] Restrict services privileges under Vista
 [ ] Use private namespaces for kernel objects under Vista ( http://www.codeguru.com/columns/kate/article.php/c13249 )
 [ ] RemoveHook(), FinalizeService() - wait until Hook processes are actually terminated (with timeout)
 
 -----
 Cosmetic:
 
+[ ] DPI-Scaling for toolbar icons
 [ ] Use Vista-style file dialogs in FFConfig (do not use CFileDialog)
 [ ] Use Vista-style treeview, listview, link controls
+[ ] Favmenu editor: use shell folder icon

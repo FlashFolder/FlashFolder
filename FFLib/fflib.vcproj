@@ -85,7 +85,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
 				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib dwmapi.lib"
 				OutputFile="..\exe\fflib6439.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -192,12 +192,12 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
 				AdditionalOptions="/NXCompat /DynamicBase"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib dwmapi.lib"
 				OutputFile="..\exe\fflib6439_64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="fflib.def"
-				DelayLoadDLLs="uxtheme.dll"
+				DelayLoadDLLs="uxtheme.dll dwmapi.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/fflib.pdb"
 				BaseAddress="0x69000000"
@@ -301,7 +301,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
 				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib dwmapi.lib"
 				OutputFile="..\exe\fflib6439.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -411,12 +411,12 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
 				AdditionalOptions="/NXCompat /DynamicBase"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib dwmapi.lib"
 				OutputFile="..\exe\fflib6439_64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="fflib.def"
-				DelayLoadDLLs="uxtheme.dll"
+				DelayLoadDLLs="uxtheme.dll dwmapi.dll"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
@@ -456,15 +456,27 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Quellcodedateien"
+			Name="main"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
+			<File
+				RelativePath="..\_version.h"
+				>
+			</File>
 			<File
 				RelativePath=".\CmnFileDlgHook.cpp"
 				>
 			</File>
 			<File
+				RelativePath=".\CmnFileDlgHook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CmnFolderDlgHook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CmnFolderDlgHook.h"
 				>
 			</File>
 			<File
@@ -495,6 +507,10 @@
 			</File>
 			<File
 				RelativePath=".\fflib.def"
+				>
+			</File>
+			<File
+				RelativePath=".\fflib.h"
 				>
 			</File>
 			<File
@@ -534,7 +550,23 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\fflib_exports.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FileDlg_base.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MsoFileDlgHook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MsoFileDlgHook.h"
+				>
+			</File>
+			<File
+				RelativePath="resource.h"
 				>
 			</File>
 			<File
@@ -573,43 +605,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-		</Filter>
-		<Filter
-			Name="Header-Dateien"
-			Filter="h;hpp;hxx;hm;inl"
-			>
-			<File
-				RelativePath="..\_version.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CmnFileDlgHook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CmnFolderDlgHook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\fflib.h"
-				>
-			</File>
-			<File
-				RelativePath=".\fflib_exports.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FileDlg_base.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MsoFileDlgHook.h"
-				>
-			</File>
-			<File
-				RelativePath="resource.h"
-				>
-			</File>
 			<File
 				RelativePath=".\stdafx.h"
 				>
@@ -619,6 +614,10 @@
 			Name="Ressourcendateien"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
+			<File
+				RelativePath="..\common\res\FlashFolder.ico"
+				>
+			</File>
 			<File
 				RelativePath="res\folder.ico"
 				>
@@ -637,7 +636,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="common_h"
+			Name="common"
 			Filter="*.h"
 			>
 			<File
@@ -645,7 +644,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\Favorites.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\Favorites.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\ff_utils.cpp"
 				>
 			</File>
 			<File
@@ -653,7 +660,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\HistoryLst.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\HistoryLst.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\ProfileDefaults.cpp"
 				>
 			</File>
 			<File
@@ -662,44 +677,34 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="common_cpp"
-			Filter="*.cpp"
+			Name="commonUtils"
 			>
 			<File
-				RelativePath="..\common\Favorites.cpp"
+				RelativePath="..\commonUtils\ExplorerUtils.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\common\ff_utils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\HistoryLst.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\ProfileDefaults.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="commonUtils_h"
-			Filter="*.h;*.hpp;*.hxx"
-			>
 			<File
 				RelativePath="..\commonUtils\ExplorerUtils.h"
 				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\NTKernelApi.h"
+				RelativePath="..\commonUtils\GdiUtils.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\NtKernelUtils.h"
+				RelativePath="..\commonUtils\GdiUtils.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\Profile.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\commonUtils\Profile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\Registry.cpp"
 				>
 			</File>
 			<File
@@ -711,6 +716,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\TotalCmdUtils.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\TotalCmdUtils.h"
 				>
 			</File>
@@ -719,43 +728,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\commonUtils\Utils.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="commonUtils_cpp"
-			>
-			<File
-				RelativePath="..\commonUtils\ExplorerUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\GdiUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\NTKernelApi.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\NtKernelUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Profile.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Registry.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TotalCmdUtils.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\commonUtils\Utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\Utils.h"
 				>
 			</File>
 		</Filter>
