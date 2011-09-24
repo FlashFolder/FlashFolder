@@ -37,8 +37,6 @@
 
 using namespace std;
 
-const WORD OSVERSION = GetOsVersion();
-
 //-----------------------------------------------------------------------------------------
 // global variables  
 //-----------------------------------------------------------------------------------------
@@ -586,7 +584,7 @@ LRESULT CALLBACK ToolWindowEditPathProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			
 		case WM_PAINT:
 		{
-			if( ::GetFocus() != hwnd )
+			if( IsCompositionSupportedAndActive() && ::GetFocus() != hwnd )
 			{
 				// Paint only background of parent (glowing text) when not editing.								
 				PaintDC dc( hwnd );
@@ -704,13 +702,16 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
 		case WM_INITDIALOG:
 		{
-			// make full glass window
-			MARGINS glassMargins = { -1, -1, -1, -1 };
-			::DwmExtendFrameIntoClientArea( hwnd, &glassMargins );
+			if( IsCompositionSupportedAndActive() )
+			{
+				// make full glass window
+				MARGINS glassMargins = { -1, -1, -1, -1 };
+				::DwmExtendFrameIntoClientArea( hwnd, &glassMargins );
 
-			// Inform the window of the frame change made by WM_NCCALCSIZE.
-			Rect rc = GetWindowRect( hwnd );
-			::SetWindowPos( hwnd, NULL, rc.left, rc.top, rc.Width(), rc.Height(), SWP_FRAMECHANGED );
+				// Inform the window of the frame change made by WM_NCCALCSIZE.
+				::SetWindowPos( hwnd, NULL, 0, 0, 0, 0, 
+					SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
+			}
 
 			// no default focus wanted
 			return FALSE;
@@ -857,7 +858,7 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE );
 
 			// Update glowing path text
-			if( GetFocus() != hPath )
+			if( IsCompositionSupportedAndActive() && GetFocus() != hPath )
 				InvalidateRect( hwnd, NULL, FALSE );
 		}
 		break;
@@ -886,12 +887,18 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case WM_ERASEBKGND:
 		{
-			// Erasing background behind toolbar is crucial for having correct transparency over aero glass.
-			// The rest of the window we paint completely in WM_PAINT.
 			HDC hdc = reinterpret_cast<HDC>( wParam );
-			Rect rc = GetChildRect( hwnd, ID_FF_TOOLBAR );
-			::FillRect( hdc, rc, GetStockBrush( BLACK_BRUSH ) );
-		
+
+			HBRUSH brush;
+			if( IsCompositionSupportedAndActive() )
+				brush = GetStockBrush( BLACK_BRUSH );
+			else
+				brush = ::GetSysColorBrush( COLOR_BTNFACE );
+
+			// Erasing background behind toolbar is crucial for having correct transparency.
+			// The rest of the window we paint completely in WM_PAINT to avoid flickering.
+			::FillRect( hdc, GetChildRect( hwnd, ID_FF_TOOLBAR ), brush );
+
 			::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, TRUE );
 			return TRUE;
 		}
@@ -911,34 +918,41 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			HDC dc = reinterpret_cast<HDC>( wParam );
 			Rect rcClient = GetClientRect( hwnd );
 			
-			HWND hEdit = ::GetDlgItem( hwnd, ID_FF_PATH );
-			if( ::GetFocus() != hEdit )
+			if( IsCompositionSupportedAndActive() )
 			{
-				// Draw glowing text for background of edit control when it is not focused.
-				// So the text looks good on aero glass but still has enough contrast on dark background.
-				
-				Theme theme( hwnd, L"CompositedWindow::Window" );
+				HWND hEdit = ::GetDlgItem( hwnd, ID_FF_PATH );
+				if( ::GetFocus() != hEdit )
+				{
+					// Draw glowing text for background of edit control when it is not focused.
+					// So the text looks good on aero glass but still has enough contrast on dark background.
+					
+					Theme theme( hwnd, L"CompositedWindow::Window" );
 
-				PaintBuf buf( rcClient );
+					PaintBuf buf( rcClient );
 
-				HFONT font = reinterpret_cast<HFONT>( ::SendMessage( hEdit, WM_GETFONT, 0, 0 ) );
-				AutoSelectObj selFont( buf, font );
+					HFONT font = reinterpret_cast<HFONT>( ::SendMessage( hEdit, WM_GETFONT, 0, 0 ) );
+					AutoSelectObj selFont( buf, font );
 
-				WCHAR text[ MAX_PATH ] = L"";
-				::GetWindowText( hEdit, text, _countof( text ) );
+					WCHAR text[ MAX_PATH ] = L"";
+					::GetWindowText( hEdit, text, _countof( text ) );
 
-				Rect rcText = GetChildRect( hwnd, hEdit );
-				rcText.left += static_cast<int>( ::SendMessage( hEdit, EM_GETMARGINS, 0, 0 ) & 0xFFFF );
+					Rect rcText = GetChildRect( hwnd, hEdit );
+					rcText.left += static_cast<int>( ::SendMessage( hEdit, EM_GETMARGINS, 0, 0 ) & 0xFFFF );
 
-				DTTOPTS opt = { sizeof( opt ), DTT_COMPOSITED | DTT_GLOWSIZE };
-				opt.iGlowSize = 12;
-				::DrawThemeTextEx( theme, buf, WP_CAPTION, CS_ACTIVE, text, -1, DT_NOPREFIX | DT_PATH_ELLIPSIS, &rcText, &opt );
+					DTTOPTS opt = { sizeof( opt ), DTT_COMPOSITED | DTT_GLOWSIZE };
+					opt.iGlowSize = 12;
+					::DrawThemeTextEx( theme, buf, WP_CAPTION, CS_ACTIVE, text, -1, DT_NOPREFIX | DT_PATH_ELLIPSIS, &rcText, &opt );
 
-				::BitBlt( dc, 0, 0, rcClient.right, rcClient.bottom, buf, 0, 0, SRCCOPY );
+					::BitBlt( dc, 0, 0, rcClient.right, rcClient.bottom, buf, 0, 0, SRCCOPY );
+				}
+				else
+				{
+					::FillRect( dc, rcClient, GetStockBrush( BLACK_BRUSH ) );
+				}
 			}
 			else
 			{
-				::FillRect( dc, rcClient, GetStockBrush( BLACK_BRUSH ) );
+				::FillRect( dc, rcClient, ::GetSysColorBrush( COLOR_BTNFACE ) );
 			}
 			
 			return TRUE;
@@ -956,7 +970,7 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_NCCALCSIZE:
 		{
 			// Extend client area into whole glass window (removing non-client area).
-			if( wParam != FALSE )
+			if( IsCompositionSupportedAndActive() && wParam != FALSE )
 			{
 				::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, 0 );
 				return TRUE;
@@ -980,132 +994,147 @@ BOOL CALLBACK ToolWndSetFont(HWND hwnd, LPARAM lParam)
 
 void CreateToolWindow( bool isFileDialog )
 {
-	bool isThemed = false;
-	if( OSVERSION >= 0x0501 )
-		isThemed = ::IsThemeActive() != 0;	
+	bool isThemed = IsThemeSupportedAndActive();
+	bool isComposited = IsCompositionSupportedAndActive();
 
 	//--- create the external tool window ---
-	
-	g_isToolWndVisible = false;
+	{
+		g_isToolWndVisible = false;
 
-	// Register unique class name so FF can be identified by other tools.
-	WNDCLASS wc = { 0 };
-	wc.lpszClassName = FF_WNDCLASSNAME;
-	wc.hInstance = g_hInstDll;
-	wc.hCursor = ::LoadCursor( NULL, IDC_ARROW );
-	wc.lpfnWndProc = DefDlgProc;
-	wc.cbWndExtra = DLGWINDOWEXTRA;
-	::RegisterClass( &wc );
+		// Register unique class name so FF can be identified by other tools.
+		WNDCLASS wc = { 0 };
+		wc.lpszClassName = FF_WNDCLASSNAME;
+		wc.hInstance = g_hInstDll;
+		wc.hCursor = ::LoadCursor( NULL, IDC_ARROW );
+		wc.lpfnWndProc = DefDlgProc;
+		wc.cbWndExtra = DLGWINDOWEXTRA;
+		::RegisterClass( &wc );
 
-	g_hToolWnd = ::CreateDialog( g_hInstDll, MAKEINTRESOURCE( IDD_TOOLWND ), g_hFileDialog, ToolDlgProc );
-	if( g_hToolWnd == NULL )
-		return;
-		
-	int toolWndHeight = MapDialogY( g_hToolWnd, 20 );
-	::MoveWindow( g_hToolWnd, 0, 0, 100, toolWndHeight, FALSE );
-		
-	AdjustToolWindowPos();
+		g_hToolWnd = ::CreateDialog( g_hInstDll, MAKEINTRESOURCE( IDD_TOOLWND ), g_hFileDialog, ToolDlgProc );
+		if( g_hToolWnd == NULL )
+			return;
+
+		if( ! isComposited )
+		{
+			LONG_PTR style = ::GetWindowLongPtr( g_hToolWnd, GWL_STYLE );
+			LONG_PTR styleRemove = WS_CAPTION | DS_MODALFRAME, 
+			         styleAdd    = WS_THICKFRAME;
+			::SetWindowLongPtr( g_hToolWnd, GWL_STYLE, ( style & ~styleRemove ) | styleAdd );
+			// Inform the window of the frame change
+			::SetWindowPos( g_hToolWnd, NULL, 0, 0, 0, 0, 
+				SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
+		}
+			
+		// Set window height independently of window style.
+		int height = MapDialogY( g_hToolWnd, 22 );
+		::MoveWindow( g_hToolWnd, 0, 0, 100, height, FALSE );
+			
+		AdjustToolWindowPos();
+	}
 
 	Rect rcClient = GetClientRect( g_hToolWnd );
 
 	//--- create the toolbar ---
 
-	vector<TBBUTTON> tbButtons;
+	HWND hTb = NULL;
+	int xTb = 0;
+	Size tbSize;
 	{
-		TBBUTTON btn = { 5, ID_FF_LASTDIR,                 0, BTNS_BUTTON, 0, 0, 0, 0 };
-		tbButtons.push_back( btn );
-	}
-	{
-		TBBUTTON btn = { 0, ID_FF_GLOBALHIST,              0, BTNS_BUTTON, 0, 0, 0, 0 };
-		tbButtons.push_back( btn );
-	}
-	{
-		TBBUTTON btn = { 2, ID_FF_OPENDIRS,  TBSTATE_ENABLED, BTNS_BUTTON, 0, 0, 0, 0 };
-		tbButtons.push_back( btn );
-	}
-	{
-		TBBUTTON btn = { 3, ID_FF_FAVORITES, TBSTATE_ENABLED, BTNS_BUTTON, 0, 0, 0, 0 };
-		tbButtons.push_back( btn );
-	}	  
-	if( isFileDialog )
-	{
-		TBBUTTON btn = { 4, ID_FF_SHOWALL,   TBSTATE_ENABLED, BTNS_BUTTON, 0, 0, 0, 0 };
-		tbButtons.push_back( btn );
-	}
-	{
-		TBBUTTON btn = { 6, ID_FF_CONFIG,    TBSTATE_ENABLED, BTNS_BUTTON, 0, 0, 0, 0 };
-		tbButtons.push_back( btn );
-	}
+		vector<TBBUTTON> tbButtons;
+		{
+			TBBUTTON btn = { 5, ID_FF_LASTDIR,                 0, BTNS_BUTTON, 0, 0, 0, 0 };
+			tbButtons.push_back( btn );
+		}
+		{
+			TBBUTTON btn = { 0, ID_FF_GLOBALHIST,              0, BTNS_BUTTON, 0, 0, 0, 0 };
+			tbButtons.push_back( btn );
+		}
+		{
+			TBBUTTON btn = { 2, ID_FF_OPENDIRS,  TBSTATE_ENABLED, BTNS_BUTTON, 0, 0, 0, 0 };
+			tbButtons.push_back( btn );
+		}
+		{
+			TBBUTTON btn = { 3, ID_FF_FAVORITES, TBSTATE_ENABLED, BTNS_BUTTON, 0, 0, 0, 0 };
+			tbButtons.push_back( btn );
+		}	  
+		if( isFileDialog )
+		{
+			TBBUTTON btn = { 4, ID_FF_SHOWALL,   TBSTATE_ENABLED, BTNS_BUTTON, 0, 0, 0, 0 };
+			tbButtons.push_back( btn );
+		}
+		{
+			TBBUTTON btn = { 6, ID_FF_CONFIG,    TBSTATE_ENABLED, BTNS_BUTTON, 0, 0, 0, 0 };
+			tbButtons.push_back( btn );
+		}
 
-	// Check whether the 32 bpp version of the toolbar bitmap is supported. 
-	// For this, OS must be >= WinXP and display mode >= 16 bpp.
-	bool isToolbar32bpp = false;
-	if( OSVERSION >= 0x0501 )
-	{
-		HDC hScreenIC = ::CreateIC( _T("DISPLAY"), NULL, NULL, NULL );
-		isToolbar32bpp = ::GetDeviceCaps( hScreenIC, BITSPIXEL ) >= 16;
-		::DeleteDC( hScreenIC );
+		// Check whether the 32 bpp version of the toolbar bitmap is supported. 
+		// For this, OS must be >= WinXP and display mode >= 16 bpp.
+		bool isToolbar32bpp = false;
+		if( OSVERSION >= WINVER_XP )
+		{
+			DC dc( ::CreateIC( _T("DISPLAY"), NULL, NULL, NULL ) );
+			isToolbar32bpp = ::GetDeviceCaps( dc, BITSPIXEL ) >= 16;
+		}
+
+		hTb = ::CreateToolbarEx( g_hToolWnd, WS_CHILD | WS_TABSTOP | TBSTYLE_FLAT | 
+			CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS,
+			ID_FF_TOOLBAR, (int) tbButtons.size(), 
+			isToolbar32bpp ? NULL : g_hInstDll, isToolbar32bpp ? 0 : ID_FF_TOOLBAR, 
+			&tbButtons[ 0 ], (int) tbButtons.size(), 16,16, 16,16, sizeof(TBBUTTON) );
+
+		::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS );
+		::ShowWindow( hTb, SW_SHOW );
+
+		if( isToolbar32bpp )
+		{
+			g_hToolbarImages = ::ImageList_LoadImage( g_hInstDll, MAKEINTRESOURCE( ID_FF_TOOLBAR_XP ), 
+				16, 1, CLR_NONE, IMAGE_BITMAP, LR_CREATEDIBSECTION );
+			::SendMessage( hTb, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>( g_hToolbarImages ) );
+		}
+
+		::SendMessage( hTb, TB_AUTOSIZE, 0, 0 );
+
+		// calculate width of the toolbar from position of last button (TB_GETMAXSIZE has a bug under Win2k!)
+		Rect tbRC;
+		::SendMessage( hTb, TB_GETRECT, tbButtons.back().idCommand, reinterpret_cast<LPARAM>( &tbRC ) );
+		tbSize = Size( tbRC.right, tbRC.bottom );
+		
+		xTb = MapDialogX( g_hToolWnd, 4 );
+		SetWindowPos( hTb, NULL, xTb, ( rcClient.bottom - tbSize.cy ) / 2, tbSize.cx, tbSize.cy, SWP_NOZORDER | SWP_NOACTIVATE );
 	}
-
-    HWND hTb = ::CreateToolbarEx( g_hToolWnd, WS_CHILD | WS_TABSTOP | TBSTYLE_FLAT | 
-		CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS,
-		ID_FF_TOOLBAR, (int) tbButtons.size(), 
-		isToolbar32bpp ? NULL : g_hInstDll, isToolbar32bpp ? 0 : ID_FF_TOOLBAR, 
-		&tbButtons[ 0 ], (int) tbButtons.size(), 16,16, 16,16, sizeof(TBBUTTON) );
-
-	::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS );
-	::ShowWindow( hTb, SW_SHOW );
-
-	if( isToolbar32bpp )
-	{
-		g_hToolbarImages = ::ImageList_LoadImage( g_hInstDll, MAKEINTRESOURCE( ID_FF_TOOLBAR_XP ), 
-			16, 1, CLR_NONE, IMAGE_BITMAP, LR_CREATEDIBSECTION );
-		::SendMessage( hTb, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>( g_hToolbarImages ) );
-	}
-
-	::SendMessage( hTb, TB_AUTOSIZE, 0, 0 );
-
-	// calculate width of the toolbar from position of last button (TB_GETMAXSIZE has a bug under Win2k!)
-	Rect tbRC;
-	::SendMessage( hTb, TB_GETRECT, tbButtons.back().idCommand, reinterpret_cast<LPARAM>( &tbRC ) );
-	SIZE tbSize = { tbRC.right, tbRC.bottom };
-	
-	int xTB = MapDialogX( g_hToolWnd, 4 );
-	SetWindowPos( hTb, NULL, xTB, ( rcClient.bottom - tbSize.cy ) / 2, tbSize.cx, tbSize.cy, SWP_NOZORDER | SWP_NOACTIVATE );
 
 	//--- create + sub-class the edit control 
-
-	Rect rcDiv( 0, 0, 6, 1 ); 
-	Rect rcDivR( 0, 0, 4, 1 ); 
-	// use themed border if possible
-	DWORD edStyleEx = isThemed ? WS_EX_CLIENTEDGE : WS_EX_STATICEDGE;
-	if( OSVERSION >= 0x0600 && isThemed )
 	{
-		// Visual tuning for Vista
-		rcDiv.bottom = rcDivR.bottom = 2;
-		edStyleEx = 0;
+		Rect rcDiv( 0, 0, 6, 1 ); 
+		Rect rcDivR( 0, 0, 4, 1 ); 
+		// use themed border if possible
+		DWORD edStyleEx = isThemed ? WS_EX_CLIENTEDGE : WS_EX_STATICEDGE;
+		if( OSVERSION >= WINVER_VISTA && isThemed )
+		{
+			rcDiv.bottom = rcDivR.bottom = 2;
+			edStyleEx = 0;
+		}
+		::MapDialogRect( g_hToolWnd, &rcDiv ); 
+		::MapDialogRect( g_hToolWnd, &rcDivR ); 
+		int xEdit = xTb + tbSize.cx + rcDiv.right;
+		int editHeight = MapDialogY( g_hToolWnd, 11 );
+
+		HWND hEdit = ::CreateWindowEx( edStyleEx, _T("Edit"), NULL, 
+			WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL | WS_TABSTOP, 
+			xEdit, ( rcClient.bottom - editHeight ) / 2, 
+			rcClient.right - rcClient.left - xEdit - rcDivR.right, 
+			editHeight, 
+			g_hToolWnd, (HMENU) ID_FF_PATH, g_hInstDll, NULL);
+
+		if( isComposited )
+			::SetWindowTheme( hEdit, NULL, L"EditComposited::Edit" );
+							
+		// enable auto-complete for the edit control
+		::SHAutoComplete( hEdit, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
+		//sub-class the edit control to handle key-stroke messages
+		g_wndProcToolWindowEditPath = reinterpret_cast<WNDPROC>(  
+			::SetWindowLongPtr( hEdit, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>( &ToolWindowEditPathProc ) ) );
 	}
-	::MapDialogRect( g_hToolWnd, &rcDiv ); 
-	::MapDialogRect( g_hToolWnd, &rcDivR ); 
-	int xEdit = xTB + tbSize.cx + rcDiv.right;
-	int editHeight = MapDialogY( g_hToolWnd, 10 );
-
-	HWND hEdit = ::CreateWindowEx( edStyleEx, _T("Edit"), NULL, 
-		WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL | WS_TABSTOP, 
-		xEdit, ( rcClient.bottom - editHeight ) / 2, 
-		rcClient.right - rcClient.left - xEdit - rcDivR.right, 
-		editHeight, 
-		g_hToolWnd, (HMENU) ID_FF_PATH, g_hInstDll, NULL);
-
-	if( OSVERSION >= 0x0600 && isThemed )
-		::SetWindowTheme( hEdit, NULL, L"EditComposited::Edit" );
-						
-	// enable auto-complete for the edit control
-	::SHAutoComplete( hEdit, SHACF_FILESYS_DIRS | SHACF_AUTOSUGGEST_FORCE_ON );
-	//sub-class the edit control to handle key-stroke messages
-	g_wndProcToolWindowEditPath = (WNDPROC)  
-		SetWindowLongPtr( hEdit, GWLP_WNDPROC, (LONG) &ToolWindowEditPathProc );
-
 
     //--- set default font for all child controls
     

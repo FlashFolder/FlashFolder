@@ -78,7 +78,7 @@
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="uxtheme.dll;urlmon.dll"
+				DelayLoadDLLs="uxtheme.dll;dwmapi.dll;urlmon.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -265,7 +265,7 @@
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="uxtheme.dll;urlmon.dll"
+				DelayLoadDLLs="uxtheme.dll;dwmapi.dll;urlmon.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -609,11 +609,19 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="common_h"
+			Name="common"
 			Filter="*.h;*.hpp;*.hxx"
 			>
 			<File
+				RelativePath="..\common\Favorites.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\Favorites.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\ff_utils.cpp"
 				>
 			</File>
 			<File
@@ -621,7 +629,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\HistoryLst.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\HistoryLst.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\ProfileDefaults.cpp"
 				>
 			</File>
 			<File
@@ -630,32 +646,19 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="common_cpp"
+			Name="commonUtils"
 			Filter="*.cpp"
 			>
 			<File
-				RelativePath="..\common\Favorites.cpp"
+				RelativePath="..\commonUtils\BalloonHelp.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\common\ff_utils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\HistoryLst.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\ProfileDefaults.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="commonUtils_h"
-			Filter="*.h;*.hpp;*.hxx"
-			>
 			<File
 				RelativePath="..\commonUtils\BalloonHelp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\CacheImageList.cpp"
 				>
 			</File>
 			<File
@@ -663,7 +666,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\DlgExpander.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\DlgExpander.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\DownloadThread.cpp"
 				>
 			</File>
 			<File
@@ -671,7 +682,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\DragListCtrl.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\DragListCtrl.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreeListCtrl\EditableTreeListCtrl.cpp"
 				>
 			</File>
 			<File
@@ -679,7 +698,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\EditEx.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\EditEx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\FolderDlg.cpp"
 				>
 			</File>
 			<File
@@ -687,7 +714,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\GdiUtils.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\GdiUtils.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\GroupCheck.cpp"
 				>
 			</File>
 			<File
@@ -699,7 +734,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\HTMLFormatter.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\HyperLink.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\HyperLink.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\MessageBox.cpp"
 				>
 			</File>
 			<File
@@ -708,6 +755,10 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\MfcThread.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreeListCtrl\MultiSelTree.cpp"
 				>
 			</File>
 			<File
@@ -723,7 +774,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\OsVersion.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\OsVersion.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\Profile.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\Profile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreePropSheet\PropPageFrame.cpp"
 				>
 			</File>
 			<File
@@ -731,11 +798,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\TreePropSheet\PropPageFrameDefault.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\TreePropSheet\PropPageFrameDefault.h"
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\Registry.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\Registry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\ResizableDlg.cpp"
 				>
 			</File>
 			<File
@@ -744,123 +823,6 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\StringUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TinyXml\tinyxml.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TotalCmdUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreeListCtrl\TreeListCtrl.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\tstring.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\UnicodeUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Utils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\VersionInfo.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\VistaFontHelper.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="commonUtils_cpp"
-			Filter="*.cpp"
-			>
-			<File
-				RelativePath="..\commonUtils\BalloonHelp.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\CacheImageList.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\DlgExpander.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\DownloadThread.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\DragListCtrl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreeListCtrl\EditableTreeListCtrl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\EditEx.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\FolderDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\GdiUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\GroupCheck.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\HTMLFormatter.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\HyperLink.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\MessageBox.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreeListCtrl\MultiSelTree.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Profile.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreePropSheet\PropPageFrame.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreePropSheet\PropPageFrameDefault.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Registry.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\ResizableDlg.cpp"
 				>
 			</File>
 			<File
@@ -934,6 +896,10 @@
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TinyXml\tinyxml.h"
+				>
 			</File>
 			<File
 				RelativePath="..\commonUtils\TinyXml\tinyxmlerror.cpp"
@@ -1012,7 +978,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\TotalCmdUtils.h"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\TreeListCtrl\TreeListCtrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\TreeListCtrl\TreeListCtrl.h"
 				>
 			</File>
 			<File
@@ -1020,7 +994,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\tstring.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\UnicodeUtils.h"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\Utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\Utils.h"
 				>
 			</File>
 			<File
@@ -1028,7 +1018,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\VersionInfo.h"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\VistaFontHelper.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\VistaFontHelper.h"
 				>
 			</File>
 		</Filter>

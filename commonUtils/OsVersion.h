@@ -14,30 +14,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
  */
+ 
+/// \file OS version utilities.
+ 
+#pragma once
 
-#include "stdafx.h"
-#include "GdiUtils.h"
+/// Windows version constants.
+enum WinVer
+{	
+	WINVER_2K    = 0x0500,
+	WINVER_XP    = 0x0501,
+	WINVER_VISTA = 0x0600,
+	WINVER_7     = 0x0601
+};
 
-//-----------------------------------------------------------------------------------------------
-
-void GetStandardOsFont( LOGFONT *pLF, WORD* pDefSize )
+/// Get runtime OS version, high-byte = major version, low-byte = minor version.
+inline WORD GetOsVersion()
 {
-	// Use explicit size here, otherwise when compiling with WINVER >= 0x0600, it would break
-	// backwards compatibility with XP.
-	NONCLIENTMETRICS ncm = { sizeof(UINT) + 9 * sizeof(int) + 5 * sizeof(LOGFONT) };
-	::SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0 );
-	*pLF = ncm.lfMessageFont;
-
-	if( pDefSize )
-	{
-		// CreateIC() is less overhead than GetDC().
-		HDC hScreenIC = ::CreateIC( _T("DISPLAY"), NULL, NULL, NULL );
-
-		int h = pLF->lfHeight < 0 ? -pLF->lfHeight : pLF->lfHeight;
-		*pDefSize = (WORD) MulDiv( h, 72, GetDeviceCaps( hScreenIC, LOGPIXELSY ) );
-		::DeleteDC( hScreenIC );
-	}
+	WORD ver = static_cast<WORD>( ::GetVersion() );
+	return ( ver << 8 ) | ( ver >> 8 );
 }
 
+/// Get runtime OS version, high-byte = major version, low-byte = minor version.
+extern const WORD OSVERSION; 

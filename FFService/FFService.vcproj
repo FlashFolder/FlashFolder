@@ -438,7 +438,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Quellcodedateien"
+			Name="main"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
@@ -492,6 +492,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\FFLib\HookInstaller.h"
+				>
+			</File>
+			<File
+				RelativePath="Resource.h"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
@@ -537,19 +545,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-		</Filter>
-		<Filter
-			Name="Header-Dateien"
-			Filter="h;hpp;hxx;hm;inl"
-			>
-			<File
-				RelativePath="..\FFLib\HookInstaller.h"
-				>
-			</File>
-			<File
-				RelativePath="Resource.h"
-				>
-			</File>
 			<File
 				RelativePath="StdAfx.h"
 				>
@@ -569,26 +564,22 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="common_h"
-			>
-			<File
-				RelativePath="..\commonUtils\LogFile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Utils.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="common_cpp"
+			Name="common"
 			>
 			<File
 				RelativePath="..\commonUtils\LogFile.cpp"
 				>
 			</File>
 			<File
+				RelativePath="..\commonUtils\LogFile.h"
+				>
+			</File>
+			<File
 				RelativePath="..\commonUtils\Utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\Utils.h"
 				>
 			</File>
 		</Filter>

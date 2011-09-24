@@ -90,7 +90,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="fflib.def"
-				DelayLoadDLLs="uxtheme.dll"
+				DelayLoadDLLs="uxtheme.dll;dwmapi.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/fflib.pdb"
 				BaseAddress="0x69000000"
@@ -306,7 +306,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="fflib.def"
-				DelayLoadDLLs="uxtheme.dll"
+				DelayLoadDLLs="uxtheme.dll;dwmapi.dll"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
@@ -693,6 +693,14 @@
 			</File>
 			<File
 				RelativePath="..\commonUtils\GdiUtils.h"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\OsVersion.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\commonUtils\OsVersion.h"
 				>
 			</File>
 			<File

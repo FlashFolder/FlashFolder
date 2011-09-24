@@ -21,9 +21,13 @@
 #pragma once
 
 #include "boost\noncopyable.hpp"
+#include "OsVersion.h"
 #include <windows.h>
+#include <uxtheme.h>
+#include <dwmapi.h>
 
 //----------------------------------------------------------------------------------------------------
+/// RAII wrapper for HDC which calls ::DeleteDC() in destructor.
 
 class DC : boost::noncopyable
 {
@@ -49,6 +53,7 @@ private:
 };
 
 //----------------------------------------------------------------------------------------------------
+/// RAII wrapper for HDC which calls ::ReleaseDC() in destructor.
 
 class WindowDC : boost::noncopyable
 {
@@ -77,6 +82,7 @@ private:
 };
 
 //----------------------------------------------------------------------------------------------------
+/// RAII wrapper for ::BeginPaint() / ::EndPaint()
 
 class PaintDC : boost::noncopyable
 {
@@ -108,6 +114,7 @@ private:
 };
 
 //----------------------------------------------------------------------------------------------------
+/// RAII wrapper for GDI objects which calls ::DeleteObject() in destructor.
 
 template< typename T >
 class GdiObject : boost::noncopyable
@@ -143,7 +150,7 @@ typedef GdiObject< HPEN > Pen;
 typedef GdiObject< HRGN > Region;
 
 //----------------------------------------------------------------------------------------------------
-/// 32 bpp paint buffer (DIB section + device context)
+/// 32 bpp paint buffer (DIB section + associated device context).
 
 class PaintBuf : boost::noncopyable
 {
@@ -203,7 +210,7 @@ private:
 
 //-----------------------------------------------------------------------------------------------
 
-/// Wrapper for SelectObject() API
+/// RAII Wrapper for SelectObject() API
 class AutoSelectObj : boost::noncopyable
 {
 public:
@@ -236,7 +243,7 @@ private:
 
 //-----------------------------------------------------------------------------------------------
 
-/// Wrapper for SaveDC() API
+/// RAII Wrapper for SaveDC() API
 class AutoSaveDC : boost::noncopyable
 {
 public:
@@ -262,7 +269,7 @@ private:
 
 //-----------------------------------------------------------------------------------------------
 
-/// Wrapper for WM_SETREDRAW
+/// RAII Wrapper for WM_SETREDRAW
 class AutoRedraw : boost::noncopyable
 {
 public:
@@ -283,6 +290,7 @@ private:
 };
 
 //-----------------------------------------------------------------------------------------------
+/// RAII wrapper for HTHEME (::OpenThemeData() / ::CloseThemeData())
 
 class Theme : boost::noncopyable
 {
@@ -309,6 +317,7 @@ private:
 };
 
 //----------------------------------------------------------------------------------------------------
+/// Class wrapper for POINT
 
 struct Point : POINT
 {
@@ -319,6 +328,7 @@ struct Point : POINT
 	operator const POINT*() const { return this; }
 };
 
+/// Class wrapper for SIZE
 struct Size : SIZE
 {
 	Size() { cx = cy = 0; }
@@ -328,6 +338,7 @@ struct Size : SIZE
 	operator const SIZE*() const { return this; }
 };
 
+/// Class wrapper for RECT
 struct Rect : RECT
 {
 	Rect() { left = top = right = bottom = 0; }
@@ -488,4 +499,22 @@ inline void ClientToScreenRect( HWND hwnd, RECT* prc )
 
 //-----------------------------------------------------------------------------------------------
 
+/// Get a stock brush.
 inline HBRUSH GetStockBrush( int i ) { return reinterpret_cast<HBRUSH>( ::GetStockObject( i ) ); }
+
+//-----------------------------------------------------------------------------------------------
+
+/// Call ::IsThemeActive() if current OS version supports it.
+/// Requires to use delay-load for uxtheme.dll!
+inline bool IsThemeSupportedAndActive()
+{
+	return OSVERSION >= WINVER_XP && ::IsThemeActive();
+}
+
+/// Call ::DwmIsCompositionEnabled() if current OS version supports it.
+/// Requires to use delay-load for dwmapi.dll!
+inline bool IsCompositionSupportedAndActive()
+{
+	BOOL enabled = FALSE;
+	return OSVERSION >= WINVER_VISTA && SUCCEEDED( ::DwmIsCompositionEnabled( &enabled ) ) && enabled;
+}

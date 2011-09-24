@@ -64,15 +64,6 @@ bool IsIniSectionNotEmpty( LPCTSTR filename, LPCTSTR sectionName );
 
 void AddTextInput( std::vector<INPUT>* pInput, LPCTSTR pText );
 
-/// Get runtime OS version, high-byte = major version, low-byte = minor version.
-/// e.g. 0x0500 = Win2k, 0x0501 = WinXP, 0x0600 = Vista
-inline WORD GetOsVersion()
-{
-	OSVERSIONINFO ovi = { sizeof(ovi) };
-	::GetVersionEx( &ovi );
-	return static_cast<WORD>( ovi.dwMajorVersion << 8 | ovi.dwMinorVersion );
-}
-
 inline bool IsShiftKeyPressed() 
 	{ return (GetKeyState(VK_SHIFT) & (1 << (sizeof(SHORT)*8-1))) != 0; }
 inline bool IsCtrlKeyPressed()  

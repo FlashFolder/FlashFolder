@@ -48,6 +48,7 @@ using namespace std;
 
 //--- utilities
 #include <tstring.h>
+#include <OsVersion.h>
 #include <Utils.h>
 #include <GdiUtils.h>
 #include <Profile.h>
