@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "boost\noncopyable.hpp"
+#include <boost\noncopyable.hpp>
 #include "OsVersion.h"
 #include <windows.h>
 #include <uxtheme.h>
@@ -89,13 +89,8 @@ class PaintDC : boost::noncopyable
 public:
 	explicit PaintDC( HWND hwnd ) :
 		m_hwnd( hwnd ),
-		m_hdc( NULL )
-	{
-		if( ::GetUpdateRect( hwnd, NULL, FALSE ) )
-			m_hdc = ::BeginPaint( hwnd, &m_ps );
-		else
-			memset( &m_ps, 0, sizeof( m_ps ) );
-	}
+		m_hdc( ::BeginPaint( hwnd, &m_ps ) )
+	{}
 
 	~PaintDC()
 	{

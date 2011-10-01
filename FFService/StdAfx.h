@@ -20,8 +20,10 @@
 #include <tchar.h>
 
 // Common headers
-#include <utils.h>
-#include "../common/ProcessNames.h"
+#include <common\_autolink.h>
+#include <common\ProcessNames.h>
+#include <commonUtils\_autolink.h>
+#include <commonUtils\utils.h>
 
 #include <strsafe.h>
 

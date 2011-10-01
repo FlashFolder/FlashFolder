@@ -1,1 +1,2 @@
-msiexec /qb /x FlashFolder_release.msi /l*v log_uninst.txt
+cd en-US
+msiexec /qb /x FlashFolder_release_x64.msi /l*vx log_uninst.txt

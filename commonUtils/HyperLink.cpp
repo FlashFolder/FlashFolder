@@ -436,7 +436,7 @@ void CHyperLink::ReportError(int nError)
         case SE_ERR_SHARE:            str = "A sharing violation occurred. ";
         default:                      str.Format(_T("Unknown Error (%d) occurred."), nError); break;
     }
-    str = "Unable to open hyperlink:\n\n" + str;
+    str = _T("Unable to open hyperlink:\n\n") + str;
     AfxMessageBox(str, MB_ICONEXCLAMATION | MB_OK);
 }
 

@@ -16,6 +16,7 @@
 
 #include "stdafx.h"
 #include "PropPageFrameDefault.h"
+#include "GdiUtils.h"
 
 #pragma warning(disable:4800) // convert BOOL to bool
 #pragma warning(disable:4244) // convert to smaller type

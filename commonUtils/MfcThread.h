@@ -17,11 +17,13 @@
  */          
 #pragma once
 
+#include <boost\noncopyable.hpp>
+
 /** \brief Abstract class for creating an MFC worker thread.
 *
 * This class is basically a wrapper for AfxBeginThread()
 */
-class CMfcThread
+class CMfcThread : boost::noncopyable
 {
 public:
 	CMfcThread() :

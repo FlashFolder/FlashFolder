@@ -95,7 +95,7 @@ public:
                const CPoint& ptAnchor,          // anchor (tail position) of balloon
                unsigned int unOptions,          // options (see above)
                CWnd* pParentWnd = NULL,         // parent window (NULL == MFC main window)
-               const CString strURL = "",       // URL to open (ShellExecute()) when clicked
+               const CString strURL = CString(),       // URL to open (ShellExecute()) when clicked
                unsigned int unTimeout = 0,      // delay before closing automatically (milliseconds)
                HICON hIcon = NULL);             // icon to display
 
@@ -105,7 +105,7 @@ public:
                LPCTSTR szIcon = IDI_EXCLAMATION,
                unsigned int unOptions = unSHOW_CLOSE_BUTTON,
                CWnd* pParentWnd = NULL, 
-               const CString strURL = "",
+               const CString strURL = CString(),
                unsigned int unTimeout = 10000);
 
    // Sets the font used for drawing the balloon title.  Deleted by balloon, do not use CFont* after passing to this function.

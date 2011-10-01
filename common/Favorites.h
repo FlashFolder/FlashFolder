@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <commonUtils\tstring.h>
+
 struct FavoritesItem
 {
 	tstring command;      ///< file path or TC command (required)

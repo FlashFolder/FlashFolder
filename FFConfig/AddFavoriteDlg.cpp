@@ -20,7 +20,6 @@
 #include "stdafx.h"
 #include "FFConfig.h"
 #include "AddFavoriteDlg.h"
-#include "utils.h"
 #include "FolderFavoritesDlg.h"
 
 //-----------------------------------------------------------------------------------------------

@@ -22,7 +22,7 @@
 #if _MSC_VER < 1300
 #include <..\src\occimpl.h> 
 #else
-#include "afxocc.h"
+#include <afxocc.h>
 #endif
 
 //-------------------------------------------------------------------------------------------

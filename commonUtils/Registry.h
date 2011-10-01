@@ -22,10 +22,13 @@
 
 #pragma once
 
+#include <boost\noncopyable.hpp>
+#include "tstring.h"
+
 /**
  *  \brief Encapsulates a registry key (HKEY) and provides methods to access it.
 **/
-class RegKey
+class RegKey : boost::noncopyable
 {
 public:
 	RegKey() : m_hKey( NULL ) {}

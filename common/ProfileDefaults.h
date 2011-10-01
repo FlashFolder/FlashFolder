@@ -17,6 +17,9 @@
  */
 #pragma once
 
+#include <commonUtils\Profile.h>
+#include <commonUtils\GdiUtils.h>
+
 //-----------------------------------------------------------------------------------------
 /**
  * Get default program settings.

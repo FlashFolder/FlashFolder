@@ -1,6 +1,3 @@
-// stdafx.h : include file for standard system include files,
-// or project specific include files that are used frequently,
-// but are changed infrequently
 
 #pragma once
 
@@ -55,40 +52,40 @@
 
 //--- own headers
 
-// XML parser
-#include <TinyXml/TinyXml.h>
-
 // utilities
-#include <tstring.h>
-#include <Utils.h>
-#include <StringUtils.h>
-#include <UnicodeUtils.h>
-#include <Profile.h>
-#include <Registry.h>
-#include <TotalCmdUtils.h>
-#include <DownloadThread.h>
-#include <VersionInfo.h>
+#include <commonUtils\_autolink.h>
+#include <CommonUtils\tstring.h>
+#include <CommonUtils\Utils.h>
+#include <CommonUtils\StringUtils.h>
+#include <CommonUtils\UnicodeUtils.h>
+#include <CommonUtils\Profile.h>
+#include <CommonUtils\Registry.h>
+#include <CommonUtils\TotalCmdUtils.h>
+#include <CommonUtils\DownloadThread.h>
+#include <CommonUtils\VersionInfo.h>
+#include <commonUtils\TinyXml\TinyXml.h>
 
 // UI
-#include <GdiUtils.h>
-#include <GroupCheck.h>
-#include <ResizableDlg.h>
-#include <FolderDlg.h>
-#include <EditEx.h>
-#include <HyperLink.h>
-#include <DlgExpander.h>
-#include <TreeListCtrl/EditableTreeListCtrl.h>
-#include <BalloonHelp.h>
-#include <TreePropSheet/TreePropSheet.h>
-#include <TreePropSheet/PropPageFrame.h>
-#include <TreePropSheet/PropPageFrameDefault.h>
-#include <PopupDlg.h>
-#include <CacheImageList.h>
-#include <MessageBox.h>
-#include <VistaFontHelper.h>
+#include <CommonUtils\GdiUtils.h>
+#include <CommonUtils\GroupCheck.h>
+#include <CommonUtils\ResizableDlg.h>
+#include <CommonUtils\FolderDlg.h>
+#include <CommonUtils\EditEx.h>
+#include <CommonUtils\HyperLink.h>
+#include <CommonUtils\DlgExpander.h>
+#include <CommonUtils\TreeListCtrl/EditableTreeListCtrl.h>
+#include <CommonUtils\BalloonHelp.h>
+#include <CommonUtils\TreePropSheet/TreePropSheet.h>
+#include <CommonUtils\TreePropSheet/PropPageFrame.h>
+#include <CommonUtils\TreePropSheet/PropPageFrameDefault.h>
+#include <CommonUtils\PopupDlg.h>
+#include <CommonUtils\CacheImageList.h>
+#include <CommonUtils\MessageBox.h>
+#include <CommonUtils\VistaFontHelper.h>
 
-// project-specific
-#include "../common/ff_utils.h"
-#include "../common/Favorites.h"
-#include "../common/ProfileDefaults.h"
-#include "../common/ProcessNames.h"
+// FlashFolder-specific
+#include <common\_autolink.h>
+#include <common\ff_utils.h>
+#include <common\Favorites.h>
+#include <common\ProfileDefaults.h>
+#include <common\ProcessNames.h>

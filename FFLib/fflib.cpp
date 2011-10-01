@@ -732,49 +732,72 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_NOTIFY:
 		{
 			NMHDR* pnm = reinterpret_cast<NMHDR*>( lParam );
-			if( pnm->code == TBN_DROPDOWN )
+			switch( pnm->code )
 			{
-				// drop-down button pressed
-
-				NMTOOLBAR* pnmt = reinterpret_cast<NMTOOLBAR*>( pnm );
-				ExecuteToolbarCommand( pnmt->iItem );
-
-				::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, TBDDRET_DEFAULT );
-				return TRUE;
-			}
-			else if( pnm->code == TTN_NEEDTEXT )
-			{
-				// tooltip text requested
-			
-				NMTTDISPINFO* pTTT = reinterpret_cast<NMTTDISPINFO*>( pnm );
-
-				pTTT->hinst = NULL;
-
-				const int TOOLTIP_BUFSIZE = MAX_PATH + 64;
-				static TCHAR s_tooltipBuf[ TOOLTIP_BUFSIZE + 1 ];
-				s_tooltipBuf[ 0 ] = 0;
-				pTTT->lpszText = s_tooltipBuf;
-			
-				if( pTTT->hdr.idFrom == ID_FF_LASTDIR )
+				case TBN_DROPDOWN:
 				{
-					// use most recent entry of global history as tooltip
-					tstring sLastDir = g_profile.GetString( _T("GlobalFolderHistory"), _T("0") );
-					if( sLastDir.empty() )
-						::LoadString( g_hInstDll, (UINT) pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
+					// drop-down button pressed
+
+					NMTOOLBAR* pnmt = reinterpret_cast<NMTOOLBAR*>( pnm );
+					ExecuteToolbarCommand( pnmt->iItem );
+
+					::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, TBDDRET_DEFAULT );
+					return TRUE;
+				}
+				
+				case TTN_NEEDTEXT:
+				{
+					// tooltip text requested
+				
+					NMTTDISPINFO* pTTT = reinterpret_cast<NMTTDISPINFO*>( pnm );
+
+					pTTT->hinst = NULL;
+
+					const int TOOLTIP_BUFSIZE = MAX_PATH + 64;
+					static TCHAR s_tooltipBuf[ TOOLTIP_BUFSIZE + 1 ];
+					s_tooltipBuf[ 0 ] = 0;
+					pTTT->lpszText = s_tooltipBuf;
+				
+					if( pTTT->hdr.idFrom == ID_FF_LASTDIR )
+					{
+						// use most recent entry of global history as tooltip
+						tstring sLastDir = g_profile.GetString( _T("GlobalFolderHistory"), _T("0") );
+						if( sLastDir.empty() )
+							::LoadString( g_hInstDll, (UINT) pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
+						else
+							StringCbCopy( s_tooltipBuf, sizeof(s_tooltipBuf), sLastDir.c_str() );
+					}
 					else
-						StringCbCopy( s_tooltipBuf, sizeof(s_tooltipBuf), sLastDir.c_str() );
-				}
-				else
-				{
-					::LoadString( g_hInstDll, (UINT) pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
+					{
+						::LoadString( g_hInstDll, (UINT) pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
+					}
+
+					// append hotkey name
+					if( int hotkey = g_profile.GetInt( _T("Hotkeys"), GetCommandName( (int) pTTT->hdr.idFrom ) ) )
+					{
+						StringCchCat( s_tooltipBuf, TOOLTIP_BUFSIZE, _T("\nShortcut: ") ); 					
+						TCHAR hkName[ 256 ]; GetHotkeyName( hkName, 255, hotkey );
+						StringCchCat( s_tooltipBuf, TOOLTIP_BUFSIZE, hkName ); 					
+					}
+					
+					return TRUE;
 				}
 
-				// append hotkey name
-				if( int hotkey = g_profile.GetInt( _T("Hotkeys"), GetCommandName( (int) pTTT->hdr.idFrom ) ) )
+				case NM_CUSTOMDRAW:
 				{
-					StringCchCat( s_tooltipBuf, TOOLTIP_BUFSIZE, _T("\nShortcut: ") ); 					
-					TCHAR hkName[ 256 ]; GetHotkeyName( hkName, 255, hotkey );
-					StringCchCat( s_tooltipBuf, TOOLTIP_BUFSIZE, hkName ); 					
+					LPNMTBCUSTOMDRAW pcd = reinterpret_cast<LPNMTBCUSTOMDRAW>( lParam );
+
+					if( IsCompositionSupportedAndActive() )
+					{
+						HWND hTb = ::GetDlgItem( hwnd, ID_FF_TOOLBAR );
+						if( pcd->nmcd.hdr.hwndFrom == hTb && pcd->nmcd.dwDrawStage == CDDS_PREERASE )
+						{
+							// make toolbar background transparent on aero glass
+							::FillRect( pcd->nmcd.hdc, GetClientRect( hTb ), GetStockBrush( BLACK_BRUSH ) );
+							::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, CDRF_SKIPDEFAULT );
+							return TRUE;								
+						}
+					}				
 				}
 			}
 		}
@@ -887,18 +910,6 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case WM_ERASEBKGND:
 		{
-			HDC hdc = reinterpret_cast<HDC>( wParam );
-
-			HBRUSH brush;
-			if( IsCompositionSupportedAndActive() )
-				brush = GetStockBrush( BLACK_BRUSH );
-			else
-				brush = ::GetSysColorBrush( COLOR_BTNFACE );
-
-			// Erasing background behind toolbar is crucial for having correct transparency.
-			// The rest of the window we paint completely in WM_PAINT to avoid flickering.
-			::FillRect( hdc, GetChildRect( hwnd, ID_FF_TOOLBAR ), brush );
-
 			::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, TRUE );
 			return TRUE;
 		}
@@ -1014,21 +1025,23 @@ void CreateToolWindow( bool isFileDialog )
 		if( g_hToolWnd == NULL )
 			return;
 
-		if( ! isComposited )
+		int height = 0;
+		DWORD wndPosFlags = SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE;
+
+		if( isComposited )
+		{
+			height = MapDialogY( g_hToolWnd, 20 );			
+		}
+		else
 		{
 			LONG_PTR style = ::GetWindowLongPtr( g_hToolWnd, GWL_STYLE );
-			LONG_PTR styleRemove = WS_CAPTION | DS_MODALFRAME, 
-			         styleAdd    = WS_THICKFRAME;
-			::SetWindowLongPtr( g_hToolWnd, GWL_STYLE, ( style & ~styleRemove ) | styleAdd );
-			// Inform the window of the frame change
-			::SetWindowPos( g_hToolWnd, NULL, 0, 0, 0, 0, 
-				SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
+			::SetWindowLongPtr( g_hToolWnd, GWL_STYLE, style & ~( WS_CAPTION | DS_MODALFRAME ) );
+			wndPosFlags |= SWP_FRAMECHANGED;
+
+			height = MapDialogY( g_hToolWnd, 18 );
 		}
-			
-		// Set window height independently of window style.
-		int height = MapDialogY( g_hToolWnd, 22 );
-		::MoveWindow( g_hToolWnd, 0, 0, 100, height, FALSE );
-			
+
+		::SetWindowPos( g_hToolWnd, NULL, 0, 0, 0, height, wndPosFlags );			
 		AdjustToolWindowPos();
 	}
 
@@ -1037,8 +1050,7 @@ void CreateToolWindow( bool isFileDialog )
 	//--- create the toolbar ---
 
 	HWND hTb = NULL;
-	int xTb = 0;
-	Size tbSize;
+	Rect tbRect;
 	{
 		vector<TBBUTTON> tbButtons;
 		{
@@ -1075,14 +1087,17 @@ void CreateToolWindow( bool isFileDialog )
 			DC dc( ::CreateIC( _T("DISPLAY"), NULL, NULL, NULL ) );
 			isToolbar32bpp = ::GetDeviceCaps( dc, BITSPIXEL ) >= 16;
 		}
+		
+		UINT tbStyle = WS_CHILD | WS_TABSTOP | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT |
+			CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS |
+			( isComposited ? TBSTYLE_CUSTOMERASE : 0 );
 
-		hTb = ::CreateToolbarEx( g_hToolWnd, WS_CHILD | WS_TABSTOP | TBSTYLE_FLAT | 
-			CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS,
+		hTb = ::CreateToolbarEx( g_hToolWnd, tbStyle,
 			ID_FF_TOOLBAR, (int) tbButtons.size(), 
 			isToolbar32bpp ? NULL : g_hInstDll, isToolbar32bpp ? 0 : ID_FF_TOOLBAR, 
 			&tbButtons[ 0 ], (int) tbButtons.size(), 16,16, 16,16, sizeof(TBBUTTON) );
 
-		::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS );
+		::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS ); // | TBSTYLE_EX_DOUBLEBUFFER );
 		::ShowWindow( hTb, SW_SHOW );
 
 		if( isToolbar32bpp )
@@ -1092,15 +1107,16 @@ void CreateToolWindow( bool isFileDialog )
 			::SendMessage( hTb, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>( g_hToolbarImages ) );
 		}
 
+		// calculate width of the toolbar from position of last button
 		::SendMessage( hTb, TB_AUTOSIZE, 0, 0 );
+		::SendMessage( hTb, TB_GETRECT, tbButtons.back().idCommand, reinterpret_cast<LPARAM>( &tbRect ) );
 
-		// calculate width of the toolbar from position of last button (TB_GETMAXSIZE has a bug under Win2k!)
-		Rect tbRC;
-		::SendMessage( hTb, TB_GETRECT, tbButtons.back().idCommand, reinterpret_cast<LPARAM>( &tbRC ) );
-		tbSize = Size( tbRC.right, tbRC.bottom );
-		
-		xTb = MapDialogX( g_hToolWnd, 4 );
-		SetWindowPos( hTb, NULL, xTb, ( rcClient.bottom - tbSize.cy ) / 2, tbSize.cx, tbSize.cy, SWP_NOZORDER | SWP_NOACTIVATE );
+		tbRect.top = ( rcClient.bottom - tbRect.bottom ) / 2;
+		tbRect.left = tbRect.top;
+		tbRect.bottom += tbRect.top;
+		tbRect.right += tbRect.left;
+				
+		SetWindowPos( hTb, NULL, tbRect.left, tbRect.top, tbRect.Width(), tbRect.Height(), SWP_NOZORDER | SWP_NOACTIVATE );
 	}
 
 	//--- create + sub-class the edit control 
@@ -1116,7 +1132,7 @@ void CreateToolWindow( bool isFileDialog )
 		}
 		::MapDialogRect( g_hToolWnd, &rcDiv ); 
 		::MapDialogRect( g_hToolWnd, &rcDivR ); 
-		int xEdit = xTb + tbSize.cx + rcDiv.right;
+		int xEdit = tbRect.right + rcDiv.right;
 		int editHeight = MapDialogY( g_hToolWnd, 11 );
 
 		HWND hEdit = ::CreateWindowEx( edStyleEx, _T("Edit"), NULL, 

@@ -46,19 +46,22 @@ using namespace std;
 // include after all STD headers to avoid false warnings
 #include <strsafe.h>
 
-//--- utilities
-#include <tstring.h>
-#include <OsVersion.h>
-#include <Utils.h>
-#include <GdiUtils.h>
-#include <Profile.h>
-#include <TotalCmdUtils.h>
-#include <Registry.h>
-#include <ExplorerUtils.h>
-
 //--- common project files
-#include "../common/Favorites.h"
-#include "../common/ff_utils.h"
-#include "../common/HistoryLst.h"
-#include "../common/ProfileDefaults.h"
-#include "../common/ProcessNames.h"
+#include <common\_autolink.h>
+#include <common\Favorites.h>
+#include <common\ff_utils.h>
+#include <common\HistoryLst.h>
+#include <common\ProfileDefaults.h>
+#include <common\ProcessNames.h>
+
+//--- utilities
+#include <commonUtils\_autolink.h>
+#include <commonUtils\tstring.h>
+#include <commonUtils\OsVersion.h>
+#include <commonUtils\Utils.h>
+#include <commonUtils\GdiUtils.h>
+#include <commonUtils\Profile.h>
+#include <commonUtils\TotalCmdUtils.h>
+#include <commonUtils\Registry.h>
+#include <commonUtils\ExplorerUtils.h>
+

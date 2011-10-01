@@ -29,7 +29,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine=""
+				CommandLine="echo $(SolutionDir)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -48,7 +48,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\commonUtils"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -73,11 +73,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="..\Common\Lib;..\CommonUtils\Lib"
 				DelayLoadDLLs="uxtheme.dll;dwmapi.dll;urlmon.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -121,7 +122,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine=""
+				CommandLine="echo $(SolutionDir)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -141,7 +142,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\commonUtils"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN64;_WINDOWS;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -166,11 +167,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalOptions="/NXCompat /DynamicBase"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig64.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="..\Common\Lib;..\CommonUtils\Lib"
 				DelayLoadDLLs="uxtheme.dll;urlmon.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -236,7 +238,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="false"
-				AdditionalIncludeDirectories="..\commonUtils"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				MinimalRebuild="false"
 				RuntimeLibrary="0"
@@ -260,11 +262,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="..\Common\Lib;..\CommonUtils\Lib"
 				DelayLoadDLLs="uxtheme.dll;dwmapi.dll;urlmon.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -312,7 +315,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine=""
+				CommandLine="echo $(SolutionDir)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -334,7 +337,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="false"
-				AdditionalIncludeDirectories="..\commonUtils"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN64;_WINDOWS;NDEBUG"
 				MinimalRebuild="false"
 				RuntimeLibrary="0"
@@ -358,11 +361,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalOptions="/NXCompat /DynamicBase"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig64.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="..\Common\Lib;..\CommonUtils\Lib"
 				DelayLoadDLLs="uxtheme.dll;urlmon.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -403,7 +407,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Quelldateien"
+			Name="source"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
@@ -412,7 +416,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\AboutDlg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\AddFavoriteDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AddFavoriteDlg.h"
 				>
 			</File>
 			<File
@@ -420,7 +432,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\AutoPropertyPage.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ExcludesDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ExcludesDlg.h"
 				>
 			</File>
 			<File
@@ -428,11 +448,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FFConfig.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FFConfigDlg.cpp"
 				>
 			</File>
 			<File
+				RelativePath=".\FFConfigDlg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FolderFavoritesDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FolderFavoritesDlg.h"
 				>
 			</File>
 			<File
@@ -444,7 +476,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PageCommonDirDlg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PageCommonFileDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PageCommonFileDlg.h"
 				>
 			</File>
 			<File
@@ -452,7 +492,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PageGeneric.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PageMsoFileDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PageMsoFileDlg.h"
 				>
 			</File>
 			<File
@@ -464,7 +512,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PageToolbar.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PageTotalcmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Resource.h"
 				>
 			</File>
 			<File
@@ -504,69 +560,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\UpdateCheckDlg.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Headerdateien"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath=".\AboutDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\AddFavoriteDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\AutoPropertyPage.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ExcludesDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FFConfig.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FFConfigDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FolderFavoritesDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageCommonDirDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageCommonFileDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageGeneric.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageMsoFileDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageToolbar.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Resource.h"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UpdateCheckDlg.cpp"
 				>
 			</File>
 			<File
@@ -575,7 +573,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Ressourcendateien"
+			Name="res"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
@@ -605,428 +603,6 @@
 			</File>
 			<File
 				RelativePath=".\res\submenu.ico"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="common"
-			Filter="*.h;*.hpp;*.hxx"
-			>
-			<File
-				RelativePath="..\common\Favorites.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\Favorites.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\ff_utils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\ff_utils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\HistoryLst.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\HistoryLst.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\ProfileDefaults.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\ProfileDefaults.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="commonUtils"
-			Filter="*.cpp"
-			>
-			<File
-				RelativePath="..\commonUtils\BalloonHelp.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\BalloonHelp.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\CacheImageList.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\CacheImageList.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\DlgExpander.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\DlgExpander.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\DownloadThread.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\DownloadThread.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\DragListCtrl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\DragListCtrl.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreeListCtrl\EditableTreeListCtrl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreeListCtrl\EditableTreeListCtrl.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\EditEx.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\EditEx.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\FolderDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\FolderDlg.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\GdiUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\GdiUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\GroupCheck.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\GroupCheck.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\HighColorTab.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\HTMLFormatter.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\HyperLink.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\HyperLink.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\MessageBox.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\messagebox.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\MfcThread.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreeListCtrl\MultiSelTree.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreeListCtrl\MultiSelTree.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\NTKernelApi.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\NtKernelUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\OsVersion.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\OsVersion.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Profile.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Profile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreePropSheet\PropPageFrame.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreePropSheet\PropPageFrame.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreePropSheet\PropPageFrameDefault.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreePropSheet\PropPageFrameDefault.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Registry.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Registry.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\ResizableDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\ResizableDlg.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\StringUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TinyXml\tinystr.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TinyXml\tinyxml.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TinyXml\tinyxml.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TinyXml\tinyxmlerror.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TinyXml\tinyxmlparser.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TotalCmdUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TotalCmdUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreeListCtrl\TreeListCtrl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreeListCtrl\TreeListCtrl.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TreePropSheet\TreePropSheet.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\tstring.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\UnicodeUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Utils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Utils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\VersionInfo.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\VersionInfo.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\VistaFontHelper.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\VistaFontHelper.h"
 				>
 			</File>
 		</Filter>

@@ -21,6 +21,7 @@
 #pragma once
 
 #include <vector>
+#include <commonUtils\tstring.h>
 
 /// Get current pathes of all open Explorer windows, beginning from topmost window.
 size_t GetAllExplorerPathes( std::vector<tstring>* pPathes );

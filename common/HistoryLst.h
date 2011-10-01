@@ -19,6 +19,7 @@
 #pragma once
 
 #include <vector>
+#include <commonUtils\Profile.h>
 
 //----------------------------------------------------------------------------------
 

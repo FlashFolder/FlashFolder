@@ -21,6 +21,8 @@
 
 #include "TotalCmdUtils.h"
 #include "StringUtils.h"
+#include "utils.h"
+#include "Registry.h"
 
 //-------------------------------------------------------------------------------------------------
 

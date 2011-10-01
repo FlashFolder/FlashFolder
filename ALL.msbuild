@@ -26,6 +26,8 @@
 	<!-- Build sub projects ....................................................................... -->
 
 	<ItemGroup>
+		<VCProject Include="CommonUtils\CommonUtilsLib.vcproj"/>
+		<VCProject Include="Common\CommonLib.vcproj"/>
 		<VCProject Include="Installer\wcautil\wcautil.vcproj"/>
 		<VCProject Include="Installer\CustomActions\CustomActions.vcproj"/>
 		<VCProject Include="FFConfig\FFConfig.vcproj"/>

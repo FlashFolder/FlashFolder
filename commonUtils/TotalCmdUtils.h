@@ -20,6 +20,7 @@
 
 #include <windows.h>
 #include <tchar.h>
+#include "tstring.h"
 
 //-------------------------------------------------------------------------------------------------
 /// \brief Class to get information from a running Total Commander instance.

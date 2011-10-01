@@ -53,7 +53,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\commonUtils"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE;_USRDLL;_MT;FFLIB_EXPORTS;ISOLATION_AWARE_ENABLED"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
@@ -84,11 +84,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
+				LinkLibraryDependencies="false"
 				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib dwmapi.lib"
 				OutputFile="..\exe\fflib6439.dll"
-				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\Common\Lib;..\CommonUtils\Lib"
 				ModuleDefinitionFile="fflib.def"
 				DelayLoadDLLs="uxtheme.dll;dwmapi.dll"
 				GenerateDebugInformation="true"
@@ -160,7 +161,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\commonUtils"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN64;_DEBUG;_WINDOWS;UNICODE;_USRDLL;_MT;FFLIB_EXPORTS;ISOLATION_AWARE_ENABLED"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
@@ -191,13 +192,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
+				LinkLibraryDependencies="false"
 				AdditionalOptions="/NXCompat /DynamicBase"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib dwmapi.lib"
 				OutputFile="..\exe\fflib6439_64.dll"
-				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\Common\Lib;..\CommonUtils\Lib"
 				ModuleDefinitionFile="fflib.def"
-				DelayLoadDLLs="uxtheme.dll dwmapi.dll"
+				DelayLoadDLLs="uxtheme.dll;dwmapi.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/fflib.pdb"
 				BaseAddress="0x69000000"
@@ -269,8 +271,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="1"
 				InlineFunctionExpansion="1"
-				FavorSizeOrSpeed="2"
-				AdditionalIncludeDirectories="..\commonUtils"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE;_USRDLL;_MT;FFLIB_EXPORTS;ISOLATION_AWARE_ENABLED"
 				StringPooling="true"
 				ExceptionHandling="1"
@@ -300,11 +301,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
+				LinkLibraryDependencies="false"
 				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib dwmapi.lib"
 				OutputFile="..\exe\fflib6439.dll"
-				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\Common\Lib;..\CommonUtils\Lib"
 				ModuleDefinitionFile="fflib.def"
 				DelayLoadDLLs="uxtheme.dll;dwmapi.dll"
 				OptimizeReferences="2"
@@ -379,8 +381,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="1"
 				InlineFunctionExpansion="1"
-				FavorSizeOrSpeed="2"
-				AdditionalIncludeDirectories="..\commonUtils"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN64;NDEBUG;_WINDOWS;UNICODE;_USRDLL;_MT;FFLIB_EXPORTS;ISOLATION_AWARE_ENABLED"
 				StringPooling="true"
 				ExceptionHandling="1"
@@ -410,13 +411,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
+				LinkLibraryDependencies="false"
 				AdditionalOptions="/NXCompat /DynamicBase"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib dwmapi.lib"
 				OutputFile="..\exe\fflib6439_64.dll"
-				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\Common\Lib;..\CommonUtils\Lib"
 				ModuleDefinitionFile="fflib.def"
-				DelayLoadDLLs="uxtheme.dll dwmapi.dll"
+				DelayLoadDLLs="uxtheme.dll;dwmapi.dll"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
@@ -456,7 +458,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="main"
+			Name="source"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
@@ -611,7 +613,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Ressourcendateien"
+			Name="res"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
@@ -632,115 +634,6 @@
 			</File>
 			<File
 				RelativePath=".\res\xp_manifest.xml"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="common"
-			Filter="*.h"
-			>
-			<File
-				RelativePath="..\common\Defines.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\Favorites.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\Favorites.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\ff_utils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\ff_utils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\HistoryLst.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\HistoryLst.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\ProfileDefaults.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\ProfileDefaults.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="commonUtils"
-			>
-			<File
-				RelativePath="..\commonUtils\ExplorerUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\ExplorerUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\GdiUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\GdiUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\OsVersion.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\OsVersion.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Profile.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Profile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Registry.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Registry.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\StringUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TotalCmdUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\TotalCmdUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\tstring.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Utils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\commonUtils\Utils.h"
 				>
 			</File>
 		</Filter>
