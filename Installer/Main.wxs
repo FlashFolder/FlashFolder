@@ -27,7 +27,7 @@
 	     
 	<Product Id="*"
 		UpgradeCode="$(var.UpgradeCode)"
-		Name="!(loc.ProductName) ($(var.Platform))" 
+		Name="!(loc.ProductName)" 
 		Language="!(loc.LCID)" Version="$(var.Version)" 
 		Manufacturer="!(loc.ProductManufacturer)">
 

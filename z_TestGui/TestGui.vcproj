@@ -20,8 +20,8 @@
 	<Configurations>
 		<Configuration
 			Name="Unicode Debug|Win32"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -105,8 +105,8 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -191,8 +191,8 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -276,8 +276,8 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Release|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -362,8 +362,8 @@
 		</Configuration>
 		<Configuration
 			Name="ANSI Release|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -447,8 +447,8 @@
 		</Configuration>
 		<Configuration
 			Name="ANSI Release|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -533,8 +533,8 @@
 		</Configuration>
 		<Configuration
 			Name="ANSI Debug|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -618,8 +618,8 @@
 		</Configuration>
 		<Configuration
 			Name="ANSI Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -704,8 +704,8 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Debug Symbols|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -789,8 +789,8 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Debug Symbols|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -875,8 +875,8 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Debug NoManifest|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -960,8 +960,8 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Debug NoManifest|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -1046,8 +1046,8 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Release NoManifest|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -1131,8 +1131,8 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Release NoManifest|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
