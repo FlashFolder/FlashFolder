@@ -494,11 +494,6 @@ inline void ClientToScreenRect( HWND hwnd, RECT* prc )
 
 //-----------------------------------------------------------------------------------------------
 
-/// Get a stock brush.
-inline HBRUSH GetStockBrush( int i ) { return reinterpret_cast<HBRUSH>( ::GetStockObject( i ) ); }
-
-//-----------------------------------------------------------------------------------------------
-
 /// Call ::IsThemeActive() if current OS version supports it.
 /// Requires to use delay-load for uxtheme.dll!
 inline bool IsThemeSupportedAndActive()

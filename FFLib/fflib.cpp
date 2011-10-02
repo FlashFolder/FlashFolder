@@ -49,9 +49,11 @@ auto_ptr<FileDlgHook_base> g_spFileDlgHook;       // ptr to the hook instance
 auto_ptr<FileDlgHook_base> g_spOpenWithDlgHook;   // ptr to the hook instance
 
 HWND g_hToolWnd = NULL;					// handle of cool external tool window
-WNDPROC g_wndProcToolWindowEditPath;
+WNDPROC g_wndProcToolWindowEditPath = NULL;
 HIMAGELIST g_hToolbarImages = NULL;
 HFONT g_hStdFont = NULL;
+HHOOK g_hGetMessageHook = NULL;
+HACCEL g_hAccTable = NULL;
 
 TCHAR g_favIniFilePath[MAX_PATH+1];		// Path to INI-File with favorite folders
 
@@ -61,8 +63,6 @@ MemoryProfile g_profileDefaults;
 TCHAR g_currentExePath[ MAX_PATH + 1 ] = _T("");
 LPCTSTR g_currentExeName = _T("");
 TCHAR g_currentExeDir[ MAX_PATH + 1 ] = _T("");
-
-vector<ATOM> g_hotkeyAtoms;              // unique identifiers of assigned hotkeys
 
 Rect g_toolbarOffset;                    // Toolbar position / width offset to adjust for some XP themes.
 
@@ -79,8 +79,7 @@ int g_globalHistoryMaxEntries;
 //-----------------------------------------------------------------------------------------
 
 void GetSharedData();
-void RegisterMyHotkeys();
-void UnregisterMyHotkeys();
+HACCEL CreateMyAcceleratorTable();
 LPCTSTR GetCommandName( int cmd );
 
 
@@ -692,9 +691,29 @@ void ExecuteToolbarCommand( UINT cmd )
 }
 
 //-----------------------------------------------------------------------------------------
+
+LRESULT CALLBACK GetMessageProc( int code, WPARAM wParam, LPARAM lParam )
+{
+	if( code == HC_ACTION && wParam == PM_REMOVE && g_hAccTable )
+	{
+		MSG* msg = reinterpret_cast<MSG*>( lParam );
+
+		if( ::TranslateAccelerator( g_hToolWnd, g_hAccTable, msg ) )
+		{
+			// prevent further message processing
+			msg->message = WM_NULL;
+			msg->hwnd = NULL;
+			msg->wParam = msg->lParam = 0;
+		}
+	}
+
+	return ::CallNextHookEx( NULL, code, wParam, lParam );
+}
+
+//-----------------------------------------------------------------------------------------
 // Window proc of the FlashFolder toolbar window
 
-INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK ToolDlgProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	static bool s_inMenu = false;
 
@@ -713,19 +732,43 @@ INT_PTR CALLBACK ToolDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
 			}
 
+			g_hAccTable = CreateMyAcceleratorTable();
+
+			// Register local hook for processing keyboard accelerators
+			g_hGetMessageHook = ::SetWindowsHookEx( WH_GETMESSAGE, GetMessageProc, NULL, ::GetCurrentThreadId() );
+
 			// no default focus wanted
 			return FALSE;
+		}
+		break;
+
+		case WM_NCDESTROY:
+		{
+			if( g_hGetMessageHook )
+			{
+				::UnhookWindowsHookEx( g_hGetMessageHook );
+				g_hGetMessageHook = NULL;
+			}
+			if( g_hAccTable )
+			{
+				::DestroyAcceleratorTable( g_hAccTable );
+				g_hAccTable = NULL;
+			}
 		}
 		break;
     
 		case WM_COMMAND:
 		{
-			WORD wNotifyCode = HIWORD(wParam); // notification code 
-			WORD wID = LOWORD(wParam);         // item, control, or accelerator identifier 
-			HWND hwndCtl = (HWND) lParam;      // handle of control 
- 
-			if( wNotifyCode == BN_CLICKED )
+			WORD wNotifyCode = HIWORD( wParam );             // notification code 
+			WORD wID = LOWORD( wParam );                     // item, control, or accelerator identifier 
+			HWND hwndCtl = reinterpret_cast<HWND>( lParam );      // handle of control 
+
+			DebugOut( L"WM_COMMAND" );
+
+			if( wNotifyCode == BN_CLICKED || wNotifyCode == 1 )
+			{
 				ExecuteToolbarCommand( wID );
+			}
 		}
 		break;
 
@@ -1177,39 +1220,44 @@ void CreateToolWindow( bool isFileDialog )
 
 //-----------------------------------------------------------------------------------------------
 
-void RegisterMyHotkeys()
+HACCEL CreateMyAcceleratorTable()
 {
-	if( ! g_hotkeyAtoms.empty() )
-		return;
-
-	const int cmdCount = 6;
-	LPCTSTR cmdList[ cmdCount ] = {
-		_T("ff_LastFolder"),
-		_T("ff_MenuFolderHistory"),
-		_T("ff_MenuOpenFolders"),
-		_T("ff_MenuFavorites"),
-		_T("ff_ViewAllFiles"),
-		_T("ff_FocusPathEdit") };
-
-	tstring ffGuid = tstring( _T(".") ) + tstring( FF_GUID );
-
-	for( int i = 0; i < cmdCount; ++i )
+	struct
 	{
-		int hotkey = g_profile.GetInt( _T("Hotkeys"), cmdList[ i ] );  
-		if( hotkey == 0 )
-			continue;
-
-		// use GlobalAddAtom() to avoid conflicts with hotkey IDs of other programs / DLLs
-		tstring atomName = tstring( cmdList[ i ] ) + ffGuid;
-		ATOM atom = ::GlobalAddAtom( atomName.c_str() );
-
-		UINT vk, mod;
-		SplitHotKey( &vk, &mod, hotkey );
-		if( ::RegisterHotKey( g_hToolWnd, atom, mod, vk ) )
-			g_hotkeyAtoms.push_back( atom );
-		else
-			::GlobalDeleteAtom( atom );
+		LPCWSTR name;
+		UINT id;
 	}
+	cmdList[] = {
+		{ L"ff_LastFolder", ID_FF_LASTDIR },
+		{ L"ff_ViewAllFiles", ID_FF_SHOWALL },
+		{ L"ff_FocusPathEdit", ID_FF_FOCUSPATH },
+		{ L"ff_MenuFolderHistory", ID_FF_GLOBALHIST },
+		{ L"ff_MenuOpenFolders", ID_FF_OPENDIRS },
+		{ L"ff_MenuFavorites", ID_FF_FAVORITES },
+		{ L"ff_MenuConfig", ID_FF_CONFIG }
+	};
+
+	vector< ACCEL > accel;
+
+	for( int i = 0; i < _countof( cmdList ); ++i )
+	{
+		int hotkey = g_profile.GetInt( L"Hotkeys", cmdList[ i ].name );  
+		if( hotkey != 0 )
+		{
+			UINT vk, mod;
+			SplitHotKey( &vk, &mod, hotkey );
+			ACCEL ac = { FVIRTKEY, vk, cmdList[ i ].id };
+			if( mod & MOD_CONTROL )
+				ac.fVirt |= FCONTROL;
+			if( mod & MOD_ALT )
+				ac.fVirt |= FALT;
+			if( mod & MOD_SHIFT )
+				ac.fVirt |= FSHIFT;
+			accel.push_back( ac );
+		}
+	}
+
+	return ::CreateAcceleratorTable( &accel[ 0 ], static_cast<int>( accel.size() ) );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -1225,22 +1273,8 @@ LPCTSTR GetCommandName( int cmd )
 		case ID_FF_OPENDIRS:    return _T("ff_MenuOpenFolders");
 		case ID_FF_FAVORITES:   return _T("ff_MenuFavorites");
 		case ID_FF_CONFIG:      return _T("ff_MenuConfig");
-		default:
-			DebugOut( _T("[fflib] ERROR: invalid command for GetCommandName()") );
 	}
 	return _T("");
-}
-
-//-----------------------------------------------------------------------------------------------
-
-void UnregisterMyHotkeys()
-{
-	for( size_t i = 0; i < g_hotkeyAtoms.size(); ++i )
-	{
-		::UnregisterHotKey( g_hToolWnd, g_hotkeyAtoms[ i ] );
-		::GlobalDeleteAtom( g_hotkeyAtoms[ i ] );		
-	}
-	g_hotkeyAtoms.clear();
 }
 
 //-----------------------------------------------------------------------------------------
@@ -1279,15 +1313,7 @@ namespace FileDlgHookCallbacks
 	}
 
 	void OnActivate( WPARAM wParam, LPARAM lParam )
-	{
-		// since we are using global hotkeys, disable them if both toolbar and filedialog are not active
-
-		g_isFileDlgActive = LOWORD( wParam ) != WA_INACTIVE;
-		if( g_isToolWndActive || g_isFileDlgActive )
-			RegisterMyHotkeys();
-		else
-			UnregisterMyHotkeys();
-	}
+	{}
 
 	void OnDestroy( bool isOkBtnPressed )
 	{
@@ -1295,10 +1321,6 @@ namespace FileDlgHookCallbacks
 
 		if( isOkBtnPressed )
 			AddCurrentFolderToHistory();			
-
-		//--- unregister hotkeys 
-
-		UnregisterMyHotkeys();
 
 		//--- destroy tool window + class
 
@@ -1382,7 +1404,6 @@ void InitHook( HWND hwnd, FileDlgType fileDlgType )
 	g_hFileDialog = hwnd;
 
 	CreateToolWindow( isFileDialog );
-	RegisterMyHotkeys();
 
 	// create an instance of a file dialog hook class depending on the
 	// type of file dialog

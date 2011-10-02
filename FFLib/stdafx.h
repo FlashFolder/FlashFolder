@@ -15,6 +15,7 @@
 
 //--- windows headers
 #include <windows.h>
+#include <windowsx.h>
 #include <commdlg.h>
 #include <shobjidl.h>
 #include <objbase.h>
@@ -43,9 +44,6 @@ using namespace std;
 #include <set>
 #include <string>
 
-// include after all STD headers to avoid false warnings
-#include <strsafe.h>
-
 //--- common project files
 #include <common\_autolink.h>
 #include <common\Favorites.h>
@@ -65,3 +63,5 @@ using namespace std;
 #include <commonUtils\Registry.h>
 #include <commonUtils\ExplorerUtils.h>
 
+// include after all other headers to avoid false warnings
+#include <strsafe.h>
