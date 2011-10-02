@@ -38,7 +38,7 @@
 
 					<!-- Regkey to store profile data if "shared profile" is selected in the multi-user dialog -->
 					<RegistryKey Key="Shared" Action="create">
-						<Permission User="Everyone" GenericAll="yes" ChangePermission="no" />
+						<Permission User="Users" GenericAll="yes" ChangePermission="no" />
 					</RegistryKey>
 				</RegistryKey>
 

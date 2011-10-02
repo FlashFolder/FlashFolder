@@ -1,10 +1,11 @@
 -----
 Generic:
 
-[ ] Hotkeys bug
-[ ] Fix toolbar UI if Aero Glass is not enabled
 [ ] Test if iTunes is still incompatible
 [ ] Optionally save last folder even on Cancel
+[x] Hotkeys cannot be deleted
+[x] Hotkeys bug
+[x] Fix toolbar UI if Aero Glass is not enabled
 [x] "View all files" bug
 [x] Fix "remember view mode" for Vista
 [x] 64-bit: control panel, hooks (service can stay 32-bit?)
@@ -12,9 +13,9 @@ Generic:
 -----
 Security:
 
-[x] Restrict services privileges under Vista
 [ ] Use private namespaces for kernel objects under Vista ( http://www.codeguru.com/columns/kate/article.php/c13249 )
 [ ] RemoveHook(), FinalizeService() - wait until Hook processes are actually terminated (with timeout)
+[x] Restrict services privileges under Vista
 
 -----
 Cosmetic:
@@ -23,3 +24,4 @@ Cosmetic:
 [ ] Use Vista-style file dialogs in FFConfig (do not use CFileDialog)
 [ ] Use Vista-style treeview, listview, link controls
 [ ] Favmenu editor: use shell folder icon
+[ ] Favmenu editor: minor display problems under Vista/Win7

@@ -56,6 +56,7 @@ void CPageShortcuts::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPageShortcuts, CPageShortcuts::base)
 	ON_NOTIFY( LVN_ITEMCHANGED, IDC_LST_SHORTCUTS, OnLvnItemchangedLstShortcuts )
+	ON_NOTIFY( NM_DBLCLK, IDC_LST_SHORTCUTS, OnDblClickLstShortcuts )
 	ON_EN_CHANGE( IDC_HOTKEY, OnShortcutChange )
 	ON_BN_CLICKED(IDC_BTN_CLEAR, OnBnClickedBtnClear)
 END_MESSAGE_MAP()
@@ -144,6 +145,13 @@ void CPageShortcuts::ReadProfile( const Profile& profile )
 	m_lstShortcuts.InsertItem( nItem, title );
 	m_lstShortcuts.SetItemData( nItem, profile.GetInt( PROFILE_GROUP, cmd ) );
 
+	++nItem;
+	title = _T("Menu: configuration");
+	cmd   = _T("ff_MenuConfig");
+	m_mapTitleToCmd[ title ] = cmd;
+	m_lstShortcuts.InsertItem( nItem, title );
+	m_lstShortcuts.SetItemData( nItem, profile.GetInt( PROFILE_GROUP, cmd ) );
+
 	for( int i = 0; i <= nItem; ++i )
 	{
 		DWORD hotkey = m_lstShortcuts.GetItemData( i );
@@ -163,13 +171,13 @@ BOOL CPageShortcuts::OnApply()
 	for( int i = 0; i < count; ++i )
 	{
 		DWORD hotkey = m_lstShortcuts.GetItemData( i );
+		CString title = m_lstShortcuts.GetItemText( i, COL_TITLE );
+		std::map<CString,CString>::iterator itCmd = m_mapTitleToCmd.find( title );
+		ASSERT( itCmd != m_mapTitleToCmd.end() );
 		if( hotkey != 0 )
-		{
-			CString title = m_lstShortcuts.GetItemText( i, COL_TITLE );
-			std::map<CString,CString>::iterator itCmd = m_mapTitleToCmd.find( title );
-			ASSERT( itCmd != m_mapTitleToCmd.end() );
 			g_profile.SetInt( PROFILE_GROUP, itCmd->second, hotkey );
-		}
+		else
+			g_profile.DeleteValue( PROFILE_GROUP, itCmd->second );
 	}
 
 	return base::OnApply();
@@ -271,5 +279,10 @@ void CPageShortcuts::OnBnClickedBtnClear()
 	}
 }
 
+//-----------------------------------------------------------------------------------------------
 
-
+void CPageShortcuts::OnDblClickLstShortcuts( NMHDR* pnm, LRESULT* result )
+{
+	*result = 0;
+	GotoDlgCtrl( &m_hotkeyCtrl );
+}

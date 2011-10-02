@@ -37,7 +37,8 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
-	afx_msg void OnLvnItemchangedLstShortcuts(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnItemchangedLstShortcuts( NMHDR *pNMHDR, LRESULT *pResult );
+	afx_msg void OnDblClickLstShortcuts( NMHDR* pnm, LRESULT* result );
 	afx_msg void OnShortcutChange();
 	afx_msg void OnBnClickedBtnClear();
 

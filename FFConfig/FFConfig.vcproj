@@ -508,6 +508,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PageShortcuts.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PageToolbar.cpp"
 				>
 			</File>
