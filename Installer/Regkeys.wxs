@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+	xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<!--  
 		This file is part of FlashFolder. 
 		Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
@@ -38,7 +39,7 @@
 
 					<!-- Regkey to store profile data if "shared profile" is selected in the multi-user dialog -->
 					<RegistryKey Key="Shared" Action="create">
-						<Permission User="Users" GenericAll="yes" ChangePermission="no" />
+						<Permission User="Everyone" GenericAll="yes" ChangePermission="no" />
 					</RegistryKey>
 				</RegistryKey>
 

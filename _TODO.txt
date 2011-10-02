@@ -1,6 +1,7 @@
 -----
 Generic:
 
+[ ] On first install, "multi user: shared" option causes crash when file dlg is opened
 [ ] Test if iTunes is still incompatible
 [ ] Optionally save last folder even on Cancel
 [x] Hotkeys cannot be deleted

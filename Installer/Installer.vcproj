@@ -117,26 +117,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Source_UI"
-			>
-			<File
-				RelativePath=".\UI_Main.wxs"
-				>
-			</File>
-			<File
-				RelativePath=".\UI_MultiUserDlg.wxs"
-				>
-			</File>
-			<File
-				RelativePath=".\UI_UpgradeDlg.wxs"
-				>
-			</File>
-			<File
-				RelativePath=".\UI_WelcomeDlg.wxs"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Source"
 			>
 			<File
@@ -153,6 +133,22 @@
 			</File>
 			<File
 				RelativePath=".\Regkeys.wxs"
+				>
+			</File>
+			<File
+				RelativePath=".\UI_Main.wxs"
+				>
+			</File>
+			<File
+				RelativePath=".\UI_MultiUserDlg.wxs"
+				>
+			</File>
+			<File
+				RelativePath=".\UI_UpgradeDlg.wxs"
+				>
+			</File>
+			<File
+				RelativePath=".\UI_WelcomeDlg.wxs"
 				>
 			</File>
 		</Filter>
