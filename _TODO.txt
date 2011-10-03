@@ -1,9 +1,9 @@
 -----
 Generic:
 
-[ ] On first install, "multi user: shared" option causes crash when file dlg is opened
 [ ] Test if iTunes is still incompatible
 [ ] Optionally save last folder even on Cancel
+[x] On first install, "multi user: shared" option causes crash when file dlg is opened
 [x] Hotkeys cannot be deleted
 [x] Hotkeys bug
 [x] Fix toolbar UI if Aero Glass is not enabled

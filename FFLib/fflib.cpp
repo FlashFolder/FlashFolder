@@ -55,8 +55,6 @@ HFONT g_hStdFont = NULL;
 HHOOK g_hGetMessageHook = NULL;
 HACCEL g_hAccTable = NULL;
 
-TCHAR g_favIniFilePath[MAX_PATH+1];		// Path to INI-File with favorite folders
-
 RegistryProfile g_profile;   
 MemoryProfile g_profileDefaults;
 
@@ -66,8 +64,6 @@ TCHAR g_currentExeDir[ MAX_PATH + 1 ] = _T("");
 
 Rect g_toolbarOffset;                    // Toolbar position / width offset to adjust for some XP themes.
 
-bool g_isFileDlgActive = false;
-bool g_isToolWndActive = false;
 bool g_isToolWndVisible = false;
 
 //--- options read from profile
@@ -761,14 +757,9 @@ INT_PTR CALLBACK ToolDlgProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		{
 			WORD wNotifyCode = HIWORD( wParam );             // notification code 
 			WORD wID = LOWORD( wParam );                     // item, control, or accelerator identifier 
-			HWND hwndCtl = reinterpret_cast<HWND>( lParam );      // handle of control 
-
-			DebugOut( L"WM_COMMAND" );
 
 			if( wNotifyCode == BN_CLICKED || wNotifyCode == 1 )
-			{
 				ExecuteToolbarCommand( wID );
-			}
 		}
 		break;
 
@@ -1257,7 +1248,9 @@ HACCEL CreateMyAcceleratorTable()
 		}
 	}
 
-	return ::CreateAcceleratorTable( &accel[ 0 ], static_cast<int>( accel.size() ) );
+	if( ! accel.empty() )
+		return ::CreateAcceleratorTable( &accel[ 0 ], static_cast<int>( accel.size() ) );
+	return NULL;
 }
 
 //-----------------------------------------------------------------------------------------------
