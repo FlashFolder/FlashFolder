@@ -39,15 +39,15 @@ const UINT WM_GETISHELLBROWSER = WM_USER + 7;
 inline IShellBrowser* GetShellBrowser( HWND hwnd )
 	{ return reinterpret_cast<IShellBrowser*>( ::SendMessage( hwnd, WM_GETISHELLBROWSER, 0, 0 ) ); }
 
-bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter );
+bool FileDlgSetFilter( HWND hwndFileDlg, LPCWSTR filter );
 
 tstring ShellViewGetCurrentFolder( IShellBrowser *psb );
-bool ShellViewSetCurrentFolder( IShellBrowser *psb, LPCTSTR path );
+bool ShellViewSetCurrentFolder( IShellBrowser *psb, LPCWSTR path );
 bool ShellViewGetViewMode( IShellBrowser *psb, FOLDERVIEWMODE* pViewMode, int* pImageSize );
 bool ShellViewSetViewMode( IShellBrowser* psb, FOLDERVIEWMODE viewMode, int imageSize );
 
 tstring ShellViewGetCurrentFolder( HWND hwnd );
-bool ShellViewSetCurrentFolder( HWND hwndFileDlg, LPCTSTR path );
+bool ShellViewSetCurrentFolder( HWND hwndFileDlg, LPCWSTR path );
 bool ShellViewGetViewMode( HWND hwnd, FOLDERVIEWMODE* pViewMode, int* pImageSize = NULL );
 bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize = -1 );
 

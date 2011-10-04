@@ -27,15 +27,14 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-
 //-----------------------------------------------------------------------------------------
 
 BOOL CALLBACK DebugEnumChildProc( HWND hwnd, LPARAM lParam )
 {
 	HWND parent = ::GetParent( hwnd );
 	DWORD id = ::GetDlgCtrlID( hwnd );
-	TCHAR sclass[ 256 ] = L"";
-	TCHAR stitle[ 256 ] = L"";
+	WCHAR sclass[ 256 ] = L"";
+	WCHAR stitle[ 256 ] = L"";
 	::GetClassName( hwnd, sclass, _countof( sclass ) );
 	::GetWindowText( hwnd, stitle, _countof( stitle ) );
 	DebugOut( L"hwnd = %04x, parent = %04x, id = %d, class = '%s', title = '%s'\n", 
@@ -45,32 +44,31 @@ BOOL CALLBACK DebugEnumChildProc( HWND hwnd, LPARAM lParam )
 }
 
 //-----------------------------------------------------------------------------------------
-// GetFileDlgType()
-//
-//   checks, whether given window handle is the handle of a new-style 
-//   common file dialog or the MS Office file dialog
-//-----------------------------------------------------------------------------------------
+/// Checks if given window handle is the handle of a new-style common file dialog or an 
+/// MS Office file dialog.
+/// Uses various heuristics since there is no official way to detect a file dialog.
+
 FileDlgType GetFileDlgType( HWND dlg )
 {
 	HWND hStat1, hEditFileName, hShellView, hDriveListBox;
 
-	TCHAR className[256] = _T("");
-    ::GetClassName(dlg, className, sizeof(className) / sizeof(TCHAR) - 1 );
-	if( _tcscmp( className, _T("#32770") ) != 0 )
+	WCHAR className[256] = L"";
+    ::GetClassName(dlg, className, _countof( className ) );
+	if( wcscmp( className, L"#32770" ) != 0 )
 	{
 		// Detect variants of the MS Office file dialog.
 		// In different versions of this dialog the ID / classname of the filename edit control
 		// changes.
 
-		if( _tcsncmp( className, _T("bosa_sdm_"), 9 ) == 0 )
+		if( wcsncmp( className, L"bosa_sdm_", 9 ) == 0 )
 		{
-			if( ::FindWindowEx( dlg, NULL, _T("Snake List"), NULL ) )
+			if( ::FindWindowEx( dlg, NULL, L"Snake List", NULL ) )
 			{		
 				if( hEditFileName = GetDlgItem( dlg, VS2005_FILEDLG_ED_FILENAME ) )
 				{
 					className[0] = 0;
-					::GetClassName( hEditFileName, className, sizeof(className) / sizeof(TCHAR) - 1 );
-					if( _tcscmp( className, _T("Edit") ) == 0 )
+					::GetClassName( hEditFileName, className, _countof( className ) );
+					if( wcscmp( className, L"Edit" ) == 0 )
 						return FileDlgType( FDT_MSOFFICE, FDT_VS2005 );
 				}
 
@@ -84,8 +82,8 @@ FileDlgType GetFileDlgType( HWND dlg )
 				if( hEditFileName )
 				{
 					className[0] = 0;
-					::GetClassName( hEditFileName, className, sizeof(className) / sizeof(TCHAR) - 1 );
-					if( _tcsncmp( className, _T("RichEdit20"), 10 ) == 0 )
+					::GetClassName( hEditFileName, className, _countof( className ) );
+					if( wcsncmp( className, L"RichEdit20", 10 ) == 0 )
 						return res;
 				}
 			}
@@ -98,8 +96,8 @@ FileDlgType GetFileDlgType( HWND dlg )
 	if( HWND hWnd = ::GetDlgItem( dlg, 0 ) )
 	{
 		className[0] = 0;
-		::GetClassName( hWnd, className, sizeof(className) / sizeof(TCHAR) - 1 );
-		if( _tcscmp( className, _T("SHBrowseForFolder ShellNameSpace Control") ) == 0 )
+		::GetClassName( hWnd, className, _countof( className ) );
+		if( wcscmp( className, L"SHBrowseForFolder ShellNameSpace Control" ) == 0 )
 			return FileDlgType( FDT_COMMON_FOLDER );
 	}
 	
@@ -109,8 +107,20 @@ FileDlgType GetFileDlgType( HWND dlg )
 	// Only the "Save as" dialog can be detected easily, since at this time it already has
 	// the shell view child window created.
 	
-	if( FindChildWindowRecursively( dlg, L"SHELLDLL_DefView" ) )
+	hShellView = FindChildWindowRecursively( dlg, L"SHELLDLL_DefView" );
+	if( hShellView )
+	{
+		// Exclude "Disconnect Network Drives" dialog and possibly other non-file dialogs.
+		if( HWND hShellParent = ::GetAncestor( hShellView, GA_PARENT ) )
+		{
+			className[ 0 ] = 0;
+			::GetClassName( hShellParent, className, _countof( className ) );
+			if( wcscmp( className, L"ExplorerBrowserControl" ) == 0 )
+				return FileDlgType( FDT_NONE );
+		}
+
 		return FileDlgType( FDT_COMMON );
+	}
 
 	// To detect the "Open" dialog we do a heuristic check of various control IDs and 
 	// class names that should exist only in this dialog.
@@ -118,22 +128,22 @@ FileDlgType GetFileDlgType( HWND dlg )
 	if( (hShellView = GetDlgItem(dlg, FILEDLG_LB_SHELLVIEW)) == NULL )
 		return FileDlgType( FDT_NONE );
 	className[0] = 0;
-    ::GetClassName(hShellView, className, sizeof(className) / sizeof(TCHAR) - 1 );
-	if( _tcscmp( className, _T("ListBox") ) != 0)
+    ::GetClassName(hShellView, className, _countof( className ) );
+	if( wcscmp( className, L"ListBox" ) != 0)
 		return FileDlgType( FDT_NONE );
 
 	if( (hStat1 = GetDlgItem(dlg, FILEDLG_ST_SEARCH)) == NULL )
 		return FileDlgType( FDT_NONE );	
 	className[0] = 0;
-    ::GetClassName( hStat1, className, sizeof(className) / sizeof(TCHAR) - 1 );
-	if( _tcscmp( className, _T("Static") ) != 0)
+    ::GetClassName( hStat1, className, _countof( className ) );
+	if( wcscmp( className, L"Static" ) != 0)
 		return FileDlgType( FDT_NONE );
 
 	if ((hEditFileName = GetDlgItem(dlg, FILEDLG_ED_FILENAME)) == NULL)
 		return FileDlgType( FDT_NONE );
 	className[0] = 0;
-    ::GetClassName( hEditFileName, className, sizeof(className) / sizeof(TCHAR) - 1 );
-	if( _tcscmp( className, _T("Edit") ) != 0)
+    ::GetClassName( hEditFileName, className, _countof( className ) );
+	if( wcscmp( className, L"Edit" ) != 0)
 		return FileDlgType( FDT_NONE );
 
 	// Filter out old-style (Win 3.1) open/save dialogs. They are detect by checking 
@@ -146,20 +156,17 @@ FileDlgType GetFileDlgType( HWND dlg )
 }
 
 //-----------------------------------------------------------------------------------------
-// FileDlgSetFilter()
-//
-//   sets a filter for the specified common file dialog
-//   --> should be called only in the address space of the process which owns the
-//       file dialog
-//   returns true if successful
-//-----------------------------------------------------------------------------------------
-bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter )
+/// Sets a filter for the specified common file dialog.
+/// Must be called in the address space of the process which owns the file dialog.
+/// \return true if successful
+
+bool FileDlgSetFilter( HWND hwndFileDlg, LPCWSTR filter )
 {
 	if ( filter == NULL || filter[0] == 0 || 
-		 (( _tcschr( filter, _T('*') ) == NULL ) && ( _tcschr( filter, _T('?') ) == NULL )) )
+		 ( ( wcschr( filter, L'*' ) == NULL ) && ( wcschr( filter, L'?' ) == NULL ) ) )
 	   return false;
 
-	TCHAR oldEditTxt[1024] = _T(""); 
+	WCHAR oldEditTxt[1024] = L""; 
     HWND hEditFileName = ::GetDlgItem( hwndFileDlg, FILEDLG_ED_FILENAME );
 
     // in NT systems, the filename edit control can actually be a combobox
@@ -190,12 +197,12 @@ bool FileDlgSetFilter( HWND hwndFileDlg, LPCTSTR filter )
 			if( hOldFocus != hEditFileName )
 				::SendMessage( hwndFileDlg, WM_NEXTDLGCTL, (WPARAM) hEditFileName, TRUE ); 
 
-            ::GetWindowText( hEditFileName, oldEditTxt, (sizeof(oldEditTxt) - 1) * sizeof(TCHAR) );
+            ::GetWindowText( hEditFileName, oldEditTxt, _countof( oldEditTxt ) );
             ::SetWindowText( hEditFileName, filter );
             ::SendMessage( hwndFileDlg, WM_COMMAND, MAKEWPARAM(IDOK, BN_CLICKED), (LPARAM) hBtnOk );
 			//only restore old text if it was not a filter
-			if( ( _tcschr( oldEditTxt, _T('*') ) == NULL ) &&
-				( _tcschr( oldEditTxt, _T('?') ) == NULL) )
+			if( ( wcschr( oldEditTxt, L'*' ) == NULL ) &&
+				( wcschr( oldEditTxt, L'?' ) == NULL) )
                 ::SetWindowText( hEditFileName, oldEditTxt );
 
 			// restore focus
