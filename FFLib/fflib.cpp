@@ -713,6 +713,8 @@ INT_PTR CALLBACK ToolDlgProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 {
 	static bool s_inMenu = false;
 
+	::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, 0 );
+
     switch( uMsg )
     {
 		case WM_INITDIALOG:
@@ -821,17 +823,19 @@ INT_PTR CALLBACK ToolDlgProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				{
 					LPNMTBCUSTOMDRAW pcd = reinterpret_cast<LPNMTBCUSTOMDRAW>( lParam );
 
-					if( IsCompositionSupportedAndActive() )
+					HWND hTb = ::GetDlgItem( hwnd, ID_FF_TOOLBAR );
+					if( pcd->nmcd.hdr.hwndFrom == hTb && pcd->nmcd.dwDrawStage == CDDS_PREERASE )
 					{
-						HWND hTb = ::GetDlgItem( hwnd, ID_FF_TOOLBAR );
-						if( pcd->nmcd.hdr.hwndFrom == hTb && pcd->nmcd.dwDrawStage == CDDS_PREERASE )
-						{
-							// make toolbar background transparent on aero glass
-							::FillRect( pcd->nmcd.hdc, GetClientRect( hTb ), GetStockBrush( BLACK_BRUSH ) );
-							::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, CDRF_SKIPDEFAULT );
-							return TRUE;								
-						}
-					}				
+						// Use black brush to make toolbar background transparent on aero glass.
+						HBRUSH brush = IsCompositionSupportedAndActive() ?
+							GetStockBrush( BLACK_BRUSH ) : GetSysColorBrush( COLOR_BTNFACE );
+						::FillRect( pcd->nmcd.hdc, GetClientRect( hTb ), brush );
+						
+						::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, CDRF_SKIPDEFAULT );
+						return TRUE;								
+					}		
+
+					return FALSE;
 				}
 			}
 		}
@@ -928,27 +932,13 @@ INT_PTR CALLBACK ToolDlgProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			g_spFileDlgHook->OnTimer();
 		break;
 	
-		case WM_NCHITTEST:
-		{
-			// Make sure the window cannot be resized since we have the resize border
-			// solely to match the style of the file dialog.
-			LRESULT ht = ::DefWindowProc( hwnd, WM_NCHITTEST, wParam, lParam );
-			
-			if( ht != HTNOWHERE && ht != HTTRANSPARENT )
-				ht = HTCLIENT;
-				
-			::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, ht );
-			return TRUE;								
-		}
-		break;
-
 		case WM_ERASEBKGND:
 		{
 			::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, TRUE );
 			return TRUE;
 		}
 		break;
-		
+
 		case WM_PAINT:
 		{
 			PaintDC dc( hwnd );
@@ -960,6 +950,9 @@ INT_PTR CALLBACK ToolDlgProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		// Processing this message helps with some transparency issues when putting controls on aero glass.
 		case WM_PRINTCLIENT:
 		{
+			if( ! ( lParam & PRF_CLIENT ) )
+				break;
+
 			HDC dc = reinterpret_cast<HDC>( wParam );
 			Rect rcClient = GetClientRect( hwnd );
 			
@@ -1000,6 +993,7 @@ INT_PTR CALLBACK ToolDlgProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				::FillRect( dc, rcClient, ::GetSysColorBrush( COLOR_BTNFACE ) );
 			}
 			
+			::SetWindowLongPtr( hwnd, DWLP_MSGRESULT, TRUE );
 			return TRUE;
 		}		
 		break;
@@ -1123,15 +1117,14 @@ void CreateToolWindow( bool isFileDialog )
 		}
 		
 		UINT tbStyle = WS_CHILD | WS_TABSTOP | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT |
-			CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS |
-			( isComposited ? TBSTYLE_CUSTOMERASE : 0 );
+			CCS_NODIVIDER | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_TOOLTIPS | TBSTYLE_CUSTOMERASE;
 
 		hTb = ::CreateToolbarEx( g_hToolWnd, tbStyle,
 			ID_FF_TOOLBAR, (int) tbButtons.size(), 
 			isToolbar32bpp ? NULL : g_hInstDll, isToolbar32bpp ? 0 : ID_FF_TOOLBAR, 
 			&tbButtons[ 0 ], (int) tbButtons.size(), 16,16, 16,16, sizeof(TBBUTTON) );
 
-		::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS ); // | TBSTYLE_EX_DOUBLEBUFFER );
+		::SendMessage( hTb, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS );
 		::ShowWindow( hTb, SW_SHOW );
 
 		if( isToolbar32bpp )
@@ -1167,7 +1160,7 @@ void CreateToolWindow( bool isFileDialog )
 		::MapDialogRect( g_hToolWnd, &rcDiv ); 
 		::MapDialogRect( g_hToolWnd, &rcDivR ); 
 		int xEdit = tbRect.right + rcDiv.right;
-		int editHeight = MapDialogY( g_hToolWnd, 11 );
+		int editHeight = MapDialogY( g_hToolWnd, 10 );
 
 		HWND hEdit = ::CreateWindowEx( edStyleEx, _T("Edit"), NULL, 
 			WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL | WS_TABSTOP, 
