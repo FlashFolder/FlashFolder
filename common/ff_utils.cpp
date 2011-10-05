@@ -245,15 +245,15 @@ bool ShellViewSetCurrentFolder( IShellBrowser* psb, LPCWSTR path )
 
 tstring ShellViewGetCurrentFolder( IShellBrowser* psb )
 {
-	CComPtr<IShellView> psv;
+	CComPtr< IShellView > psv;
 	if( FAILED( psb->QueryActiveShellView( &psv ) ) )
 		return L"";
 		
-	CComPtr<IFolderView> pfv;
-	if( FAILED( psv->QueryInterface( IID_IFolderView, (void**) &pfv ) ) )
+	CComQIPtr< IFolderView > pfv( psv );
+	if( ! pfv )
 		return L"";
 		 
-	CComPtr<IPersistFolder2> ppf2;
+	CComPtr< IPersistFolder2 > ppf2;
 	if( FAILED( pfv->GetFolder( IID_IPersistFolder2, (void**) &ppf2 ) ) )
 		return L"";
 		
@@ -273,12 +273,12 @@ tstring ShellViewGetCurrentFolder( IShellBrowser* psb )
 
 bool ShellViewGetViewMode( IShellBrowser *psb, FOLDERVIEWMODE* pViewMode, int* pImageSize )
 {
-	CComPtr<IShellView> psv;
+	CComPtr< IShellView > psv;
 	if( FAILED( psb->QueryActiveShellView( &psv ) ) ) 
 		return false;
 
-	CComPtr<IFolderView2> pfv2;  
-	if( SUCCEEDED( psv->QueryInterface( IID_IFolderView2, (void**) &pfv2 ) ) )
+	CComQIPtr< IFolderView2 > pfv2( psv );	
+	if( pfv2 )  
 	{		
 		// Vista and above
 
@@ -288,16 +288,16 @@ bool ShellViewGetViewMode( IShellBrowser *psb, FOLDERVIEWMODE* pViewMode, int* p
 	{
 		// XP and below
 		
-		CComPtr<IFolderView> pfv;
-		if( FAILED( psv->QueryInterface( IID_IFolderView, (void**) &pfv ) ) ) 
-			return false;
-
-		UINT viewMode = FVM_AUTO;
-		if( SUCCEEDED( pfv->GetCurrentViewMode( &viewMode ) ) )
+		CComQIPtr< IFolderView > pfv( psv );
+		if( pfv )
 		{
-			*pViewMode = (FOLDERVIEWMODE) viewMode;
-			*pImageSize = -1;
-			return true;
+			UINT viewMode = FVM_AUTO;
+			if( SUCCEEDED( pfv->GetCurrentViewMode( &viewMode ) ) )
+			{
+				*pViewMode = (FOLDERVIEWMODE) viewMode;
+				*pImageSize = -1;
+				return true;
+			}
 		}
 	}
 		
@@ -308,13 +308,13 @@ bool ShellViewGetViewMode( IShellBrowser *psb, FOLDERVIEWMODE* pViewMode, int* p
 
 bool ShellViewSetViewMode( IShellBrowser* psb, FOLDERVIEWMODE viewMode, int imageSize )
 {
-	CComPtr<IShellView> psv;
+	CComPtr< IShellView > psv;
 	if( FAILED( psb->QueryActiveShellView( &psv ) ) )
 		return false;
 
-	CComPtr<IFolderView2> pfv2;  
-	if( SUCCEEDED( psv->QueryInterface( IID_IFolderView2, (void**) &pfv2 ) ) )
-	{		
+	CComQIPtr< IFolderView2 > pfv2( psv );	
+	if( pfv2 )  
+	{
 		// Vista and above
 	
 		return SUCCEEDED( pfv2->SetViewModeAndIconSize( viewMode, imageSize ) );
@@ -323,12 +323,11 @@ bool ShellViewSetViewMode( IShellBrowser* psb, FOLDERVIEWMODE viewMode, int imag
 	{
 		// XP and below
 		
-		CComPtr<IFolderView> pfv;
-		if( FAILED( psv->QueryInterface( IID_IFolderView, (void**) &pfv ) ) )
-			return false;
-
-		return SUCCEEDED( pfv->SetCurrentViewMode( (UINT) viewMode ) );
+		CComQIPtr< IFolderView > pfv( psv );
+		if( pfv )
+			return SUCCEEDED( pfv->SetCurrentViewMode( (UINT) viewMode ) );
 	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -365,4 +364,50 @@ bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize )
 	if( IShellBrowser *psb = GetShellBrowser( hwnd ) )
 		return ShellViewSetViewMode( psb, viewMode, imageSize );
 	return false;
+}
+
+//-----------------------------------------------------------------------------------------
+
+size_t GetAllExplorerPathes( std::vector<tstring>* pathes )
+{
+	DebugOut( L"[fflib] GetAllExplorerPathes()" );
+	pathes->clear();
+
+	CComPtr< IShellWindows > shellWnds;
+	if( FAILED( shellWnds.CoCreateInstance( CLSID_ShellWindows ) ) )
+		return 0;
+
+	long count = 0;
+	shellWnds->get_Count( &count );
+	DebugOut( L"[fflib] shell window count: %d", count );
+
+	for( int i = 0; i < count; ++i )
+	{
+		CComVariant vi( i );
+		CComPtr< IDispatch > disp;
+		if( FAILED( shellWnds->Item( vi, &disp  ) ) )
+			break;
+
+		if( ! disp )
+			// Skip - this shell window was registered with a NULL IDispatch
+			continue;
+
+		CComQIPtr< IWebBrowserApp > app( disp );
+		if( ! app )
+			break;
+
+		CComQIPtr< IServiceProvider > psp( app );
+		if( ! psp )
+			break;
+
+		CComPtr< IShellBrowser > browser;
+		if( FAILED( psp->QueryService( SID_STopLevelBrowser, &browser ) ) )
+			break;
+		
+		tstring path = ShellViewGetCurrentFolder( browser );
+		if( path != L"" )
+			pathes->push_back( path );
+	}
+	
+	return pathes->size();	
 }

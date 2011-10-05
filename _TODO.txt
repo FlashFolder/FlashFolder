@@ -1,10 +1,10 @@
 -----
 Generic:
 
-[ ] Bug: Pathes of current explorer windows not detected (Win7 x64)
-[ ] Bug: Flashfolder attaches to "network connections" common dialog
 [ ] Test if iTunes is still incompatible
 [ ] Optionally save last folder even on Cancel
+[x] Bug: Pathes of current explorer windows not detected (Win7 x64)
+[x] Bug: Flashfolder attaches to "network connections" common dialog
 [x] On first install, "multi user: shared" option causes crash when file dlg is opened
 [x] Hotkeys cannot be deleted
 [x] Hotkeys bug

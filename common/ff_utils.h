@@ -51,6 +51,8 @@ bool ShellViewSetCurrentFolder( HWND hwndFileDlg, LPCWSTR path );
 bool ShellViewGetViewMode( HWND hwnd, FOLDERVIEWMODE* pViewMode, int* pImageSize = NULL );
 bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize = -1 );
 
+size_t GetAllExplorerPathes( std::vector<tstring>* pathes );
+
 // some control ID's of common file dialog
 const unsigned FILEDLG_SHELLVIEW    = 1121;
 const unsigned FILEDLG_LB_SHELLVIEW = 1120;

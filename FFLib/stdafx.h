@@ -61,7 +61,6 @@ using namespace std;
 #include <commonUtils\Profile.h>
 #include <commonUtils\TotalCmdUtils.h>
 #include <commonUtils\Registry.h>
-#include <commonUtils\ExplorerUtils.h>
 
 // include after all other headers to avoid false warnings
 #include <strsafe.h>
