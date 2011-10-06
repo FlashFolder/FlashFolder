@@ -90,11 +90,11 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "Total Commander Integration"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "&Share Total Commander® directory menu",IDC_CHK_ENABLE,
+    CONTROL         "&Share Total Commander® directory menu (experimental)",IDC_CHK_ENABLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,216,17
     LTEXT           "If this option is enabled, FlashFolder reads the the directory menu items from the .ini-file of an installed Total Commander.\nIf you change the menu from within FlashFolder, the items will be written back to the TC .ini-file.",IDC_STATIC,18,31,205,34
     LTEXT           "Total Commander® is a registered trademark of Christian Ghisler, C. Ghisler & Co., Switzerland.",IDC_STATIC,7,147,216,17,SS_NOPREFIX
-    LTEXT           "WARNING: Some users have reported issues for this function. See the bug tracker (available from the ""About"" dialog) for details. ",IDC_STATIC,18,69,205,27
+    LTEXT           "WARNING: Some users had problems with this function, especially when using advanced features of the TC .ini file like redirection.\nPlease make a backup of your TC .ini file and consult the bug tracker (available from the ""About"" dialog) for more details. ",IDC_STATIC,18,69,205,47
 END
 
 IDD_PAGE_SHORTCUTS DIALOGEX 0, 0, 232, 156
@@ -218,9 +218,9 @@ BEGIN
     LTEXT           "Max. height of file&types combobox:",IDC_STATIC,8,108,114,8
     EDITTEXT        IDC_ED_FILETYPECOMBO_MAXHEIGHT,127,105,45,14,ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SP_FILETYPECOMBO_MAXHEIGHT,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,172,105,11,14
-    CONTROL         "&Resize non-resizable dialogs",IDC_CHK_RESIZENONRESIZABLE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,129,105,10
-    PUSHBUTTON      "E&xcludes...",IDC_BTN_NONRESIZABLE_EXCLUDES,113,127,47,14
+    CONTROL         "&Resize fixed dialogs (experimental)",IDC_CHK_RESIZENONRESIZABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,129,127,10
+    PUSHBUTTON      "E&xcludes...",IDC_BTN_NONRESIZABLE_EXCLUDES,136,127,47,14
     CONTROL         "Remember &view mode",IDC_CHK_KEEP_LISTVIEW_MODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,146,86,10
 END
 
@@ -387,7 +387,8 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 190
         VERTGUIDE, 60
-        TOPMARGIN, 7
+        VERTGUIDE, 182
+        TOPMARGIN, 8
         BOTTOMMARGIN, 170
     END
 

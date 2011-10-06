@@ -1,6 +1,7 @@
 -----
 Generic:
 
+[ ] Favorites editor: multi-selection not working anymore
 [ ] Test if iTunes is still incompatible
 [ ] Optionally save last folder even on Cancel
 [x] Bug: Pathes of current explorer windows not detected (Win7 x64)
