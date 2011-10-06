@@ -134,7 +134,8 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	
 	CRect rcTree; GetDlgItem( IDC_ST_TREE_PLACEHOLDER )->GetWindowRect( rcTree );
 	ScreenToClient( rcTree );
-	m_tree.Create( this, rcTree, IDC_LST_FAVS );
+	m_tree.Create( this, rcTree, IDC_LST_FAVS, WS_CHILD | WS_VISIBLE |
+		TVS_HASBUTTONS | TVS_FULLROWSELECT | TVS_LINESATROOT | TVS_SHOWSELALWAYS );
 	m_tree.SetWindowPos( GetDlgItem( IDC_ST_FAVMENU ), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
 	m_tree.SetFont( GetFont() );
 	m_tree.GetHeaderCtrl().ModifyStyle( HDS_BUTTONS, 0 );

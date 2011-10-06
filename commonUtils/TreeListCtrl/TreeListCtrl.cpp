@@ -313,7 +313,9 @@ CTreeListCtrl_tree::CTreeListCtrl_tree() :
 	m_lastClientWidth( -1 ),
 	m_isRedrawEnabled( true ),
 	m_isOnPaint( false ),
-	m_isMouseOver( false )
+	m_isMouseOver( false ),
+	m_tooltipItem( NULL ),
+	m_tooltipColumn( -1 )
 {
 	// create initial sys-color dependent objects
 	HandleSysColorChange();
@@ -653,21 +655,24 @@ void CTreeListCtrl_tree::OnCustomDraw( NMHDR* _pnm, LRESULT *pResult )
 
 				DrawTreeGraphics( dc, pnm, rcSubItem ); 
 
-				CImageList* pImgList = GetImageList( TVSIL_NORMAL );
-				int nStdImage, nSelImage;
-				if( pImgList && GetItemImage( hTreeItem, nStdImage, nSelImage ) )
+				if( ! ( itemFormat.flags & CTreeListCtrl::FMT_DIVIDER ) )
 				{
-					IMAGEINFO img;
-					pImgList->GetImageInfo( nStdImage, &img );
-					int y = ( rcSubItem.Height() - img.rcImage.bottom + img.rcImage.top ) / 2;
+					CImageList* pImgList = GetImageList( TVSIL_NORMAL );
+					int nStdImage, nSelImage;
+					if( pImgList && GetItemImage( hTreeItem, nStdImage, nSelImage ) )
+					{
+						IMAGEINFO img;
+						pImgList->GetImageInfo( nStdImage, &img );
+						int y = ( rcSubItem.Height() - img.rcImage.bottom + img.rcImage.top ) / 2;
 
-					if( nSelImage == 0 )
-						nSelImage = nStdImage;
-					int nImage = pnm->nmcd.uItemState & CDIS_SELECTED ? nSelImage : nStdImage;
+						if( nSelImage == 0 )
+							nSelImage = nStdImage;
+						int nImage = pnm->nmcd.uItemState & CDIS_SELECTED ? nSelImage : nStdImage;
 
-					if( nImage != -1 )
-						ImageList_Draw( *pImgList, nImage, dc, 
-							rcText.left - indentUnit, rcSubItem.top + y, ILD_NORMAL ); 
+						if( nImage != -1 )
+							ImageList_Draw( *pImgList, nImage, dc, 
+								rcText.left - indentUnit, rcSubItem.top + y, ILD_NORMAL ); 
+					}
 				}
 			}
 			CRect rc = TREE_FIRSTCOLUMN_TEXT_MARGINS;
@@ -982,7 +987,7 @@ void CTreeListCtrl_tree::OnMouseMove( UINT nFlags, CPoint pt )
 	m_pParent->GetClientRect( rcParent );
 	m_pParent->MapWindowPoints( this, rcParent );  
 
-	// determine mouse-over column, if it contains clipped text
+	// determine mouse-over item and column, if it contains clipped text
 	int nCol = -1;
 	CRect rcCol;
 	UINT htFlags = 0;
@@ -1009,32 +1014,41 @@ void CTreeListCtrl_tree::OnMouseMove( UINT nFlags, CPoint pt )
 	
 	if( nCol != -1 )
 	{
-		m_tooltip.SetFont( GetFont(), FALSE );
+		if( hItem != m_tooltipItem || nCol != m_tooltipColumn )
+		{
+			m_tooltipItem = hItem;
+			m_tooltipColumn = nCol;
 
-		CString s = m_pParent->GetItemText( hItem, nCol );
-		m_toolInfo.lpszText = const_cast<LPTSTR>( s.GetString() );
-		m_tooltip.SendMessage( TTM_UPDATETIPTEXT, 0, reinterpret_cast<LPARAM>( &m_toolInfo ) );
+			m_tooltip.SetFont( GetFont(), FALSE );
 
-		CRect rcTT;
-		m_pParent->GetSubItemRect( NULL, &rcTT, NULL, hItem, nCol );
-		ClientToScreen( rcTT );		
-		m_tooltip.SendMessage( TTM_ADJUSTRECT, TRUE, reinterpret_cast<LPARAM>( &rcTT ) );
-		m_tooltip.SendMessage( TTM_TRACKPOSITION, 0, MAKELONG( rcTT.left, rcTT.top ) );
-		
-		if( ! m_tooltip.IsWindowVisible() )
-			m_tooltip.SendMessage( 
-				TTM_TRACKACTIVATE, TRUE, reinterpret_cast<LPARAM>( &m_toolInfo ) );
+			CString s = m_pParent->GetItemText( hItem, nCol );
+			m_toolInfo.lpszText = const_cast<LPTSTR>( s.GetString() );
+			m_tooltip.SendMessage( TTM_UPDATETIPTEXT, 0, reinterpret_cast<LPARAM>( &m_toolInfo ) );
+
+			CRect rcTT;
+			m_pParent->GetSubItemRect( NULL, &rcTT, NULL, hItem, nCol );
+			ClientToScreen( rcTT );		
+			m_tooltip.SendMessage( TTM_ADJUSTRECT, TRUE, reinterpret_cast<LPARAM>( &rcTT ) );
+			m_tooltip.SendMessage( TTM_TRACKPOSITION, 0, MAKELONG( rcTT.left, rcTT.top ) );
+						
+			if( ! m_tooltip.IsWindowVisible() )
+				m_tooltip.SendMessage( 
+					TTM_TRACKACTIVATE, TRUE, reinterpret_cast<LPARAM>( &m_toolInfo ) );
+		}
 	}
 	else
 	{
 		m_tooltip.SendMessage( 
 			TTM_TRACKACTIVATE, FALSE, reinterpret_cast<LPARAM>( &m_toolInfo ) );
+			
+		m_tooltipItem = NULL;
+		m_tooltipColumn = -1;			
 	}
 
 	if( ! m_isMouseOver )
 	{
 		m_isMouseOver = true;
-		// create a timer for checking when to hide the tooltip
+		// Create a timer for checking when the mouse leaves the window so we should hide the tooltip.
 		SetTimer( ID_TOOLTIP_TIMER, 250, NULL );
 	}
 	
@@ -1062,10 +1076,14 @@ void CTreeListCtrl_tree::OnTimer( UINT_PTR id )
 
     if( ! rc.PtInRect( pt ) )
 	{
-		m_isMouseOver = false;
 		m_tooltip.SendMessage( 
 			TTM_TRACKACTIVATE, FALSE, reinterpret_cast<LPARAM>( &m_toolInfo ) );
+
 		KillTimer( ID_TOOLTIP_TIMER );
+
+		m_isMouseOver = false;
+		m_tooltipItem = NULL;
+		m_tooltipColumn = -1;			
 	}
 }
 
@@ -1208,7 +1226,8 @@ CTreeListCtrl::CTreeListCtrl() :
 	m_horizScrollMax( 0 ),
 	m_isThemeActive( false ),
 	m_hTheme( NULL ),
-	m_options( 0 )
+	m_options( 0 ),
+	m_treeStyle( 0 )
 {
 	memset( &m_rcClientPos, 0, sizeof(m_rcClientPos) );
 
@@ -1235,17 +1254,19 @@ CTreeListCtrl::CTreeListCtrl() :
 
 //--------------------------------------------------------------------------------------------
 
-BOOL CTreeListCtrl::Create( CWnd* pParentWnd, const RECT& rect, UINT nID, DWORD dwStyle, DWORD dwExStyle) 
+BOOL CTreeListCtrl::Create( CWnd* pParentWnd, const RECT& rect, UINT nID, DWORD dwStyle, DWORD dwExStyle ) 
 {
     ASSERT( pParentWnd->GetSafeHwnd() );
+    
+	m_treeStyle = dwStyle & 0xFFFF;
 
 	memset( &m_templ, 0, sizeof(m_templ) );
-	m_templ.dlg.style = ( dwStyle & ~WS_VISIBLE ) | WS_CHILD | WS_CLIPCHILDREN | DS_CONTROL | DS_SETFONT;
+	m_templ.dlg.style = ( dwStyle & 0xFFFF0000 & ~WS_VISIBLE ) | WS_CHILD | WS_CLIPCHILDREN | DS_CONTROL | DS_SETFONT;
 	m_templ.dlg.dwExtendedStyle = dwExStyle;
 	StringCbCopyW( m_templ.classArray, sizeof(m_templ.classArray), L"TreeListCtrl_zett42" );
 	StringCbCopyW( m_templ.fontFace, sizeof(m_templ.fontFace), L"MS Shell Dlg" );
 	m_templ.fontSize = 8;
-
+	
 	if( CreateIndirect( &m_templ, pParentWnd ) )
 	{
 		SetDlgCtrlID( nID );
@@ -1274,8 +1295,7 @@ BOOL CTreeListCtrl::OnInitDialog()
 
 	//--- create tree ctrl ----
 	m_tree.LinkToParentCtrl( this );
-	m_tree.Create( WS_CHILD | WS_VISIBLE | WS_TABSTOP |
-		TVS_HASBUTTONS | TVS_FULLROWSELECT | TVS_LINESATROOT | TVS_SHOWSELALWAYS | TVS_NOTOOLTIPS, 
+	m_tree.Create( WS_CHILD | WS_VISIBLE | WS_TABSTOP | TVS_NOTOOLTIPS | m_treeStyle, 
 		CRect(0,0,0,0), this, IDC_TREE );
     m_tree.LinkToHeaderCtrl( &m_headerCtrl );
 

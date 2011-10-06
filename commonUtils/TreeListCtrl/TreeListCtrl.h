@@ -134,6 +134,8 @@ private:
 	bool m_isMouseOver;
 	CTreeListCtrl_tooltip m_tooltip;
 	TOOLINFO m_toolInfo;
+	HTREEITEM m_tooltipItem;
+	int m_tooltipColumn;
 };
 
 
@@ -348,6 +350,8 @@ private:
 	CTreeListCtrl_tree m_tree;
 	CTreeListCtrl_header m_headerCtrl;
 	CScrollBar m_horizScrollBar;
+
+	DWORD m_treeStyle;
 
 	int m_horizScrollPos;
 	int m_horizScrollMax;
