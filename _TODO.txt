@@ -26,5 +26,4 @@ Cosmetic:
 [ ] DPI-Scaling for toolbar icons
 [ ] Use Vista-style file dialogs in FFConfig (do not use CFileDialog)
 [ ] Use Vista-style treeview, listview, link controls
-[ ] Favmenu editor: use shell folder icon
-[ ] Favmenu editor: minor display problems under Vista/Win7
+[x] Favmenu editor: minor display problems under Vista/Win7
