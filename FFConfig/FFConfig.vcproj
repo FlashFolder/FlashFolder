@@ -73,7 +73,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="false"
+				LinkLibraryDependencies="true"
 				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
@@ -167,7 +167,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="false"
+				LinkLibraryDependencies="true"
 				AdditionalOptions="/NXCompat /DynamicBase"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig64.exe"
@@ -262,7 +262,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="false"
+				LinkLibraryDependencies="true"
 				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig.exe"
@@ -361,7 +361,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="false"
+				LinkLibraryDependencies="true"
 				AdditionalOptions="/NXCompat /DynamicBase"
 				AdditionalDependencies="version.lib uxtheme.lib"
 				OutputFile="../exe/FFConfig64.exe"

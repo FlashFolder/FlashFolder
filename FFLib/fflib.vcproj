@@ -84,7 +84,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
-				LinkLibraryDependencies="false"
+				LinkLibraryDependencies="true"
 				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib dwmapi.lib"
 				OutputFile="..\exe\fflib6439.dll"
@@ -192,7 +192,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
-				LinkLibraryDependencies="false"
+				LinkLibraryDependencies="true"
 				AdditionalOptions="/NXCompat /DynamicBase"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib dwmapi.lib"
 				OutputFile="..\exe\fflib6439_64.dll"
@@ -301,7 +301,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
-				LinkLibraryDependencies="false"
+				LinkLibraryDependencies="true"
 				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib dwmapi.lib"
 				OutputFile="..\exe\fflib6439.dll"
@@ -411,7 +411,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
-				LinkLibraryDependencies="false"
+				LinkLibraryDependencies="true"
 				AdditionalOptions="/NXCompat /DynamicBase"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib mpr.lib shlwapi.lib uxtheme.lib dwmapi.lib"
 				OutputFile="..\exe\fflib6439_64.dll"
