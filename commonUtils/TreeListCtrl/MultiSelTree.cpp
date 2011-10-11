@@ -25,10 +25,10 @@
 //1  0  1	A selection gain on itemNew
 //else undefined
 //
-//---------------------------------------------------------------------
-// Modified July/2007 by zett42 (zett42 at users.sourceforge.net).
-//---------------------------------------------------------------------
-
+//----------------------------------------------------------------------------------------------------
+// Modified 07/2007 by zett42 (zett42 at users.sourceforge.net).
+// Modified 10/2011 by zett42 to fix selection bug under Vista and above (somewhat)
+//----------------------------------------------------------------------------------------------------
 
 #include "stdafx.h"
 #include <windowsx.h>
@@ -501,6 +501,9 @@ void CMultiSelTree::DoPreSelection(HTREEITEM hItem, BOOL bLeft, UINT nFlags)
 				m_hSelect = GetSelectedItem();	//focus
 			SelectRange(m_hSelect, hItem, !_bCtrl);
 			SetItemState(hItem, TVIS_FOCUSED, TVIS_FOCUSED);	//focus changes to last clicked
+			
+			if( m_hSelect != hItem )
+				SetItemState( m_hSelect, TVIS_SELECTED, TVIS_SELECTED );  // zett42: Workaround for Vista and above
 		}
 		else {
 			if (!_bCtrl) {
@@ -584,7 +587,13 @@ void CMultiSelTree::DoAction(HTREEITEM hItem, BOOL bLeft, UINT nFlags, CPoint po
 				nState ^= (GetItemState(hItem, TVIS_SELECTED) & TVIS_SELECTED);
 			else
 				SelectAllIgnore(FALSE, hItem);
+				
+			HTREEITEM hSel = GetSelectedItem(); // zett42: Workaround for Vista and above	
+			
 			SetItemState(hItem, TVIS_FOCUSED|nState, TVIS_FOCUSED|TVIS_SELECTED);
+			
+			if( hSel && hSel != hItem )         
+				SetItemState( hSel, TVIS_SELECTED, TVIS_SELECTED ); // zett42: Workaround for Vista and above
 		}
 		if (::GetFocus() != m_hWnd)
 			::SetFocus(m_hWnd);

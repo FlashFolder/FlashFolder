@@ -4,9 +4,10 @@
 // Original code is copyright (c) 1999 Richard Hazlewood
 // This code is provided as-is.  Use at your own peril.
 //
-//---------------------------------------------------------------------
-// Modified July/2007 by zett42 (zett42 at users.sourceforge.net).
-//---------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+// Modified 07/2007 by zett42 (zett42 at users.sourceforge.net).
+// Modified 10/2011 by zett42 to fix selection bug under Vista and above (somewhat)
+//----------------------------------------------------------------------------------------------------
 
 #include <afxtempl.h>
 
