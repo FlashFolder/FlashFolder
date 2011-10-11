@@ -65,6 +65,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				LinkLibraryDependencies="true"
 				OutputFile="lib\Common_d.lib"
 				AdditionalLibraryDirectories="..\CommonUtils\lib"
 			/>
@@ -132,6 +133,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				LinkLibraryDependencies="true"
 				OutputFile="lib\Common64_d.lib"
 				AdditionalLibraryDirectories="..\CommonUtils\lib"
 			/>
@@ -199,6 +201,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				LinkLibraryDependencies="true"
 				OutputFile="lib\Common.lib"
 				AdditionalLibraryDirectories="..\CommonUtils\lib"
 			/>
@@ -267,6 +270,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				LinkLibraryDependencies="true"
 				OutputFile="lib\Common64.lib"
 				AdditionalLibraryDirectories="..\CommonUtils\lib"
 			/>
