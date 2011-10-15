@@ -31,7 +31,7 @@ public:
 
 	CPageCommonFileDlg();
 
-	virtual void ReadProfile( const Profile& profile );
+	virtual void ReadProfile();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    
@@ -47,5 +47,5 @@ private:
 	CComboBox m_cbPos;
 	std::vector<CString> m_excludes;
 	std::vector<CString> m_nonResizableExcludes;
-	bool m_bReadDefaults;
+	
 };

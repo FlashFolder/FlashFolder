@@ -30,8 +30,7 @@ const CString PROFILE_GROUP = _T("CommonFileDlg");
 //-----------------------------------------------------------------------------------------------
 
 CPageCommonFileDlg::CPageCommonFileDlg()
-	: base(CPageCommonFileDlg::IDD),
-	m_bReadDefaults( false )
+	: base(CPageCommonFileDlg::IDD)
 {}
 
 //-----------------------------------------------------------------------------------------------
@@ -68,24 +67,16 @@ BOOL CPageCommonFileDlg::OnInitDialog()
 
 	//--- get profile data
 
-	if( m_bReadDefaults )
-		ReadProfile( g_profileDefaults );
-	else
-		ReadProfile( g_profile );
+	ReadProfile();
 
 	return TRUE;
 }
 
 //-----------------------------------------------------------------------------------------------
 
-void CPageCommonFileDlg::ReadProfile( const Profile& profile )
+void CPageCommonFileDlg::ReadProfile()
 {
-	if( ! GetSafeHwnd() )
-	{
-		// If the dialog was not active before, it has not been initialized yet.
-		m_bReadDefaults = true;
-		return;
-	}
+	const Profile& profile = CApp::GetReadProfile();
 
 	CString s;
 	CheckDlgButton( IDC_CHK_ENABLE, profile.GetInt( PROFILE_GROUP, _T("EnableHook") ) );
@@ -123,31 +114,33 @@ void CPageCommonFileDlg::ReadProfile( const Profile& profile )
 
 BOOL CPageCommonFileDlg::OnApply()
 {
+	Profile& profile = CApp::GetWriteProfile();
+
 	CString s;
-	g_profile.SetInt( PROFILE_GROUP, _T("EnableHook"), IsDlgButtonChecked( IDC_CHK_ENABLE ) );
+	profile.SetInt( PROFILE_GROUP, _T("EnableHook"), IsDlgButtonChecked( IDC_CHK_ENABLE ) );
 	GetDlgItemText( IDC_ED_MINWIDTH, s );
-	g_profile.SetInt( PROFILE_GROUP, _T("MinWidth"), _ttoi( s ) );
+	profile.SetInt( PROFILE_GROUP, _T("MinWidth"), _ttoi( s ) );
 	GetDlgItemText( IDC_ED_MINHEIGHT, s );
-	g_profile.SetInt( PROFILE_GROUP, _T("MinHeight"), _ttoi( s ) );
-	g_profile.SetInt( PROFILE_GROUP, _T("Center"), m_cbPos.GetCurSel() );
-	g_profile.SetInt( PROFILE_GROUP, _T("ResizeNonResizableDialogs"), 
+	profile.SetInt( PROFILE_GROUP, _T("MinHeight"), _ttoi( s ) );
+	profile.SetInt( PROFILE_GROUP, _T("Center"), m_cbPos.GetCurSel() );
+	profile.SetInt( PROFILE_GROUP, _T("ResizeNonResizableDialogs"), 
 		IsDlgButtonChecked( IDC_CHK_RESIZENONRESIZABLE ) );
 	GetDlgItemText( IDC_ED_FILETYPECOMBO_MAXHEIGHT, s );
-	g_profile.SetInt( PROFILE_GROUP, _T("FiletypesComboHeight"), _ttoi( s ) );
+	profile.SetInt( PROFILE_GROUP, _T("FiletypesComboHeight"), _ttoi( s ) );
 	GetDlgItemText( IDC_ED_FOLDERCOMBO_MAXHEIGHT, s );
-	g_profile.SetInt( PROFILE_GROUP, _T("FolderComboHeight"), _ttoi( s ) );
+	profile.SetInt( PROFILE_GROUP, _T("FolderComboHeight"), _ttoi( s ) );
 
 	vector<tstring> list;
 	for( int i = 0; i != m_excludes.size(); ++i )
 		list.push_back( m_excludes[ i ].GetString() );
-	g_profile.SetStringList( PROFILE_GROUP + _T(".Excludes"), list );
+	profile.SetStringList( PROFILE_GROUP + _T(".Excludes"), list );
 
 	list.clear();
 	for( int i = 0; i != m_nonResizableExcludes.size(); ++i )
 		list.push_back( m_nonResizableExcludes[ i ].GetString() );
-	g_profile.SetStringList( PROFILE_GROUP + _T(".NonResizableExcludes"), list );
+	profile.SetStringList( PROFILE_GROUP + _T(".NonResizableExcludes"), list );
 
-	g_profile.SetInt( _T("main"), _T("ListViewMode"), 
+	profile.SetInt( _T("main"), _T("ListViewMode"), 
 		IsDlgButtonChecked( IDC_CHK_KEEP_LISTVIEW_MODE ) ? FVM_LIST : FVM_AUTO );
 
 	return base::OnApply();

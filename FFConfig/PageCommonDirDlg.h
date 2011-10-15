@@ -31,7 +31,7 @@ public:
 
 	CPageCommonDirDlg();
 
-	virtual void ReadProfile( const Profile& profile );
+	virtual void ReadProfile();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    
@@ -45,5 +45,5 @@ protected:
 private:
 	CComboBox m_cbPos;
 	std::vector<CString> m_excludes;
-	bool m_bReadDefaults;
+	
 };

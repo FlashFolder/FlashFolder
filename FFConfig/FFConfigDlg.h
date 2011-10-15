@@ -22,7 +22,7 @@
 #include "PageCommonFileDlg.h"
 #include "PageCommonDirDlg.h"
 #include "PageMsoFileDlg.h"
-#include "PageTotalCmd.h"
+#include "PageFileManager.h"
 #include "PageShortcuts.h"
 #include "PageToolbar.h"
 
@@ -49,7 +49,7 @@ private:
 	CPageCommonFileDlg m_pageCommonFileDlg;
 	CPageCommonDirDlg m_pageCommonDirDlg;
 	CPageMsoFileDlg m_pageMsoFileDlg;
-	CPageTotalcmd m_pageTotalcmd;
+	CPageFileManager m_pageFileManager;
 	CPageShortcuts m_pageShortcuts;
 	CPageToolbar m_pageToolbar;
 };

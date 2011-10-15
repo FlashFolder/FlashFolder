@@ -28,11 +28,12 @@
 	<ItemGroup>
 		<VCProject Include="CommonUtils\CommonUtilsLib.vcproj"/>
 		<VCProject Include="Common\CommonLib.vcproj"/>
-		<VCProject Include="Installer\wcautil\wcautil.vcproj"/>
-		<VCProject Include="Installer\CustomActions\CustomActions.vcproj"/>
 		<VCProject Include="FFConfig\FFConfig.vcproj"/>
 		<VCProject Include="FFLib\FFLib.vcproj"/>
 		<VCProject Include="FFService\FFService.vcproj"/>
+		<VCProject Include="FileMgrPlugin\FileMgrPlugin.vcproj"/>
+		<VCProject Include="Installer\wcautil\wcautil.vcproj"/>
+		<VCProject Include="Installer\CustomActions\CustomActions.vcproj"/>
 	</ItemGroup>
 
 	<Target Name="VCProjects_x86" DependsOnTargets="SvnVersionInclude">

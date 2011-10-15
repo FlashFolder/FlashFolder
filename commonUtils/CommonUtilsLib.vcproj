@@ -49,6 +49,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -115,6 +116,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -181,6 +183,7 @@
 				AdditionalIncludeDirectories=".;..;tinyxml;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -248,6 +251,7 @@
 				AdditionalIncludeDirectories=".;..;tinyxml;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -352,6 +356,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FileFinder.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FolderDlg.cpp"
 				>
 			</File>
@@ -409,6 +417,10 @@
 			</File>
 			<File
 				RelativePath=".\MfcThread.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Module.h"
 				>
 			</File>
 			<File
@@ -666,14 +678,6 @@
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\TotalCmdUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TotalCmdUtils.h"
-				>
 			</File>
 			<File
 				RelativePath=".\TreeListCtrl\TreeListCtrl.cpp"

@@ -29,6 +29,7 @@
 #define IDI_SUBMENU                     159
 #define IDR_FAVORITES_CONTEXTMENU       160
 #define IDD_PAGE_TOTALCMD               162
+#define IDD_PAGE_FILEMANAGER            162
 #define IDD_PAGE_SHORTCUTS              163
 #define IDD_ADD_FAVORITE                166
 #define IDD_PAGE_TOOLBAR                168
@@ -119,6 +120,9 @@
 #define IDC_CHK_KEEP_LISTVIEW_MODE      1097
 #define IDC_SP_OFFSET_W                 1098
 #define IDC_ST_FFSERVICE2               1098
+#define IDC_LIST_SOURCE                 1103
+#define IDC_CHECK1                      1104
+#define IDC_CHK_SHOW_ALL                1104
 #define ID_FAVCONTEXT_NEWITEM           32771
 #define ID_FAVCONTEXT_NEWDIVIDER        32772
 #define ID_FAVCONTEXT_NEWSUBMENU        32773
@@ -133,7 +137,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        169
 #define _APS_NEXT_COMMAND_VALUE         32778
-#define _APS_NEXT_CONTROL_VALUE         1099
+#define _APS_NEXT_CONTROL_VALUE         1105
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif

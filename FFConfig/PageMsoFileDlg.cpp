@@ -30,8 +30,7 @@ const CString PROFILE_GROUP = _T("MSOfficeFileDlg");
 //-----------------------------------------------------------------------------------------------
 
 CPageMsoFileDlg::CPageMsoFileDlg() : 
-	base(CPageMsoFileDlg::IDD),
-	m_bReadDefaults( false )
+	base(CPageMsoFileDlg::IDD)
 {}
 
 //-----------------------------------------------------------------------------------------------
@@ -65,23 +64,16 @@ BOOL CPageMsoFileDlg::OnInitDialog()
 
 	//--- get profile data
 
-	if( m_bReadDefaults )
-		ReadProfile( g_profileDefaults );
-	else
-		ReadProfile( g_profile );
+	ReadProfile();
 
 	return TRUE;
 }
 
 //-----------------------------------------------------------------------------------------------
 
-void CPageMsoFileDlg::ReadProfile( const Profile& profile )
+void CPageMsoFileDlg::ReadProfile()
 {
-	if( ! GetSafeHwnd() )
-	{
-		m_bReadDefaults = true;
-		return;
-	}
+	const Profile& profile = CApp::GetReadProfile();
 
 	CString s;
 	CheckDlgButton( IDC_CHK_ENABLE, profile.GetInt( PROFILE_GROUP, _T("EnableHook") ) );
@@ -105,18 +97,20 @@ void CPageMsoFileDlg::ReadProfile( const Profile& profile )
 
 BOOL CPageMsoFileDlg::OnApply()
 {
+	Profile& profile = CApp::GetWriteProfile();
+
 	CString s;
-	g_profile.SetInt( PROFILE_GROUP, _T("EnableHook"), IsDlgButtonChecked( IDC_CHK_ENABLE ) );
+	profile.SetInt( PROFILE_GROUP, _T("EnableHook"), IsDlgButtonChecked( IDC_CHK_ENABLE ) );
 	GetDlgItemText( IDC_ED_MINWIDTH, s );
-	g_profile.SetInt( PROFILE_GROUP, _T("MinWidth"), _ttoi( s ) );
+	profile.SetInt( PROFILE_GROUP, _T("MinWidth"), _ttoi( s ) );
 	GetDlgItemText( IDC_ED_MINHEIGHT, s );
-	g_profile.SetInt( PROFILE_GROUP, _T("MinHeight"), _ttoi( s ) );
-	g_profile.SetInt( PROFILE_GROUP, _T("Center"), m_cbPos.GetCurSel() );
+	profile.SetInt( PROFILE_GROUP, _T("MinHeight"), _ttoi( s ) );
+	profile.SetInt( PROFILE_GROUP, _T("Center"), m_cbPos.GetCurSel() );
 
 	vector<tstring> list;
 	for( int i = 0; i != m_excludes.size(); ++i )
 		list.push_back( m_excludes[ i ].GetString() );
-	g_profile.SetStringList( PROFILE_GROUP + _T(".Excludes"), list );
+	profile.SetStringList( PROFILE_GROUP + _T(".Excludes"), list );
 
 	return base::OnApply();
 }

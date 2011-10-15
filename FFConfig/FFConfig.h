@@ -26,18 +26,32 @@
 
 //-----------------------------------------------------------------------------------------------
 
-class CFFConfigApp : public CWinApp
+class CApp : public CWinApp
 {
 public:
-	CFFConfigApp();
+	static void SetReadDefaults( bool defaults ) { s_app.m_isReadDefaults = defaults; }
+
+	static Profile& GetReadProfile() 
+	{ 
+		if( s_app.m_isReadDefaults )
+			return s_app.m_profileDefaults;
+		return s_app.m_profile;  
+	}
+
+	static Profile& GetWriteProfile()            { return s_app.m_profile; }
 
 private:
+	static CApp s_app;
+
+	CApp();
+
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
 
 	DECLARE_MESSAGE_MAP()
+
+	bool m_isReadDefaults;	
+	RegistryProfile m_profile;
+	MemoryProfile m_profileDefaults;
 };
 
-extern CFFConfigApp g_app;
-extern RegistryProfile g_profile;
-extern MemoryProfile g_profileDefaults;

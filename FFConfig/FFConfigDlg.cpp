@@ -41,7 +41,7 @@ CFFConfigDlg::CFFConfigDlg(CWnd* pParent /*=NULL*/)
 	AddPage( &m_pageCommonFileDlg );
 	AddPage( &m_pageCommonDirDlg );		
 	AddPage( &m_pageMsoFileDlg );
-	AddPage( &m_pageTotalcmd );
+	AddPage( &m_pageFileManager );
 	AddPage( &m_pageShortcuts );
 	AddPage( &m_pageToolbar );	
 

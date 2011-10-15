@@ -38,11 +38,16 @@
 #include <memory>
 using namespace std;
 
-//--- STL headers
+//--- std headers
 #include <vector>
 #include <map>
 #include <set>
 #include <string>
+
+//--- boost headers
+#include <boost\foreach.hpp>
+#include <boost\scoped_ptr.hpp>
+#define foreach BOOST_FOREACH
 
 //--- common project files
 #include <common\_autolink.h>
@@ -51,6 +56,8 @@ using namespace std;
 #include <common\HistoryLst.h>
 #include <common\ProfileDefaults.h>
 #include <common\ProcessNames.h>
+#include <common\TotalCmdUtils.h>
+#include <common\PluginManager.h>
 
 //--- utilities
 #include <commonUtils\_autolink.h>
@@ -59,7 +66,6 @@ using namespace std;
 #include <commonUtils\Utils.h>
 #include <commonUtils\GdiUtils.h>
 #include <commonUtils\Profile.h>
-#include <commonUtils\TotalCmdUtils.h>
 #include <commonUtils\Registry.h>
 
 // include after all other headers to avoid false warnings

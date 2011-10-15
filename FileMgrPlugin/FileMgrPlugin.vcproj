@@ -2,10 +2,10 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="FFConfig"
-	ProjectGUID="{C0CEF810-20AE-41FF-ABAF-FEC874FE4B0C}"
-	RootNamespace="FFConfig"
-	Keyword="MFCProj"
+	Name="FileMgrPlugin"
+	ProjectGUID="{F98FEEED-D6A7-438F-BBAF-84A5A7225582}"
+	RootNamespace="FileMgrPlugin"
+	Keyword="Win32Proj"
 	>
 	<Platforms>
 		<Platform
@@ -22,14 +22,11 @@
 			Name="Debug|Win32"
 			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="echo $(SolutionDir)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -42,18 +39,16 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="false"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".."
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FILEMGRPLUGIN_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				TreatWChar_tAsBuiltInType="true"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -64,22 +59,16 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="true"
-				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
-				AdditionalDependencies="version.lib uxtheme.lib"
-				OutputFile="../exe/FFConfig.exe"
+				OutputFile="../exe/plugins32/Default/DefFileMgr.ffplugin"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\Common\Lib;..\CommonUtils\Lib"
-				DelayLoadDLLs="uxtheme.dll;dwmapi.dll;urlmon.dll"
+				ModuleDefinitionFile="FileMgrPlugin.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -89,7 +78,6 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				AdditionalManifestFiles="res\manifest.xml"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -108,21 +96,17 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="echo $(SolutionDir)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -135,19 +119,17 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="false"
 				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".."
-				PreprocessorDefinitions="WIN64;_WINDOWS;_DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FILEMGRPLUGIN_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				TreatWChar_tAsBuiltInType="true"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -158,22 +140,16 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="true"
-				AdditionalOptions="/NXCompat /DynamicBase"
-				AdditionalDependencies="version.lib uxtheme.lib"
-				OutputFile="../exe/FFConfig64.exe"
+				OutputFile="../exe/plugins64/Default/DefFileMgr.ffplugin"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\Common\Lib;..\CommonUtils\Lib"
-				DelayLoadDLLs="uxtheme.dll;urlmon.dll"
+				ModuleDefinitionFile="FileMgrPlugin.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
@@ -183,7 +159,6 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				AdditionalManifestFiles="res\manifest.xml"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -202,22 +177,18 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="1"
+			ConfigurationType="2"
 			CharacterSet="1"
-			WholeProgramOptimization="0"
+			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -230,19 +201,13 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="false"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="1"
-				EnableIntrinsicFunctions="false"
 				AdditionalIncludeDirectories=".."
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
-				MinimalRebuild="false"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FILEMGRPLUGIN_EXPORTS"
 				RuntimeLibrary="0"
-				TreatWChar_tAsBuiltInType="true"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -253,27 +218,20 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="true"
-				AdditionalOptions="/NXCompat /DynamicBase /SafeSEH"
-				AdditionalDependencies="version.lib uxtheme.lib"
-				OutputFile="../exe/FFConfig.exe"
+				OutputFile="../exe/plugins32/Default/DefFileMgr.ffplugin"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Common\Lib;..\CommonUtils\Lib"
-				DelayLoadDLLs="uxtheme.dll;dwmapi.dll;urlmon.dll"
+				ModuleDefinitionFile="FileMgrPlugin.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				OptimizeForWindows98="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -281,7 +239,6 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				AdditionalManifestFiles="res\manifest.xml"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -300,22 +257,18 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory="output\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="output\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="1"
+			ConfigurationType="2"
 			CharacterSet="1"
-			WholeProgramOptimization="0"
+			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="echo $(SolutionDir)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -328,20 +281,14 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="false"
 				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="1"
-				EnableIntrinsicFunctions="false"
 				AdditionalIncludeDirectories=".."
-				PreprocessorDefinitions="WIN64;_WINDOWS;NDEBUG"
-				MinimalRebuild="false"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FILEMGRPLUGIN_EXPORTS"
 				RuntimeLibrary="0"
-				TreatWChar_tAsBuiltInType="true"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -352,27 +299,20 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="true"
-				AdditionalOptions="/NXCompat /DynamicBase"
-				AdditionalDependencies="version.lib uxtheme.lib"
-				OutputFile="../exe/FFConfig64.exe"
+				OutputFile="../exe/plugins64/Default/DefFileMgr.ffplugin"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Common\Lib;..\CommonUtils\Lib"
-				DelayLoadDLLs="uxtheme.dll;urlmon.dll"
+				ModuleDefinitionFile="FileMgrPlugin.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				OptimizeForWindows98="1"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -380,7 +320,6 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				AdditionalManifestFiles="res\manifest.xml"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -399,7 +338,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
@@ -408,123 +346,23 @@
 	<Files>
 		<Filter
 			Name="source"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			Filter="h;hpp;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\AboutDlg.cpp"
+				RelativePath=".\FileMgrPlugin.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\AboutDlg.h"
+				RelativePath=".\FileMgrPlugin.def"
 				>
 			</File>
 			<File
-				RelativePath=".\AddFavoriteDlg.cpp"
+				RelativePath=".\FileMgrPlugin.rc"
 				>
 			</File>
 			<File
-				RelativePath=".\AddFavoriteDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\AutoPropertyPage.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\AutoPropertyPage.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ExcludesDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ExcludesDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FFConfig.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FFConfig.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FFConfigDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FFConfigDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FolderFavoritesDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FolderFavoritesDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageCommonDirDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PageCommonDirDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageCommonFileDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PageCommonFileDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageFileManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PageFileManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageGeneric.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PageGeneric.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageMsoFileDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PageMsoFileDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageShortcuts.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PageShortcuts.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PageToolbar.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PageToolbar.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Resource.h"
+				RelativePath=".\resource.h"
 				>
 			</File>
 			<File
@@ -567,54 +405,8 @@
 				RelativePath=".\stdafx.h"
 				>
 			</File>
-			<File
-				RelativePath=".\UpdateCheckDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UpdateCheckDlg.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="res"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-			<File
-				RelativePath=".\res\dragging.cur"
-				>
-			</File>
-			<File
-				RelativePath=".\FFConfig.rc"
-				>
-			</File>
-			<File
-				RelativePath=".\res\FFConfig.rc2"
-				>
-			</File>
-			<File
-				RelativePath="..\common\res\FlashFolder.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\res\manifest.xml"
-				>
-			</File>
-			<File
-				RelativePath=".\res\menuitem.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\res\submenu.ico"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>
-		<Global
-			Name="RESOURCE_FILE"
-			Value="FFConfig.rc"
-		/>
 	</Globals>
 </VisualStudioProject>

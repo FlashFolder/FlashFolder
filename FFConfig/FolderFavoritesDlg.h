@@ -42,7 +42,6 @@ private:
 	afx_msg void OnBnClickedBtnAddDivider();
 	afx_msg void OnBnClickedBtnAddSubmenu();
 	afx_msg void OnBnClickedBtnRemove();
-	afx_msg void OnBnClickedBtnImport();
 	afx_msg void OnBnClickedBtnBrowse();
 	afx_msg void OnBnClickedBtnTargetbrowse();
 	afx_msg void OnBnClickedBtnRevert();

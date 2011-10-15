@@ -306,6 +306,7 @@ void DebugOut( LPCTSTR pFormat, ... )
 	va_start( args, pFormat );
 	StringCbVPrintf( buf, sizeof(buf), pFormat, args );
 	va_end( args );
+	StringCchCat( buf, _countof( buf ), _T("\n") );
 	::OutputDebugString( buf );
 }
 

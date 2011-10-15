@@ -31,17 +31,7 @@
 			
 			<ComponentRef Id="ProgramRegkeys"/>
 			<ComponentGroupRef Id="ProgramFiles"/>
-
-			<Feature Id="ControlPanelApplet"
-				Title="!(loc.FF_ControlPanel)"
-				Description="!(loc.FF_ControlPanelDescr)"
-				Display="expand" 
-				Level="1"
-				Absent="allow"
-				AllowAdvertise="no">
-
-				<ComponentRef Id="FFControlPanel"/>	
-			</Feature>
+			<ComponentRef Id="FFControlPanel"/>
 		</Feature>		
 	</Fragment>
 </Wix>	

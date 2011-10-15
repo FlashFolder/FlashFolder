@@ -63,10 +63,21 @@
 #include <memory>
 #include <strsafe.h>  // include after all STD headers to avoid false warnings
 
+//--- boost headers
+
+#include <boost\foreach.hpp>
+#define foreach BOOST_FOREACH
+
 //--- CommonUtils headers
 
 #include <CommonUtils\_autolink.h>
 #include <CommonUtils\Profile.h>
 #include <CommonUtils\Utils.h>
-#include <CommonUtils\TotalCmdUtils.h>
 #include <commonUtils\GdiUtils.h>
+#include <commonUtils\FileFinder.h>
+#include <commonUtils\Module.h>
+
+//--- common headers
+
+#include <common\TotalCmdUtils.h>
+

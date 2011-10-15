@@ -20,7 +20,7 @@
 
 #include <windows.h>
 #include <tchar.h>
-#include "tstring.h"
+#include <commonUtils\tstring.h>
 
 //-------------------------------------------------------------------------------------------------
 /// \brief Class to get information from a running Total Commander instance.
@@ -84,5 +84,4 @@ bool IsTcPathControl( HWND hwnd );
 
 /// Get the directory path from a TC path control (strips backslash and filter)
 void GetPathFromTcControl( HWND hwnd, LPTSTR pPath, size_t nSize ); 
-
 

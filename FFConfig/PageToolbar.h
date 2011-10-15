@@ -31,7 +31,7 @@ public:
 
 	CPageToolbar();
 
-	virtual void ReadProfile( const Profile& profile );
+	virtual void ReadProfile();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    
@@ -41,5 +41,5 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	bool m_bReadDefaults;
+	
 };

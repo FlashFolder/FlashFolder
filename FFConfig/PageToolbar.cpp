@@ -30,8 +30,7 @@ const CString PROFILE_GROUP = _T("Toolbar");
 //-----------------------------------------------------------------------------------------------
 
 CPageToolbar::CPageToolbar() :
-	base(CPageToolbar::IDD),
-	m_bReadDefaults( false )
+	base(CPageToolbar::IDD)
 {}
 
 //-----------------------------------------------------------------------------------------------
@@ -60,10 +59,7 @@ BOOL CPageToolbar::OnInitDialog()
 
 	//--- get profile data
 
-	if( m_bReadDefaults )
-		ReadProfile( g_profileDefaults );
-	else
-		ReadProfile( g_profile );
+	ReadProfile();
 
 	GotoDlgCtrl( GetDlgItem( IDC_ED_OFFSET_X ) );
 	return FALSE;
@@ -71,13 +67,9 @@ BOOL CPageToolbar::OnInitDialog()
 
 //-----------------------------------------------------------------------------------------------
 
-void CPageToolbar::ReadProfile( const Profile& profile )
+void CPageToolbar::ReadProfile()
 {
-	if( ! GetSafeHwnd() )
-	{
-		m_bReadDefaults = true;
-		return;
-	}
+	const Profile& profile = CApp::GetReadProfile();
 
 	CString offsetX, offsetY, offsetWidth;
 	offsetX.Format( _T("%d"), profile.GetInt( PROFILE_GROUP, _T("OffsetX") ) );
@@ -92,6 +84,8 @@ void CPageToolbar::ReadProfile( const Profile& profile )
 
 BOOL CPageToolbar::OnApply()
 {
+	Profile& profile = CApp::GetWriteProfile();
+
 	// Multi-User option is currently read-only since it would require more work like
 	// checking for admin rights, elevation on Vista, etc.
 
@@ -99,9 +93,9 @@ BOOL CPageToolbar::OnApply()
 	GetDlgItemText( IDC_ED_OFFSET_X, offsetX );
 	GetDlgItemText( IDC_ED_OFFSET_Y, offsetY );
 	GetDlgItemText( IDC_ED_OFFSET_W, offsetWidth );
-	g_profile.SetInt( PROFILE_GROUP, _T("OffsetX"), _ttoi( offsetX ) );
-	g_profile.SetInt( PROFILE_GROUP, _T("OffsetY"), _ttoi( offsetY ) );
-	g_profile.SetInt( PROFILE_GROUP, _T("OffsetWidth"), _ttoi( offsetWidth ) );
+	profile.SetInt( PROFILE_GROUP, _T("OffsetX"), _ttoi( offsetX ) );
+	profile.SetInt( PROFILE_GROUP, _T("OffsetY"), _ttoi( offsetY ) );
+	profile.SetInt( PROFILE_GROUP, _T("OffsetWidth"), _ttoi( offsetWidth ) );
 	
 	return base::OnApply();
 }

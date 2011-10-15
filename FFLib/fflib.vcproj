@@ -58,6 +58,7 @@
 				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
+				EnableFunctionLevelLinking="true"
 				TreatWChar_tAsBuiltInType="true"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="2"
@@ -166,6 +167,7 @@
 				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
+				EnableFunctionLevelLinking="true"
 				TreatWChar_tAsBuiltInType="true"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="2"
@@ -459,7 +461,7 @@
 	<Files>
 		<Filter
 			Name="source"
-			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+			Filter="h;hpp;cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
 				RelativePath="..\_version.h"
@@ -560,6 +562,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FolderMenus.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FolderMenus.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MsoFileDlgHook.cpp"
 				>
 			</File>
@@ -609,6 +619,14 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Utils.h"
 				>
 			</File>
 		</Filter>

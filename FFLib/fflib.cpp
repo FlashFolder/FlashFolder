@@ -34,19 +34,20 @@
 #include "CmnFileDlgHook.h"
 #include "MsoFileDlgHook.h"
 #include "CmnFolderDlgHook.h"
+#include "FolderMenus.h"
+#include "Utils.h"
 
 using namespace std;
 
 //-----------------------------------------------------------------------------------------
 // global variables  
-//-----------------------------------------------------------------------------------------
 
 HINSTANCE g_hInstDll = NULL;
 
 HWND g_hFileDialog = NULL;				// handle of file open/save dialog 
 
-auto_ptr<FileDlgHook_base> g_spFileDlgHook;       // ptr to the hook instance
-auto_ptr<FileDlgHook_base> g_spOpenWithDlgHook;   // ptr to the hook instance
+boost::scoped_ptr< FileDlgHook_base > g_spFileDlgHook;       // ptr to the hook instance
+boost::scoped_ptr< FileDlgHook_base > g_spOpenWithDlgHook;   // ptr to the hook instance
 
 HWND g_hToolWnd = NULL;					// handle of cool external tool window
 WNDPROC g_wndProcToolWindowEditPath = NULL;
@@ -58,21 +59,19 @@ HACCEL g_hAccTable = NULL;
 RegistryProfile g_profile;   
 MemoryProfile g_profileDefaults;
 
-TCHAR g_currentExePath[ MAX_PATH + 1 ] = _T("");
-LPCTSTR g_currentExeName = _T("");
-TCHAR g_currentExeDir[ MAX_PATH + 1 ] = _T("");
+TCHAR g_currentExePath[ MAX_PATH + 1 ] = L"";
+LPCTSTR g_currentExeName = L"";
+TCHAR g_currentExeDir[ MAX_PATH + 1 ] = L"";
 
 Rect g_toolbarOffset;                    // Toolbar position / width offset to adjust for some XP themes.
 
 bool g_isToolWndVisible = false;
 
-//--- options read from profile
-int g_globalHistoryMaxEntries;
+boost::scoped_ptr< PluginManager > g_pluginMgr;
 
 
 //-----------------------------------------------------------------------------------------
 // Prototypes
-//-----------------------------------------------------------------------------------------
 
 void GetSharedData();
 HACCEL CreateMyAcceleratorTable();
@@ -81,7 +80,7 @@ LPCTSTR GetCommandName( int cmd );
 
 //-----------------------------------------------------------------------------------------
 // DLL entry point
-//-----------------------------------------------------------------------------------------
+
 BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved )
 {
     switch( ul_reason_for_call )
@@ -94,21 +93,33 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 			g_hInstDll = hModule;
 
 			::GetModuleFileName( NULL, g_currentExePath, MAX_PATH );
-			if( LPTSTR p = _tcsrchr( g_currentExePath, _T('\\') ) )
+			if( LPTSTR p = _tcsrchr( g_currentExePath, L'\\' ) )
 			{
 				g_currentExeName = p + 1;
 				StringCbCopy( g_currentExeDir, sizeof(g_currentExeDir), g_currentExePath );
 				g_currentExeDir[ p - g_currentExePath ] = 0;
 			}
 			
-			DebugOut( _T("[fflib] DLL_PROCESS_ATTACH (pid %08Xh, \"%s\")\n"), 
+			DebugOut( L"[fflib] DLL_PROCESS_ATTACH (pid %08Xh, \"%s\"\n", 
 				::GetCurrentProcessId(), g_currentExePath );
 		}
 		break;
 
 		case DLL_PROCESS_DETACH:
 		{
-			DebugOut( _T("[fflib] DLL_PROCESS_DETACH (pid %08Xh)\n"), ::GetCurrentProcessId() );
+			bool isProcessTerminated = !! lpReserved;
+
+			DebugOut( L"[fflib] DLL_PROCESS_DETACH (pid %08Xh, terminated=%d)\n", 
+				::GetCurrentProcessId(), isProcessTerminated );
+
+			if( ! isProcessTerminated )
+			{
+				// As stated by MSDN, we must only call FreeLibrary() if the process is not terminated.
+				// So we will only get here if FreeLibrary() was explicitly called for fflib,
+				// which usually happens during uninstall or upgrade install.
+				//if( g_pluginMgr )
+				//	g_pluginMgr->UnloadPlugins();
+			}
 		}
 		break;
     }
@@ -140,403 +151,9 @@ void AdjustToolWindowPos()
 
 void UpdatePathEdit()
 {
-    TCHAR folderPath[MAX_PATH + 1] = _T("");
+    TCHAR folderPath[MAX_PATH + 1] = L"";
 	g_spFileDlgHook->GetFolder( folderPath );
     SetDlgItemText(g_hToolWnd, ID_FF_PATH, folderPath);
-}
-
-//-----------------------------------------------------------------------------------------
-
-void AddCurrentFolderToHistory()
-{
-    TCHAR folderPath[MAX_PATH + 1];
-	if( ! g_spFileDlgHook->GetFolder( folderPath ) )
-		return;
-
-	HistoryLst globalHistory;
-	globalHistory.LoadFromProfile( g_profile, _T("GlobalFolderHistory") );
-	globalHistory.SetMaxEntries( g_globalHistoryMaxEntries );
-	globalHistory.AddFolder( folderPath );
-	globalHistory.SaveToProfile( g_profile, _T("GlobalFolderHistory") );
-}
-
-//----------------------------------------------------------------------------------------
-
-void GotoLastDir()
-{
-	SetForegroundWindow(g_hFileDialog);
-
-	HistoryLst history;
-
-	//load + display the history
-	if( ! history.LoadFromProfile( g_profile, _T("GlobalFolderHistory") ) )
-		return;
-
-	SetDlgItemText( g_hToolWnd, ID_FF_PATH, history.GetList().front().c_str() );
-
-	tstring path = GetExistingDirOrParent( history.GetList().front().c_str() );
-	if( ! path.empty() )
-		g_spFileDlgHook->SetFolder( path.c_str() );
-}
-
-//-----------------------------------------------------------------------------------------
-
-HMENU CreateFolderMenu( const vector<tstring> &folderList, HMENU hMenu = NULL )
-{
-    if( ! hMenu ) hMenu = CreatePopupMenu();
-	if( hMenu == NULL ) 
-		return NULL;
-
-	for( size_t i = 0; i < folderList.size(); i++ )
-	{
-		if( folderList[ i ] == _T("-") )
-			::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
-		else
-	        ::AppendMenu( hMenu, MF_STRING, i + 1, folderList[i].c_str() );
-	}
-	return hMenu;
-}
-
-//-----------------------------------------------------------------------------------------
-
-int DisplayFolderMenu( HMENU hMenu, int buttonID )
-{
-	HWND hTb = GetDlgItem(g_hToolWnd, ID_FF_TOOLBAR);
-	Rect rc;
-	SendMessage(hTb, TB_GETRECT, buttonID, (LPARAM) &rc);
-	::ClientToScreen( hTb, reinterpret_cast<POINT*>( &rc ) ); 
-	::ClientToScreen( hTb, reinterpret_cast<POINT*>( &rc.right ) ); 
-
-	int id = TrackPopupMenu(hMenu, 
-		TPM_LEFTALIGN | TPM_TOPALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD | TPM_NONOTIFY, 
-		rc.left, rc.bottom, 0, g_hToolWnd, NULL);
-
-	if( id > 0 )
-	{
-        // get directory path from menu item text
-        TCHAR path[MAX_PATH+1] = _T("");
-        MENUITEMINFO mi = { sizeof(mi) };
-        mi.fMask = MIIM_STRING;
-        mi.dwTypeData = path;
-        mi.cch = MAX_PATH;
-        ::GetMenuItemInfo( hMenu, id, FALSE, &mi );
-
-		// strip additional text to get the path only
-		LPCTSTR pPath = mi.dwTypeData;
-		if( pPath[ 0 ] == '[' )
-			pPath = _tcsstr( pPath, _T("] ") ) + 2;
-
-		if( IsFilePath( pPath ) )
-        {
-			tstring existingDir = GetExistingDirOrParent( pPath );
-			if( ! existingDir.empty() )
-			{ 
-				SetDlgItemText( g_hToolWnd, ID_FF_PATH, existingDir.c_str() );
-			
-				SetForegroundWindow( g_hFileDialog );
-				g_spFileDlgHook->SetFolder( existingDir.c_str() );
-			}
-        }
-	}
-
-	return id;
-}
-
-//-----------------------------------------------------------------------------------------
-
-void DisplayMenu_GlobalHist()
-{
-	HistoryLst history;
-
-	//load + display the history
-	if (history.LoadFromProfile( g_profile, _T("GlobalFolderHistory") ) )
-	{
-		HMENU hMenu = CreateFolderMenu(history.GetList());
-		DisplayFolderMenu( hMenu, ID_FF_GLOBALHIST );
-		DestroyMenu(hMenu);
-	}
-		
-	SetForegroundWindow(g_hFileDialog);
-}
-
-//-------------------------------------------------------------------------------------------------
-/// Show a menu with the current folders of the application and other file managers.
-
-void DisplayMenu_OpenDirs()
-{
-	HMENU hMenu = ::CreatePopupMenu();
-
-    //--- get current Total Commander folders (if any) and add them to the menu
-
-	CTotalCmdUtils tcmdUtils( FindTopTcWnd() );
-    if( tcmdUtils.GetTCmdWnd() )
-    {
-        TCHAR leftDir[MAX_PATH+1] = _T("");
-        TCHAR rightDir[MAX_PATH+1] = _T("");
-        if( tcmdUtils.GetDirs( leftDir, MAX_PATH, rightDir, MAX_PATH ) )
-        {
-			if( ! leftDir[ 0 ] == 0 )
-			{
-				TCHAR s1[ MAX_PATH + 20 ] = _T("[TC] ");
-				StringCbCat( s1, sizeof(s1), leftDir );
-				::AppendMenu( hMenu, MF_STRING, 2000, s1 );
-			}
-			if( ! rightDir[ 0 ] == 0 )
-			{
-				TCHAR s2[ MAX_PATH + 20 ] = _T("[TC] ");
-				StringCbCat( s2, sizeof(s2), rightDir );
-				::AppendMenu( hMenu, MF_STRING, 2001, s2 );
-			}
-			::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
-        }
-    }
-
-	//--- get current Windows Explorer folders (if any) and add them to the menu
-
-	std::vector<tstring> explorerPathes;
-	if( GetAllExplorerPathes( &explorerPathes ) > 0 )
-	{
-		for( int i = 0; i != explorerPathes.size(); ++i )
-		{
-			TCHAR s[ MAX_PATH + 20 ] = _T("[Explorer] ");
-			StringCbCat( s, sizeof(s), explorerPathes[ i ].c_str() );
-			::AppendMenu( hMenu, MF_STRING, 2100 + i, s );
-		}
-		::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
-	}
-	
-    //--- add application dir to the menu
-
-	TCHAR exeDir[ MAX_PATH + 20 ] = _T("[Application] ");
-	StringCbCat( exeDir, sizeof(exeDir), g_currentExeDir );
-	::AppendMenu( hMenu, MF_STRING, 1, exeDir );
-    
-    //--- 
-    
-	DisplayFolderMenu( hMenu, ID_FF_OPENDIRS );
-    
-	DestroyMenu( hMenu );
-		
-	SetForegroundWindow(g_hFileDialog);
-}
-
-//-----------------------------------------------------------------------------------------
-// display favorite folders menu
-
-void FavMenu_Create( HMENU hMenu, const FavoritesList& favs, size_t& iItem )
-{
-	while( iItem < favs.size() )
-	{
-		const FavoritesList::value_type& fav = favs[ iItem ];
-		
-		if( fav.title == _T("--") )
-		{
-			// end of submenu
-
-			++iItem;
-			return;
-		}
-		else if( fav.title.size() > 1 && fav.title.substr( 0, 1 ) == _T("-") )
-		{
-			// insert submenu recursively
-
-			HMENU hSubMenu = ::CreatePopupMenu();
-			::AppendMenu( hMenu, MF_POPUP | MF_STRING, reinterpret_cast<UINT_PTR>( hSubMenu ),
-				fav.title.substr( 1 ).c_str() );
-
-			++iItem;
-
-			FavMenu_Create( hSubMenu, favs, iItem );			
-		}
-		else if( fav.title == _T("-") )
-		{
-			// insert divider
-			
-			::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
-
-			++iItem;
-		}
-		else
-		{
-			// insert normal item
-
-			::AppendMenu( hMenu, MF_STRING, iItem + 1, fav.title.c_str() );
-
-			++iItem;
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------------------------
-
-int FavMenu_Display( HWND hWndParent, int x, int y, const FavoritesList& favs )
-{
-    HMENU hMenu = ::CreatePopupMenu();
-	size_t iItem = 0;
-	FavMenu_Create( hMenu, favs, iItem );
-
-	if( ! favs.empty() )
-		::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
-
-	::AppendMenu( hMenu, MF_STRING, 1000, _T("&Add current folder") );
-	::AppendMenu( hMenu, MF_STRING, 1001, _T("&Configure...") );
-
-	int id = ::TrackPopupMenu( hMenu, TPM_RETURNCMD | TPM_NONOTIFY, 
-		x, y, 0, hWndParent, NULL );
-
-	::DestroyMenu( hMenu );
-
-    return id;	
-}
-
-//-----------------------------------------------------------------------------------------------
-/// Get path of "FFConfig.exe" - prefer x64 version, if available. 
-
-void GetConfigProcessPath( LPWSTR path, DWORD nChars )
-{
-	WCHAR dir[ 4096 ] = L"";
-	GetAppDir( g_hInstDll, dir, _countof( dir ) );
-	wcscpy_s( path, nChars, dir );
-	wcscat_s( path, nChars, L"FFConfig64.exe" );
-	if( FileExists( path ) )
-		return;
-	wcscpy_s( path, nChars, dir );
-	wcscat_s( path, nChars, L"FFConfig.exe" );	
-}
-
-//-----------------------------------------------------------------------------------------------
-
-void FavMenu_StartEditor( HWND hWndParent )
-{
-	TCHAR path[ 4096 ] = L"";
-	GetConfigProcessPath( path, _countof( path ) );
-
-	TCHAR params[ 256 ] = _T("");
-	StringCbPrintf( params, sizeof(params),	_T("%d --fav"), hWndParent ); 
-
-	::ShellExecute( hWndParent, _T("open"), path, params, NULL, SW_SHOW );
-}
-
-//-----------------------------------------------------------------------------------------------
-
-void FavMenu_AddDir( HWND hWndParent, FavoritesList& favs, LPCTSTR pPath, LPCTSTR pTargetPath = _T("") )
-{
-	TCHAR path[ 4096 ] = L"";
-	GetConfigProcessPath( path, _countof( path ) );
-
-	TCHAR params[ 4096 ] = _T("");
-	StringCbPrintf( params, sizeof(params),	_T("%d --addfav \"%s\""), hWndParent, 
-		RemoveBackslash( pPath ).c_str() );
-	if( pTargetPath[ 0 ] != 0 )
-	{	
-		StringCbCat( params, sizeof(params), _T(" \"") );
-		StringCbCat( params, sizeof(params), RemoveBackslash( pTargetPath ).c_str() );
-		StringCbCat( params, sizeof(params), _T("\"") );
-	}
-	::ShellExecute( hWndParent, _T("open"), path, params, NULL, SW_SHOW );
-}
-
-//-----------------------------------------------------------------------------------------------
-
-void FavMenu_DisplayForFileDialog()
-{
-	//--- show menu
-
-	FavoritesList favs;
-	GetDirFavorites( &favs );
-
-	HWND hTb = GetDlgItem( g_hToolWnd, ID_FF_TOOLBAR );
-	Rect rc;
-	::SendMessage( hTb, TB_GETRECT, ID_FF_FAVORITES, reinterpret_cast<LPARAM>( &rc ) );
-	ClientToScreenRect( hTb, &rc );
-
-	int id = FavMenu_Display( g_hToolWnd, rc.left, rc.bottom, favs );
-
-	//--- execute selected command
-
-	if( id == 1000 )
-	{
-		TCHAR path[ MAX_PATH + 1 ];
-		if( g_spFileDlgHook->GetFolder( path ) )
-			FavMenu_AddDir( g_hFileDialog, favs, path );
-	}
-	else if( id == 1001 )
-	{
-		FavMenu_StartEditor( g_hFileDialog );
-	}
-	else if( id > 0 )
-	{
-		//--- execute favorites menu item
-
-		const FavoritesItem& fav = favs[ id - 1 ];
-
-		tstring path;
-		tstring token, args;
-		SplitTcCommand( fav.command.c_str(), &token, &args );
-
-		if( _tcsicmp( token.c_str(), _T("cd") ) == 0 )
-			path = args;
-		else if( IsFilePath( fav.command.c_str() ) )
-			path = fav.command;
-
-		path = GetExistingDirOrParent( path.c_str() );
-		if( ! path.empty() )
-			if( DirectoryExists( path.c_str() ) )
-			{
-				SetDlgItemText( g_hToolWnd, ID_FF_PATH, path.c_str() );
-			
-				SetForegroundWindow( g_hFileDialog );
-				g_spFileDlgHook->SetFolder( path.c_str() );
-			}
-	}		
-
-	SetForegroundWindow( g_hFileDialog );
-}
-
-//-----------------------------------------------------------------------------------------------
-
-void DisplayMenu_Config()
-{
-	const int buttonId = ID_FF_CONFIG;
-
-	// get menu position
-	HWND hTb = ::GetDlgItem( g_hToolWnd, ID_FF_TOOLBAR );
-	Rect rc;
-	::SendMessage( hTb, TB_GETRECT, buttonId, (LPARAM) &rc );
-	::ClientToScreen( hTb, reinterpret_cast<POINT*>( &rc ) ); 
-	::ClientToScreen( hTb, reinterpret_cast<POINT*>( &rc.right ) ); 
-
-	HMENU hMenu = ::CreatePopupMenu();
-	::AppendMenu( hMenu, MF_STRING, 1, _T("Options...") );
-	::AppendMenu( hMenu, MF_STRING, 2, _T("Check for updates") );
-	::AppendMenu( hMenu, MF_STRING, 3, _T("About FlashFolder...") );
-
-	int id = TrackPopupMenu(hMenu, 
-		TPM_LEFTALIGN | TPM_TOPALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD | TPM_NONOTIFY, 
-		rc.left, rc.bottom, 0, g_hToolWnd, NULL);
-
-	TCHAR path[ 4096 ] = L"";
-	GetConfigProcessPath( path, _countof( path ) );
-	
-	TCHAR params[ 256 ] = _T("");
-	StringCbPrintf( params, sizeof(params), _T("%d"), g_hFileDialog ); 
-	
-	if( id == 1 )
-	{
-		::ShellExecute( g_hFileDialog, _T("open"), path, params, NULL, SW_SHOW );
-	}
-	else if( id == 2 )
-	{
-		StringCbCat( params, sizeof(params), _T(" --updatecheck") );
-		::ShellExecute( g_hFileDialog, _T("open"), path, params, NULL, SW_SHOW );	
-	}
-	else if( id == 3 )
-	{
-		StringCbCat( params, sizeof(params), _T(" --about") );
-		::ShellExecute( g_hFileDialog, _T("open"), path, params, NULL, SW_SHOW );
-	}
-
-	::SetForegroundWindow( g_hFileDialog );
 }
 
 //-----------------------------------------------------------------------------------------
@@ -550,7 +167,7 @@ LRESULT CALLBACK ToolWindowEditPathProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		case WM_KEYDOWN:
 			if (wParam == VK_RETURN)
 			{
-				TCHAR path[MAX_PATH + 1] = _T("");
+				TCHAR path[MAX_PATH + 1] = L"";
 				GetWindowText(hwnd, path, MAX_PATH );
 				if( DirectoryExists( path ) )
 				{
@@ -645,10 +262,10 @@ void ExecuteToolbarCommand( UINT cmd )
 	switch( cmd )
 	{
 		case ID_FF_LASTDIR:
-			GotoLastDir();
+			GotoLastDir( g_hFileDialog, g_hToolWnd, g_spFileDlgHook.get(), g_profile );
 			break;
 		case ID_FF_SHOWALL:
-			g_spFileDlgHook->SetFilter( _T("*.*") );
+			g_spFileDlgHook->SetFilter( L"*.*" );
 			break;
 		case ID_FF_FOCUSPATH:
 		{
@@ -660,29 +277,30 @@ void ExecuteToolbarCommand( UINT cmd )
 		case ID_FF_GLOBALHIST:
 		{
 			PressTbButton ptb( ID_FF_GLOBALHIST );				
-			DisplayMenu_GlobalHist();
+			DisplayMenu_GlobalHist( g_hFileDialog, g_hToolWnd, g_spFileDlgHook.get(), g_profile );
 			break;
 		}
 		case ID_FF_OPENDIRS:
 		{
 			PressTbButton ptb( ID_FF_OPENDIRS );				
-			DisplayMenu_OpenDirs();
+			DisplayMenu_OpenDirs( g_hFileDialog, g_hToolWnd, g_spFileDlgHook.get(), *g_pluginMgr );
 			break;
 		}
 		case ID_FF_FAVORITES:
 		{
-			PressTbButton ptb( ID_FF_FAVORITES );		
-			FavMenu_DisplayForFileDialog();
+			PressTbButton ptb( ID_FF_FAVORITES );
+			FavMenu_DisplayForFileDialog( g_hFileDialog, g_hToolWnd, g_spFileDlgHook.get(), 
+			                              *g_pluginMgr, g_profile );
 			break;
 		}
 		case ID_FF_CONFIG:
 		{
 			PressTbButton ptb( ID_FF_CONFIG );
-			DisplayMenu_Config();
+			DisplayMenu_Config( g_hInstDll, g_hFileDialog, g_hToolWnd );
 			break;
 		}
 		default:
-			DebugOut( _T("[fflib] ERROR: invalid command") );
+			DebugOut( L"[fflib] ERROR: invalid command" );
 	}	
 }
 
@@ -797,7 +415,7 @@ INT_PTR CALLBACK ToolDlgProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 					if( pTTT->hdr.idFrom == ID_FF_LASTDIR )
 					{
 						// use most recent entry of global history as tooltip
-						tstring sLastDir = g_profile.GetString( _T("GlobalFolderHistory"), _T("0") );
+						tstring sLastDir = g_profile.GetString( L"GlobalFolderHistory", L"0" );
 						if( sLastDir.empty() )
 							::LoadString( g_hInstDll, (UINT) pTTT->hdr.idFrom, s_tooltipBuf, TOOLTIP_BUFSIZE );
 						else
@@ -809,9 +427,9 @@ INT_PTR CALLBACK ToolDlgProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 					}
 
 					// append hotkey name
-					if( int hotkey = g_profile.GetInt( _T("Hotkeys"), GetCommandName( (int) pTTT->hdr.idFrom ) ) )
+					if( int hotkey = g_profile.GetInt( L"Hotkeys", GetCommandName( (int) pTTT->hdr.idFrom ) ) )
 					{
-						StringCchCat( s_tooltipBuf, TOOLTIP_BUFSIZE, _T("\nShortcut: ") ); 					
+						StringCchCat( s_tooltipBuf, TOOLTIP_BUFSIZE, L"\nShortcut: " ); 					
 						TCHAR hkName[ 256 ]; GetHotkeyName( hkName, 255, hotkey );
 						StringCchCat( s_tooltipBuf, TOOLTIP_BUFSIZE, hkName ); 					
 					}
@@ -849,27 +467,27 @@ INT_PTR CALLBACK ToolDlgProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				break;
 
 			ATOM hotkeyAtom = static_cast<ATOM>( wParam );
-			TCHAR atomName[ 256 ] = _T("");
+			TCHAR atomName[ 256 ] = L"";
 			::GlobalGetAtomName( hotkeyAtom, atomName, 255 );
 
-			tstring ffGuid = tstring( _T(".") ) + tstring( FF_GUID );
+			tstring ffGuid = tstring( L"." ) + tstring( FF_GUID );
 
 			HWND hTb = ::GetDlgItem( hwnd, ID_FF_TOOLBAR );
 			
 			UINT cmd = 0;
 			const UINT IS_MENU = 0x10000;
 
-			if( tstring( _T("ff_LastFolder") ) + ffGuid == atomName )
+			if( tstring( L"ff_LastFolder" ) + ffGuid == atomName )
 				cmd = ID_FF_LASTDIR;
-			else if( tstring( _T("ff_ViewAllFiles") ) + ffGuid == atomName )
+			else if( tstring( L"ff_ViewAllFiles" ) + ffGuid == atomName )
 				cmd = ID_FF_SHOWALL;
-			else if( tstring( _T("ff_FocusPathEdit") ) + ffGuid == atomName )
+			else if( tstring( L"ff_FocusPathEdit" ) + ffGuid == atomName )
 				cmd = ID_FF_FOCUSPATH;
-			else if( tstring( _T("ff_MenuFolderHistory") ) + ffGuid == atomName )
+			else if( tstring( L"ff_MenuFolderHistory" ) + ffGuid == atomName )
 				cmd = ID_FF_GLOBALHIST | IS_MENU;
-			else if( tstring( _T("ff_MenuOpenFolders") ) + ffGuid == atomName )
+			else if( tstring( L"ff_MenuOpenFolders" ) + ffGuid == atomName )
 				cmd = ID_FF_OPENDIRS   | IS_MENU;
-			else if( tstring( _T("ff_MenuFavorites") ) + ffGuid == atomName )
+			else if( tstring( L"ff_MenuFavorites" ) + ffGuid == atomName )
 				cmd = ID_FF_FAVORITES  | IS_MENU;
 
 			if( s_inMenu )
@@ -1112,7 +730,7 @@ void CreateToolWindow( bool isFileDialog )
 		bool isToolbar32bpp = false;
 		if( OSVERSION >= WINVER_XP )
 		{
-			DC dc( ::CreateIC( _T("DISPLAY"), NULL, NULL, NULL ) );
+			DC dc( ::CreateIC( L"DISPLAY", NULL, NULL, NULL ) );
 			isToolbar32bpp = ::GetDeviceCaps( dc, BITSPIXEL ) >= 16;
 		}
 		
@@ -1162,7 +780,7 @@ void CreateToolWindow( bool isFileDialog )
 		int xEdit = tbRect.right + rcDiv.right;
 		int editHeight = MapDialogY( g_hToolWnd, 10 );
 
-		HWND hEdit = ::CreateWindowEx( edStyleEx, _T("Edit"), NULL, 
+		HWND hEdit = ::CreateWindowEx( edStyleEx, L"Edit", NULL, 
 			WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL | WS_TABSTOP, 
 			xEdit, ( rcClient.bottom - editHeight ) / 2, 
 			rcClient.right - rcClient.left - xEdit - rcDivR.right, 
@@ -1187,15 +805,13 @@ void CreateToolWindow( bool isFileDialog )
 
 	//--- read options from global configuration
 
-	g_globalHistoryMaxEntries = g_profile.GetInt( _T("main"), _T("MaxGlobalHistoryEntries") );
-
-	g_toolbarOffset.left = g_profile.GetInt( _T("Toolbar"), _T("OffsetX") );
-	g_toolbarOffset.top = g_profile.GetInt( _T("Toolbar"), _T("OffsetY") );
-	g_toolbarOffset.right = g_profile.GetInt( _T("Toolbar"), _T("OffsetWidth") );
+	g_toolbarOffset.left = g_profile.GetInt( L"Toolbar", L"OffsetX" );
+	g_toolbarOffset.top = g_profile.GetInt( L"Toolbar", L"OffsetY" );
+	g_toolbarOffset.right = g_profile.GetInt( L"Toolbar", L"OffsetWidth" );
  
 	//--- enable toolbar buttons / leave disabled ---
 	
-	if( ! g_profile.GetString( _T("GlobalFolderHistory"), _T("0") ).empty() )
+	if( ! g_profile.GetString( L"GlobalFolderHistory", L"0" ).empty() )
 	{
 		SendMessage( hTb, TB_SETSTATE, ID_FF_GLOBALHIST, MAKELONG( TBSTATE_ENABLED, 0 ) );
 		SendMessage( hTb, TB_SETSTATE, ID_FF_LASTDIR, MAKELONG(TBSTATE_ENABLED, 0 ) );
@@ -1252,15 +868,15 @@ LPCTSTR GetCommandName( int cmd )
 {
 	switch( cmd )
 	{
-		case ID_FF_LASTDIR:     return _T("ff_LastFolder");
-		case ID_FF_SHOWALL:     return _T("ff_ViewAllFiles");
-		case ID_FF_FOCUSPATH:   return _T("ff_FocusPathEdit");
-		case ID_FF_GLOBALHIST:  return _T("ff_MenuFolderHistory");
-		case ID_FF_OPENDIRS:    return _T("ff_MenuOpenFolders");
-		case ID_FF_FAVORITES:   return _T("ff_MenuFavorites");
-		case ID_FF_CONFIG:      return _T("ff_MenuConfig");
+		case ID_FF_LASTDIR:     return L"ff_LastFolder";
+		case ID_FF_SHOWALL:     return L"ff_ViewAllFiles";
+		case ID_FF_FOCUSPATH:   return L"ff_FocusPathEdit";
+		case ID_FF_GLOBALHIST:  return L"ff_MenuFolderHistory";
+		case ID_FF_OPENDIRS:    return L"ff_MenuOpenFolders";
+		case ID_FF_FAVORITES:   return L"ff_MenuFavorites";
+		case ID_FF_CONFIG:      return L"ff_MenuConfig";
 	}
-	return _T("");
+	return L"";
 }
 
 //-----------------------------------------------------------------------------------------
@@ -1306,7 +922,7 @@ namespace FileDlgHookCallbacks
 		//--- add folder to history if file dialog was closed with OK
 
 		if( isOkBtnPressed )
-			AddCurrentFolderToHistory();			
+			AddCurrentFolderToHistory( g_spFileDlgHook.get(), &g_profile );			
 
 		//--- destroy tool window + class
 
@@ -1344,32 +960,32 @@ namespace FileDlgHookCallbacks
 bool IsCurrentProgramEnabledForDialog( FileDlgType fileDlgType )
 {
 	// Check if FlashFolder is globally disabled for given kind of dialog.
-	TCHAR* pProfileGroup = _T("");
+	TCHAR* pProfileGroup = L"";
 	switch( fileDlgType.mainType )
 	{
 		case FDT_COMMON:
-			pProfileGroup = _T("CommonFileDlg");
+			pProfileGroup = L"CommonFileDlg";
 		break;
 		case FDT_MSOFFICE:
-			pProfileGroup = _T("MSOfficeFileDlg");
+			pProfileGroup = L"MSOfficeFileDlg";
 		break;
 		case FDT_COMMON_OPENWITH:
-			pProfileGroup = _T("CommonOpenWithDlg");
+			pProfileGroup = L"CommonOpenWithDlg";
 		break;
 		case FDT_COMMON_FOLDER:
-			pProfileGroup = _T("CommonFolderDlg");
+			pProfileGroup = L"CommonFolderDlg";
 		break;	
 	}
-	if( g_profile.GetInt( pProfileGroup, _T("EnableHook") ) == 0 )
+	if( g_profile.GetInt( pProfileGroup, L"EnableHook" ) == 0 )
 		return false;
 
 	// Check if EXE filename is in the excludes list for given dialog type.
 	tstring excludesGroup = pProfileGroup;
-	excludesGroup += _T(".Excludes");
+	excludesGroup += L".Excludes";
 	for( int i = 0;; ++i )
 	{
 		TCHAR key[10];
-		StringCbPrintf( key, sizeof(key), _T("%d"), i );
+		StringCbPrintf( key, sizeof(key), L"%d", i );
 		tstring path = g_profile.GetString( excludesGroup.c_str(), key );
 		if( path.empty() )
 			break;
@@ -1388,6 +1004,12 @@ void InitHook( HWND hwnd, FileDlgType fileDlgType )
 	bool isFileDialog = ( fileDlgType.mainType == FDT_COMMON || fileDlgType.mainType == FDT_MSOFFICE );
 
 	g_hFileDialog = hwnd;
+
+	// Load plugins if not already done for this process.
+	// We specify FL_NO_AUTOUNLOAD so the plugin DLLs will not be unloaded automatically during 
+	// process termination (see DllMain()).
+	if( ! g_pluginMgr )
+		g_pluginMgr.reset( new PluginManager( g_hInstDll, PluginManager::FL_NO_AUTOUNLOAD ) );
 
 	CreateToolWindow( isFileDialog );
 
@@ -1440,7 +1062,7 @@ LRESULT CALLBACK FFHook_CBT( int nCode, WPARAM wParam, LPARAM lParam )
 				if( g_profileDefaults.IsEmpty() )
 				{
 					GetProfileDefaults( &g_profileDefaults );
-					g_profile.SetRoot( _T("zett42\\FlashFolder") );
+					g_profile.SetRoot( L"zett42\\FlashFolder" );
 					g_profile.SetDefaults( &g_profileDefaults );
 				}
 

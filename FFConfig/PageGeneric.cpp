@@ -30,8 +30,7 @@ const CString PROFILE_GROUP = _T("Main");
 //-----------------------------------------------------------------------------------------------
 
 CPageGeneric::CPageGeneric() :
-	base(CPageGeneric::IDD),
-	m_bReadDefaults( false )
+	base(CPageGeneric::IDD)
 {}
 
 //-----------------------------------------------------------------------------------------------
@@ -60,14 +59,16 @@ BOOL CPageGeneric::OnInitDialog()
 
 	//--- get profile data
 
+	bool isShared = false;
+	if( const RegistryProfile* profile = dynamic_cast< const RegistryProfile* >(
+			&CApp::GetReadProfile() ) )
+		isShared = profile->IsShared();
+
 	CString s;
-	s.LoadString( g_profile.IsShared() ? IDS_MU_SHARED : IDS_MU_INDIVIDUAL );
+	s.LoadString( isShared ? IDS_MU_SHARED : IDS_MU_INDIVIDUAL );
 	SetDlgItemText( IDC_ST_MULTIUSER, s );
 
-	if( m_bReadDefaults )
-		ReadProfile( g_profileDefaults );
-	else
-		ReadProfile( g_profile );
+	ReadProfile();
 
 	SendMessage( WM_NEXTDLGCTL, (WPARAM) GetDlgItem( IDC_ED_MAX_DIRHISTORY )->GetSafeHwnd(), TRUE ); 
 	
@@ -76,13 +77,9 @@ BOOL CPageGeneric::OnInitDialog()
 
 //-----------------------------------------------------------------------------------------------
 
-void CPageGeneric::ReadProfile( const Profile& profile )
+void CPageGeneric::ReadProfile()
 {
-	if( ! GetSafeHwnd() )
-	{
-		m_bReadDefaults = true;
-		return;
-	}
+	const Profile& profile = CApp::GetReadProfile();
 
 	CString s;
 	s.Format( _T("%d"), profile.GetInt( PROFILE_GROUP, _T("MaxGlobalHistoryEntries") ) );
@@ -93,12 +90,14 @@ void CPageGeneric::ReadProfile( const Profile& profile )
 
 BOOL CPageGeneric::OnApply()
 {
+	Profile& profile = CApp::GetWriteProfile();
+
 	// Multi-User option is currently read-only since it would require more work like
 	// checking for admin rights, elevation on Vista, etc.
 
 	CString s;
 	GetDlgItemText( IDC_ED_MAX_DIRHISTORY, s );
-	g_profile.SetInt( PROFILE_GROUP, _T("MaxGlobalHistoryEntries"), _ttoi( s ) );
+	profile.SetInt( PROFILE_GROUP, _T("MaxGlobalHistoryEntries"), _ttoi( s ) );
 		
 	return base::OnApply();
 }
@@ -107,20 +106,23 @@ BOOL CPageGeneric::OnApply()
 
 void CPageGeneric::OnBnClickedBtnReset()
 {
-	CPropertySheet* pSheet = static_cast<CPropertySheet*>( GetParent() );
+	CPropertySheet* sheet = static_cast<CPropertySheet*>( GetParent() );
 	ASSERT( pSheet );
-	if( ! pSheet )
-		return;
 
-	int pageCount = pSheet->GetPageCount();
+	// Make all pages read the default profile.
+	CApp::SetReadDefaults( true );	
+
+	int pageCount = sheet->GetPageCount();
 	for( int i = 0; i < pageCount; ++i )
 	{
-		CAutoPropertyPage* pPage = static_cast<CAutoPropertyPage*>( pSheet->GetPage( i ) );
-		ASSERT( pPage );
-		if( pPage )
+		CAutoPropertyPage* page = static_cast<CAutoPropertyPage*>( sheet->GetPage( i ) );
+		ASSERT( page );
+
+		// only pages which have been created already
+		if( page->GetSafeHwnd() )
 		{
-			pPage->ReadProfile( g_profileDefaults );
-			pPage->SetModified();
+			page->ReadProfile();
+			page->SetModified();
 		}
 	}
 	GetDlgItem( IDC_BTN_RESET )->EnableWindow( FALSE );

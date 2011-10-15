@@ -29,41 +29,29 @@
 #define new DEBUG_NEW
 #endif
 
-//-----------------------------------------------------------------------------------------------
-
-// The one and only CFFConfigApp object
-CFFConfigApp g_app;
-
-// The one and only Profile object
-RegistryProfile g_profile( _T("zett42\\FlashFolder") );
-MemoryProfile g_profileDefaults;
+void ActivateWindow( LPCTSTR pWndClassName );
 
 //-----------------------------------------------------------------------------------------------
 
-void ActivateWindow( LPCTSTR pWndClassName )
-{
-    if( HWND hwnd = ::FindWindow( pWndClassName, NULL ) )
-    {
-        ::SetForegroundWindow( hwnd );
-        if( ::IsIconic( hwnd ) )
-            ::ShowWindowAsync( hwnd, SW_RESTORE );
-    }
-}
+// The one and only CApp object
+CApp CApp::s_app;
 
 //-----------------------------------------------------------------------------------------------
 
-BEGIN_MESSAGE_MAP(CFFConfigApp, CWinApp)
+BEGIN_MESSAGE_MAP(CApp, CWinApp)
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------------------------
 
-CFFConfigApp::CFFConfigApp() :
-	CWinApp( _T("FlashFolder") )
+CApp::CApp() :
+	CWinApp( L"FlashFolder" ),
+	m_isReadDefaults( false ),
+	m_profile( L"zett42\\FlashFolder" )
 {}
 
 //-----------------------------------------------------------------------------------------------
 
-BOOL CFFConfigApp::InitInstance()
+BOOL CApp::InitInstance()
 {
 	CWinApp::InitInstance();
 
@@ -147,8 +135,8 @@ BOOL CFFConfigApp::InitInstance()
 	::RegisterClass( &wc );
 
 	// intialize default profile settings
-	GetProfileDefaults( &g_profileDefaults );
-	g_profile.SetDefaults( &g_profileDefaults );
+	GetProfileDefaults( &m_profileDefaults );
+	m_profile.SetDefaults( &m_profileDefaults );
 	
 	// By specifying the handle of the parent window, dialogs of FFConfig behave like modal dialogs to
 	// the program where FlashFolder toolbar is currently attached to.
@@ -203,9 +191,21 @@ BOOL CFFConfigApp::InitInstance()
 
 //-----------------------------------------------------------------------------------------------
 
-int CFFConfigApp::ExitInstance()
+int CApp::ExitInstance()
 {
 	::CoUninitialize();
 	
 	return CWinApp::ExitInstance();
+}
+
+//-----------------------------------------------------------------------------------------------
+
+void ActivateWindow( LPCTSTR pWndClassName )
+{
+    if( HWND hwnd = ::FindWindow( pWndClassName, NULL ) )
+    {
+        ::SetForegroundWindow( hwnd );
+        if( ::IsIconic( hwnd ) )
+            ::ShowWindowAsync( hwnd, SW_RESTORE );
+    }
 }

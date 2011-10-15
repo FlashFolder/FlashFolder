@@ -49,6 +49,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -117,6 +118,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -185,6 +187,7 @@
 				AdditionalIncludeDirectories=".;.."
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -254,6 +257,7 @@
 				AdditionalIncludeDirectories=".;.."
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -296,7 +300,7 @@
 	<Files>
 		<Filter
 			Name="source"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			Filter="h;hpp;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
@@ -329,6 +333,18 @@
 			</File>
 			<File
 				RelativePath=".\HistoryLst.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PluginApi.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PluginManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PluginManager.h"
 				>
 			</File>
 			<File
@@ -377,6 +393,14 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TotalCmdUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TotalCmdUtils.h"
 				>
 			</File>
 		</Filter>

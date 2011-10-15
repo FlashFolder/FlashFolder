@@ -31,7 +31,7 @@ public:
 
 	CPageShortcuts();
 
-	virtual void ReadProfile( const Profile& profile );
+	virtual void ReadProfile();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    
@@ -48,6 +48,6 @@ private:
 	CListCtrl m_lstShortcuts;
 	CHotKeyCtrl m_hotkeyCtrl;
 	int m_selItem;
-	bool m_bReadDefaults;
+	
 	std::map<CString,CString> m_mapTitleToCmd;
 };

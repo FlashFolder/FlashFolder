@@ -19,28 +19,35 @@
 #pragma once
 
 #include "AutoPropertyPage.h"
+#include <common\PluginManager.h>
 
 //-----------------------------------------------------------------------------------------------
 
-class CPageTotalcmd : public CAutoPropertyPage
+class CPageFileManager : public CAutoPropertyPage
 {
 public:
 	typedef CAutoPropertyPage base;
 
-	enum { IDD = IDD_PAGE_TOTALCMD };
+	enum { IDD = IDD_PAGE_FILEMANAGER };
 
-	CPageTotalcmd();
+	CPageFileManager();
 
-	virtual void ReadProfile( const Profile& profile );
+	virtual void ReadProfile();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 
-	afx_msg void OnBnClickedChkEnable();
+	afx_msg void OnBnClickedChkShowAll();
+	afx_msg void OnLvnItemchangingListSource(NMHDR *pNMHDR, LRESULT *pResult);
 	DECLARE_MESSAGE_MAP()
 
+	void UpdateFavoritesSources();
+
 private:
-	bool m_bReadDefaults;
+	CListCtrl m_lstSource;
+	boost::scoped_ptr< PluginManager > m_pluginMgr;
+
+	PluginManager::FileMgrs m_fileMgrs;
 };

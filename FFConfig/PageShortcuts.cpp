@@ -39,8 +39,7 @@ const CString PROFILE_GROUP = _T("Hotkeys");
 //-----------------------------------------------------------------------------------------------
 
 CPageShortcuts::CPageShortcuts()
-	: base(CPageShortcuts::IDD),
-	m_bReadDefaults( false )
+	: base(CPageShortcuts::IDD)
 {}
 
 //-----------------------------------------------------------------------------------------------
@@ -79,23 +78,16 @@ BOOL CPageShortcuts::OnInitDialog()
 
 	//--- get profile data
 
-	if( m_bReadDefaults )
-		ReadProfile( g_profileDefaults );
-	else
-		ReadProfile( g_profile );
+	ReadProfile();
 
 	return TRUE;
 }
 
 //-----------------------------------------------------------------------------------------------
 
-void CPageShortcuts::ReadProfile( const Profile& profile )
+void CPageShortcuts::ReadProfile()
 {
-	if( ! GetSafeHwnd() )
-	{
-		m_bReadDefaults = true;
-		return;
-	}
+	const Profile& profile = CApp::GetReadProfile();
 
 	m_lstShortcuts.DeleteAllItems();
 
@@ -139,15 +131,15 @@ void CPageShortcuts::ReadProfile( const Profile& profile )
 	m_lstShortcuts.SetItemData( nItem, profile.GetInt( PROFILE_GROUP, cmd ) );
 
 	++nItem;
-	title = _T("Focus path edit field");
-	cmd   = _T("ff_FocusPathEdit");
+	title = _T("Menu: configuration");
+	cmd   = _T("ff_MenuConfig");
 	m_mapTitleToCmd[ title ] = cmd;
 	m_lstShortcuts.InsertItem( nItem, title );
 	m_lstShortcuts.SetItemData( nItem, profile.GetInt( PROFILE_GROUP, cmd ) );
 
 	++nItem;
-	title = _T("Menu: configuration");
-	cmd   = _T("ff_MenuConfig");
+	title = _T("Focus path edit field");
+	cmd   = _T("ff_FocusPathEdit");
 	m_mapTitleToCmd[ title ] = cmd;
 	m_lstShortcuts.InsertItem( nItem, title );
 	m_lstShortcuts.SetItemData( nItem, profile.GetInt( PROFILE_GROUP, cmd ) );
@@ -167,6 +159,8 @@ void CPageShortcuts::ReadProfile( const Profile& profile )
 
 BOOL CPageShortcuts::OnApply()
 {
+	Profile& profile = CApp::GetWriteProfile();
+
 	int count = m_lstShortcuts.GetItemCount();
 	for( int i = 0; i < count; ++i )
 	{
@@ -175,9 +169,9 @@ BOOL CPageShortcuts::OnApply()
 		std::map<CString,CString>::iterator itCmd = m_mapTitleToCmd.find( title );
 		ASSERT( itCmd != m_mapTitleToCmd.end() );
 		if( hotkey != 0 )
-			g_profile.SetInt( PROFILE_GROUP, itCmd->second, hotkey );
+			profile.SetInt( PROFILE_GROUP, itCmd->second, hotkey );
 		else
-			g_profile.DeleteValue( PROFILE_GROUP, itCmd->second );
+			profile.DeleteValue( PROFILE_GROUP, itCmd->second );
 	}
 
 	return base::OnApply();

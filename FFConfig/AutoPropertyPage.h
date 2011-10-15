@@ -34,7 +34,7 @@ public:
 	CAutoPropertyPage() {}
 	CAutoPropertyPage( UINT resId );
 
-	virtual void ReadProfile( const Profile& profile ) = 0;
+	virtual void ReadProfile() = 0;
 
 protected:
 	virtual BOOL OnInitDialog();

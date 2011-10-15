@@ -19,66 +19,71 @@
 #include "ProfileDefaults.h"
 
 //-----------------------------------------------------------------------------------------
-void GetProfileDefaults( Profile* pProfile )
+void GetProfileDefaults( Profile* profile )
 {
 	LONG baseUnits = ::GetDialogBaseUnits();
 	int baseUnitX = baseUnits & 0xFFFF;
 	int baseUnitY = baseUnits >> 16;
 
-	pProfile->Clear();
+	profile->Clear();
 
 	//--- general
 
-	pProfile->SetInt( _T("main"), _T("MaxGlobalHistoryEntries"), 15 );
-	pProfile->SetInt( _T("main"), _T("ListViewMode"), -1 );
-	pProfile->SetInt( _T("main"), _T("ListViewImageSize"), -1 );
+	profile->SetInt( L"main", L"MaxGlobalHistoryEntries", 15 );
+	profile->SetInt( L"main", L"ListViewMode", -1 );
+	profile->SetInt( L"main", L"ListViewImageSize", -1 );
 
 	//--- common file dialog
 
-	pProfile->SetInt( _T("CommonFileDlg"), _T("EnableHook"), 1 );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("MinWidth"), 433 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("MinHeight"), 308 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("Center"), 1 );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("FolderComboHeight"), 400 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("FiletypesComboHeight"), 246 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("CommonFileDlg"), _T("ResizeNonResizableDialogs"), 1 );
-	pProfile->SetString( _T("CommonFileDlg.NonResizableExcludes"), _T("0"), _T("i_view32.exe") );
-	pProfile->SetString( _T("CommonFileDlg.Excludes"), _T("0"), _T("iTunes.exe") );
+	profile->SetInt( L"CommonFileDlg", L"EnableHook", 1 );
+	profile->SetInt( L"CommonFileDlg", L"MinWidth", 433 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"CommonFileDlg", L"MinHeight", 308 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"CommonFileDlg", L"Center", 1 );
+	profile->SetInt( L"CommonFileDlg", L"FolderComboHeight", 400 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"CommonFileDlg", L"FiletypesComboHeight", 246 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"CommonFileDlg", L"ResizeNonResizableDialogs", 1 );
+	profile->SetString( L"CommonFileDlg.NonResizableExcludes", L"0", L"i_view32.exe" );
+	profile->SetString( L"CommonFileDlg.Excludes", L"0", L"iTunes.exe" );
 
 	//--- common folder dialog
 
-	pProfile->SetInt( _T("CommonFolderDlg"), _T("EnableHook"), 1 );
-	pProfile->SetInt( _T("CommonFolderDlg"), _T("MinWidth"), 267 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("CommonFolderDlg"), _T("MinHeight"), 308 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("CommonFolderDlg"), _T("Center"), 1 );
-	pProfile->SetString( _T("CommonFolderDlg.Excludes"), _T("0"), _T("iTunes.exe") );
+	profile->SetInt( L"CommonFolderDlg", L"EnableHook", 1 );
+	profile->SetInt( L"CommonFolderDlg", L"MinWidth", 267 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"CommonFolderDlg", L"MinHeight", 308 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"CommonFolderDlg", L"Center", 1 );
+	profile->SetString( L"CommonFolderDlg.Excludes", L"0", L"iTunes.exe" );
 
 	//--- MSO file dialog
 
-	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("EnableHook"), 1 );
-	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("MinWidth"), 433 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("MinHeight"), 308 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("MSOfficeFileDlg"), _T("Center"), 1 );
+	profile->SetInt( L"MSOfficeFileDlg", L"EnableHook", 1 );
+	profile->SetInt( L"MSOfficeFileDlg", L"MinWidth", 433 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"MSOfficeFileDlg", L"MinHeight", 308 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"MSOfficeFileDlg", L"Center", 1 );
 
 	//--- common "Open With" dialog
 
-	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("EnableHook"), 0 );
-	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinWidth"), 267 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("MinHeight"), 308 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("CommonOpenWithDlg"), _T("Center"), 1 );
+	profile->SetInt( L"CommonOpenWithDlg", L"EnableHook", 0 );
+	profile->SetInt( L"CommonOpenWithDlg", L"MinWidth", 267 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"CommonOpenWithDlg", L"MinHeight", 308 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"CommonOpenWithDlg", L"Center", 1 );
 
 	//--- favorites editor
 
-	pProfile->SetInt( _T("main"), _T("FavoritesDlgWidth"), 450 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("main"), _T("FavoritesDlgHeight"), 330 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("main"), _T("UseTcFavorites"), 0 );
-	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_title"), 130 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_command"), 140 + DIALOG_UNITS_FLAG );
-	pProfile->SetInt( _T("Favorites.Options"), _T("ColWidth_targetPath"), 140 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"main", L"FavoritesDlgWidth", 450 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"main", L"FavoritesDlgHeight", 330 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"main", L"UseTcFavorites", 0 );
+	profile->SetInt( L"Favorites.Options", L"ColWidth_title", 130 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"Favorites.Options", L"ColWidth_command", 140 + DIALOG_UNITS_FLAG );
+	profile->SetInt( L"Favorites.Options", L"ColWidth_targetPath", 140 + DIALOG_UNITS_FLAG );
 
 	//--- toolbar
 	
-	pProfile->SetInt( _T("Toolbar"), _T("OffsetX"), 0 );
-	pProfile->SetInt( _T("Toolbar"), _T("OffsetY"), 0 );
-	pProfile->SetInt( _T("Toolbar"), _T("OffsetWidth"), 0 );
+	profile->SetInt( L"Toolbar", L"OffsetX", 0 );
+	profile->SetInt( L"Toolbar", L"OffsetY", 0 );
+	profile->SetInt( L"Toolbar", L"OffsetWidth", 0 );
+
+	//--- file manager integration
+
+	profile->SetString( L"FileManager", L"FavoritesSrc.PluginName", L"FF_FileMgrPlugin.dll" );
+	profile->SetString( L"FileManager", L"FavoritesSrc.ProgramId", L"ID_Explorer" );
 }

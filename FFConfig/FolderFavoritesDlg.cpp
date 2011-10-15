@@ -19,7 +19,6 @@
 #include "stdafx.h"
 #include "FFConfig.h"
 #include "FolderFavoritesDlg.h"
-#include "ImportDlg.h"
 
 #pragma warning(disable:4244) // numeric conversion
 
@@ -99,7 +98,6 @@ BEGIN_MESSAGE_MAP(CFolderFavoritesDlg, CResizableDlg)
 	ON_BN_CLICKED( IDC_BTN_ADD_DIVIDER, OnBnClickedBtnAddDivider )
 	ON_BN_CLICKED( IDC_BTN_ADD_SUBMENU, OnBnClickedBtnAddSubmenu )
 	ON_BN_CLICKED( IDC_BTN_REMOVE, OnBnClickedBtnRemove )
-	ON_BN_CLICKED( IDC_BTN_IMPORT, OnBnClickedBtnImport )
 	ON_BN_CLICKED(IDC_BTN_TARGETBROWSE, OnBnClickedBtnTargetbrowse)
 	ON_BN_CLICKED(IDC_BTN_REVERT, OnBnClickedBtnRevert)
 	ON_WM_CONTEXTMENU()
@@ -111,6 +109,8 @@ END_MESSAGE_MAP()
 BOOL CFolderFavoritesDlg::OnInitDialog()
 {
 	CResizableDlg::OnInitDialog();
+
+	const Profile& profile = CApp::GetReadProfile();
 
 	CString exeName;
 	GetAppFilename( AfxGetInstanceHandle(), exeName.GetBuffer( 4096 ), 4096 );
@@ -153,13 +153,13 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	m_tree.GetTree().SetImageList( &m_treeIcons, TVSIL_NORMAL );
 
 	int colWidth;
-	colWidth = MapProfileX( *this, g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_title") ) );
+	colWidth = MapProfileX( *this, profile.GetInt( _T("Favorites.Options"), _T("ColWidth_title") ) );
 	m_tree.InsertColumn( 0, _T("Title"), LVCFMT_LEFT, colWidth );
 
-	colWidth = MapProfileX( *this, g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_command") ) );
+	colWidth = MapProfileX( *this, profile.GetInt( _T("Favorites.Options"), _T("ColWidth_command") ) );
 	m_tree.InsertColumn( 1, _T("Command"), LVCFMT_LEFT, colWidth );
 
-	colWidth = MapProfileX( *this, g_profile.GetInt( _T("Favorites.Options"), _T("ColWidth_targetPath") ) );
+	colWidth = MapProfileX( *this, profile.GetInt( _T("Favorites.Options"), _T("ColWidth_targetPath") ) );
 	m_tree.InsertColumn( 2, _T("Target path"), LVCFMT_LEFT, colWidth );
 
 	LoadFavorites();
@@ -183,8 +183,8 @@ BOOL CFolderFavoritesDlg::OnInitDialog()
 	SetMinSize();
 
 	// get dialog size from profile
-	int width = MapProfileX( *this, g_profile.GetInt( _T("main"), _T("FavoritesDlgWidth") ) );
-	int height = MapProfileY( *this, g_profile.GetInt( _T("main"), _T("FavoritesDlgHeight") ) );
+	int width = MapProfileX( *this, profile.GetInt( _T("main"), _T("FavoritesDlgWidth") ) );
+	int height = MapProfileY( *this, profile.GetInt( _T("main"), _T("FavoritesDlgHeight") ) );
 
 	SetWindowPos( NULL, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE );
 
@@ -381,19 +381,21 @@ void CFolderFavoritesDlg::OnCancel()
 
 void CFolderFavoritesDlg::SaveDialogSize()
 {
+	Profile& profile = CApp::GetWriteProfile();
+
 	CRect rc; GetWindowRect( rc );
-	g_profile.SetInt( _T("main"), _T("FavoritesDlgWidth"), rc.Width() );
-	g_profile.SetInt( _T("main"), _T("FavoritesDlgHeight"), rc.Height() );
+	profile.SetInt( _T("main"), _T("FavoritesDlgWidth"), rc.Width() );
+	profile.SetInt( _T("main"), _T("FavoritesDlgHeight"), rc.Height() );
 
 	int colWidth;
 	colWidth = m_tree.GetHeaderCtrl().GetItemWidth( COL_TITLE );
-	g_profile.SetInt( _T("Favorites.Options"), _T("ColWidth_title"), colWidth );
+	profile.SetInt( _T("Favorites.Options"), _T("ColWidth_title"), colWidth );
 
 	colWidth = m_tree.GetHeaderCtrl().GetItemWidth( COL_COMMAND );
-	g_profile.SetInt( _T("Favorites.Options"), _T("ColWidth_command"), colWidth );
+	profile.SetInt( _T("Favorites.Options"), _T("ColWidth_command"), colWidth );
 
 	colWidth = m_tree.GetHeaderCtrl().GetItemWidth( COL_TARGETPATH );
-	g_profile.SetInt( _T("Favorites.Options"), _T("ColWidth_targetPath"), colWidth );
+	profile.SetInt( _T("Favorites.Options"), _T("ColWidth_targetPath"), colWidth );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -811,50 +813,3 @@ void CFolderFavoritesDlg::OnContextMenu(CWnd* pWnd, CPoint pt )
 		default: ASSERT( false );
 	}
 }
-
-//-----------------------------------------------------------------------------------------------
-/// Import menu from Total Commander
-
-void CFolderFavoritesDlg::OnBnClickedBtnImport()
-{
-	CImportDlg dlg( this );
-	if( dlg.DoModal() == IDOK )
-	{
-		FavoritesList favs;
-		GetTcFavorites( &favs, dlg.GetTcIniPath() );
-
-		AutoRedraw( m_tree.GetSafeHwnd() );
-
-		HTREEITEM hInsertAfter = TVI_LAST;
-		HTREEITEM hParent = TVI_ROOT;
-
-		if( dlg.GetReplaceExisting() )
-		{
-			m_tree.DeleteAllItems();
-			hInsertAfter = TVI_LAST;
-			hParent = TVI_ROOT;
-		}
-		else if( m_hSelItem )
-		{
-			m_tree.GetTree().SelectAll( false );
-			hInsertAfter = m_hSelItem;
-			hParent = m_tree.GetTree().GetParentItem( m_hSelItem );
-			if( ! hParent )
-				hParent = TVI_ROOT;
-		}
-
-		size_t iItem = 0;
-		LoadFavorites_worker( hParent, hInsertAfter, favs, iItem, true );
-
-		if( dlg.GetReplaceExisting() )
-		{
-			// select first item (if any)
-			m_tree.GetTree().SelectAll( FALSE );
-			if( HTREEITEM hItem = m_tree.GetTree().GetChildItem( TVI_ROOT ) )
-				m_tree.GetTree().SetItemState( hItem, TVIS_SELECTED | TVIS_FOCUSED, TVIS_SELECTED | TVIS_FOCUSED );
-		}
-		
-		EnableDlgItem( *this, IDC_BTN_REVERT );
-	}
-}
-

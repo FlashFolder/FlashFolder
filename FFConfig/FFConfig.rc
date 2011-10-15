@@ -85,16 +85,15 @@ IDR_MAINFRAME           ICON                    "..\\common\\res\\FlashFolder.ic
 // Dialog
 //
 
-IDD_PAGE_TOTALCMD DIALOGEX 0, 0, 230, 171
+IDD_PAGE_FILEMANAGER DIALOGEX 0, 0, 230, 178
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
-CAPTION "Total Commander Integration"
+CAPTION "File Manager Integration"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "&Share Total Commander® directory menu (experimental)",IDC_CHK_ENABLE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,216,17
-    LTEXT           "If this option is enabled, FlashFolder reads the the directory menu items from the .ini-file of an installed Total Commander.\nIf you change the menu from within FlashFolder, the items will be written back to the TC .ini-file.",IDC_STATIC,18,31,205,34
-    LTEXT           "Total Commander® is a registered trademark of Christian Ghisler, C. Ghisler & Co., Switzerland.",IDC_STATIC,7,147,216,17,SS_NOPREFIX
-    LTEXT           "WARNING: Some users had problems with this function, especially when using advanced features of the TC .ini file like redirection.\nPlease make a backup of your TC .ini file and consult the bug tracker (available from the ""About"" dialog) for more details. ",IDC_STATIC,18,69,205,47
+    LTEXT           "&Select the source for favorite folders:",IDC_STATIC,7,7,122,8
+    CONTROL         "",IDC_LIST_SOURCE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,22,216,134
+    CONTROL         "Sh&ow supported programs which are currently not installed",IDC_CHK_SHOW_ALL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,161,204,10
 END
 
 IDD_PAGE_SHORTCUTS DIALOGEX 0, 0, 232, 156
@@ -293,7 +292,7 @@ END
 
 IDD_PAGE_TOOLBAR DIALOGEX 0, 0, 219, 119
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Toolbar|Toolbar Options"
+CAPTION "Toolbar"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Toolbar positioning",IDC_STATIC,7,7,205,105
@@ -318,13 +317,12 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO 
 BEGIN
-    IDD_PAGE_TOTALCMD, DIALOG
+    IDD_PAGE_FILEMANAGER, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 223
-        VERTGUIDE, 18
         TOPMARGIN, 7
-        BOTTOMMARGIN, 164
+        BOTTOMMARGIN, 171
     END
 
     IDD_PAGE_SHORTCUTS, DIALOG

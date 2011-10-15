@@ -29,3 +29,7 @@
 
 #pragma comment( lib, "fflib" )
 #pragma comment( lib, "WtsApi32" )
+
+//---
+
+#define foreach BOOST_FOREACH

@@ -18,11 +18,8 @@
  */
 
 #include "stdafx.h"
-
 #include "TotalCmdUtils.h"
-#include "StringUtils.h"
-#include "utils.h"
-#include "Registry.h"
+#include <commonUtils\Registry.h>
 
 //-------------------------------------------------------------------------------------------------
 
@@ -296,13 +293,13 @@ bool SetTcCurrentPathesW( HWND hWndTC, LPCWSTR pPath1, LPCWSTR pPath2, DWORD fla
 		StringCbCatA( chFlags, sizeof(chFlags), "S" );
 	if( flags & STC_BACKGROUND_TAB )
 		StringCbCatA( chFlags, sizeof(chFlags), "T" );
-	int len = strlen( cmdBuf );
+	size_t len = strlen( cmdBuf );
 	StringCbCatA( cmdBuf + len + 1, sizeof(cmdBuf) - len - 1, chFlags );
 
 	// prepare TC protocol
 	COPYDATASTRUCT cd;
 	cd.dwData = 'C' | 'D' << 8;
-	cd.cbData = len + 1 + strlen( chFlags );
+	cd.cbData = static_cast<DWORD>( len + 1 + strlen( chFlags ) );
 	cd.lpData = cmdBuf;
 
 	return ::SendMessage( hWndTC, WM_COPYDATA, 0, reinterpret_cast<LPARAM>( &cd ) ) != 0;
@@ -313,10 +310,11 @@ bool SetTcCurrentPathesW( HWND hWndTC, LPCWSTR pPath1, LPCWSTR pPath2, DWORD fla
 void GetPathFromTcControl( HWND hwnd, LPTSTR pPath, size_t nSize )
 { 
 	pPath[ 0 ] = 0;
-	::GetWindowText( hwnd, pPath, nSize );
+	::GetWindowText( hwnd, pPath, static_cast<int>( nSize ) );
 	if( TCHAR* p = _tcsrchr( pPath, '\\' ) )
 		if( p - pPath > 2 )
 			*p = 0;
 		else
 			*(++p) = 0;
 }
+

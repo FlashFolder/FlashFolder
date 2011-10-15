@@ -50,6 +50,12 @@
 #include <iterator>
 #include <cstdlib>
 
+//--- boost headers
+
+#include <boost\foreach.hpp>
+#include <boost\scoped_ptr.hpp>
+#define foreach BOOST_FOREACH
+
 //--- own headers
 
 // utilities
@@ -60,7 +66,6 @@
 #include <CommonUtils\UnicodeUtils.h>
 #include <CommonUtils\Profile.h>
 #include <CommonUtils\Registry.h>
-#include <CommonUtils\TotalCmdUtils.h>
 #include <CommonUtils\DownloadThread.h>
 #include <CommonUtils\VersionInfo.h>
 #include <commonUtils\TinyXml\TinyXml.h>
@@ -89,3 +94,5 @@
 #include <common\Favorites.h>
 #include <common\ProfileDefaults.h>
 #include <common\ProcessNames.h>
+#include <common\TotalCmdUtils.h>
+

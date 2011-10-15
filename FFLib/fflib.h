@@ -22,7 +22,3 @@
 
 extern RegistryProfile g_profile;
 extern HINSTANCE g_hInstDll;
-
-int FavMenu_Display( HWND hWndParent, int x, int y, const FavoritesList& favs );
-void FavMenu_StartEditor( HWND hWndParent );
-void FavMenu_AddDir( HWND hWndParent, FavoritesList& favs, LPCTSTR pPath, LPCTSTR pTargetPath );
