@@ -1,5 +1,5 @@
 /* This file is part of FlashFolder. 
- * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+ * Copyright (C) 2007-2012 zett42.de ( zett42 at users.sourceforge.net ) 
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
