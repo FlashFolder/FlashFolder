@@ -90,6 +90,17 @@ BOOL CPageFileManager::OnInitDialog()
 	m_pluginMgr.reset( new PluginManager );
 	m_fileMgrs = m_pluginMgr->GetSupportedFileManagers();
 
+	bool allProgramsInstalled = true;
+	foreach( const PluginManager::FileMgr& fm, m_fileMgrs )
+		if( ! fm.program.isInstalled )
+		{
+			allProgramsInstalled = false;
+			break;
+		}
+
+	if( allProgramsInstalled )
+		GetDlgItem( IDC_CHK_SHOW_ALL )->EnableWindow( FALSE );
+
 	UpdateFavoritesSources();
 
 	//--- get profile data
@@ -109,8 +120,13 @@ void CPageFileManager::UpdateFavoritesSources()
 
 	m_lstSource.EnableGroupView( showNotInstalled );
 
+	bool hasNotInstalledPrograms = false;
+
 	foreach( const PluginManager::FileMgr& fm, m_fileMgrs )
 	{
+		// Skip unsupported programs.
+		if( ( fm.program.capabilities & ffplug::FMC_EnumFavorites ) == 0 )
+			continue;
 		if( ! fm.program.isInstalled && ! showNotInstalled )
 			continue;
 

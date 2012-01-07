@@ -400,6 +400,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ItemIdList.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ItemIdList.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LogFile.cpp"
 				>
 			</File>

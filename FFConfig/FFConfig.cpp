@@ -19,7 +19,7 @@
 #include "stdafx.h"
 #include "FFConfig.h"
 #include "FFConfigDlg.h"
-#include "FolderFavoritesDlg.h"
+//#include "FolderFavoritesDlg.h"
 #include "UpdateCheckDlg.h"
 #include "AboutDlg.h"
 #include "AddFavoriteDlg.h"
@@ -151,9 +151,9 @@ BOOL CApp::InitInstance()
 		}
 		case DLG_FAVS:
 		{
-			CFolderFavoritesDlg dlg( pParent, favSelectItem );
-			m_pMainWnd = &dlg;
-			dlg.DoModal();
+//			CFolderFavoritesDlg dlg( pParent, favSelectItem );
+//			m_pMainWnd = &dlg;
+//			dlg.DoModal();
 			break;
 		}
 		case DLG_UPDATECHECK:
@@ -174,6 +174,7 @@ BOOL CApp::InitInstance()
 		}
 		case DLG_ADD_FAVORITE:
 		{
+/*
 			CAddFavoriteDlg dlg( pParent, addFavPath, addFavTargetPath );
 			m_pMainWnd = &dlg;
 			if( dlg.DoModal() == CAddFavoriteDlg::ID_EDITMENU )
@@ -182,6 +183,7 @@ BOOL CApp::InitInstance()
 				CString params; params.Format( _T("0 --fav %d"), dlg.GetNewItemId() );
 				::ShellExecute( NULL, _T("open"), appPath, params, NULL, SW_SHOW );			
 			}	
+*/
 			break;
 		}		
 	}

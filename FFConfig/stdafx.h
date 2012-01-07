@@ -87,12 +87,11 @@
 #include <CommonUtils\CacheImageList.h>
 #include <CommonUtils\MessageBox.h>
 #include <CommonUtils\VistaFontHelper.h>
+#include <CommonUtils\ItemIdList.h>
 
 // FlashFolder-specific
 #include <common\_autolink.h>
 #include <common\ff_utils.h>
-#include <common\Favorites.h>
 #include <common\ProfileDefaults.h>
 #include <common\ProcessNames.h>
-#include <common\TotalCmdUtils.h>
 

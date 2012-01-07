@@ -31,6 +31,8 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
+using namespace std;
+
 //-----------------------------------------------------------------------------------------
 
 bool GetAppDir( HINSTANCE hInstApp, LPTSTR szDir, DWORD nSize )
@@ -358,3 +360,35 @@ HWND FindChildWindowRecursively( HWND hwndParent, int dlgCtrlId )
 	::EnumChildWindows( hwndParent, FindChildWindowRecursivelyProc, (LPARAM) &info );
 	return info.hwnd;
 }
+
+//----------------------------------------------------------------------------------------------------
+
+std::wstring GetKnownFolderPath( REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken )
+{
+	wstring result;
+
+	typedef HRESULT ( STDAPICALLTYPE *P_SHGetKnownFolderPath )( REFKNOWNFOLDERID, DWORD, HANDLE, PWSTR* );
+	
+	if( HMODULE hMod = ::LoadLibrary( L"Shell32.dll" ) )
+	{
+		P_SHGetKnownFolderPath fnSHGetKnownFolderPath = reinterpret_cast< P_SHGetKnownFolderPath >(
+			::GetProcAddress( hMod, "SHGetKnownFolderPath" ) );
+		if( fnSHGetKnownFolderPath )
+		{
+			PWSTR path = NULL;
+			HRESULT hr = fnSHGetKnownFolderPath( rfid, dwFlags, hToken, &path );
+			if( SUCCEEDED( hr ) )
+			{
+				result = wstring( path );
+				if( result != L"" && result[ result.size() - 1 ] != L'\\' )
+					result += L"\\";
+				::CoTaskMemFree( path );
+			}
+		}
+
+		::FreeLibrary( hMod );
+	}
+
+	return result;
+}
+

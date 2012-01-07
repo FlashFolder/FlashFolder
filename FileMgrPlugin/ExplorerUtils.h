@@ -15,28 +15,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 #pragma once
 
-#include <commonUtils\tstring.h>
-
-struct FavoritesItem
-{
-	tstring command;      ///< file path or TC command (required)
-	tstring title;        ///< menu item title
-	tstring targetpath;   ///< unused, round-trip data from TC
-};
-
-typedef std::vector<FavoritesItem> FavoritesList;
-
-enum DirFavoritesSrc
-{
-	DFS_DEFAULT,
-	DFS_FLASHFOLDER,
-	DFS_TOTALCMD
-};
-
-void GetDirFavorites( FavoritesList* pList, DirFavoritesSrc source = DFS_DEFAULT );
-void SetDirFavorites( const FavoritesList& list, DirFavoritesSrc source = DFS_DEFAULT );
-
-int GetFavItemByPath( const FavoritesList& favs, LPCTSTR pPath, LPCTSTR pTargetPath = NULL );
+HRESULT GetCurrentExplorerFolders( std::vector< PIDLIST_ABSOLUTE >* folders );

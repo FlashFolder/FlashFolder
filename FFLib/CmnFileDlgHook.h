@@ -40,8 +40,8 @@ public:
 	virtual bool Init( HWND hwndFileDlg, HWND hWndTool );
 	virtual void Uninstall();
 	
-	virtual bool SetFolder( LPCTSTR path );
-	virtual bool GetFolder( LPTSTR folderPath );
+	virtual bool SetFolder( PCIDLIST_ABSOLUTE folder );
+	virtual SpITEMIDLIST GetFolder();
 	virtual bool SetFilter( LPCTSTR filter );
 
 private:
@@ -55,7 +55,7 @@ private:
         m_isWindowActive = false;
         m_shellViewMode = FVM_AUTO;
         m_shellViewImageSize = -1;
-        m_folderPath = L"";
+		m_currentFolder.reset();
 	}
 	
 	static LRESULT CALLBACK HookWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 
@@ -74,7 +74,7 @@ private:
 	int m_shellViewImageSize;
 	HWND m_shellWnd;
 	IShellBrowser *m_pShellBrowser;
-	tstring m_folderPath;
+	SpITEMIDLIST m_currentFolder;
 
 	// options read from INI file specified in Init()
 

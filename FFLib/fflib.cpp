@@ -107,19 +107,7 @@ BOOL APIENTRY DllMain( HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRe
 
 		case DLL_PROCESS_DETACH:
 		{
-			bool isProcessTerminated = !! lpReserved;
-
-			DebugOut( L"[fflib] DLL_PROCESS_DETACH (pid %08Xh, terminated=%d)\n", 
-				::GetCurrentProcessId(), isProcessTerminated );
-
-			if( ! isProcessTerminated )
-			{
-				// As stated by MSDN, we must only call FreeLibrary() if the process is not terminated.
-				// So we will only get here if FreeLibrary() was explicitly called for fflib,
-				// which usually happens during uninstall or upgrade install.
-				//if( g_pluginMgr )
-				//	g_pluginMgr->UnloadPlugins();
-			}
+			DebugOut( L"[fflib] DLL_PROCESS_DETACH (pid %08Xh)\n", ::GetCurrentProcessId() );
 		}
 		break;
     }
@@ -151,9 +139,12 @@ void AdjustToolWindowPos()
 
 void UpdatePathEdit()
 {
-    TCHAR folderPath[MAX_PATH + 1] = L"";
-	g_spFileDlgHook->GetFolder( folderPath );
-    SetDlgItemText(g_hToolWnd, ID_FF_PATH, folderPath);
+	if( SpITEMIDLIST folder = g_spFileDlgHook->GetFolder() )
+	{
+		WCHAR path[ MAX_PATH ] = L"";
+		if( ::SHGetPathFromIDList( folder.get(), path ) )
+			SetDlgItemText( g_hToolWnd, ID_FF_PATH, path );
+	}
 }
 
 //-----------------------------------------------------------------------------------------
@@ -165,14 +156,18 @@ LRESULT CALLBACK ToolWindowEditPathProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 	switch( uMsg )
 	{
 		case WM_KEYDOWN:
-			if (wParam == VK_RETURN)
+			if( wParam == VK_RETURN )
 			{
-				TCHAR path[MAX_PATH + 1] = L"";
-				GetWindowText(hwnd, path, MAX_PATH );
+				WCHAR path[ MAX_PATH ] = L"";
+				GetWindowText( hwnd, path, _countof( path ) );
 				if( DirectoryExists( path ) )
 				{
-					SetForegroundWindow(g_hFileDialog);
-					g_spFileDlgHook->SetFolder( path );
+					SpITEMIDLIST folder;
+					if( SUCCEEDED( GetPidlFromPath( &folder, path ) ) )
+					{
+						SetForegroundWindow( g_hFileDialog );
+						g_spFileDlgHook->SetFolder( folder.get() );
+					}
 				}
 			}
 			else if (wParam == VK_ESCAPE) 

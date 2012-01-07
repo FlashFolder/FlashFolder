@@ -1,7 +1,25 @@
-
+/* This file is part of FlashFolder. 
+ * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 #pragma once
 
 #include <windows.h>
+
+namespace ffplug {
 
 struct PluginInfo
 {
@@ -33,8 +51,7 @@ struct FileMgrProgram
 struct FavMenuItem
 {
 	WCHAR displayName[ 256 ];
-	WCHAR folder[ 1024 ];
-	WCHAR folder2[ 1024 ];    // optional
+	PIDLIST_ABSOLUTE pidlFolder;
 	
 	enum Type { T_UNKNOWN, T_FOLDER_FAVORITE, T_SEPARATOR, T_SUBMENU, T_SUBMENU_END }
 		type;
@@ -42,8 +59,8 @@ struct FavMenuItem
 
 struct FileMgrFolders
 {
-	WCHAR folder[ 1024 ];
-	WCHAR folder2[ 1024 ];   // optional
+	PIDLIST_ABSOLUTE pidlFolder;
+	PIDLIST_ABSOLUTE pidlFolder2;   // optional "target" folder for two-pane file managers
 };
 
 /// Initialize the plugin. Mandatory function.
@@ -57,7 +74,7 @@ typedef BOOL ( CALLBACK *P_EnumFavorites )( LPCWSTR fileManagerId, UINT index, F
 
 /// Add an item to the favorites menu of the given file manager.
 typedef BOOL ( CALLBACK *P_AddFavoriteFolder )( 
-	LPCWSTR fileManagerId, LPCWSTR displayName, LPCWSTR folderPath, INT insertAfter );
+	LPCWSTR fileManagerId, LPCWSTR displayName, PCIDLIST_ABSOLUTE folder, INT insertAfter );
 
 /// Start the build-in favorites menu editor of the file manager.
 typedef BOOL ( CALLBACK *P_StartFavoritesEditor )( LPCWSTR fileManagerId );
@@ -65,4 +82,4 @@ typedef BOOL ( CALLBACK *P_StartFavoritesEditor )( LPCWSTR fileManagerId );
 /// Get the currently open folders of the file manager.
 typedef BOOL ( CALLBACK *P_EnumCurrentFolders )( LPCWSTR fileManagerId, UINT index, FileMgrFolders* folders );
 
-
+}; //namespace

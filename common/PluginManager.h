@@ -1,7 +1,24 @@
-
+/* This file is part of FlashFolder. 
+ * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 #pragma once
 
 #include "PluginApi.h"
+#include <commonUtils\ItemIdList.h>
 
 //-------------------------------------------------------------------------------------------------------------
 /// Manages FlashFolder plugins.
@@ -17,14 +34,14 @@ public:
 	{
 		HMODULE handle;
 		std::wstring name;
-		PluginInfo info;
+		ffplug::PluginInfo info;
 
-		P_FlashFolderPluginInit fnFlashFolderPluginInit;
-		P_EnumSupportedFileManagers fnEnumSupportedFileManagers;
-		P_EnumFavorites fnEnumFavorites;
-		P_AddFavoriteFolder fnAddFavoriteFolder;
-		P_StartFavoritesEditor fnStartFavoritesEditor;
-		P_EnumCurrentFolders fnEnumCurrentFolders;
+		ffplug::P_FlashFolderPluginInit fnFlashFolderPluginInit;
+		ffplug::P_EnumSupportedFileManagers fnEnumSupportedFileManagers;
+		ffplug::P_EnumFavorites fnEnumFavorites;
+		ffplug::P_AddFavoriteFolder fnAddFavoriteFolder;
+		ffplug::P_StartFavoritesEditor fnStartFavoritesEditor;
+		ffplug::P_EnumCurrentFolders fnEnumCurrentFolders;
 
 		Plugin() :
 			handle( NULL ),
@@ -70,7 +87,7 @@ public:
 	struct FileMgr
 	{
 		int nPlugin;
-		FileMgrProgram program;
+		ffplug::FileMgrProgram program;
 	};
 
 	/// Container of file managers supported by a plugin.
@@ -79,19 +96,27 @@ public:
 	/// Get supported file managers from all loaded plugins.
 	FileMgrs GetSupportedFileManagers() const;
 
+	/// Favorites menu item (encapsulates PIDL allocation compared to FavMenuItem ).
+	struct FavoriteItem
+	{
+		std::wstring displayName;
+		SpITEMIDLIST folder;
+		ffplug::FavMenuItem::Type type;
+	};
+
 	/// Container of favorites item.
-	typedef std::vector< FavMenuItem > FavMenuItems;
+	typedef std::vector< FavoriteItem > FavoriteItems;
 
 	/// Get favorites from a file manager.
-	bool GetFavMenu( LPCWSTR pluginName, LPCWSTR programId, PluginManager::FavMenuItems* result ) const;
+	bool GetFavMenu( LPCWSTR pluginName, LPCWSTR programId, FavoriteItems* result ) const;
 
 	/// Add a favorite folder to the favorites menu.
-	bool AddFavMenuItem( LPCWSTR pluginName, LPCWSTR programId, LPCWSTR displayName, LPCWSTR folder ) const;
+	bool AddFavMenuItem( LPCWSTR pluginName, LPCWSTR programId, LPCWSTR displayName, PCIDLIST_ABSOLUTE folder ) const;
 
 	/// Current folder associated with a file manager.
 	struct CurrentFolder
 	{
-		std::wstring folder;
+		SpcITEMIDLIST folder;
 		std::wstring programShortName;
 	};
 

@@ -41,7 +41,7 @@ bool MsoFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 
 	DebugOut( _T("[fflib] MsoFileDlgHook::Init()\n") );
 
-	m_currentDir[ 0 ] = 0;
+	m_currentFolder.reset();
 
 	g_pHook = this;
 
@@ -203,34 +203,32 @@ bool MsoFileDlgHook::EnterFilenameEditText( LPCTSTR pText )
 
 //-----------------------------------------------------------------------------------------
 
-bool MsoFileDlgHook::SetFolder( LPCTSTR path )
+bool MsoFileDlgHook::SetFolder( PCIDLIST_ABSOLUTE folder )
 {	
-	// append backslash to path if necessary
-	TCHAR pathBuf[MAX_PATH + 1 ];
-	StringCbCopy( pathBuf, sizeof(pathBuf), path );
-	size_t len = _tcslen( pathBuf );
-	if( len > 0 )
-	{
-		TCHAR* p = _tcsninc( pathBuf, len - 1 );
-        if( *p != _T('\\') ) 
-			StringCbCat( pathBuf, sizeof(pathBuf), _T("\\") );
-	}
+	TCHAR path[ MAX_PATH ] = L"";
+	if( ! ::SHGetPathFromIDList( folder, path ) )
+		return false;
 
+	::PathAddBackslash( path );
+
+	// Hack: Must enter the path into the edit control since IShellBrowser method
+	// would not update internal state of MSO file dialog.
 	return EnterFilenameEditText( path );
 }
 
 //-----------------------------------------------------------------------------------------
 
-bool MsoFileDlgHook::GetFolder( LPTSTR folderPath )
+SpITEMIDLIST MsoFileDlgHook::GetFolder()
 {
-	StringCchCopy( folderPath, MAX_PATH, m_currentDir );
-	return true;
+	return m_currentFolder;	
 }
 
 //-----------------------------------------------------------------------------------------
 
 bool MsoFileDlgHook::SetFilter( LPCTSTR filter )
 {
+	// Hack: Must enter the path into the edit control since IShellBrowser method
+	// would not update internal state of MSO file dialog.
 	return EnterFilenameEditText( filter );
 }
 
@@ -247,12 +245,19 @@ void MsoFileDlgHook::OnTimer()
 
 	if( HWND hwnd = ::FindWindowEx( g_pHook->m_hwndFileDlg, NULL, _T("Snake List"), NULL ) ) 
 	{
-		tstring curDir = ShellViewGetCurrentFolder( hwnd );
-	
-		if( _tcsicmp( curDir.c_str(), m_currentDir ) != 0 )
+		SpITEMIDLIST newFolder;
+		if( SUCCEEDED( ShellViewGetCurrentFolder( hwnd, &newFolder ) ) )
 		{
-			StringCbCopy( m_currentDir, sizeof(m_currentDir), curDir.c_str() );
-			FileDlgHookCallbacks::OnFolderChange();
+			WCHAR lastFolderPath[ MAX_PATH ] = L"";
+			WCHAR newFolderPath[ MAX_PATH ] = L"";
+			if( m_currentFolder )
+				::SHGetPathFromIDList( m_currentFolder.get(), lastFolderPath );
+			::SHGetPathFromIDList( newFolder.get(), newFolderPath );
+			if( _wcsicmp( lastFolderPath, newFolderPath ) != 0 )
+			{
+				m_currentFolder = newFolder;
+				FileDlgHookCallbacks::OnFolderChange();
+			}
 		}
 	}
 }

@@ -41,8 +41,8 @@ public:
 
 	// overridings of FileDlgHook_base
 	virtual bool Init( HWND hwndFileDlg, HWND hWndTool );
-	virtual bool SetFolder( LPCTSTR path );
-	virtual bool GetFolder( LPTSTR folderPath );
+	virtual bool SetFolder( PCIDLIST_ABSOLUTE folder );
+	virtual SpITEMIDLIST GetFolder();
 	virtual bool SetFilter( LPCTSTR filter );
 
 private:
@@ -56,7 +56,7 @@ private:
 	bool m_isWindowActive;
 	bool m_fileDialogCanceled;
 	bool m_initDone;
-	TCHAR m_currentPath[ MAX_PATH + 1 ];
+	SpITEMIDLIST m_currentFolder;
 
 	// options read from INI file specified in Init()
 

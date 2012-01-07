@@ -1,36 +1,42 @@
 
 #pragma once
 
-#ifndef WINVER				
-#define WINVER 0x0501		
-#endif
+//--- Windows headers
 
-#ifndef _WIN32_WINNT		                   
+#define WINVER 0x0600		
 #define _WIN32_WINNT WINVER	
-#endif						
-
-#ifndef _WIN32_IE			
 #define _WIN32_IE 0x0600
-#endif
+#define WIN32_LEAN_AND_MEAN
 
-#define WIN32_LEAN_AND_MEAN		// Selten verwendete Teile der Windows-Header nicht einbinden.
 #include <windows.h>
 #include <shlwapi.h>
 #include <shlobj.h>
+
+//--- ATL headers
+
+#include <atlbase.h>
+#include <atlrx.h>
+#include <atlfile.h>
+#include <atlsecurity.h>
+
+//--- std headers
 
 #include <stdlib.h>
 #include <tchar.h>
 #include <string>
 #include <vector>
 
+//--- own headers
+
 #include <common\_autolink.h>
 #include <common\PluginApi.h>
-#include <common\TotalCmdUtils.h>
-#include <common\ff_utils.h>
 
 #include <commonUtils\_autolink.h>
 #include <commonUtils\StringUtils.h>
 #include <commonUtils\Utils.h>
 #include <commonUtils\Registry.h>
+#include <commonUtils\FileFinder.h>
+#include <commonUtils\ItemIdList.h>
 
+// include after all others to avoid false compiler warnings
 #include <strsafe.h>

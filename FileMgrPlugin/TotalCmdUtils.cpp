@@ -21,13 +21,18 @@
 #include "TotalCmdUtils.h"
 #include <commonUtils\Registry.h>
 
+using namespace std;
+
+namespace totalcmdutils
+{
+
 //-------------------------------------------------------------------------------------------------
 
 BOOL CALLBACK FindTopWnd_Proc( HWND hwnd, LPARAM lParam )
 {
-    TCHAR classname[256] = _T("");
+    WCHAR classname[256] = L"";
     if( ::GetClassName( hwnd, classname, 255 ) > 0 )
-        if( _tcscmp( classname, _T("TTOTAL_CMD") ) == 0 )
+        if( wcscmp( classname, L"TTOTAL_CMD" ) == 0 )
         {
             HWND* phwndRes = reinterpret_cast<HWND*>( lParam );
             *phwndRes = hwnd;
@@ -53,13 +58,13 @@ HWND FindTopTcWnd( bool currentThreadOnly )
 
 bool IsTcPathControl( HWND hwnd )
 {
-    TCHAR wndtext[ MAX_PATH + 1 ] = _T("");
+    WCHAR wndtext[ MAX_PATH + 1 ] = L"";
     if( ::GetWindowText( hwnd, wndtext, MAX_PATH ) > 0 )
         if( IsFilePath( wndtext ) )
         {
             // check if this is not the command line label
-            size_t len = _tcslen( wndtext );
-            TCHAR* pLast = _tcsninc( wndtext, len - 1 );
+            size_t len = wcslen( wndtext );
+            WCHAR* pLast = _wcsninc( wndtext, len - 1 );
             return *pLast != '>';
 		}
 	return false;
@@ -67,14 +72,14 @@ bool IsTcPathControl( HWND hwnd )
 
 //-----------------------------------------------------------------------------------------------
 
-void CTotalCmdUtils::SetTCmdWnd( HWND hwndTotalCmd ) 
+void TcInstance::SetTCmdWnd( HWND hwndTotalCmd ) 
 { 
     m_hwnd = hwndTotalCmd; 
 	m_hwndLeft = m_hwndRight = m_hwndActive = NULL; 
     if( ! m_hwnd ) return;
 
 	// Find the child windows which contain the left / right path
-    CFindSubWindowsData data;
+    FindSubWindowsData data;
     data.m_thisptr = this;
     ::EnumChildWindows( m_hwnd, FindSubWindows_Proc, reinterpret_cast<LPARAM>( &data ) );
 
@@ -91,10 +96,10 @@ void CTotalCmdUtils::SetTCmdWnd( HWND hwndTotalCmd )
 
 //-----------------------------------------------------------------------------------------------
 
-bool CTotalCmdUtils::IsLeftDirActive() const
+bool TcInstance::IsLeftDirActive() const
 {
-	TCHAR leftDir[ MAX_PATH + 1 ];
-	TCHAR activeDir[ MAX_PATH + 1 ];
+	WCHAR leftDir[ MAX_PATH + 1 ];
+	WCHAR activeDir[ MAX_PATH + 1 ];
 	GetDirs( leftDir, MAX_PATH );
 	GetActiveDir( activeDir, MAX_PATH );
 	return ComparePath( leftDir, activeDir ) == 0;
@@ -102,8 +107,8 @@ bool CTotalCmdUtils::IsLeftDirActive() const
 
 //-----------------------------------------------------------------------------------------------
 
-bool CTotalCmdUtils::GetDirs( LPTSTR pLeftDir, unsigned leftDirLen, 
-                              LPTSTR pRightDir, unsigned rightDirLen ) const
+bool TcInstance::GetDirs( LPWSTR pLeftDir, unsigned leftDirLen, 
+                              LPWSTR pRightDir, unsigned rightDirLen ) const
 {
 	if( pLeftDir )
 	{
@@ -122,18 +127,18 @@ bool CTotalCmdUtils::GetDirs( LPTSTR pLeftDir, unsigned leftDirLen,
 
 //-----------------------------------------------------------------------------------------------
 
-bool CTotalCmdUtils::GetActiveDir( LPTSTR pDir, unsigned len ) const
+bool TcInstance::GetActiveDir( LPWSTR pDir, unsigned len ) const
 {
 	pDir[ 0 ] = 0;
 	if( ! m_hwndActive )
 		return false;
 
-    TCHAR wndtext[ MAX_PATH + 1 ] = _T("");
+    WCHAR wndtext[ MAX_PATH + 1 ] = L"";
     if( ::GetWindowText( m_hwndActive, wndtext, MAX_PATH ) > 0 )
 	{
-        size_t len = _tcslen( wndtext );
-        TCHAR* pLast = _tcsninc( wndtext, len - 1 );
-        if( *pLast == _T('>') )
+        size_t len = wcslen( wndtext );
+        WCHAR* pLast = wndtext + len - 1;
+        if( *pLast == L'>' )
 			*pLast = 0;
 
 		StringCchCopy( pDir, len, wndtext );
@@ -146,10 +151,10 @@ bool CTotalCmdUtils::GetActiveDir( LPTSTR pDir, unsigned len ) const
 
 //-------------------------------------------------------------------------------------------------
 
-BOOL CALLBACK CTotalCmdUtils::FindSubWindows_Proc( HWND hwnd, LPARAM lParam )
+BOOL CALLBACK TcInstance::FindSubWindows_Proc( HWND hwnd, LPARAM lParam )
 {
-    CFindSubWindowsData *pData = reinterpret_cast<CFindSubWindowsData*>( lParam );
-    TCHAR wndtext[MAX_PATH + 1] = _T("");
+    FindSubWindowsData *pData = reinterpret_cast<FindSubWindowsData*>( lParam );
+    WCHAR wndtext[MAX_PATH + 1] = L"";
     if( ::GetWindowText( hwnd, wndtext, MAX_PATH ) > 0 )
         if( IsFilePath( wndtext ) )
         {
@@ -157,9 +162,9 @@ BOOL CALLBACK CTotalCmdUtils::FindSubWindows_Proc( HWND hwnd, LPARAM lParam )
             bool bIsActive = false;
             if( ! pData->m_thisptr->m_hwndActive )
             {
-                size_t len = _tcslen( wndtext );
-                TCHAR* pLast = _tcsninc( wndtext, len - 1 );
-                if( *pLast == _T('>') )
+                size_t len = wcslen( wndtext );
+                WCHAR* pLast = wndtext + len - 1;
+                if( *pLast == L'>' )
                 {
                     pData->m_thisptr->m_hwndActive = hwnd;                
                     bIsActive = true;
@@ -181,7 +186,7 @@ BOOL CALLBACK CTotalCmdUtils::FindSubWindows_Proc( HWND hwnd, LPARAM lParam )
 
 //-------------------------------------------------------------------------------------------------
 
-bool GetTotalCmdLocation( tstring* pInstallDir, tstring* pIniPath )
+bool GetTotalCmdLocation( wstring* pInstallDir, wstring* pIniPath )
 {
 	// Try to get EXE path from one of following locations:
 	// - registry HKCU
@@ -189,22 +194,22 @@ bool GetTotalCmdLocation( tstring* pInstallDir, tstring* pIniPath )
 	// - Windows directory
 
 	if( pInstallDir )
-		*pInstallDir = _T("");
+		*pInstallDir = L"";
 	if( pIniPath )
-		*pIniPath = _T("");
+		*pIniPath = L"";
 
 	bool needInstDir = pInstallDir != NULL; 
 	bool needIniPath = pIniPath != NULL;
 
-	TCHAR pathBuf[ MAX_PATH + 1 ] = _T("");
+	WCHAR pathBuf[ MAX_PATH + 1 ] = L"";
 
 	HKEY hRegRoots[] = { HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE };
 	for( int iRoot = 0; iRoot != 2; ++iRoot )
 	{
 		RegKey reg;
-		if( reg.Open( hRegRoots[ iRoot ], _T("Software\\Ghisler\\Total Commander") ) ) 
+		if( reg.Open( hRegRoots[ iRoot ], L"Software\\Ghisler\\Total Commander" ) ) 
 		{
-			tstring instDir = reg.GetString( _T("InstallDir") );
+			wstring instDir = reg.GetString( L"InstallDir" );
 			::ExpandEnvironmentStrings( instDir.c_str(), pathBuf, MAX_PATH );
 			::PathAddBackslash( pathBuf );
 			instDir = pathBuf;
@@ -214,13 +219,13 @@ bool GetTotalCmdLocation( tstring* pInstallDir, tstring* pIniPath )
 				needInstDir = false;
 			}
 
-			tstring iniPath = reg.GetString( _T("IniFileName") ); 
+			wstring iniPath = reg.GetString( L"IniFileName" ); 
 			if( needIniPath && ! iniPath.empty() )
 			{
 				::ExpandEnvironmentStrings( iniPath.c_str(), pathBuf, MAX_PATH );
-				tstring tmpPath;
+				wstring tmpPath;
 				if( IsRelativePath( pathBuf ) )
-					tmpPath = instDir + tstring( pathBuf );
+					tmpPath = instDir + wstring( pathBuf );
 				else
 					tmpPath = pathBuf;
 				::PathCanonicalize( pathBuf, tmpPath.c_str() );
@@ -235,10 +240,10 @@ bool GetTotalCmdLocation( tstring* pInstallDir, tstring* pIniPath )
 
 	if( needIniPath )
 	{
-		TCHAR path[ MAX_PATH + 1 ] = _T("");
+		WCHAR path[ MAX_PATH + 1 ] = L"";
 		::GetWindowsDirectory( path, MAX_PATH );
 		::PathAddBackslash( path );
-		StringCbCat( path, sizeof(path), _T("wincmd.ini") );	
+		StringCbCat( path, sizeof(path), L"wincmd.ini" );	
 		if( FileExists( path ) )
 		{
 			*pIniPath = path;
@@ -253,16 +258,16 @@ bool GetTotalCmdLocation( tstring* pInstallDir, tstring* pIniPath )
 
 //-----------------------------------------------------------------------------------------------
 
-void SplitTcCommand( LPCTSTR pCmd, tstring* pToken, tstring* pArgs )
+void SplitTcCommand( LPCWSTR pCmd, wstring* pToken, wstring* pArgs )
 {
-	*pToken = _T("");
+	*pToken = L"";
 	if( pArgs )
-		*pArgs = _T("");
+		*pArgs = L"";
 
-	LPCTSTR p = _tcschr( pCmd, ' ' );
+	LPCWSTR p = wcschr( pCmd, ' ' );
 	if( p )
 	{
-		*pToken = tstring( pCmd, p - pCmd );
+		*pToken = wstring( pCmd, p - pCmd );
 		if( pArgs )
 		{
 			while( *p == ' ' ) ++p;
@@ -273,7 +278,7 @@ void SplitTcCommand( LPCTSTR pCmd, tstring* pToken, tstring* pArgs )
 
 //-----------------------------------------------------------------------------------------------
 
-bool SetTcCurrentPathesW( HWND hWndTC, LPCWSTR pPath1, LPCWSTR pPath2, DWORD flags )
+bool SetCurrentPathes( HWND hWndTC, LPCWSTR pPath1, LPCWSTR pPath2, DWORD flags )
 {
 	if( ! hWndTC )
 		hWndTC = FindTopTcWnd();
@@ -307,14 +312,102 @@ bool SetTcCurrentPathesW( HWND hWndTC, LPCWSTR pPath1, LPCWSTR pPath2, DWORD fla
 
 //-----------------------------------------------------------------------------------------------
 
-void GetPathFromTcControl( HWND hwnd, LPTSTR pPath, size_t nSize )
+void GetPathFromTcControl( HWND hwnd, LPWSTR pPath, size_t nSize )
 { 
 	pPath[ 0 ] = 0;
 	::GetWindowText( hwnd, pPath, static_cast<int>( nSize ) );
-	if( TCHAR* p = _tcsrchr( pPath, '\\' ) )
+	if( WCHAR* p = wcsrchr( pPath, '\\' ) )
 		if( p - pPath > 2 )
 			*p = 0;
 		else
 			*(++p) = 0;
 }
 
+//----------------------------------------------------------------------------------------------------
+
+bool LoadFavoritesMenu( FavMenu* items, LPCWSTR iniPath, LPCWSTR iniSection )
+{
+	items->clear();
+
+	WCHAR key[ 32 ] = L"";
+	WCHAR buf[ 1024 ] = L"";
+
+	if( ::GetPrivateProfileString( iniSection, L"RedirectSection", L"", buf, _countof( buf ), iniPath ) )
+		return false;
+
+	for( int i = 1;; ++i )
+	{
+		swprintf_s( key, L"menu%d", i );
+		if( ! ::GetPrivateProfileString( iniSection, key, L"", buf, _countof( buf ), iniPath ) )
+			break;
+
+		FavMenuItem item;
+		item.menu = wstring( buf );
+
+		swprintf_s( key, L"cmd%d", i );
+		if( ::GetPrivateProfileString( iniSection, key, L"", buf, _countof( buf ), iniPath ) )
+			item.cmd = wstring( buf );
+	
+		swprintf_s( key, L"path%d", i );
+		if( ::GetPrivateProfileString( iniSection, key, L"", buf, _countof( buf ), iniPath ) )
+			item.path = wstring( buf );
+
+		swprintf_s( key, L"param%d", i );
+		if( ::GetPrivateProfileString( iniSection, key, L"", buf, _countof( buf ), iniPath ) )
+			item.param = wstring( buf );
+
+		items->push_back( item );
+	}
+
+	return true;
+}
+
+//----------------------------------------------------------------------------------------------------
+
+bool SaveFavoritesMenu( const FavMenu& items, LPCWSTR iniPath, LPCWSTR iniSection )
+{
+	WCHAR key[ 32 ] = L"";
+	WCHAR buf[ 1024 ] = L"";
+
+	if( ::GetPrivateProfileString( iniSection, L"RedirectSection", L"", buf, _countof( buf ), iniPath ) )
+		return false;
+	
+	// Wipe out old menu.
+
+	if( ! ::WritePrivateProfileSection( iniSection, L"\0", iniPath ) )
+		return false;
+
+	// Write modified menu back.
+
+	for( size_t i = 0; i < items.size(); ++i )
+	{
+		const FavMenuItem& item = items[ i ];
+
+		swprintf_s( key, L"menu%d", i + 1 );
+		::WritePrivateProfileString( iniSection, key, item.menu.c_str(), iniPath );
+
+		if( ! item.cmd.empty() )
+		{
+			swprintf_s( key, L"cmd%d", i + 1 );
+			::WritePrivateProfileString( iniSection, key, item.cmd.c_str(), iniPath );
+		}
+
+		if( ! item.path.empty() )
+		{
+			swprintf_s( key, L"path%d", i + 1 );
+			::WritePrivateProfileString( iniSection, key, item.path.c_str(), iniPath );
+		}
+
+		if( ! item.param.empty() )
+		{
+			swprintf_s( key, L"param%d", i + 1 );
+			::WritePrivateProfileString( iniSection, key, item.path.c_str(), iniPath );
+		}
+	}
+
+	return true;
+}
+
+//----------------------------------------------------------------------------------------------------
+
+} //namespace

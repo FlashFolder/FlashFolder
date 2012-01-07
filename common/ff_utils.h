@@ -41,17 +41,14 @@ inline IShellBrowser* GetShellBrowser( HWND hwnd )
 
 bool FileDlgSetFilter( HWND hwndFileDlg, LPCWSTR filter );
 
-tstring ShellViewGetCurrentFolder( IShellBrowser *psb );
-bool ShellViewSetCurrentFolder( IShellBrowser *psb, LPCWSTR path );
+HRESULT ShellViewGetCurrentFolder( IShellBrowser *psb, SpITEMIDLIST* pidlResult );
 bool ShellViewGetViewMode( IShellBrowser *psb, FOLDERVIEWMODE* pViewMode, int* pImageSize );
 bool ShellViewSetViewMode( IShellBrowser* psb, FOLDERVIEWMODE viewMode, int imageSize );
 
-tstring ShellViewGetCurrentFolder( HWND hwnd );
-bool ShellViewSetCurrentFolder( HWND hwndFileDlg, LPCWSTR path );
+HRESULT ShellViewGetCurrentFolder( HWND hwnd, SpITEMIDLIST* pidlResult );
+HRESULT ShellViewSetCurrentFolder( HWND hwnd, PCIDLIST_ABSOLUTE folder );
 bool ShellViewGetViewMode( HWND hwnd, FOLDERVIEWMODE* pViewMode, int* pImageSize = NULL );
 bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize = -1 );
-
-size_t GetAllExplorerPathes( std::vector<tstring>* pathes );
 
 // some control ID's of common file dialog
 const unsigned FILEDLG_SHELLVIEW    = 1121;

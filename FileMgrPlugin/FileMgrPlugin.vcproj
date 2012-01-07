@@ -350,6 +350,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\ExplorerUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ExplorerUtils.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FileMgrPlugin.cpp"
 				>
 			</File>
@@ -359,6 +367,14 @@
 			</File>
 			<File
 				RelativePath=".\FileMgrPlugin.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\FileMgrPlugin_Explorer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FileMgrPlugin_TC.cpp"
 				>
 			</File>
 			<File
@@ -403,6 +419,14 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TotalCmdUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TotalCmdUtils.h"
 				>
 			</File>
 		</Filter>

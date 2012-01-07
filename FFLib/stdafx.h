@@ -49,16 +49,6 @@ using namespace std;
 #include <boost\scoped_ptr.hpp>
 #define foreach BOOST_FOREACH
 
-//--- common project files
-#include <common\_autolink.h>
-#include <common\Favorites.h>
-#include <common\ff_utils.h>
-#include <common\HistoryLst.h>
-#include <common\ProfileDefaults.h>
-#include <common\ProcessNames.h>
-#include <common\TotalCmdUtils.h>
-#include <common\PluginManager.h>
-
 //--- utilities
 #include <commonUtils\_autolink.h>
 #include <commonUtils\tstring.h>
@@ -67,6 +57,15 @@ using namespace std;
 #include <commonUtils\GdiUtils.h>
 #include <commonUtils\Profile.h>
 #include <commonUtils\Registry.h>
+#include <commonUtils\ItemIdList.h>
+
+//--- common project files
+#include <common\_autolink.h>
+#include <common\ff_utils.h>
+#include <common\HistoryLst.h>
+#include <common\ProfileDefaults.h>
+#include <common\ProcessNames.h>
+#include <common\PluginManager.h>
 
 // include after all other headers to avoid false warnings
 #include <strsafe.h>

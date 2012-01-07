@@ -420,14 +420,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\AddFavoriteDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\AddFavoriteDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\AutoPropertyPage.cpp"
 				>
 			</File>
@@ -457,14 +449,6 @@
 			</File>
 			<File
 				RelativePath=".\FFConfigDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FolderFavoritesDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FolderFavoritesDlg.h"
 				>
 			</File>
 			<File

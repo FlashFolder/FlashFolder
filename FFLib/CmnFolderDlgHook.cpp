@@ -42,7 +42,7 @@ bool CmnFolderDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 
 	m_hwndFileDlg = hwndFileDlg;
 
-	m_currentPath[ 0 ] = 0;
+	m_currentFolder.reset();
 
 	// Subclass the window proc of the file dialog.
 	m_oldWndProc = reinterpret_cast<WNDPROC>( 
@@ -63,24 +63,25 @@ bool CmnFolderDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 
 //-----------------------------------------------------------------------------------------
 
-bool CmnFolderDlgHook::SetFolder( LPCTSTR path )
+bool CmnFolderDlgHook::SetFolder( PCIDLIST_ABSOLUTE folder )
 {
-	::SendMessage( m_hwndFileDlg, BFFM_SETSELECTION, TRUE, reinterpret_cast<LPARAM>( path ) );
+	::SendMessage( m_hwndFileDlg, BFFM_SETSELECTION, FALSE, reinterpret_cast<LPARAM>( folder ) );
+	m_currentFolder = MakeSharedPidl( ILClone( folder ) );
 	return true;
 }
 
 //-----------------------------------------------------------------------------------------
 
-bool CmnFolderDlgHook::GetFolder( LPTSTR folderPath )
+SpITEMIDLIST CmnFolderDlgHook::GetFolder()
 {
-	StringCchCopy( folderPath, MAX_PATH, m_currentPath );
-	return true;
+	return m_currentFolder;
 }
 
 //-----------------------------------------------------------------------------------------
 
 bool CmnFolderDlgHook::SetFilter( LPCTSTR filter )
 {
+	// filter has no use in folder dialog
 	return true;
 }
 
@@ -89,13 +90,13 @@ bool CmnFolderDlgHook::SetFilter( LPCTSTR filter )
 
 bool CmnFolderDlgHook::UpdateCurrentPath( HWND hwndTree, HTREEITEM hItem )
 {
-	m_currentPath[ 0 ] = 0;
-
 	// Get absolute directory path by traversing the tree down 
 	// until a root directory (drive path) is found.
+	// TODO: make it work with virtual folders
 
-	TCHAR tmp[ MAX_PATH + 1 ] = _T("");
-	TCHAR textBuf[ MAX_PATH + 1 ] = _T("");
+	WCHAR path[ MAX_PATH ] = L"";
+	WCHAR tmp[ MAX_PATH ] = L"";
+	WCHAR textBuf[ MAX_PATH ] = L"";
 
 	while( hItem )
 	{
@@ -107,10 +108,10 @@ bool CmnFolderDlgHook::UpdateCurrentPath( HWND hwndTree, HTREEITEM hItem )
 
 		TreeView_GetItem( hwndTree, &item );
 
-		// check if this is the root m_currentPath
-		TCHAR* pPathPart = item.pszText;
-		TCHAR rootBuf[ 3 ] = _T("");					
-		if( TCHAR* p = _tcschr( item.pszText, ':' ) )
+		// check if this is the root path
+		WCHAR* pPathPart = item.pszText;
+		WCHAR rootBuf[ 3 ] = L"";					
+		if( WCHAR* p = wcschr( item.pszText, ':' ) )
 		{
 			if( p != item.pszText )
 			{
@@ -120,16 +121,18 @@ bool CmnFolderDlgHook::UpdateCurrentPath( HWND hwndTree, HTREEITEM hItem )
 			}
 		}
 
-		StringCbCopy( tmp, sizeof(tmp), m_currentPath );
-		StringCchCopy( m_currentPath, MAX_PATH, pPathPart );
-		StringCchCat( m_currentPath, MAX_PATH, _T("\\") );
-		StringCchCat( m_currentPath, MAX_PATH, tmp );
+		wcscpy_s( tmp, path );
+		wcscpy_s( path, pPathPart );
+		wcscpy_s( path, L"\\" );
+		wcscpy_s( path, tmp );
 
 		if( pPathPart == rootBuf )
 			break;
 
 		hItem = TreeView_GetParent( hwndTree, hItem );
 	}
+
+	GetPidlFromPath( &m_currentFolder, path );
 
 	return true;
 }

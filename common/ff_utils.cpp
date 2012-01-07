@@ -18,7 +18,6 @@
  */
 
 #include <stdafx.h>
-
 #include "ff_utils.h"
 
 #ifdef _DEBUG
@@ -218,55 +217,31 @@ bool FileDlgSetFilter( HWND hwndFileDlg, LPCWSTR filter )
 
 //-----------------------------------------------------------------------------------------
 
-bool ShellViewSetCurrentFolder( IShellBrowser* psb, LPCWSTR path )
-{	
-	if( ! DirectoryExists( path ) )
-		return false;
-
-	bool res = false;
-
-	CComPtr<IShellFolder> pDesktopFolder;
-	if( FAILED( ::SHGetDesktopFolder( &pDesktopFolder ) ) )
-		return false;
-		
-	LPITEMIDLIST pidl;
-	if( FAILED( pDesktopFolder->ParseDisplayName( NULL, NULL, const_cast<LPWSTR>( path ), NULL, &pidl, NULL ) ) )
-		return false;
-
-	HRESULT hr = psb->BrowseObject( pidl, SBSP_DEFBROWSER | SBSP_ABSOLUTE );
-	if( FAILED( hr ) )
-		DebugOut( L"ShellViewSetCurrentFolder failed, hr = %08X\n", hr );
-	::CoTaskMemFree( pidl );
-
-	return SUCCEEDED( hr );
-}
-
-//-----------------------------------------------------------------------------------------
-
-tstring ShellViewGetCurrentFolder( IShellBrowser* psb )
+HRESULT ShellViewGetCurrentFolder( IShellBrowser* psb, SpITEMIDLIST* pidlResult )
 {
+	pidlResult->reset();
+
 	CComPtr< IShellView > psv;
-	if( FAILED( psb->QueryActiveShellView( &psv ) ) )
-		return L"";
+	HRESULT hr = psb->QueryActiveShellView( &psv );
+	if( FAILED( hr ) )	
+		return hr;
 		
 	CComQIPtr< IFolderView > pfv( psv );
 	if( ! pfv )
-		return L"";
+		return E_FAIL;
 		 
 	CComPtr< IPersistFolder2 > ppf2;
-	if( FAILED( pfv->GetFolder( IID_IPersistFolder2, (void**) &ppf2 ) ) )
-		return L"";
+	hr = pfv->GetFolder( IID_IPersistFolder2, (void**) &ppf2 );
+	if( FAILED( hr ) )
+		return hr;
 		
-	LPITEMIDLIST pidlFolder;
-	if( SUCCEEDED( ppf2->GetCurFolder( &pidlFolder ) ) ) 
-	{
-		WCHAR path[ MAX_PATH ] = L"";
-		BOOL success = ::SHGetPathFromIDList( pidlFolder, path );
-		::CoTaskMemFree( pidlFolder );
-		return success ? path : L"";
-	}
-	
-	return L"";
+	LPITEMIDLIST pidl = NULL;
+	hr = ppf2->GetCurFolder( &pidl );
+	if( FAILED( hr ) )
+		return hr;
+
+	*pidlResult = MakeSharedPidl( pidl );
+	return S_OK;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -332,20 +307,20 @@ bool ShellViewSetViewMode( IShellBrowser* psb, FOLDERVIEWMODE viewMode, int imag
 
 //-----------------------------------------------------------------------------------------
 
-tstring ShellViewGetCurrentFolder( HWND hwnd )
+HRESULT ShellViewGetCurrentFolder( HWND hwnd, SpITEMIDLIST* pidlResult )
 {
 	if( IShellBrowser *psb = GetShellBrowser( hwnd ) )
-		return ShellViewGetCurrentFolder( psb );
-	return L"";
+		return ShellViewGetCurrentFolder( psb, pidlResult );
+	return E_FAIL;
 }
 
 //-----------------------------------------------------------------------------------------
 
-bool ShellViewSetCurrentFolder( HWND hwnd, LPCWSTR path )
+HRESULT ShellViewSetCurrentFolder( HWND hwnd, PCIDLIST_ABSOLUTE folder )
 {	
 	if( IShellBrowser *psb = GetShellBrowser( hwnd ) )
-		return ShellViewSetCurrentFolder( psb, path );
-	return false;
+		return psb->BrowseObject( folder, SBSP_DEFBROWSER | SBSP_ABSOLUTE );
+	return E_FAIL;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -366,48 +341,3 @@ bool ShellViewSetViewMode( HWND hwnd, FOLDERVIEWMODE viewMode, int imageSize )
 	return false;
 }
 
-//-----------------------------------------------------------------------------------------
-
-size_t GetAllExplorerPathes( std::vector<tstring>* pathes )
-{
-	DebugOut( L"[fflib] GetAllExplorerPathes()" );
-	pathes->clear();
-
-	CComPtr< IShellWindows > shellWnds;
-	if( FAILED( shellWnds.CoCreateInstance( CLSID_ShellWindows ) ) )
-		return 0;
-
-	long count = 0;
-	shellWnds->get_Count( &count );
-	DebugOut( L"[fflib] shell window count: %d", count );
-
-	for( int i = 0; i < count; ++i )
-	{
-		CComVariant vi( i );
-		CComPtr< IDispatch > disp;
-		if( FAILED( shellWnds->Item( vi, &disp  ) ) )
-			break;
-
-		if( ! disp )
-			// Skip - this shell window was registered with a NULL IDispatch
-			continue;
-
-		CComQIPtr< IWebBrowserApp > app( disp );
-		if( ! app )
-			break;
-
-		CComQIPtr< IServiceProvider > psp( app );
-		if( ! psp )
-			break;
-
-		CComPtr< IShellBrowser > browser;
-		if( FAILED( psp->QueryService( SID_STopLevelBrowser, &browser ) ) )
-			break;
-		
-		tstring path = ShellViewGetCurrentFolder( browser );
-		if( path != L"" )
-			pathes->push_back( path );
-	}
-	
-	return pathes->size();	
-}

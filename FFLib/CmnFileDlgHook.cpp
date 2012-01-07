@@ -90,22 +90,30 @@ void CmnFileDlgHook::Uninstall()
 
 //-----------------------------------------------------------------------------------------
 
-bool CmnFileDlgHook::SetFolder( LPCTSTR path )
+bool CmnFileDlgHook::SetFolder( PCIDLIST_ABSOLUTE folder )
 {
-	if( ShellViewSetCurrentFolder( m_hwndFileDlg, path ) )
+	if( IShellBrowser *psb = GetShellBrowser( m_hwndFileDlg ) )
 	{
-		m_folderPath = path;
-		return true;
+		HRESULT hr = psb->BrowseObject( folder, SBSP_DEFBROWSER | SBSP_ABSOLUTE );
+		if( SUCCEEDED( hr ) )
+		{
+			m_currentFolder = MakeSharedPidl( ::ILClone( folder ) );
+			return true;
+		}
+
+		DebugOut( L"IShellBrowser::BrowseObject failed, hr = %08X", hr );
+		return false;			
 	}
+
+	DebugOut( L"Failed to get IShellBrowser" );
 	return false;
 }
 
 //-----------------------------------------------------------------------------------------
 
-bool CmnFileDlgHook::GetFolder( LPTSTR folderPath )
+SpITEMIDLIST CmnFileDlgHook::GetFolder()
 {
-	wcscpy_s( folderPath, MAX_PATH, m_folderPath.c_str() );
-	return true;
+	return m_currentFolder;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -297,7 +305,7 @@ void CmnFileDlgHook::InitShellWnd()
 			ShellViewSetViewMode( m_pShellBrowser, m_shellViewMode, m_shellViewImageSize );
 			
 			// Cache path of current folder so it will be available even after the shellview is destroyed.
-			m_folderPath = ShellViewGetCurrentFolder( m_pShellBrowser );
+			ShellViewGetCurrentFolder( m_pShellBrowser, &m_currentFolder );
 		}
 
 		// hook the shell window to get notified of view mode changes
@@ -408,9 +416,10 @@ void CmnFileDlgHook::ResizeNonResizableFileDialog( int x, int y, int newWidth, i
 		   fdm.rcList.bottom - fdm.rcList.top + fdm.dy, 
 		   SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 
-	//force size update of the listview:
-	tstring folderPath = ShellViewGetCurrentFolder( m_hwndFileDlg );
-	ShellViewSetCurrentFolder( m_hwndFileDlg, folderPath.c_str() );
+	//force size update of the listview
+	SpITEMIDLIST folder;
+	if( SUCCEEDED( ShellViewGetCurrentFolder( m_hwndFileDlg, &folder ) ) )
+		ShellViewSetCurrentFolder( m_hwndFileDlg, folder.get() );
 }
 
 //-----------------------------------------------------------------------------------------

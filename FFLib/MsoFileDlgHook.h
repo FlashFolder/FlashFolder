@@ -42,8 +42,8 @@ public:
 
 	// overridings of FileDlgHook_base
 	virtual bool Init( HWND hwndFileDlg, HWND hWndTool );
-	virtual bool SetFolder( LPCTSTR path );
-	virtual bool GetFolder( LPTSTR folderPath );
+	virtual bool SetFolder( PCIDLIST_ABSOLUTE folder );
+	virtual SpITEMIDLIST GetFolder();
 	virtual bool SetFilter( LPCTSTR filter );
 	virtual void OnTimer();
 
@@ -61,7 +61,7 @@ private:
 	bool m_isWindowActive;
 	bool m_fileDialogCanceled;
 	bool m_initDone;
-	TCHAR m_currentDir[ MAX_PATH + 1 ];
+	SpITEMIDLIST m_currentFolder;
 	UINT m_wmObjectSel;
 	HHOOK m_hKeyboardHook;
 

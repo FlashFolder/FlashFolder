@@ -11,7 +11,8 @@ void FavMenu_DisplayForFileDialog( HWND hFileDialog, HWND hToolWnd, FileDlgHook_
 void FavMenu_StartEditor( HWND hWndParent );
 
 /// Add folder to favorites menu.
-void FavMenu_AddDir( HWND hwndParent, const PluginManager& pluginMgr, const Profile& profile, LPCTSTR path );
+void FavMenu_AddFolder( HWND hwndParent, const PluginManager& pluginMgr, const Profile& profile,
+                        LPCWSTR displayName, PCIDLIST_ABSOLUTE folder );
 
 /// Show a menu with the current folders of the application and other file managers.
 void DisplayMenu_OpenDirs( HWND hFileDialog, HWND hToolWnd, FileDlgHook_base* fileDlgHook, 

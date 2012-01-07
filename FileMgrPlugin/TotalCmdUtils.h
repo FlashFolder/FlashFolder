@@ -18,17 +18,16 @@
  */          
 #pragma once
 
-#include <windows.h>
-#include <tchar.h>
-#include <commonUtils\tstring.h>
+namespace totalcmdutils
+{
 
 //-------------------------------------------------------------------------------------------------
 /// \brief Class to get information from a running Total Commander instance.
 
-class CTotalCmdUtils
+class TcInstance
 {
 public:
-    CTotalCmdUtils( HWND hwndTotalCmd = NULL ) { SetTCmdWnd( hwndTotalCmd ); }
+    TcInstance( HWND hwndTotalCmd = NULL ) { SetTCmdWnd( hwndTotalCmd ); }
     void SetTCmdWnd( HWND hwndTotalCmd ); 
     
     HWND GetTCmdWnd() const { return m_hwnd; }
@@ -37,15 +36,15 @@ public:
 	HWND GetActivePathWnd()  const { return m_hwndActive; }
 
 	bool IsLeftDirActive() const; 
-    bool GetDirs( LPTSTR pLeftDir = NULL, unsigned leftDirLen = 0, 
-                  LPTSTR pRightDir = NULL, unsigned rightDirLen = 0 ) const;
-	bool GetActiveDir( LPTSTR pDir, unsigned len ) const;
+    bool GetDirs( LPWSTR pLeftDir = NULL, unsigned leftDirLen = 0, 
+                  LPWSTR pRightDir = NULL, unsigned rightDirLen = 0 ) const;
+	bool GetActiveDir( LPWSTR pDir, unsigned len ) const;
 	
 private:
-    struct CFindSubWindowsData
+    struct FindSubWindowsData
     {
-        CTotalCmdUtils* m_thisptr;
-		CFindSubWindowsData() : m_thisptr( NULL ) {}
+        TcInstance* m_thisptr;
+		FindSubWindowsData() : m_thisptr( NULL ) {}
     };
 
 private:
@@ -61,12 +60,12 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 /// \brief Get install-directory and path of .INI-file of Total Commander
-bool GetTotalCmdLocation( tstring* pInstallDir = NULL, tstring* pIniPath = NULL );
+bool GetTotalCmdLocation( std::wstring* pInstallDir = NULL, std::wstring* pIniPath = NULL );
 
 /// Split a TC command
-void SplitTcCommand( LPCTSTR pCmd, tstring* pToken, tstring* pArgs = NULL );
+void SplitTcCommand( LPCWSTR pCmd, std::wstring* pToken, std::wstring* pArgs = NULL );
 
-/// Bit flags for SetTcCurrentPathes()
+/// Bit flags for SetCurrentPathes()
 enum 
 {
 	STC_SOURCE_AND_TARGET = 0x0001,
@@ -74,7 +73,7 @@ enum
 };
 
 /// Set current TC pathes
-bool SetTcCurrentPathesW( HWND hWndTC, LPCWSTR pPath1, LPCWSTR pPath2, DWORD flags = 0 );
+bool SetCurrentPathes( HWND hWndTC, LPCWSTR pPath1, LPCWSTR pPath2, DWORD flags = 0 );
 
 /// Get HWND of TC that is topmost in z-order
 HWND FindTopTcWnd( bool currentThreadOnly = false );
@@ -83,5 +82,26 @@ HWND FindTopTcWnd( bool currentThreadOnly = false );
 bool IsTcPathControl( HWND hwnd );
 
 /// Get the directory path from a TC path control (strips backslash and filter)
-void GetPathFromTcControl( HWND hwnd, LPTSTR pPath, size_t nSize ); 
+void GetPathFromTcControl( HWND hwnd, LPWSTR pPath, size_t nSize ); 
 
+//----------------------------------------------------------------------------------------------------
+
+/// TC folder favorites menu item.
+struct FavMenuItem { std::wstring menu, cmd, path, param; };
+
+/// TC folder favorites menu.
+typedef std::vector< FavMenuItem > FavMenu;
+
+/// Load the folder favorites or the starter menu from a TC INI file.
+/// Note: RedirectSection key is currently not supported.
+bool LoadFavoritesMenu( FavMenu* items, LPCWSTR iniPath, LPCWSTR iniSection = L"DirMenu" );
+
+/// Save the folder favorites or the starter menu to a TC INI file, replacing all previous menu items
+/// of the given section.
+/// Note: RedirectSection key is currently not supported. The INI file will not be changed if 
+/// a RedirectSection key is encountered.
+bool SaveFavoritesMenu( const FavMenu& items, LPCWSTR iniPath, LPCWSTR iniSection = L"DirMenu" );
+
+//----------------------------------------------------------------------------------------------------
+
+}; //namespace

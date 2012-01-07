@@ -1,4 +1,20 @@
-
+/* This file is part of FlashFolder. 
+ * Copyright (C) 2007 zett42 ( zett42 at users.sourceforge.net ) 
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 #include "StdAfx.h"
 #include "PluginManager.h"
 
@@ -46,7 +62,7 @@ PluginManager::PluginManager( HINSTANCE hInst, UINT flags ) :
 			Plugin plugin;
 			plugin.name = pluginFinder.GetFileName();
 
-			plugin.fnFlashFolderPluginInit = reinterpret_cast<P_FlashFolderPluginInit>(
+			plugin.fnFlashFolderPluginInit = reinterpret_cast<ffplug::P_FlashFolderPluginInit>(
 				::GetProcAddress( module, "FlashFolderPluginInit" ) );
 			if( ! plugin.fnFlashFolderPluginInit )
 			{
@@ -62,15 +78,15 @@ PluginManager::PluginManager( HINSTANCE hInst, UINT flags ) :
 				continue;
 			}
 
-			plugin.fnEnumSupportedFileManagers = reinterpret_cast<P_EnumSupportedFileManagers>(
+			plugin.fnEnumSupportedFileManagers = reinterpret_cast<ffplug::P_EnumSupportedFileManagers>(
 				::GetProcAddress( module, "EnumSupportedFileManagers" ) );
-			plugin.fnEnumFavorites = reinterpret_cast<P_EnumFavorites>(
+			plugin.fnEnumFavorites = reinterpret_cast<ffplug::P_EnumFavorites>(
 				::GetProcAddress( module, "EnumFavorites" ) );
-			plugin.fnAddFavoriteFolder = reinterpret_cast<P_AddFavoriteFolder>(
+			plugin.fnAddFavoriteFolder = reinterpret_cast<ffplug::P_AddFavoriteFolder>(
 				::GetProcAddress( module, "AddFavoriteFolder" ) );
-			plugin.fnStartFavoritesEditor = reinterpret_cast<P_StartFavoritesEditor>(
+			plugin.fnStartFavoritesEditor = reinterpret_cast<ffplug::P_StartFavoritesEditor>(
 				::GetProcAddress( module, "StartFavoritesEditor" ) );
-			plugin.fnEnumCurrentFolders = reinterpret_cast<P_EnumCurrentFolders>(
+			plugin.fnEnumCurrentFolders = reinterpret_cast<ffplug::P_EnumCurrentFolders>(
 				::GetProcAddress( module, "EnumCurrentFolders" ) );
 
 			plugin.handle = module.Detach();
@@ -155,7 +171,7 @@ PluginManager::FileMgrs PluginManager::GetSupportedFileManagers() const
 
 //----------------------------------------------------------------------------------------------------
 
-bool PluginManager::GetFavMenu( LPCWSTR pluginName, LPCWSTR programId, PluginManager::FavMenuItems* result ) const
+bool PluginManager::GetFavMenu( LPCWSTR pluginName, LPCWSTR programId, FavoriteItems* result ) const
 {
 	::SetLastError( ERROR_SUCCESS );
 	result->clear();
@@ -177,11 +193,16 @@ bool PluginManager::GetFavMenu( LPCWSTR pluginName, LPCWSTR programId, PluginMan
 
 	for( UINT i = 0; i < 500; ++i )
 	{
-		FavMenuItem menuItem = { 0 };
+		ffplug::FavMenuItem menuItem = { 0 };
 		if( ! plugin.fnEnumFavorites( programId, i, &menuItem ) )
 			break;
 
-		result->push_back( menuItem );
+		FavoriteItem item;
+		item.displayName = menuItem.displayName;
+		item.type = menuItem.type;
+		item.folder = MakeSharedPidl( menuItem.pidlFolder );
+
+		result->push_back( item );
 	}
 
 	return true;
@@ -190,7 +211,7 @@ bool PluginManager::GetFavMenu( LPCWSTR pluginName, LPCWSTR programId, PluginMan
 //----------------------------------------------------------------------------------------------------
 
 bool PluginManager::AddFavMenuItem( 
-	LPCWSTR pluginName, LPCWSTR programId, LPCWSTR displayName, LPCWSTR folder ) const
+	LPCWSTR pluginName, LPCWSTR programId, LPCWSTR displayName, PCIDLIST_ABSOLUTE folder ) const
 {
 	::SetLastError( ERROR_SUCCESS );
 
@@ -239,16 +260,16 @@ PluginManager::CurrentFolders PluginManager::GetCurrentFolders() const
 
 			for( UINT i = 0; i < 50; ++i )
 			{
-				FileMgrFolders folders = { 0 };
+				ffplug::FileMgrFolders folders = { 0 };
 				if( ! plugin.fnEnumCurrentFolders( fm.program.id, i, &folders ) )
 					break;
 
-				resultItem.folder = wstring( folders.folder );
+				resultItem.folder = MakeSharedPidl( folders.pidlFolder );
 				result.push_back( resultItem );
 
-				if( folders.folder2[ 0 ] != 0 )
+				if( folders.pidlFolder2 )
 				{
-					resultItem.folder = wstring( folders.folder2 );
+					resultItem.folder = MakeSharedPidl( folders.pidlFolder2 );
 					result.push_back( resultItem );
 				}
 			}

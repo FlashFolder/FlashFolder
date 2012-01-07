@@ -76,8 +76,5 @@
 #include <commonUtils\GdiUtils.h>
 #include <commonUtils\FileFinder.h>
 #include <commonUtils\Module.h>
-
-//--- common headers
-
-#include <common\TotalCmdUtils.h>
+#include <commonUtils\ItemIdList.h>
 

@@ -4,7 +4,37 @@
 #include "utils.h"
 #include "resource.h"
 
-//-----------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+
+void NavigateToFolder( HWND hToolWnd, FileDlgHook_base* fileDlgHook, PCIDLIST_ABSOLUTE folder )
+{
+	PCIDLIST_ABSOLUTE folderToNavigate = NULL;
+	SpITEMIDLIST newFolder;
+	tstring existingPath;
+	WCHAR path[ MAX_PATH ] = L"";
+
+	if( ::SHGetPathFromIDList( folder, path ) )
+	{
+		// If file system folder does not exist anymore, get first existing ancestor folder.
+		existingPath = GetExistingDirOrParent( path );
+		if( ! existingPath.empty() && SUCCEEDED( GetPidlFromPath( &newFolder, existingPath.c_str() ) ) )
+			folderToNavigate = newFolder.get();
+	}
+	else
+	{
+		folderToNavigate = folder;	
+	}
+
+	if( folderToNavigate )
+	{
+		if( ! existingPath.empty() )
+			SetDlgItemText( hToolWnd, ID_FF_PATH, existingPath.c_str() );
+
+		fileDlgHook->SetFolder( folder );
+	}	
+}
+
+//----------------------------------------------------------------------------------------------------
 
 HMENU CreateFolderMenu( const std::vector<tstring> &folderList, HMENU hMenu )
 {
@@ -24,43 +54,43 @@ HMENU CreateFolderMenu( const std::vector<tstring> &folderList, HMENU hMenu )
 
 //----------------------------------------------------------------------------------------------------
 
-void FavMenu_Create( HMENU hMenu, const PluginManager::FavMenuItems& favs, size_t& iItem )
+void FavMenu_Create( HMENU hMenu, const PluginManager::FavoriteItems& favs, size_t& iItem )
 {
 	while( iItem < favs.size() )
 	{
-		const FavMenuItem& fav = favs[ iItem ];
+		const PluginManager::FavoriteItem& fav = favs[ iItem ];
 		++iItem;
 		
 		switch( fav.type )
 		{
-			case FavMenuItem::T_SUBMENU_END:
+			case ffplug::FavMenuItem::T_SUBMENU_END:
 			{
 				// return from recursion
 				return;
 			}
 
-			case FavMenuItem::T_SUBMENU:
+			case ffplug::FavMenuItem::T_SUBMENU:
 			{
 				// insert submenu recursively
 
 				HMENU hSubMenu = ::CreatePopupMenu();
 				::AppendMenu( hMenu, MF_POPUP | MF_STRING, reinterpret_cast<UINT_PTR>( hSubMenu ),
-				              fav.displayName );
+				              fav.displayName.c_str() );
 
 				FavMenu_Create( hSubMenu, favs, iItem );
 
 				break;
 			}
 
-			case FavMenuItem::T_SEPARATOR:
+			case ffplug::FavMenuItem::T_SEPARATOR:
 			{
 				::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
 				break;
 			}
 
-			case FavMenuItem::T_FOLDER_FAVORITE:
+			case ffplug::FavMenuItem::T_FOLDER_FAVORITE:
 			{
-				::AppendMenu( hMenu, MF_STRING, iItem, fav.displayName );
+				::AppendMenu( hMenu, MF_STRING, iItem, fav.displayName.c_str() );
 				break;
 			}
 		}
@@ -69,7 +99,7 @@ void FavMenu_Create( HMENU hMenu, const PluginManager::FavMenuItems& favs, size_
 
 //-----------------------------------------------------------------------------------------------
 
-int FavMenu_Display( HWND hWndParent, int x, int y, const PluginManager::FavMenuItems& favs )
+int FavMenu_Display( HWND hWndParent, int x, int y, const PluginManager::FavoriteItems& favs )
 {
     HMENU hMenu = ::CreatePopupMenu();
 	size_t iItem = 0;
@@ -99,7 +129,7 @@ void FavMenu_DisplayForFileDialog( HWND hFileDialog, HWND hToolWnd, FileDlgHook_
 	tstring pluginName = profile.GetString( L"FileManager", L"FavoritesSrc.PluginName" );
 	tstring programId = profile.GetString( L"FileManager", L"FavoritesSrc.ProgramId" );
 
-	PluginManager::FavMenuItems favMenu;
+	PluginManager::FavoriteItems favMenu;
 	if( ! pluginMgr.GetFavMenu( pluginName.c_str(), programId.c_str(), &favMenu ) )
 	{
 		WCHAR msg[ 200 ];
@@ -117,36 +147,51 @@ void FavMenu_DisplayForFileDialog( HWND hFileDialog, HWND hToolWnd, FileDlgHook_
 
 	int id = FavMenu_Display( hToolWnd, rc.left, rc.bottom, favMenu );
 
+	// SetForegroundWindow is convenient for the user and can be required
+	// to manipulate MSO file dialogs (since input is simulated to navigate to new folder).
+	SetForegroundWindow( hFileDialog );
+
+	CComPtr< IShellFolder > desktopFolder;
+	::SHGetDesktopFolder( &desktopFolder );
+
 	//--- execute selected command
 
 	if( id == 1000 )
 	{
-		TCHAR path[ MAX_PATH + 1 ];
-		if( fileDlgHook->GetFolder( path ) )
-			FavMenu_AddDir( hFileDialog, pluginMgr, profile, path );
+		// Add folder to favorites.
+
+		if( SpITEMIDLIST folder = fileDlgHook->GetFolder() )
+		{
+			// TODO BEGIN: show dialog to get menu item name from user
+			
+			WCHAR displayName[ MAX_PATH ] = L"";
+			CComPtr< IShellFolder > parentFolder;
+			LPCITEMIDLIST lastPidl = NULL;
+			if( SUCCEEDED( ::SHBindToParent( folder.get(), IID_IShellFolder, (void**) &parentFolder, &lastPidl ) ) )
+			{
+				STRRET str = { 0 };
+				if( SUCCEEDED( parentFolder->GetDisplayNameOf( lastPidl, SHGDN_NORMAL, &str ) ) )
+					StrRetToBuf( &str, lastPidl, displayName, _countof( displayName ) );
+			}
+
+			// TODO END
+
+			if( wcslen( displayName ) )
+				FavMenu_AddFolder( hFileDialog, pluginMgr, profile, displayName, folder.get() );
+		}
 	}
 	else if( id == 1001 )
 	{
+		// Start favorites editor.
+
 //		FavMenu_StartEditor( hFileDialog );
 	}
 	else if( id > 0 )
 	{
-		//--- execute favorites menu item
+		// Navigate to new folder.
 
-		const FavMenuItem& fav = favMenu[ id - 1 ];
-
-		tstring path = GetExistingDirOrParent( fav.folder );
-		if( ! path.empty() )
-			if( DirectoryExists( path.c_str() ) )
-			{
-				SetDlgItemText( hToolWnd, ID_FF_PATH, path.c_str() );
-			
-				SetForegroundWindow( hFileDialog );
-				fileDlgHook->SetFolder( path.c_str() );
-			}
-	}		
-
-	SetForegroundWindow( hFileDialog );
+		NavigateToFolder( hToolWnd, fileDlgHook, favMenu[ id - 1 ].folder.get() );
+	}
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -164,12 +209,13 @@ void FavMenu_StartEditor( HWND hWndParent )
 */
 //-----------------------------------------------------------------------------------------------
 
-void FavMenu_AddDir( HWND hwndParent, const PluginManager& pluginMgr, const Profile& profile, LPCTSTR path )
+void FavMenu_AddFolder( HWND hwndParent, const PluginManager& pluginMgr, const Profile& profile,
+                        LPCWSTR displayName, PCIDLIST_ABSOLUTE folder )
 {
 	tstring pluginName = profile.GetString( L"FileManager", L"FavoritesSrc.PluginName" );
 	tstring programId = profile.GetString( L"FileManager", L"FavoritesSrc.ProgramId" );
 
-	if( ! pluginMgr.AddFavMenuItem( pluginName.c_str(), programId.c_str(), path, path ) )
+	if( ! pluginMgr.AddFavMenuItem( pluginName.c_str(), programId.c_str(), displayName, folder ) )
 	{
 		WCHAR msg[ 200 ];
 		swprintf_s( msg, L"The folder could not be added to the favorites menu.\n\n"
@@ -212,14 +258,9 @@ int DisplayFolderMenu( HWND hFileDialog, HWND hToolWnd, FileDlgHook_base* fileDl
 
 		if( IsFilePath( pPath ) )
         {
-			tstring existingDir = GetExistingDirOrParent( pPath );
-			if( ! existingDir.empty() )
-			{ 
-				SetDlgItemText( hToolWnd, ID_FF_PATH, existingDir.c_str() );
-			
-				SetForegroundWindow( hFileDialog );
-				fileDlgHook->SetFolder( existingDir.c_str() );
-			}
+			SpITEMIDLIST folder;
+			if( SUCCEEDED( GetPidlFromPath( &folder, pPath ) ) )
+				NavigateToFolder( hToolWnd, fileDlgHook, folder.get() );
         }
 	}
 
@@ -238,13 +279,19 @@ void DisplayMenu_OpenDirs( HWND hFileDialog, HWND hToolWnd, FileDlgHook_base* fi
 	PluginManager::CurrentFolders folders = pluginMgr.GetCurrentFolders();
 
 	UINT menuId = 2000;
+	bool hasItems = false;
 	foreach( const PluginManager::CurrentFolder& folder, folders )
 	{
-		wstring s = wstring( L"[" ) + folder.programShortName + L"] " + folder.folder;
-		::AppendMenu( hMenu, MF_STRING, menuId++, s.c_str() );
+		WCHAR pidlPath[ MAX_PATH ] = L"";
+		if( ::SHGetPathFromIDList( folder.folder.get(), pidlPath ) )
+		{
+			wstring s = wstring( L"[" ) + folder.programShortName + L"] " + pidlPath;
+			::AppendMenu( hMenu, MF_STRING, menuId++, s.c_str() );
+			hasItems = true;
+		}
 	}
 
-	if( ! folders.empty() )
+	if( hasItems )
 		::AppendMenu( hMenu, MF_SEPARATOR, 0, NULL );
 
 	//--- add application dir
@@ -268,15 +315,18 @@ void DisplayMenu_OpenDirs( HWND hFileDialog, HWND hToolWnd, FileDlgHook_base* fi
 
 void AddCurrentFolderToHistory( FileDlgHook_base* fileDlgHook, Profile* profile )
 {
-    WCHAR folderPath[ MAX_PATH ] = L"";
-	if( ! fileDlgHook->GetFolder( folderPath ) )
-		return;
-
-	HistoryLst history;
-	history.LoadFromProfile( *profile, L"GlobalFolderHistory" );
-	history.SetMaxEntries( profile->GetInt( L"main", L"MaxGlobalHistoryEntries" ) );
-	history.AddFolder( folderPath );
-	history.SaveToProfile( *profile, L"GlobalFolderHistory" );
+	if( SpITEMIDLIST folder = fileDlgHook->GetFolder() )
+	{
+	    WCHAR folderPath[ MAX_PATH ] = L"";
+		if( ::SHGetPathFromIDList( folder.get(), folderPath ) )
+		{
+			HistoryLst history;
+			history.LoadFromProfile( *profile, L"GlobalFolderHistory" );
+			history.SetMaxEntries( profile->GetInt( L"main", L"MaxGlobalHistoryEntries" ) );
+			history.AddFolder( folderPath );
+			history.SaveToProfile( *profile, L"GlobalFolderHistory" );
+		}
+	}
 }
 
 //----------------------------------------------------------------------------------------
@@ -291,9 +341,9 @@ void GotoLastDir( HWND hFileDialog, HWND hToolWnd, FileDlgHook_base* fileDlgHook
 
 	SetDlgItemText( hToolWnd, ID_FF_PATH, history.GetList().front().c_str() );
 
-	wstring path = GetExistingDirOrParent( history.GetList().front().c_str() );
-	if( ! path.empty() )
-		fileDlgHook->SetFolder( path.c_str() );
+	SpITEMIDLIST folder;
+	if( SUCCEEDED( GetPidlFromPath( &folder, history.GetList().front().c_str() ) ) )
+		fileDlgHook->SetFolder( folder.get() );
 }
 
 //-----------------------------------------------------------------------------------------
