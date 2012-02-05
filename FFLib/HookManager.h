@@ -14,25 +14,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  */
-
 #pragma once
 
-#include "..\common\defines.h"
+#include "HookBase.h"
 
-extern RegistryProfile g_profile;
-
-// Interface for FileDlgHookBase derivates to forward messages to 
-// the FlashFolder UI.
-
-namespace FileDlgHookCallbacks
+class HookManager
 {
-	void OnInitDone();
-	void OnFolderChange();
-    void OnResize();
-	void OnEnable( bool bEnable );
-	void OnShow( bool bShow );
-	void OnActivate( WPARAM wParam, LPARAM lParam );
-	void OnDestroy( bool isOkBtnPressed );
-	void SetTimer( DWORD interval );
+public:
+
+private:
+
 };
+
+void AddCurrentFolderToHistory( const FileDlgHookBase& fileDlgHook );

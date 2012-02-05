@@ -16,7 +16,6 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "stdafx.h"
-
 #include "fflib.h"
 #include "CmnFileDlgHook.h"
 
@@ -80,16 +79,6 @@ bool CmnFileDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 
 //-----------------------------------------------------------------------------------------
 
-void CmnFileDlgHook::Uninstall()
-{
-	::RemoveWindowSubclass( m_shellWnd, HookShellWndProc, 0 );
-	::RemoveWindowSubclass( m_hwndFileDlg, HookWindowProc, 0 );
-	
-	Reset();
-}
-
-//-----------------------------------------------------------------------------------------
-
 bool CmnFileDlgHook::SetFolder( PCIDLIST_ABSOLUTE folder )
 {
 	if( IShellBrowser *psb = GetShellBrowser( m_hwndFileDlg ) )
@@ -111,7 +100,7 @@ bool CmnFileDlgHook::SetFolder( PCIDLIST_ABSOLUTE folder )
 
 //-----------------------------------------------------------------------------------------
 
-SpITEMIDLIST CmnFileDlgHook::GetFolder()
+SpITEMIDLIST CmnFileDlgHook::GetFolder() const
 {
 	return m_currentFolder;
 }

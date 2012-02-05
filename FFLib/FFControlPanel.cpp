@@ -46,7 +46,7 @@ LONG CALLBACK CPlApplet( HWND hwndCPl, UINT uMsg, LPARAM lParam1, LPARAM lParam2
 			// Create command for starting FFConfig in same directory as this DLL.
 			TCHAR cmd[ 4096 ] = L"";
 			TCHAR cplDir[ 4096 ] = L"";
-			::GetModuleFileName( g_hInstDll, cplDir, _countof( cplDir ) );
+			::GetModuleFileName( _AtlBaseModule.GetModuleInstance(), cplDir, _countof( cplDir ) );
 			::PathRemoveFileSpec( cplDir );
 			wcscpy_s( cmd, L"\"" );
 			wcscat_s( cmd, cplDir );

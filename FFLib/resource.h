@@ -3,7 +3,6 @@
 // Used by fflib.rc
 //
 #define IDI_FOLDER                      106
-#define IDD_DIALOG1                     111
 #define IDD_TOOLWND                     111
 #define IDB_BITMAP1                     112
 #define ID_FF_TOOLBAR_XP                112

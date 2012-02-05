@@ -218,7 +218,7 @@ bool MsoFileDlgHook::SetFolder( PCIDLIST_ABSOLUTE folder )
 
 //-----------------------------------------------------------------------------------------
 
-SpITEMIDLIST MsoFileDlgHook::GetFolder()
+SpITEMIDLIST MsoFileDlgHook::GetFolder() const
 {
 	return m_currentFolder;	
 }

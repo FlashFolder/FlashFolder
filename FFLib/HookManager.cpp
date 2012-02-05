@@ -14,25 +14,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  */
+#include "StdAfx.h"
+#include "fflib.h"
+#include "HookManager.h"
 
-#pragma once
-
-#include "..\common\defines.h"
-
-extern RegistryProfile g_profile;
-
-// Interface for FileDlgHookBase derivates to forward messages to 
-// the FlashFolder UI.
-
-namespace FileDlgHookCallbacks
+void AddCurrentFolderToHistory( const FileDlgHookBase& fileDlgHook )
 {
-	void OnInitDone();
-	void OnFolderChange();
-    void OnResize();
-	void OnEnable( bool bEnable );
-	void OnShow( bool bShow );
-	void OnActivate( WPARAM wParam, LPARAM lParam );
-	void OnDestroy( bool isOkBtnPressed );
-	void SetTimer( DWORD interval );
-};
+	if( SpITEMIDLIST folder = fileDlgHook.GetFolder() )
+	{
+	    WCHAR folderPath[ MAX_PATH ] = L"";
+		if( ::SHGetPathFromIDList( folder.get(), folderPath ) )
+		{
+			HistoryLst history;
+			history.LoadFromProfile( g_profile, L"GlobalFolderHistory" );
+			history.SetMaxEntries( g_profile.GetInt( L"main", L"MaxGlobalHistoryEntries" ) );
+			history.AddFolder( folderPath );
+			history.SaveToProfile( g_profile, L"GlobalFolderHistory" );
+		}
+	}
+}

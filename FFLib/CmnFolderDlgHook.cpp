@@ -46,12 +46,11 @@ bool CmnFolderDlgHook::Init( HWND hwndFileDlg, HWND hwndTool )
 
 	// Subclass the window proc of the file dialog.
 	m_oldWndProc = reinterpret_cast<WNDPROC>( 
-		::SetWindowLongPtr( hwndFileDlg, GWLP_WNDPROC, 
-		                    reinterpret_cast<LONG_PTR>( HookWindowProc) ) );
+		::SetWindowLongPtr( hwndFileDlg, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>( HookWindowProc) ) );
 	_ASSERTE( m_oldWndProc );
 
-	// Set a window property for debugging purposes (makes identifying "hooked" windows easier).
-	::SetProp( hwndFileDlg, FLASHFOLDER_HOOK_PROPERTY, NULL );
+	// Set a window property for getting hook instance from window proc.
+	::SetProp( hwndFileDlg, FLASHFOLDER_HOOK_PROPERTY, reinterpret_cast<HANDLE>( this ) );
 
 	//--- read settings from INI file ---
 	m_minFileDialogWidth = MapProfileX( hwndTool, g_profile.GetInt( _T("CommonFolderDlg"), _T("MinWidth") ) );
@@ -72,7 +71,7 @@ bool CmnFolderDlgHook::SetFolder( PCIDLIST_ABSOLUTE folder )
 
 //-----------------------------------------------------------------------------------------
 
-SpITEMIDLIST CmnFolderDlgHook::GetFolder()
+SpITEMIDLIST CmnFolderDlgHook::GetFolder() const
 {
 	return m_currentFolder;
 }

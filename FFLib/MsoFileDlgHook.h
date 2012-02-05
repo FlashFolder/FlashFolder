@@ -22,7 +22,7 @@
 	#pragma once
 #endif
 
-#include "filedlg_base.h"
+#include "HookBase.h"
 
 //-----------------------------------------------------------------------------------------
 // class MsoFileDlgHook
@@ -30,7 +30,7 @@
 // Specific code for hooking of MS Office file dialogs.
 //-----------------------------------------------------------------------------------------
 
-class MsoFileDlgHook : public FileDlgHook_base
+class MsoFileDlgHook : public FileDlgHookBase
 {
 public:
 	MsoFileDlgHook( FileDlgSubType subType ) :
@@ -40,10 +40,10 @@ public:
 		m_hKeyboardHook( NULL ) 
 	{}
 
-	// overridings of FileDlgHook_base
+	// overridings of FileDlgHookBase
 	virtual bool Init( HWND hwndFileDlg, HWND hWndTool );
 	virtual bool SetFolder( PCIDLIST_ABSOLUTE folder );
-	virtual SpITEMIDLIST GetFolder();
+	virtual SpITEMIDLIST GetFolder() const;
 	virtual bool SetFilter( LPCTSTR filter );
 	virtual void OnTimer();
 

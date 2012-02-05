@@ -30,6 +30,7 @@
 
 //--- ATL headers
 #include <atlfile.h>
+#include <atlwin.h>
 
 //--- crt headers
 #include <tchar.h>
@@ -61,6 +62,7 @@ using namespace std;
 
 //--- common project files
 #include <common\_autolink.h>
+#include <common\Defines.h>
 #include <common\ff_utils.h>
 #include <common\HistoryLst.h>
 #include <common\ProfileDefaults.h>

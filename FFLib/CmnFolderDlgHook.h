@@ -22,7 +22,7 @@
 	#pragma once
 #endif
 
-#include "filedlg_base.h"
+#include "HookBase.h"
 
 //-----------------------------------------------------------------------------------------
 // class CmnFolderDlgHook
@@ -30,7 +30,7 @@
 // Specific code for hooking of common file dialogs.
 //-----------------------------------------------------------------------------------------
 
-class CmnFolderDlgHook : public FileDlgHook_base
+class CmnFolderDlgHook : public FileDlgHookBase
 {
 public:
 	CmnFolderDlgHook() : 
@@ -39,10 +39,10 @@ public:
 		m_oldParentWndProc( NULL )
 	{}
 
-	// overridings of FileDlgHook_base
+	// overridings of FileDlgHookBase
 	virtual bool Init( HWND hwndFileDlg, HWND hWndTool );
 	virtual bool SetFolder( PCIDLIST_ABSOLUTE folder );
-	virtual SpITEMIDLIST GetFolder();
+	virtual SpITEMIDLIST GetFolder() const;
 	virtual bool SetFilter( LPCTSTR filter );
 
 private:

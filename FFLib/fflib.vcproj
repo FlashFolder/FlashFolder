@@ -558,15 +558,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FileDlg_base.h"
+				RelativePath=".\HookBase.h"
 				>
 			</File>
 			<File
-				RelativePath=".\FolderMenus.cpp"
+				RelativePath=".\HookManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\FolderMenus.h"
+				RelativePath=".\HookManager.h"
 				>
 			</File>
 			<File
@@ -619,6 +619,14 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ToolWnd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ToolWnd.h"
 				>
 			</File>
 			<File

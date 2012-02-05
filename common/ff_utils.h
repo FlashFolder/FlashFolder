@@ -19,7 +19,7 @@
 
 //-----------------------------------------------------------------------------------------------
 
-enum FileDlgMainType { FDT_NONE, FDT_COMMON, FDT_MSOFFICE, FDT_COMMON_OPENWITH, FDT_COMMON_FOLDER };
+enum FileDlgMainType { FDT_NONE, FDT_COMMON, FDT_MSOFFICE, FDT_COMMON_FOLDER };
 enum FileDlgSubType { FDT_SUB_NONE, FDT_MSO2000, FDT_MSO2002, FDT_VS2005 };
 
 struct FileDlgType

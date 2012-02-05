@@ -25,39 +25,16 @@
 #include <windows.h>
 
 //-----------------------------------------------------------------------------------
+// Abstract base class for file dialog hooks.
 
-// callback interface for FileDlgHook_base derivates to forward messages to 
-// the FlashFolder tool window
-
-namespace FileDlgHookCallbacks
-{
-	void OnInitDone();
-	void OnFolderChange();
-    void OnResize();
-	void OnEnable( bool bEnable );
-	void OnShow( bool bShow );
-	void OnActivate( WPARAM wParam, LPARAM lParam );
-	void OnDestroy( bool isOkBtnPressed );
-	void SetTimer( DWORD interval );
-};
-
-//-----------------------------------------------------------------------------------
-
-// abstract base class for manipulation of file dialogs
-
-class FileDlgHook_base
+class FileDlgHookBase
 {
 public:
-	FileDlgHook_base() {}
-	virtual ~FileDlgHook_base() {}
-
+	virtual ~FileDlgHookBase() {}
 	virtual bool Init( HWND hWndFileDlg, HWND hWndTool ) = 0;
-	virtual void Uninstall() {}
-
 	virtual bool SetFolder( PCIDLIST_ABSOLUTE folder ) = 0;
-	virtual SpITEMIDLIST GetFolder() = 0;
+	virtual SpITEMIDLIST GetFolder() const = 0;
 	virtual bool SetFilter( LPCTSTR filter ) = 0;
-
 	virtual void OnTimer() {}
 };
 
